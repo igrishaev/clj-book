@@ -1,0 +1,6 @@
+_minted-main/
+*.aux
+*.log
+*.pdf
+.DS_Store
+trash.tex
