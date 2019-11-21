@@ -1,0 +1,15 @@
+\chapter{ЫВА ыва Ыва ыВА !!}
+
+ываыва sdf \hl{SQL INSERT} ываыва ыва ы ва ыва ыва ываы ваы ва ыва ыаы а
+
+
+\begin{code}
+(deftest test-api-create-user-bad-params
+  (testing "Sending bad parameters"
+    (doseq [[params* description] params-variations]
+      (testing description
+        (let [params (merge params-ok params*)
+              response (api-create-user params)
+              {:keys [status]} response]
+          (is (= 400 status)))))))
+\end{code}

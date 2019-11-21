@@ -1,0 +1,30 @@
+\documentclass[10pt, draft]{book}
+
+\usepackage{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{minted}
+\usepackage[activate={true, nocompatibility}, final, tracking=true,
+  kerning=true, spacing=true, factor=1100, stretch=10, shrink=10]{microtype}
+
+\geometry{a5paper, left=20mm, top=20mm, bottom=30mm}
+\setlength{\parskip}{0.72em}
+\pagestyle{plain}
+
+\input macro
+
+\author{Иван Гришаев}
+\title{Язык Clojure}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\frontmatter
+
+\mainmatter
+\include{chapter1}
+
+\backmatter
+\end{document}
