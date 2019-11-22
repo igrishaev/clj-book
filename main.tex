@@ -1,4 +1,5 @@
-\documentclass[11pt]{book}
+
+\documentclass[10pt, draft]{book}
 
 \usepackage{spverbatim}
 \usepackage{geometry}
@@ -15,8 +16,21 @@
   shrink=10
 ]{microtype}
 
-\geometry{b5paper, left=25mm, right=20mm, top=20mm, bottom=30mm}
-\setlength{\parskip}{0.72em}
+\geometry{
+  paperheight=200mm,
+  paperwidth=140mm,
+  left=20mm,
+  right=15mm,
+  top=15mm,
+  bottom=20mm
+}
+
+%% a5paper
+
+%% \geometry{showframe}
+
+\setlength{\parskip}{0.32em}
+
 %% \pagestyle{plain}
 
 \setcounter{tocdepth}{1}
@@ -32,16 +46,19 @@
 
 \begin{document}
 
-%% \maketitle
-
-\frontmatter
+\maketitle
 
 \tableofcontents
 
-\mainmatter
-\include{ch5-config}
+\frontmatter
+\include{about}
 
-%% \include{chapter1}
+\mainmatter
+\include{ch4-exceptions}
+\include{ch5-config}
+\include{ch7-tests}
 
 \backmatter
+\include{afterword}
+
 \end{document}
