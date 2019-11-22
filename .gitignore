@@ -4,3 +4,4 @@ _minted-main/
 *.pdf
 .DS_Store
 trash.tex
+*.toc

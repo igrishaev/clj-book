@@ -1,15 +1,28 @@
-\documentclass[10pt, draft]{book}
+\documentclass[11pt]{book}
 
+\usepackage{spverbatim}
 \usepackage{geometry}
 \usepackage[utf8]{inputenc}
 \usepackage[russian]{babel}
-\usepackage{minted}
-\usepackage[activate={true, nocompatibility}, final, tracking=true,
-  kerning=true, spacing=true, factor=1100, stretch=10, shrink=10]{microtype}
+\usepackage[
+  activate={true, nocompatibility},
+  final,
+  tracking=true,
+  kerning=true,
+  spacing=true,
+  factor=1100,
+  stretch=10,
+  shrink=10
+]{microtype}
 
-\geometry{a5paper, left=20mm, top=20mm, bottom=30mm}
+\geometry{b5paper, left=25mm, right=20mm, top=20mm, bottom=30mm}
 \setlength{\parskip}{0.72em}
-\pagestyle{plain}
+%% \pagestyle{plain}
+
+\setcounter{tocdepth}{1}
+
+\widowpenalty 10000
+\clubpenalty 10000
 
 \input macro
 
@@ -19,12 +32,16 @@
 
 \begin{document}
 
-\maketitle
+%% \maketitle
 
 \frontmatter
 
+\tableofcontents
+
 \mainmatter
-\include{chapter1}
+\include{ch5-config}
+
+%% \include{chapter1}
 
 \backmatter
 \end{document}
