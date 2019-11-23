@@ -1,23 +1,2 @@
 
-%% https://gist.github.com/rauschma/d76643bab3ab7550b2dcf465e772b389
-%% https://tex.stackexchange.com/questions/299/how-to-get-long-texttt-sections-to-break/799#799
-
-%% \newcommand*\justify{%
-%%   \fontdimen2\font=0.4em% interword space
-%%   \fontdimen3\font=0.2em% interword stretch
-%%   \fontdimen4\font=0.1em% interword shrink
-%%   \fontdimen7\font=0.1em% extra space
-%%   \hyphenchar\font=`\-% allowing hyphenation
-%% }
-
-%% \newcommand{\hl}[1]{\texttt{\justify{#1}}}
-
-%% https://tex.stackexchange.com/questions/400111/file-ended-while-scanning-use-of-fancyverbgetline
-
 \newenvironment{code}{\small\VerbatimEnvironment\begin{minted}[linenos,samepage]{text}}{\end{minted}}
-
-%% \newcommand{\hl}[1]{\mintinline{clojure}{#1}}
-
-%% %% \newenvironment{code}{\begin{verbatim*}}{\end{verbatim*}}
-
-%% \newenvironment{code}{\begin{figure}[h]\begin{verbatim}}{\end{verbatim}\end{figure}}
