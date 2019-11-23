@@ -1,6 +1,7 @@
 
 \documentclass[10pt,draft]{book}
 
+\usepackage{tocloft}
 \usepackage{minted}
 \usepackage{spverbatim}
 \usepackage{geometry}
@@ -27,7 +28,6 @@
 }
 
 %% a5paper
-
 %% \geometry{showframe}
 
 \setlength{\parskip}{0.32em}
@@ -49,18 +49,22 @@
 
 \maketitle
 
+\input{abstract}
+
+\clearpage
 \tableofcontents
+\clearpage
 
 \frontmatter
 \include{about}
 
 \mainmatter
-\include{ch1-web}
-\include{ch2-spec}
-\include{ch3-exceptions}
-\include{ch4-mutability}
-\include{ch5-config}
-\include{ch6-systems}
+%% \include{ch1-web}
+%% \include{ch2-spec}
+%% \include{ch3-exceptions}
+%% \include{ch4-mutability}
+%% \include{ch5-config}
+%% \include{ch6-systems}
 \include{ch7-tests}
 
 \backmatter
