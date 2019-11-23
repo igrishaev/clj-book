@@ -13,7 +13,8 @@
 %% \newcommand{\hl}[1]{\texttt{\justify{#1}}}
 
 %% https://tex.stackexchange.com/questions/400111/file-ended-while-scanning-use-of-fancyverbgetline
-%% \newenvironment{code}{\VerbatimEnvironment\begin{minted}[linenos]{clojure}}{\end{minted}}
+
+\newenvironment{code}{\small\VerbatimEnvironment\begin{minted}[linenos,samepage]{text}}{\end{minted}}
 
 %% \newcommand{\hl}[1]{\mintinline{clojure}{#1}}
 
