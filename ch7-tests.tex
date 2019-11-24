@@ -2534,11 +2534,11 @@ JDBC завершает блок транзакции оператором ROLLB
 
 Вы уже знакомы с макросом \spverb|with-db-transaction|: внутри его тела действует
 транзакционное соединение, которые получают из JDBC-спеки. Напишем свой макрос
-with-db-transaction, который делает то же самое, но дополнительно устанавливает
+with-db-rollback, который делает то же самое, но дополнительно устанавливает
 флаг отката:
 
 \begin{verbatim}
-(defmacro with-db-transaction
+(defmacro with-db-rollback
   [[t-conn & bindings] & body]
   `(jdbc/with-db-transaction [~t-conn ~@bindings]
      (jdbc/db-set-rollback-only! ~t-conn)
