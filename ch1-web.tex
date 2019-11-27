@@ -719,9 +719,10 @@ JSON. Позже мы рассмотрим, как подружить Ring с э
 \end{verbatim}
 
 Видим, что \spverb|match-route*| вернула запрос, но добавила в него поле
-\spverb|:handler|. Перепишем этот код на middleware. Это функция, которая принимает
-обработчик и возвращает его измененную версию. Получив запрос, новый обработчик
-сперва добавит к нему поле \spverb|handler| и передаст в исходный обработчик.
+\spverb|:handler|. Перепишем этот код на middleware. Это функция, которая
+принимает обработчик и возвращает его измененную версию. Получив запрос, новый
+обработчик добавит к нему поле \spverb|handler| и передаст в исходный
+обработчик.
 
 \begin{verbatim}
 (defn wrap-handler [handler]
@@ -731,14 +732,11 @@ JSON. Позже мы рассмотрим, как подружить Ring с э
       (handler request*))))
 \end{verbatim}
 
-Мы еще не касались техники middleware, но вынуждены применить ее сейчкс. Ниже мы
+Мы еще не касались техники middleware, но вынуждены применить ее сейчас. Ниже мы
 рассмотрим в деталях, как они работают и почему так важны.
 
-%% ------------------
-
-Проверим \spverb|wrap-handler| на скорую руку. Будем считать, что обработчик запроса
-это стандартная функция identity. Она всегда возвращает переданный в нее
-аргумент:
+Проверим \spverb|wrap-handler| на скорую руку. Для удобства обернем функцию
+\spverb|identity|. Она возвращает переданный в нее аргумент:
 
 \begin{verbatim}
 ((wrap-handler identity)
@@ -750,20 +748,13 @@ JSON. Позже мы рассмотрим, как подружить Ring с э
  :handler :page-hello}
 \end{verbatim}
 
-Конечный обработчик запроса будет мультиметодом. Его функция-диспатчер просто
+Обработчик запроса будет мультиметодом. Его функция-диспатчер просто
 \spverb|:handler|.
 
 \begin{verbatim}
-(defmulti multi-handler
-  :handler)
+(defmulti multi-handler :handler)
 
 (defmethod multi-handler :page-index
-  [request]
-  {:status 200
-   :headers {:content-type "text/plain"}
-   :body "Learning Web for Clojure"})
-
-(defmethod multi-handler :page-hello
   [request]
   {:status 200
    :headers {:content-type "text/plain"}
@@ -776,19 +767,15 @@ JSON. Позже мы рассмотрим, как подружить Ring с э
    :body "No such a page."})
 \end{verbatim}
 
-Теперь обернем \spverb|multi-handler| в middleware. Это и будет финальное приложение.
+Обернем \spverb|multi-handler| в middleware. Это и будет финальное
+приложение. Запустите веб-сервер и проверьте результат в браузере.
 
 \begin{verbatim}
-(def app
-  (wrap-handler multi-handler))
+(def app (wrap-handler multi-handler))
 \end{verbatim}
 
-Запустите веб-сервер и проверьте результат в браузере.
-
-Это был простой вариант роутинга на Bidi. Рассмотрим пример с заказами:
-просмотр, редактирование и сохранение.
-
-Новое дерево выглядит так:
+Это был простой роутинг на \spverb|Bidi|. Теперь рассмотрим сценарий с товарами,
+их просмотром и изменением. Новое дерево выглядит так:
 
 \begin{verbatim}
 (def routes
@@ -798,29 +785,49 @@ JSON. Позже мы рассмотрим, как подружить Ring с э
                   :post :page-save}}}])
 \end{verbatim}
 
-В этой версии листья уже не теги, а словари. Ключ такого словаря~--- метод
-HTTP-запроса, а значение~--- тег. Запрос "GET /content/order/1/edit" разрешается в
-тег \spverb|:page-form|, а POST с таким же адресом~--- в \spverb|:page-save|. При прохождении
-через wrap-handler запрос получит поле route-params. Для нашего случая это будет
-словарь \spverb|{:id "1"}|.
+В этой версии листья уже не теги, а словари. Ключ каждого словаря~--- метод
+HTTP-запроса, а значение~--- тег. Запрос \spverb|GET /content/order/1/edit|
+разрешается в тег \spverb|:page-form|, а \spverb|POST| с таким же адресом~--- в \spverb|:page-save|.
+На этапе \spverb|wrap-handler| запрос получит поле \spverb|:route-params|.
+В нашем случая это словарь \spverb|{:id "1"}|.
 
-Вот так бы мог выглядеть обработчик \spverb|page-edit|. Получаем словарь заказа по его
-id. Если заказ найден, рисуем HTML страницу с формой редактирования. Если нет,
-отдаем 404 и сообщение об ошибке.
+Набросаем штрихи обработчиков. \spverb|Page-view| находит товар по номеру и
+верстает HTML-страницу с ним. Если товара нет, вернем ответ 404 <<не найдено>>.
 
 \begin{verbatim}
-(defmethod multi-handler :page-edit
+(defmethod multi-handler :page-view
   [request]
-  (let [order-id (get-in request [:route-params :id])
-        order (get-order-by-id order-id)]
-    (if order
-      {:status 200
-       :headers {:content-type "text/html"}
-       :body (render-order-form order)}
-      {:status 404
-       :headers {:content-type "text/html"}
-       :body "<h1>Order not found</h1>"})))
+  (if-let [order (-> request :route-params :id get-order-by-id)]
+    {:status 200
+     :headers {:content-type "text/html"}
+     :body (render-order-page {:order order})}
+    response-404))
 \end{verbatim}
+
+Страница с формой \spverb|:page-form| отличается тем, что вместо
+\spverb|render-order-page| мы бы вызвали \spverb|render-order-form|. Эта
+функция верстает HTML-форму с кнопками. Обновление товара сложнее: нужно выбрать поля из
+запроса и записать их а базу. Для краткости опустим валидацию:
+
+\begin{verbatim}
+(defmethod multi-handler :page-save
+  [request]
+  (let [{:keys [params route-params]} request
+        {order-id :id} route-params
+        fields (select-keys params [:title :description :price])]
+    (jdbc/update! *db* :orders fields ["id = ?" order-id])
+    {:status 302
+     :headers {:Location (format "/content/order/%s/view" order-id)}}))
+\end{verbatim}
+
+Обратите внимание: на изменение данных мы отвечаем не HTML-страницей, а
+\emph{редиректом} на нее. Если браузер получил страницу в результате
+\spverb|POST|-запроса, то при попытке ее обновить браузер снова отправит
+форму. Это чревато спонтанными изменениями на сервере. Вариант с редиректом решает
+эту проблему. Браузер загрузит страницу через \spverb|GET|, и побочных эффектов
+при обновлении не будет.
+
+%% ------------
 
 \subsection{Выбор между Compojure и Bidi}
 
