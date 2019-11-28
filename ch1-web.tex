@@ -1288,39 +1288,41 @@ curl --request POST \
      http://localhost:8080/
 \end{verbatim}
 
-Вариант с \spverb|wrap-json-params| отличается тем, где хранится структура данных. Это
-middleware заносит данные в поле \spverb|:json-params|. В дополнение, если данные были
-словарем, они вливаются в поле \spverb|:params|. Это поле, как мы помним, используются
-другими врапперами, например, \spverb|wrap-params|.
+\subsection{Проблемы слияния}
 
-Таким образом, \spverb|:params| выступает универсальным аккумулятором
-параметров. Продвинутое API может быть устроено так, что клиент вправе
-передавать данные удобным ему способом. Например, GET-запросом с параметрами
-строки, если это данные для чтения. POST с переменными в теле, чтобы изменять
-сущности. Или POST с JSON-телом, если данные с глубокой вложенностью.
+Вариант с \spverb|wrap-json-params| работает с небольшим отличием. Оно пишет
+данные в поле \spverb|:json-params|. Если из JSON пришел словарь, он дополняет
+\spverb|:params|. Объясним, в чем разница.
 
-Вспомним, что params это словарь с ключам-строками. По этой причине
-\spverb|wrap-json-params| сохраняет строки в ключах, чтобы слияние прошло
-правильно. Чтобы исправить ключи \spverb|:params| на кейворды, используйте уже знакомое
-нам \spverb|wrap-keyword-params|. Оно должно быть ниже \spverb|wrap-json-params| по стеку.
+Поле \spverb|:params| это общий аккумулятор параметров. В него пишут данные и
+другие врапперы, например, \spverb|wrap-params|. Иногда нам неважно, откуда
+пришли параметры: из адресной строки, тела или JSON. Внутри обработчика мы
+просто черпаем данные из \spverb|:params|. С точки зрения API это мог быть
+GET-запрос или POST-запрос с телом \spverb|multipart/form-data| или JSON.
 
-Разработчики не случайно выделяют поле \spverb|:json-params|. Тело JSON-документа не
-обязательно словарь, это может быть массив. Такую структуру невозможно влить в
-\spverb|:params|. Документ помещают в \spverb|:json-params|, и если это словарь, объединяют с
-\spverb|:params|.
+В других случаях важно, чтобы параметры не смешивались в один словарь и не
+заменяли друг друга. Чтобы прочесть только те данные, что пришли в JSON-теле,
+обратимся к полю \spverb|:json-params| или \spverb|:body|. Каким враппером
+пользоваться, зависит от конкретного API.
 
-Продемонстрируем сказанное на примере. Передаем данные гибридно: \spverb|username| в
-теле JSON-документа и \spverb|city| в параметрах строки. Обратите внимание на стек
-middleware. Сперва мы парсим параметры строки, затем тело документа. Оба словаря
+Вспомним, что \spverb|:params| это словарь с ключам-строками. Чтобы слияние
+прошло правильно \spverb|wrap-json-params| сохраняет строки в ключах. Исправьте
+ключи уже знакомым нам \spverb|wrap-keyword-params|. Оно должно быть ниже
+\spverb|wrap-json-params| по
+
+Разработчики не случайно выделяют поле \spverb|:json-params|. Тело
+JSON-документа не обязательно словарь; это может быть и массив. Его невозможно
+объединить с \spverb|:params|. На этот случай JSON-данные хранят отдельным
+полем.
+
+Представим, что клиент передает данные гибридно: \spverb|username| в теле
+JSON-документа и \spverb|city| в параметрах строки. Обратите внимание на стек
+middleware. Сперва мы парсим параметры строки, затем тело. Оба словаря
 накапливаются в \spverb|:params|. Затем, уже после их накопления, исправляем тип
 ключей.
 
 \begin{verbatim}
-(require '[ring.middleware.json
-           :refer [wrap-json-params]])
-
-(defn page-params
-  [request]
+(defn page-params [request]
   (let [{:keys [params]} request
         {:keys [username city]} params]
     (create-user username city)
@@ -1328,24 +1330,28 @@ middleware. Сперва мы парсим параметры строки, за
      :body {:code "CREATED"
             :message "User created"}}))
 
-(def app
-  (-> page-params
-      wrap-keyword-params
-      wrap-json-params
-      wrap-params))
+(def app (-> page-params
+             wrap-keyword-params
+             wrap-json-params
+             wrap-params))
 \end{verbatim}
 
-Пример обращения к серверу:
+\noindent
+Пример такого запроса:
 
 \begin{verbatim}
-curl \
-  --header "Content-Type: application/json" \
-  --request POST \
-  --data '{"username":"John"}' \
-  http://localhost:8080/?city=NY
+curl --request POST \
+     --header "Content-Type: application/json" \
+     --data '{"username":"John"}' \
+     http://localhost:8080/?city=NY
 \end{verbatim}
 
-\subsection{Собственные middleware}
+Из-за того, что поля приходят из разных источников, может возникнуть
+путаница. Избегайте случаев, когда в \spverb|:params| валится все подряд. Пример
+выше не призывает строить API именно так. Мы лишь показываем, как работает
+\spverb|Ring|.
+
+\subsection{Свои middleware}
 
 До сих пор мы использовали сторонние врапперы. Это те, что идут в поставке Ring
 и смежных библиотек. Но рано или поздно вам потребуются собственные. Обычно их
