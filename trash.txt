@@ -1,0 +1,51 @@
+
+`\(.+?\)`
+\\hl{\1}
+
+`\(.+?\)`
+\\hl{\1}
+
+\\hl{\(.+?\)}
+\\spverb|\1|
+
+^## \(.+?\)$
+\\section{\1}
+
+^### \(.+?\)$
+\\subsection{\1}
+
+`\(.+?\)`
+\\spverb|\1|
+
+^~~~.+?$
+\\begin{verbatim}
+
+^~~~$
+\\end{verbatim}
+
+\*\*\(.+?\)\*\*
+\\emph{\1}
+
+ --
+~---
+
+ —
+~---
+
+quotes
+ident
+
+\rule{\textwidth}{.5pt}
+
+
+елечки
+spec -- summary
+spec -- s/tuple
+spec -- угловые кавычки
+
+
+web more chapter tags
+
+
+{code}
+{verbatim}
