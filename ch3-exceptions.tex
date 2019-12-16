@@ -813,18 +813,13 @@ INFO: A message from my module
 2019-05-03 17:36:04,001 INFO  book.exceptions - Hello Logback!
 \end{verbatim}
 
-Макросы \spverb|log/info|, \spverb|log/error| и другие допускают, что первым аргументом может
-быть не текст, а пойманное исключение. В этом случае бекенд запишет исключение в
-лог. Выше мы объявили переменную \spverb|e| для экспериментов. Воспользуемся ей:
+Макросы \spverb|log/info|, \spverb|log/error| и другие допускают, что первым
+аргументом может быть не текст, а исключение. В этом случае бекенд запишет его в
+лог. Выше мы объявили переменную \spverb|e| для экспериментов. Запишем ее в лог:
 
 \begin{verbatim}
 (log/error e "Error while processing the request")
-\end{verbatim}
-
-Сокращенный результат:
-
-\begin{verbatim}
-2019-05-03 17:41:03,913 ERROR book.exceptions - Error while processing the request
+<date> ERROR book.exceptions - Error while processing the request
 clojure.lang.ExceptionInfo: Get user info error
 	at java.lang.Thread.run(Thread.java:745)
 Caused by: clojure.lang.ExceptionInfo: Auth error
@@ -834,12 +829,12 @@ Caused by: clojure.lang.ExceptionInfo: HTTP error
 	at clojure.lang.Compiler$InvokeExpr.eval(Compiler.java:3701)
 	... 31 common frames omitted
 \end{verbatim}
-
-Для экономии места мы удалили строки трейса, так как они не несут пользы. Из
-примера видно, что цепочка исключений состоит из трех звеньев. Это совпадает с
-определением переменной \spverb|e|. Проблема в том, что у каждого звена пропали его
-данные. Logback практикует Java-подход в работе с исключениями. В мире Java
-принято искать ошибку по стек-трейсу, а не данным.
+%% ----------
+Для экономии мы удалили часть трейса, так как он не несет пользы. Из примера
+видно, что цепочка состоит из трех звеньев. Это совпадает с тем, как мы задализ
+\spverb|e|. Проблема в том, что у каждого звена пропали его данные. Logback
+практикует Java-подход в работе с исключениями. В мире Java принято искать
+ошибку по стек-трейсу, а не данным.
 
 Logback предлагает несколько модификаций для вывода исключений. Они влияют на
 длину и детализацию трейса, но игнорируют данные. Аналогично ведут себя Log4j и
