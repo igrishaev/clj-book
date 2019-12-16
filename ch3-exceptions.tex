@@ -652,11 +652,9 @@ Divide by zero
 словарь. Это удобно для редакторов и IDE, потому что словарь легко разобрать на
 части. Например, показать только ту часть стек-трейса, что касается Clojure.
 
-Нижнее исключение в цепочке иногда наывают корнем, root. Для нашего удобства
-\spverb|println| дублирует корень в начале вывода. Так мы сразу увидим
-первопричину. Вот что выведет выражение \spverb|(println e)|:
-
-%% --------------
+Последнее исключение в цепочке иногда наывают корнем, \emph{root}. Для нашего
+удобства \spverb|println| дублирует корень в начале вывода. Так сразу видно
+первопричину. Вот что выведет \spverb|(println e)|:
 
 \begin{verbatim}
 #error {
@@ -665,68 +663,52 @@ Divide by zero
  :via
  [{:type clojure.lang.ExceptionInfo
    :message Get user info error
-   :data {:user-id 42}
-   :at [clojure.lang.AFn applyToHelper AFn.java 160]}
+   :data {:user-id 42}}
   {:type clojure.lang.ExceptionInfo
    :message Auth error
-   :data {:api-key .........}
-   :at [clojure.lang.AFn applyToHelper AFn.java 160]}
+   :data {:api-key .........}}
   {:type clojure.lang.ExceptionInfo
    :message HTTP error
-   :data {:method POST, :url http://api.site.com}
-   :at [clojure.lang.AFn applyToHelper AFn.java 156]}]
+   :data {:method POST, :url http://api.site.com}}]
  :trace
  [[clojure.lang.AFn applyToHelper AFn.java 156]
   [clojure.lang.AFn applyTo AFn.java 144]
   [clojure.lang.Compiler$InvokeExpr eval Compiler.java 3701]
-  [clojure.lang.Compiler$DefExpr eval Compiler.java 457]
-  [clojure.lang.Compiler eval Compiler.java 7181]
   ..........]}
 \end{verbatim}
 
-Многоточия на конце скрывают часть стек-трейса. Это Java-методы, через которые
-прошло исключение с момента выброса до перехвата. Каждый элемент трейса это
-вектор с именем класса, метода, файла и номера строки.
+Вектор \spverb|:trace| называют стек-трейсом. Это Java-методы, по которым прошло
+исключение с выброса до перехвата. Каждый элемент трейса это вектор с именем
+класса, метода, файла и номера строки.
 
-Выше мы сократили трейс, чтобы не тратить на него полезное пространство. В
-реальности трейсы очень длинные и порой достигают нескольких экранов. Это
-справедливый упрек в адрес Clojure. Действительно, трейсы несут скудную
-информацию и зашумляют вывод.
+Мы сократили трейс, чтобы не тратить на него слишком много места. В реальности
+трейсы занимают несколько экранов. Они показывают Java-код, который получился из
+Clojure, и это сбивает с толку. Шумные трейсы~--- справедливый упрек в адрес
+Clojure. С другой стороны, это этим страдают многие JVM-языки.
 
-Цепочки исключений с контекстом несут больше пользы, чем стек-трейс. Фактически,
-цепочка~--- это альтернативный трейс, построенный на данных. Различие в том, что
-он компактней и в целом больше ориентирован на человека, чем машинный список
-методов.
-
-Пакет \spverb|clojure.stacktrace| предлагает несколько функций для печати
-исключений. Так, \spverb|print-throwable| печатает класса и данные исключения без
-трейса и цепочки причин.
+В пакете \spverb|clojure.stacktrace| несколько функций для печати
+исключений. Так, \spverb|print-throwable| выводит только сообщение, текст
+и словарь данных:
 
 \begin{verbatim}
 (clojure.stacktrace/print-throwable e)
-\end{verbatim}
-
-Результат:
-
-\begin{verbatim}
 clojure.lang.ExceptionInfo: Get user info error
 {:user-id 42}
 \end{verbatim}
 
-Вывод на печать легко захватить в строку макросом \spverb|with-out-str|. Форма ниже
-ничего не напечатает, но вернет строку:
+Вывод в консоль легко захватить макросом \spverb|with-out-str|. Форма ниже
+ничего не печатает, но вернет строку:
 
 \begin{verbatim}
 (with-out-str
   (clojure.stacktrace/print-stack-trace e))
 \end{verbatim}
 
-Отдельные функции \spverb|print-stack-trace| и \spverb|print-cause-trace| печатают трейсы
-исключений. Вывод каждой из них можно ограничить параметром \spverb|n|, максимальной
-глубиной трейса.
+Функции \spverb|print-stack-trace| и \spverb|print-cause-trace| печатают трейс с
+небольшими отличиями. Параметр \spverb|n| задает максимальную глубину трейса.
 
 \section{Логирование}
-
+%% ----------------
 Печать исключений считается слабой практикой. Это частный случай, когда мы хотим
 зафиксировать ошибку для дальнейшего разбора. Печать в стандартный поток не
 подходит для этого по многим причинам.
