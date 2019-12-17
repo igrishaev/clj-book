@@ -747,7 +747,7 @@ clojure.lang.ExceptionInfo: Get user info error
 (log/info "A message from my module")
 \end{verbatim}
 
-В REPL-сессии появится строка:
+В REPL появится строка:
 
 \begin{verbatim}
 INFO: A message from my module
@@ -772,19 +772,22 @@ INFO: A message from my module
 \spverb|java.util.logging|. Вызов \spverb|log/info| сводится к вызову классов
 найденной библиотеки.
 
-Чтобы нужный бекенд <<подхватился>>, добавте его в зависимости. Многие
+Чтобы нужный бекенд <<подхватился>>, добавьте его в зависимости. Многие
 библиотеки ищут конфигурацию в стандартных местах. Например, если в папку
 \spverb|resources| положить XML-файл для бекенда, он прочтет его при старте.
 
 Из бекендов популярностью пользуется проект \spverb|Logback|. От аналогов его
 отличает большой выбор т.н. аппендеров (анг. \emph{appenders}). Так называют
 пункт назначения, куда писать сообщения. Это может быть файл, удаленный
-\spverb|syslog|, почтовый сервер. Подключите \spverb|Logback| к проекту:
+\spverb|syslog|, почтовый сервер.
+
+Подключите \spverb|Logback| к проекту:
 
 \begin{verbatim}
 [ch.qos.logback/logback-classic "1.2.3"]
 \end{verbatim}
 
+\noindent
 В папку \spverb|resources| положите файл \spverb|logback.xml| следующего содержания:
 
 \begin{verbatim}
@@ -819,17 +822,19 @@ INFO: A message from my module
 
 \begin{verbatim}
 (log/error e "Error while processing the request")
-<date> ERROR book.exceptions - Error while processing the request
+2019-05-03 17:41:03,913 ERROR book.exceptions - Error while processing the request
 clojure.lang.ExceptionInfo: Get user info error
-	at java.lang.Thread.run(Thread.java:745)
+    at java.lang.Thread.run(Thread.java:745)
 Caused by: clojure.lang.ExceptionInfo: Auth error
-	at clojure.lang.Compiler$InvokeExpr.eval(Compiler.java:3701)
-	... 30 common frames omitted
+    at clojure.lang.Compiler$InvokeExpr.eval(Compiler.java:3701)
+    ... 30 common frames omitted
 Caused by: clojure.lang.ExceptionInfo: HTTP error
-	at clojure.lang.Compiler$InvokeExpr.eval(Compiler.java:3701)
-	... 31 common frames omitted
-\end{verbatim}
+    at clojure.lang.Compiler$InvokeExpr.eval(Compiler.java:3701)
+    ... 31 common frames omitted
+\end{verbatim} 
+
 %% ----------
+
 Для экономии мы удалили часть трейса, так как он не несет пользы. Из примера
 видно, что цепочка состоит из трех звеньев. Это совпадает с тем, как мы задализ
 \spverb|e|. Проблема в том, что у каждого звена пропали его данные. Logback
@@ -977,8 +982,9 @@ POST. В теле передают JSON-документ с различными
 
 Как правило, приложение не формирует эти данные вручную, а пользуется готовыми
 библиотеками. Часто они называются Raven или похожим образом. Имеется в виду,
-%% сторожевой ворон (анг. raven) несет вести дозорному (анг. sentry). TODO
+%% сторожевой ворон (анг. raven) несет вести дозорному (анг. sentry).
 
+%% TODO
 %% [sentry-clj]: https://github.com/getsentry/sentry-clj TODO
 %% [raven]: https://github.com/exoscale/raven TODO
 
