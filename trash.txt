@@ -80,4 +80,5 @@ less Рассмотрим
 
 https://clojure.org/guides/spec#_specing_functions
 
-table of code
+table of code (3 columns)
+1st chapter headings
