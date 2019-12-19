@@ -1965,7 +1965,7 @@ Spec
 
 В Clojure принято снабжать библиотеки спеками, чтобы помочь другим. Если
 библиотека активно работает какой-то структурой данных, полезно описать ее
-спекой. Хорошим примером служит \spverb|clojure.jdbc|\footnote{github.com/clojure/java.jdbc}.
+спекой. Хорошим примером служит \spverb|clojure.jdbc|\footurl{https://github.com/clojure/java.jdbc}.
 Это библиотека для реляционных баз данных. JDBC-подключение задают словарем с ключами
 \spverb|:host|, \spverb|:port|, \spverb|:user| и так далее.
 
@@ -2018,7 +2018,7 @@ Spec входит в поставку Clojure и меняется не так ч
 прочих заслуживают внимания два проекта: \spverb|expound| и
 \spverb|spec.tools|. В этом разделе мы опишем возможности каждого.
 
-Библиотека \spverb|expound|\footnote{github.com/bhb/expound} улучшает сообщения
+Библиотека \spverb|expound|\footurl{https://github.com/bhb/expound} улучшает сообщения
 об ошибках, делает их понятней для человека. Сигнатура функции \spverb|expound|
 аналогична \spverb|s/explain|. Она тоже принимает спеку и данные. Сообщение об
 ошибке выглядит так:
@@ -2040,7 +2040,7 @@ Detected 1 error
 конфигурацию обновляют часто, поэтому внятный отчет о проблемах важен.
 
 Разработчики из Metosin собрали улучшения к clojure.spec в проекте
-\spverb|spec.tools|\footnote{github.com/metosin/spec-tools}. В сердце этой
+\spverb|spec.tools|\footurl{https://github.com/metosin/spec-tools}. В сердце этой
 библиотеки особый объект \spverb|Spec|. Он оборачивает стандартную спеку и дополняет ее
 различными методами. С помощью \spverb|spec.tools| формируют JSON-схему или
 описывают REST-проект по стандарту Swagger. Библиотека полезна как промежуточный
@@ -2055,14 +2055,14 @@ Detected 1 error
 <<alpha>> в названии. Авторы все еще экспериментируют со спекой, ищут лучшие
 способы валидации. Это смущает некоторых разработчиков. Опасаясь, что по
 окончании эксперимента от spec избавятся, они берут альтернативы:
-\spverb|schema|\footnote{github.com/plumatic/schema},
-\spverb|bouncer|\footnote{github.com/leonardoborges/bouncer} и другие.
+\spverb|schema|\footurl{https://github.com/plumatic/schema},
+\spverb|bouncer|\footurl{https://github.com/leonardoborges/bouncer} и другие.
 
 Отдельные группы пишут обертки над спекой, чтобы расширить ее
 возможности. Например, подружить ее с JSON-схемами и популярными инструментами
 вроде Swagger. Это путь \spverb|spec.tools|, который мы только что рассмотрели.
 
-В докладе <<Maybe Not>>\footnote{youtube.com/watch?v=YR5WdGrpoug} Рич Хикки
+В докладе <<Maybe Not>>\footurl{https://youtube.com/watch?v=YR5WdGrpoug} Рич Хикки
 анонсировал вторую версию спеки. В ней упростят работу со словарями (эту
 возможность назвали \emph{select}) и множественными типами (когда значением
 может быть и строка, и число). Разработка идет в открытом режиме, но еще рано
