@@ -82,3 +82,15 @@ https://clojure.org/guides/spec#_specing_functions
 
 table of code (3 columns)
 1st chapter headings
+
+(defn install-better-logging []
+  (alter-var-root
+   (var clojure.tools.logging/log*)
+   (fn [log*] ;; origin log function
+     (fn [logger level throwable message]
+       (if throwable
+         (log* logger level nil
+               (str message \newline
+                    (with-out-str
+                      (ex-print throwable))))
+         (log* logger level throwable message))))))
