@@ -94,3 +94,5 @@ table of code (3 columns)
                     (with-out-str
                       (ex-print throwable))))
          (log* logger level throwable message))))))
+
+Reflection warning,  - reference to field toString can't be resolved.
