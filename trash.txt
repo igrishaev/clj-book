@@ -96,3 +96,5 @@ table of code (3 columns)
          (log* logger level throwable message))))))
 
 Reflection warning,  - reference to field toString can't be resolved.
+
+\begin{figure}[!ht]
