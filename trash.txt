@@ -121,3 +121,19 @@ services:
 %% администратора для каждого сервиса есть форма с переменными среды, которые
 %% процесс получит при старте. Если приложение читает конфигурацию из среды,
 %% достаточно поменять значение прямо в форме и перезагрузить сервис.
+
+
+(defn wrap-headers-kw
+[handler]
+(fn [req]
+(-> req
+(update :headers keywordize-keys)
+handler
+(update :headers stringify-keys)))) ;; <-
+
+
+https://grishaev.me/clj-book-web-1/#comment-4519528307
+
+table for code
+syntax highlight
+use minted
