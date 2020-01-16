@@ -1383,12 +1383,9 @@ COMMIT
 
 Запросы \spverb|select| и \spverb|update| действительно сработали в транзакции.
 
-%% -------------
-
 \subsection{Воркер}
 
-Напишем компонент воркера. Для этого объявим новый модуль и подключим
-зависимости:
+Напишем компонент воркера. Объявим модуль и подключим зависимости:
 
 \begin{verbatim}
 (ns book.systems.comp.worker
@@ -1399,9 +1396,12 @@ COMMIT
    [clojure.tools.logging :as log]))
 \end{verbatim}
 
-Воркер это запись, которая реализует два протокола: \spverb|Lifecycle| и
-\spverb|IWorker|. Протокол \spverb|Lifecycle| уже знаком читателю: это функции \spverb|start| и
-\spverb|stop|. Они опираются на методы \spverb|IWorker|, который выглядит так:
+Воркер это запись с двумя протоколами: \spverb|Lifecycle| и
+\spverb|IWorker|. Протокол \spverb|Lifecycle| уже знаком читателю: это функции
+\spverb|start| и \spverb|stop|. В \spverb|IWorker| поместим бизнес-логику. Это
+задача и ее подготовка. Ожидаем, что \spverb|task-fn| это функция, которую
+воркер вызывает на каждом шаге цикла. Метод \spverb|make-task| оборачивает ее в
+цикл и \spverb|try/catch|.
 
 \begin{verbatim}
 (defprotocol IWorker
@@ -1409,16 +1409,15 @@ COMMIT
   (task-fn [this]))
 \end{verbatim}
 
-Мы ожидаем, что \spverb|task-fn| это функция, которую воркер вызывает на каждом шаге
-цикла. Метод \spverb|make-task| оборачивает ее в цикл и \spverb|try/catch|.
+Запись хранит четыре слота: входные опции, флаг продолжения, футура с циклом и
+база данных. Последний слот это зависимость, экземпляр \spverb|DB|, который мы
+только что рассмотрели. Реализуем \spverb|Lifecycle|:
 
-Запись хранит четыре слота: входные опции, флаг продолжения цикла, футура с
-циклом и база данных. Это зависимый компонент, который мы описали на предыдущем
-шаге. Для начала реализуем \spverb|Lifecycle|:
+%% ----------
 
 \begin{verbatim}
 (defrecord Worker
-    [options flag task db]
+  [options flag task db]
 
   component/Lifecycle
 
