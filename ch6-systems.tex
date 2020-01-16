@@ -1410,17 +1410,15 @@ COMMIT
 \end{verbatim}
 
 Запись хранит четыре слота: входные опции, флаг продолжения, футура с циклом и
-база данных. Последний слот это зависимость, экземпляр \spverb|DB|, который мы
-только что рассмотрели. Реализуем \spverb|Lifecycle|:
+база данных. Последний слот~--- зависимость компонента. Это экземпляр
+\spverb|DB|, который мы только что рассмотрели. Реализуем \spverb|Lifecycle|:
 
-%% ----------
+%% TODO note
 
 \begin{verbatim}
 (defrecord Worker
   [options flag task db]
-
   component/Lifecycle
-
   (start [this]
     (let [flag (atom true)
           this (assoc this :flag flag) ;; note
@@ -1432,47 +1430,37 @@ COMMIT
     (while (not (realized? task))
       (log/info "Waiting for the task to complete")
       (Thread/sleep 300))
-    (assoc this :flag nil :task nil))
-
-  ;; to be continued
-  )
+    (assoc this :flag nil :task nil)))
 \end{verbatim}
 
-Отдельно прокомментируем строку с меткой \spverb|;; note|. Мы заменяем \spverb|this| на его же
-версию с флагом состояния. Это нужно для того, чтобы \spverb|make-task| смог прочитать
-флаг из переданного \spverb|this|. Если строку убрать, \spverb|make-task| получит запись с
-флагом nil, что приведет к ошибке.
+Обратите внимание на строку с меткой. Мы дополняем \spverb|this| флагом %% TODO
+состояния. Метод \spverb|make-task| ожидает \spverb|this| с заполненным слотом
+\spverb|flag|. Если строку убрать, \spverb|make-task| получит запись с пустым
+слотом.
 
-Опишем протокол \spverb|IWorker|. Код \spverb|make-task| и \spverb|task-fn| уже знаком читателю из
-прошлого раздела про Mount. Разница в том, что теперь мы работаем не с
-функциями, а методами. Поскольку метод имеет прямой доступ к слотам, нет смысла
-передавать \spverb|db|, \spverb|flag| и другие параметры, как мы делали это с
-функциями. Каждый метод принимает только \spverb|this|.
+Опишем протокол \spverb|IWorker|. Код \spverb|make-task| и \spverb|task-fn| уже
+знаком читателю из раздела про \spverb|mount|. Разница в том, что теперь мы
+работаем не с функциями, а методами. Метод имеет прямой доступ к слотам, поэтому
+нет смысла передавать параметры. Ниже мы перенесли код \spverb|make-task| и
+\spverb|task-fn| в компонент. Для краткости опустим формы \spverb|try/catch| и
+поиск геоданных.
 
 \begin{verbatim}
 (defrecord Worker
-  ;; skipped
+  ;; component/Lifecycle skipped
   IWorker
 
   (make-task [this]
     (future
-      (while @flag
-        (try (task-fn this)
-             (catch Throwable e
-               (log/error e))
-             (finally
-               (Thread/sleep (:sleep options)))))))
+      (while @flag ;; try/catch skipped
+        (task-fn this))))
 
   (task-fn [this]
     (db/with-db-transaction [tx db]
-      (when-let [request (first (db/query tx query))]
-        (let [{:keys [id ip]} request
-              info (get-ip-info ip)
-              fields {:is_processed true
-                      :zip (:postal_code info)
-                      :lat (:lat info)
-                      :lon (:lng info)}]
-          (db/update! tx :requests fields ["id = ?" id]))))))
+      (when-let [[request] (db/query tx query)]
+        (let [fields ...] ;; fields
+          (db/update! tx :requests
+                      fields ["id = ?" id]))))))
 \end{verbatim}
 
 Добавим конструктор, и компонент готов:
@@ -1482,6 +1470,8 @@ COMMIT
   [options]
   (map->Worker {:options options}))
 \end{verbatim}
+
+%% -------------
 
 \subsection{Ручные зависимости}
 
