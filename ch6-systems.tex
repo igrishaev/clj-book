@@ -1351,24 +1351,27 @@ clojure.lang.PersistentArrayMap
          ~@body))))
 \end{verbatim}
 
-%% ----------------
-
 Читатель заметит, что в макросе мы нарушили принцип закрытости компонента. Мы
-вручную читаем и заменяем его приватный слот. В случае с макросом это
-нормально. Подобно компоненту, макрос изолирует низкоуровневые действия, поэтому
-сторонний потребитель не заметит манипуляций со слотами.
+вручную читаем и заменяем его приватный слот. Подумайте, как улучшить этот
+код. Подсказка: чтение спеки можно вынести в метод \spverb|get-spec|. Добавьте
+второй конструктор, который вернет компонент по спеке. Замените \spverb|assoc|
+на вызов нового конструктора с \spverb|t-conn#|.
 
-Пример работы макроса:
+Макрос в действии:
 
 \begin{verbatim}
 (with-db-transaction
   [db-tx db-started]
-  (let [requests (query db-tx "select * from requests limit 1 for update")]
-    (when-let [request (first requests)]
-      (update! db-tx :requests {:is_processed false} ["id = ?" (:id request)]))))
+  (let [query "select * from requests limit 1 for update"
+        [request] (query db-tx query)
+        {:keys [id]} request]
+    (when request
+      (update! db-tx :requests
+               {:is_processed false}
+               ["id = ?" id]))))
 \end{verbatim}
 
-В логах PostgreSQL мы увидим следующие записи:
+В логах PostgreSQL увидим записи:
 
 \begin{verbatim}
 BEGIN
@@ -1378,7 +1381,9 @@ DETAIL:  parameters: $1 = 'f', $2 = '3'
 COMMIT
 \end{verbatim}
 
-Выражения \spverb|select| и \spverb|update| действительно выполнены в транзакции.
+Запросы \spverb|select| и \spverb|update| действительно сработали в транзакции.
+
+%% -------------
 
 \subsection{Воркер}
 
