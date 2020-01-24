@@ -146,3 +146,11 @@ https://grishaev.me/clj-book-web-1/#comment-4519528307
 table for code
 syntax highlight
 use minted
+
+
+\begin{verbatim}
+Fail in test-square-roots
+One root ;; message from the testing macro
+expected: nil
+  actual: -3
+\end{verbatim}
