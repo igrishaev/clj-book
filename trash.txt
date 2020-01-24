@@ -154,3 +154,25 @@ One root ;; message from the testing macro
 expected: nil
   actual: -3
 \end{verbatim}
+
+
+:once 1 starts
+ :once 2 starts
+  :each 3 starts   +
+   :each 4 starts  | test1
+   :each 4 ends    |
+  :each 3 ends     +
+  :each 3 starts   +
+   :each 4 starts  | test2
+   :each 4 ends    |
+  :each 3 ends     +
+  :each 3 starts   +
+   :each 4 starts  | test3
+   :each 4 ends    |
+  :each 3 ends     +
+  :each 3 starts   +
+   :each 4 starts  | test4
+   :each 4 ends    |
+  :each 3 ends     +
+ :once 2 ends
+:once 1 ends
