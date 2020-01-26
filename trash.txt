@@ -176,3 +176,12 @@ expected: nil
   :each 3 ends     +
  :once 2 ends
 :once 1 ends
+
+
+%% \usepackage{qrcode}
+
+%% \marginpar{\qrcode[height=1cm]{https://test}}
+
+%% \begin{wrapfigure}{r}{0.5\textwidth}
+%%     \qrcode[height=1cm]{https://github.com/exoscale/obwald}
+%% \end{wrapfigure}
