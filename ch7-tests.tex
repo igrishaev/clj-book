@@ -2763,8 +2763,7 @@ JSON-тело. Такой запрос составляют из двух фун
          {:name "Site2" :date-updated "2019-11-10" :id 99}]}
 \end{verbatim}
 
-Упростим ответ: для каждого кафе отбросим дату и номер. Напишем функцию, которая
-очищает тело от лишних полей.
+Напишем функцию, которая очищает тело от лишних полей.
 
 \begin{verbatim}
 (defn fix-sites [body]
@@ -2790,7 +2789,7 @@ JSON-тело. Такой запрос составляют из двух фун
 \begin{verbatim}
 (let [;; obtain the response
       body (-> response :body (json/parse-string true))]
-  (is (s/valid? :api.search/handler body)))
+  (is (s/valid? :api.search/result body)))
 \end{verbatim}
 
 Затраты на спеку окупаются в будущем. Ей проверяют входные параметры, генерируют
