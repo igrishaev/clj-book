@@ -204,3 +204,6 @@ https://tex.stackexchange.com/questions/97384/why-does-the-marginpar-not-appear-
 
   marginparwidth=10mm,     % + <- Width of your marginpar
   marginparsep=1mm,        % + <- Gap between text block and marginpar
+
+
+https://github.com/lofic/pygments-style-lofic
