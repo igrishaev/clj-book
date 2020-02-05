@@ -206,4 +206,12 @@ https://tex.stackexchange.com/questions/97384/why-does-the-marginpar-not-appear-
   marginparsep=1mm,        % + <- Gap between text block and marginpar
 
 
+https://www.overleaf.com/learn/latex/Code_Highlighting_with_minted#Reference_guide
 https://github.com/lofic/pygments-style-lofic
+https://help.farbox.com/pygments.html
+https://github.com/gpoore/minted/issues/176
+https://quantixed.org/2018/10/23/new-lexicon-how-to-add-a-custom-minted-lexer-in-overleaf/
+https://github.com/pygments/pygments/blob/48e55050f8bec34d57a1a86e06e779c6288b8341/pygments/lexers/jvm.py
+
+\usepackage{minted}
+\usemintedstyle{bw}
