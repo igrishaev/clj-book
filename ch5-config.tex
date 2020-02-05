@@ -1337,23 +1337,40 @@ JSON выгодно отличается от многословного XML, к
 
 Сравните данные в YAML и JSON:
 
-%% TODO table
+\noindent
+\begin{tabular}{ p{5cm} p{5cm} }
 
 \begin{verbatim}
-                              {
-server_port: 8080                  "server_port": 8080,
-db:                                "db": {
-  dbtype:   mysql                      "dbtype":   "mysql",
-  dbname:   book                       "dbname":   "book",
-  user:     user                       "user":     "ivan",
-  password: '****'                     "password": "****"
-event:                             },
-  - 2019-07-05T12:00:00            "event": [
-  - 2019-07-12T23:59:59                "2019-07-05T12:00:00",
-                                       "2019-07-12T23:59:59"
-                                   ]
-                               }
+server_port: 8080
+db:
+  dbtype:   mysql
+  dbname:   book
+  user:     user
+  password: '****'
+event:
+  - 2019-07-05T12:00:00
+  - 2019-07-12T23:59:59
 \end{verbatim}
+
+&
+
+\begin{verbatim}
+{
+    "server_port": 8080,
+    "db": {
+        "dbtype":   "mysql",
+        "dbname":   "book",
+        "user":     "ivan",
+        "password": "****"
+    },
+    "event": [
+        "2019-07-05T12:00:00",
+        "2019-07-12T23:59:59"
+    ]
+}
+\end{verbatim}
+
+\end{tabular}
 
 Стандарт JSON не поддерживает теги, о которых мы говорили выше.
 

@@ -215,3 +215,17 @@ https://github.com/pygments/pygments/blob/48e55050f8bec34d57a1a86e06e779c6288b83
 
 \usepackage{minted}
 \usemintedstyle{bw}
+
+
+\noindent
+\begin{tabular}{ p{5cm} p{5cm} }
+
+\begin{verbatim}
+\end{verbatim}
+
+&
+
+\begin{verbatim}
+\end{verbatim}
+
+\end{tabular}

@@ -1642,16 +1642,37 @@ Clojure. Компилятор заменяет вызов макроса на т
 принимает опциональные: строку документации, пре- и пост-проверки. У функции
 может быть несколько тел:
 
-%% TODO table
+\noindent
+\begin{tabular}{ p{2cm} p{4cm} p{3cm} }
 
 \begin{verbatim}
-(defn my-inc   (defn my-inc               (defn my-inc
-  [x]            "Increase the number."     ([x]
-  (+ x 1))       [x]                         (my-inc x 1))
-                 {:pre [(int? x)]           ([x delta]
-                  :post [(int? %)]}          (+ x delta)))
-                 (+ x 1))
+(defn my-inc
+  [x]
+  (+ x 1))
 \end{verbatim}
+
+&
+
+\begin{verbatim}
+(defn my-inc
+  "Increase the number."
+  [x]
+  {:pre [(int? x)]
+   :post [(int? %)]}
+  (+ x 1))
+\end{verbatim}
+
+&
+
+\begin{verbatim}
+(defn my-inc
+  ([x]
+   (my-inc x 1))
+  ([x delta]
+   (+ x delta)))
+\end{verbatim}
+
+\end{tabular}
 
 Это одна и та же функция, записанная по-разному. Очевидно, разобрать все
 варианты вручную будет трудно. До версии Clojure 1.10 каждый макрос парсил код
