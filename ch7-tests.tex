@@ -979,10 +979,22 @@ Emacs предлагает навигацию по коду командой \sp
 а действительное~--- выражение, поэтому хочется записать их как слева.
 Увы, придется побороть себя и писать как справа:
 
+\noindent
+\begin{tabular}{ p{5cm} p{5cm} }
+
 \begin{verbatim}
-;; wrong                     ;; correct
-(= (int (->fahr 20)) 68)     (= 68 (int (->fahr 20)))
+;; wrong
+(= (int (->fahr 20)) 68)
 \end{verbatim}
+
+&
+
+\begin{verbatim}
+;; correct
+(= 68 (int (->fahr 20)))
+\end{verbatim}
+
+\end{tabular}
 
 Правило уходит корнями в прошлое. Первый фреймворк \spverb|JUnit| утвердил
 именно такой порядок в методах сравнения. Хорошо это или плохо, судить уже
@@ -998,18 +1010,34 @@ CIDER. Один и тот же тест проверяет статус отве
 путаницу. Согласно ему, нормальным считается статус 404, а не 200. Вариант
 справа выводит статусы правильно.
 
-%% TODO table
+\noindent
+\begin{tabular}{ p{5cm} p{5cm} }
 
 \begin{verbatim}
-;; wrong                ;; correct
-(is (= status 200))     (is (= 200 status))
+;; wrong
+(is (= status 200))
 
-Fail in test-...        Fail in test-...
-expected: 404           expected: 200
-  actual: 200             actual: 404
-    diff: - 404             diff: - 200
-          + 200                   + 404
+Fail in test-...
+expected: 404
+  actual: 200
+    diff: - 404
+          + 200
 \end{verbatim}
+
+&
+
+\begin{verbatim}
+;; correct
+(is (= 200 status))
+
+Fail in test-...
+expected: 200
+  actual: 404
+    diff: - 200
+          + 404
+\end{verbatim}
+
+\end{tabular}
 
 \section{Фикстуры}
 
