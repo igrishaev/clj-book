@@ -237,3 +237,14 @@ https://github.com/pygments/pygments/blob/48e55050f8bec34d57a1a86e06e779c6288b83
 \spverb|Component| Component
 \spverb|mount| Mount
 \spverb|Mount| Mount
+
+
+:headers
+
+
+- keyword headers (stringify)
+- qr codes
+- code highlight
+- set margins
+- remove unused packages
+- add Antony
