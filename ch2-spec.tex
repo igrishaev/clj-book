@@ -277,11 +277,9 @@ Execution error (NullPointerException) at java.util.regex.Matcher...
 ;; false
 \end{verbatim}
 
-%% TODO: ref
-
 Макрос \spverb|s/map-of| проверяет ключи и значения словаря. Вспомним поле
-запроса \spverb|:params| из главы про веб-разработку. Его ключи кейворды, а
-значения строки. На языке спеки это выглядит так:
+запроса \spverb|:params| \page{ring-params} из главы про веб-разработку. Его
+ключи кейворды, а значения строки. На языке спеки это выглядит так:
 
 \begin{verbatim}
 (s/def ::params
