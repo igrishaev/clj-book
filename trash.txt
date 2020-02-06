@@ -229,3 +229,11 @@ https://github.com/pygments/pygments/blob/48e55050f8bec34d57a1a86e06e779c6288b83
 \end{verbatim}
 
 \end{tabular}
+
+
+\spverb|integrant| Integrant
+\spverb|Integrant| Integrant
+\spverb|component| Component
+\spverb|Component| Component
+\spverb|mount| Mount
+\spverb|Mount| Mount
