@@ -85,15 +85,14 @@ $b$, $c$. Особенность в том, что ее логика задач�
 значениями. Каждый тест можно расширить в будущем. Тесты ниже образуют кейс,
 который проверяет алгоритм целиком.
 
-%% TODO check ints
-
 \begin{verbatim}
 (defn test-square-roots-two-roots []
   (let [[x1 x2] (square-roots 1 -5 6)]
-    (assert (= [(int x1) (int x2)] [3 2]))))
+    (assert (= [3 2] [(int x1) (int x2)]))))
 
 (defn test-square-roots-one-root []
-  (assert (= (square-roots 1 6 9) -3)))
+  (let [x (square-roots 1 6 9)]
+    (assert (= -3 (int x)))))
 
 (defn test-square-roots-no-roots []
   (assert (nil? (square-roots 2 4 7))))

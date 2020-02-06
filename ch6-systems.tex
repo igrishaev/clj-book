@@ -311,8 +311,6 @@ mount.core.NotStartedState
 конфигурации. Поскольку мы строим систему, вынесем конфигурацию в компонент. При
 запуске он читает файл или переменные среды, выводит типы, валидирует данные.
 
-%% TODO file paths
-
 Напишем модуль \spverb|config.clj|. Для краткости не будем расписывать спеку
 \spverb|::config|: оставим только проверку на словарь. Фаза \spverb|:start|
 читает EDN-файл, проверяет спекой и возвращает данные. Замените \spverb|:start|
@@ -397,8 +395,6 @@ JDBC-функции принимают первым параметром т.н. 
 \spverb|:datasource|. Библиотека \spverb|hikari-cp| предлагает функцию, чтобы
 построить источник с пулом соединений. Каждый раз, когда мы запрашиваем
 соединение у источника, получаем одно из открытых ранее.
-
-%% TODO path
 
 Пул это объект с жизненным циклом, поэтому вынесем его в компонент. Подготовим
 модуль \spverb|db.clj|:
@@ -1369,15 +1365,13 @@ COMMIT
 база данных. Последний слот~--- зависимость компонента. Это экземпляр
 \spverb|DB|, который мы только что рассмотрели. Реализуем \spverb|Lifecycle|:
 
-%% TODO note
-
 \begin{verbatim}
 (defrecord Worker
   [options flag task db]
   component/Lifecycle
   (start [this]
     (let [flag (atom true)
-          this (assoc this :flag flag) ;; note
+          this (assoc this :flag flag) ;; <= note this
           task (make-task this)]
       (assoc this :task task)))
 
@@ -1867,19 +1861,16 @@ Clojure:
 \spverb|:worker| и \spverb|(make-worker {...})|. Ниже могут быть другие флаги
 или проверки.
 
-%% TODO check below
-
 \begin{verbatim}
-(defn make-system
-  [config]
+(defn make-system [config]
   (let [{:keys [features jetty pool worker]} config
         {worker? :worker} features
-        components
-        (cond-> [:server (make-server jetty)
-                 :db     (make-db pool)]
-          worker?
-          (conj :worker (make-worker worker)))]
-    (apply component/system-map components)))
+        comps-base [:server (make-server jetty)
+                    :db (make-db pool)]
+        comps (cond-> comps-base
+                worker?
+                (conj :worker (make-worker worker)))]
+    (apply component/system-map comps)))
 \end{verbatim}
 
 Убедимся, что флаг работает. Система это запись, поэтому функция \spverb|keys|
@@ -2574,8 +2565,6 @@ Integrant предлагает функцию \spverb|read-string| что чте
 задачу, которая раз в интервал сверяет данные. Запуск и остановка задачи
 аналогичны воркеру. Пример ниже показывает, как добраться до обеих баз из
 параметров.
-
-%% TODO: check this
 
 \begin{verbatim}
 {::sync {:dbs (ig/refset ::db)}}
