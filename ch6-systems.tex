@@ -1383,7 +1383,7 @@ COMMIT
     (assoc this :flag nil :task nil)))
 \end{verbatim}
 
-Обратите внимание на строку с меткой. Мы дополняем \spverb|this| флагом %% TODO
+Обратите внимание на строку с меткой. Мы дополняем \spverb|this| флагом
 состояния. Метод \spverb|make-task| ожидает \spverb|this| с заполненным слотом
 \spverb|flag|. Если строку убрать, \spverb|make-task| получит запись с пустым
 слотом.
@@ -1608,17 +1608,9 @@ COMMIT
 \subsection{Корректное завершение}
 
 Глобальная система идет вразрез с тем, что пишет автор библиотеки. На странице
-проекта встречается фраза:
-
-%% TODO cite
-
-In production, the system map is ephemeral. It is used to start all the
-components running, then it is discarded.
-
-Что в переводе:
-
-В промышленном запуске система эфемерна. Она запускает все компоненты и затем
-исчезает.
+проекта встречается фраза: <<In production, the system map is ephemeral. It is
+used to start all the components running, then it is discarded. (В промышленном
+запуске система эфемерна. Она запускает все компоненты и затем исчезает.)>>
 
 Это редкий случай, когда мы не согласимся с автором. Даже в боевом режиме вам
 потребуется ссылка на систему. Без ссылки не получится корректно остановить
