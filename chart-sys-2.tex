@@ -1,0 +1,11 @@
+
+\begin{tikzpicture}[auto, node distance=0.5cm]
+
+\node (wrk) [entity] {Worker};
+\node (dtb) [entity, below right = of wrk, xshift=-1cm] {Database};
+\node (cfg) [entity, below = of dtb] {Config};
+
+\draw [arrow] (wrk) |- (dtb);
+\draw [arrow] (wrk) |- (cfg);
+
+\end{tikzpicture}

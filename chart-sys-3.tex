@@ -1,0 +1,9 @@
+
+\begin{tikzpicture}[auto, node distance=0.5cm]
+
+\node (wrk) [entity] {Database};
+\node (dtb) [entity, below right = of wrk, xshift=-1cm] {Config};
+
+\draw [arrow] (wrk) |- (dtb);
+
+\end{tikzpicture}

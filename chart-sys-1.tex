@@ -1,0 +1,14 @@
+
+\begin{tikzpicture}[auto, node distance=1.5cm]
+
+\node (cfg) [entity] {Config};
+\node (srv) [entity, below left = of cfg, yshift=0.5cm, xshift=2cm] {Server};
+\node (dtb) [entity, below right = of cfg, yshift=0.5cm, xshift=-2cm] {Database};
+\node (wrk) [entity, below right = of dtb, yshift=0.5cm, xshift=-2cm] {Worker};
+
+\draw [arrow] (srv) |- (cfg);
+\draw [arrow] (dtb) -| (cfg);
+\draw [arrow] (wrk) -| (dtb);
+\draw [arrow] (wrk) |- (cfg);
+
+\end{tikzpicture}

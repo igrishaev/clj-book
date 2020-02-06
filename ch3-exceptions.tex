@@ -68,22 +68,7 @@ Clojure это гостевой язык (анг. \emph{hosted language}). Он 
 уровня это классы \spverb|Error| и \spverb|Exception|. Его наследует
 \spverb|RuntimeException| и так далее. Это видно на схеме.
 
-%% TODO chart
-
-\begin{tikzpicture}[auto, node distance=1.5cm]
-
-\node (obj) [entity] {Object};
-\node (thr) [entity, below of=obj] {Throwable};
-\node (err) [entity, below left = of thr, yshift=0.5cm, xshift=2cm] {Error};
-\node (exc) [entity, below right = of thr, yshift=0.5cm, xshift=-2cm] {Exception};
-\node (rex) [entity, below right = of exc, yshift=0.5cm, xshift=-2cm] {RuntimeException};
-
-\draw [arrow] (obj) -- (thr);
-\draw [arrow] (thr) -| (err);
-\draw [arrow] (thr) -| (exc);
-\draw [arrow] (exc) -| (rex);
-
-\end{tikzpicture}
+\chart{chart-ex-tree}
 
 Пакеты Java несут дополнительные исключения, унаследованные от описанных
 выше. Например, \spverb|java.io.IOException| для ошибок ввода-вывода,

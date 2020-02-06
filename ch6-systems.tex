@@ -135,23 +135,7 @@ Clojure предлагает несколько библиотек для сис
 который обновляет записи в базе. Мы специально добавили его, чтобы научиться
 работать с зависимостями. Нарисуем топологию системы:
 
-%% TODO chart
-
-\vspace{1em}
-\begin{tikzpicture}[auto, node distance=1.5cm]
-
-\node (cfg) [entity] {Config};
-\node (srv) [entity, below left = of cfg, yshift=0.5cm, xshift=2cm] {Server};
-\node (dtb) [entity, below right = of cfg, yshift=0.5cm, xshift=-2cm] {Database};
-\node (wrk) [entity, below right = of dtb, yshift=0.5cm, xshift=-2cm] {Worker};
-
-\draw [arrow] (srv) |- (cfg);
-\draw [arrow] (dtb) -| (cfg);
-\draw [arrow] (wrk) -| (dtb);
-\draw [arrow] (wrk) |- (cfg);
-
-\end{tikzpicture}
-\vspace{1em}
+\chart{chart-sys-1}
 
 Стрелки на схеме означают отношения между компонентами. Выражение $A \to B$
 означает <<А зависит от В>>. В нашей системе все компоненты зависят от
@@ -708,22 +692,7 @@ Clojure. Пространства имен зависят друг от друг
 
 Начертим граф зависимостей:
 
-%% TODO chart
-
-\vspace{1em}
-
-\begin{tikzpicture}[auto, node distance=0.5cm]
-
-\node (wrk) [entity] {Worker};
-\node (dtb) [entity, below right = of wrk, xshift=-1cm] {Database};
-\node (cfg) [entity, below = of dtb] {Config};
-
-\draw [arrow] (wrk) |- (dtb);
-\draw [arrow] (wrk) |- (cfg);
-
-\end{tikzpicture}
-
-\vspace{1em}
+\chart{chart-sys-2}
 
 Компилятор не загрузит \spverb|mount.worker| до тех пор, пока не разрешит
 зависимости. Он начнет с модуля \spverb|mount.db|. Его упрощенное определение:
@@ -736,20 +705,7 @@ Clojure. Пространства имен зависят друг от друг
 
 Что с точки зрения компилятора:
 
-%% TODO chart
-
-\vspace{1em}
-
-\begin{tikzpicture}[auto, node distance=0.5cm]
-
-\node (wrk) [entity] {Database};
-\node (dtb) [entity, below right = of wrk, xshift=-1cm] {Config};
-
-\draw [arrow] (wrk) |- (dtb);
-
-\end{tikzpicture}
-
-\vspace{1em}
+\chart{chart-sys-3}
 
 Прежде чем загрузить \spverb|db|, компилятор займется \spverb|config|. Он не
 зависит других модулей будет и загружен первым. Затем компилятор вернется к
