@@ -228,7 +228,7 @@ http://dkhramov.dp.ua/Comp.CyrillicInListingsTex
 
 
 \noindent
-\begin{tabular}{ p{5cm} p{5cm} }
+\begin{tabular}{ @{}p{5cm} @{}p{5cm} }
 
 \begin{verbatim}
 \end{verbatim}

@@ -10,7 +10,8 @@
 
 В обучающих материалах по Clojure встречаются примеры:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (def server
   (jetty/run-jetty app {:port 8080}))
 
@@ -19,7 +20,8 @@
    :dbname   "test"
    :user     "ivan"
    :password "test"})
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Это веб-сервер на 8080 порту и параметры подключения к базе. Примеры полезны
 тем, что их можно скопировать в REPL и оценить результат: открыть страницу в
@@ -210,33 +212,38 @@ Clojure, и у DevOps уже написаны скрипты на Python для 
 текст и параметры форматирования. Если код равен нулю, пишем сообщение в
 \spverb|stdout|, иначе в \spverb|stderr|.
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (defn exit
   [code template & args]
   (let [out (if (zero? code) *out* *err*)]
     (binding [*out* out]
       (println (apply format template args))))
   (System/exit code))
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Переходим к загрузчику. Это набор шагов, каждый из которых принимает результат
 предыдущего. Логику каждого описывает имя функции. Совместим вывод типов и
 валидацию в одном шаге \spverb|coerce-config|, поскольку технически это вызов
 \spverb|s/conform|.
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (defn load-config! []
   (-> (get-config-path)
       (read-config-file)
       (coerce-config)
       (set-config!)))
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Напишем логику каждого шага. Функция \spverb|get-config-path| читает переменную
 среды и проверяет, есть ли такой файл на диске. Если все в порядке, функция
 вернет путь к файлу, иначе вызовет \spverb|exit|:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (import 'java.io.File)
 
 (defn get-config-path []
@@ -245,13 +252,15 @@ Clojure, и у DevOps уже написаны скрипты на Python для 
       filepath
       (exit 1 "File %s does not exist" filepath))
     (exit 1 "File path is not set")))
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Шаг \spverb|read-config-file| читает файл по его пути. Для разбора JSON служит
 библиотека \spverb|cheshire|. Функция \spverb|parse-string| вернет данные из
 строки документа.
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (require '[cheshire.core :as json])
 
 (defn read-config-file
@@ -260,7 +269,8 @@ Clojure, и у DevOps уже написаны скрипты на Python для 
     (-> filepath slurp (json/parse-string true))
     (catch Exception e
       (exit 1 "Malformed config file: %s" (ex-message e)))))
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Стадия проверки и вывода типов займет больше места. Это самый важный этап:
 нельзя допустить, чтобы приложение стартовало с неверными параметрами.
@@ -271,7 +281,8 @@ Clojure, и у DevOps уже написаны скрипты на Python для 
 формируем отчет об ошибке и выводим в терминал. Для отчета возьмем библиотеку
 \spverb|expound|.
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (require '[clojure.spec.alpha :as s])
 (require '[expound.alpha :as expound])
 
@@ -284,11 +295,13 @@ Clojure, и у DevOps уже написаны скрипты на Python для 
         result))
     (catch Exception e
       (exit 1 "Wrong config values: %s" (ex-message e)))))
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Не хватает определения спеки. Откроем файл и изучим его структуру:
 
-\begin{verbatim}
+\begin{english}
+  \begin{json}
 {
     "server_port": 8080,
     "db": {
@@ -302,61 +315,74 @@ Clojure, и у DevOps уже написаны скрипты на Python для 
         "2019-07-12T23:59:59"
     ]
 }
-\end{verbatim}
+  \end{json}
+\end{english}
 
 \noindent
 Опишем спеку сверху вниз. На верхнем уровне это словарь с ключами:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (s/def ::config
   (s/keys :req-un [::server_port ::db ::event]))
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Порт сервера это комбинация двух предикатов: число и вхождение в диапазон.
 Проверка на число нужна, чтобы во второй предикат не попали \spverb|nil| и
 строка. Это вызовет исключение там, где его не ждали.
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (s/def ::server_port
   (s/and int? #(< 1024 % 65535)))
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Для подключения к базе данных укажем готовую спеку из пакета \spverb|jdbc|:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (require '[clojure.java.jdbc.spec :as jdbc])
 (s/def ::db ::jdbc/db-spec)
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Событе тоже сложная спека, поэтому опишем ее сверху вниз. Это комбо из кортежа
 дат и проверки диапазона:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (s/def ::event
   (s/and (s/tuple ->date ->date)
          ::date-range))
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Спека \spverb|->date| выводит дату из строки. Чтобы не писать ручной разбор,
 возьмем функцию \spverb|read-instant-date| из пакета
 \spverb|clojure.instant|. Функция лояльна к формату строки и читает неполные
 даты, например только год. Обернем ее в \spverb|s/conformer|.
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (require '[clojure.instant :as inst])
 (def ->date (s/conformer inst/read-instant-date))
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Опишем проверку диапазона. Она принимает пару объектов \spverb|java.util.Date| и
 сравнивает их. Даты нельзя сравнивать знаками <<больше>> или <<меньше>>. Причина
 кроется в особенности класса \spverb|Date|. Функция \spverb|compare| принимает
 два объекта и возвращает -1, 0 и 1 для случаев меньше, равно и больше.
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (s/def ::date-range
   (fn [[date1 date2]]
     (neg? (compare date1 date2))))
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Спека готова, и шаг \spverb|coerce-config| тоже завершен. Для тех, кто
 торопится: удалите последнюю строку в \spverb|load-config!| и проверьте
@@ -366,20 +392,23 @@ Clojure, и у DevOps уже написаны скрипты на Python для 
 конфигурацию под именем \spverb|CONFIG|. Верхний регистр подчеркивает, что это
 глобальная переменная. В функции вы не затените ее переменной \spverb|config|.
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (def CONFIG nil)
 
 (defn set-config!
   [config]
   (alter-var-root (var CONFIG) (constantly config)))
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 На старте программы напишите \spverb|(load-config!)|, чтобы в \spverb|CONFIG|
 появилась конфигурация. Другие модули импортируют \spverb|CONFIG| в свои модули
 и читают нужные им ключи. Вот как запустить сервер или запросить базу с учетом
 конфигурации:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (require '[project.config :refer [CONFIG]])
 
 (def server
@@ -387,7 +416,8 @@ Clojure, и у DevOps уже написаны скрипты на Python для 
                         :join? false}))
 
 (jdbc/query (:db CONFIG) "select * from users")
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 \subsection{Работа над ошибками}
 
@@ -410,7 +440,8 @@ Clojure, и у DevOps уже написаны скрипты на Python для 
 \spverb|exit|. Новая функция не вызывает \spverb|System/exit|, а только кидает
 исключение. Напишем отдельную функцию:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (defn load-config-repl! []
   (with-redefs
     [exit (fn [_ template & args]
@@ -418,7 +449,8 @@ Clojure, и у DevOps уже написаны скрипты на Python для 
                   (apply format template args)]
               (throw (new Exception message))))]
     (load-config!)))
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Теперь вызов \spverb|load-config-repl!| просто бросит исключение, но не завершит
 сеанс.
@@ -451,13 +483,15 @@ Clojure, и у DevOps уже написаны скрипты на Python для 
 \spverb|FOO| это разные переменные. Пробелы и дефисы недопустимы; лексемы
 разделяют подчеркиванием. Фрагмент вывода \spverb|printenv|:
 
-\begin{verbatim}
+\begin{english}
+  \begin{bash}
 LANG=en_US.UTF-8
 PWD=/Users/ivan
 SHELL=/bin/zsh
 TERM_PROGRAM=iTerm.app
 COMMAND_MODE=unix2003
-\end{verbatim}
+  \end{bash}
+\end{english}
 
 Каждый процесс получает копию этого словаря. Процесс может добавить или удалить
 переменную, но изменения видны только этому процессу и его потомкам. Когда
@@ -473,27 +507,33 @@ COMMAND_MODE=unix2003
 переменные. Их часто путают начинающие программисты. Откройте терминал и
 выполните команду:
 
-\begin{verbatim}
+\begin{english}
+  \begin{bash}
 FOO=42
-\end{verbatim}
+  \end{bash}
+\end{english}
 
 Вы задали переменную шелла. Чтобы сослаться на переменную (получить значение по
 имени), поставьте перед ней доллар. Пример ниже напечатает 42:
 
-\begin{verbatim}
+\begin{english}
+  \begin{bash}
 echo $FOO
 42
-\end{verbatim}
+  \end{bash}
+\end{english}
 
 Если выполнить \spverb|printenv|, мы не увидим \spverb|FOO| в выводе. Команда
 \spverb|FOO=42| задает переменную шелла, а не среды. Переменные шелла видны
 только ему и не наследуются потомками. Проверим это: из текущего шелла запустим
 новый и повторим печать.
 
-\begin{verbatim}
+\begin{english}
+  \begin{bash}
 sh
 echo $FOO
-\end{verbatim}
+  \end{bash}
+\end{english}
 
 Получим пустую строку, потому что в процессе-потомке такой переменной
 нет. Выполните \spverb|exit|, чтобы вернуться в родительский шелл.
@@ -502,7 +542,8 @@ echo $FOO
 среды. Установленная таким образом, она видна в списке printenv и доступна
 потомкам:
 
-\begin{verbatim}
+\begin{english}
+  \begin{bash}
 export FOO=42
 
 printenv | grep FOO
@@ -511,15 +552,18 @@ FOO=42
 sh
 echo $FOO
 42
-\end{verbatim}
+  \end{bash}
+\end{english}
 
 Иногда нужно запустить процесс с переменной, но так, чтобы не повлиять на
 текущий набор. Тогда команду указывают после выражения \spverb|ИМЯ=значение|:
 
-\begin{verbatim}
+\begin{english}
+  \begin{bash}
 BAR=99 printenv | grep BAR
 BAR=99
-\end{verbatim}
+  \end{bash}
+\end{english}
 
 \spverb|Printenv| порождает новый процесс, которому доступна переменная
 \spverb|BAR|. Если снова напечатать \spverb|$BAR|, получим пустую строку.
@@ -530,9 +574,11 @@ PostgreSQL различает два десятка переменных: \spver
 выше, чем у параметров \spverb|--host|, \spverb|--user| и аналогов. Если в
 текущем шелле выполнить команды:
 
-\begin{verbatim}
+\begin{english}
+  \begin{bash}
 export PGHOST=host.com PGDATABASE=project
-\end{verbatim}
+  \end{bash}
+\end{english}
 
 \noindent
 , то каждая утилита из поставки PostgreSQL сработает на заданном сервере и
@@ -574,13 +620,15 @@ export PGHOST=host.com PGDATABASE=project
 образ в работе. Пример ниже запускает PostgreSQL с готовой базой и
 пользователем:
 
-\begin{verbatim}
+\begin{english}
+  \begin{bash}
 docker run \
   -e POSTGRES_DB=project_db \
   -e POSTGRES_USER=POSTGRES_USER \
   -e POSTGRES_PASSWORD=project_secret \
   -d postgres
-\end{verbatim}
+  \end{bash}
+\end{english}
 
 Принцип <<конфигурация в среде>> встречается в одном из пунктов <<The
 Twelve-Factor App>>\footurl{https://12factor.net/}. Это свод правил для
@@ -594,23 +642,27 @@ Twelve-Factor App>>\footurl{https://12factor.net/}. Это свод правил
 на откуп приложения. Делайте это декларативно, а не вручную. Так, в проектах на
 Python встречается код:
 
-\begin{verbatim}
+\begin{english}
+  \begin{python}
 db_port = int(os.environ["DB_PORT"])
-\end{verbatim}
+  \end{python}
+\end{english}
 
 Когда переменных больше двух, подобный код становится уродливым. Постройте
 словарь, где ключ это имя переменной, а значение~--- функция вывода. Специальный
 код обходит \spverb|env_mapping| и наполняет словарь результата. Для краткости
 опустим перехват ошибок:
 
-\begin{verbatim}
+\begin{english}
+  \begin{python}
 import os
 env_mapping = {"DB_PORT": int}
 
 result = {}
 for (env, fn) in env_mapping.iteritems():
     result[env] = fn(os.environ[env])
-\end{verbatim}
+  \end{python}
+\end{english}
 
 Подход справедлив и для других языков. В Clojure для разбора переменных подойдет
 спека.
@@ -621,29 +673,55 @@ for (env, fn) in env_mapping.iteritems():
 параметров. Чтобы не ставить перед каждым префикс, их выносят во вложенный
 словарь.
 
-\begin{verbatim}
+\noindent
+\begin{tabular}{ @{}p{5cm} @{}p{5cm} }
+
+\begin{english}
+  \begin{clojure}
 ;; so-so
 {:db-name "book"
  :db-user "ivan"
  :db-pass "****"}
+  \end{clojure}
+\end{english}
 
+&
+
+\begin{english}
+  \begin{clojure}
 ;; better
 {:db {:name "book"
       :user "ivan"
       :pass "****"}}
-\end{verbatim}
+  \end{clojure}
+\end{english}
+
+\end{tabular}
 
 В различных системах вложенные переменные читают по-разному. Например, одинарное
 подчеркивание разделет лексемы, но не меняет структуру. Двойное подчеркивание
 означает вложенность:
 
-\begin{verbatim}
+\noindent
+\begin{tabular}{ @{}p{5cm} @{}p{5cm} }
+
+\begin{english}
+  \begin{clojure}
 "DB_NAME=book"
 ;; {:db-name "book"}
+  \end{clojure}
+\end{english}
 
+&
+
+\begin{english}
+  \begin{clojure}
 "DB__NAME=book"
 ;; {:db {:name "book"}}
-\end{verbatim}
+  \end{clojure}
+\end{english}
+
+\end{tabular}
 
 Массив задают в квадратных скобках или через запятую. При выводе массивов из
 строк остается риск ложного разбиения. Это случается, когда запятая или скобка
@@ -669,11 +747,13 @@ for (env, fn) in env_mapping.iteritems():
 лучше. В идеале в файле только пары \spverb|ИМЯ=значение| по одной на каждую
 строку.
 
-\begin{verbatim}
+\begin{english}
+  \begin{bash}
 DB_NAME=book
 DB_USER=ivan
 DB_PASS=****
-\end{verbatim}
+  \end{bash}
+\end{english}
 
 Чтобы считать переменные в шелл, вызывают команду \spverb|source <file>|. Это
 одна из команд \spverb|bash|, которая выполняет скрипт в текущем сеансе. Cкрипт
@@ -681,28 +761,33 @@ DB_PASS=****
 важное отличие от команды \spverb|bash <file>|, которая выполнит скрипт в
 отдельном шелле.
 
-\begin{verbatim}
+\begin{english}
+  \begin{bash}
 source ENV
 echo $DB_NAME
 book
-\end{verbatim}
+  \end{bash}
+\end{english}
 
 Если запустить из текущего шелла приложение, оно \emph{не увидит} переменные из
 файла. Вспомним, что выражение \spverb|VAR=value| задает \emph{локальную}
 переменную. \spverb|DB_NAME| и другие не попадут в окружение и не будут
 наследованы приложением. Проверим это с помощью \spverb|printenv|:
 
-\begin{verbatim}
+\begin{english}
+  \begin{bash}
 source ENV
 printenv | grep DB
 # exit 1
-\end{verbatim}
+  \end{bash}
+\end{english}
 
 Есть два способа решить проблему. Первый~--- открыть файл и расставить перед
 каждой парой выражение \spverb|export|. Тогда \spverb|source| этого файла
 добавит переменные в окружение:
 
-\begin{verbatim}
+\begin{english}
+  \begin{bash}
 cat ENV
 export DB_NAME=book
 export DB_USER=ivan
@@ -713,7 +798,8 @@ printenv | grep DB
 DB_NAME=book
 DB_USER=ivan
 DB_PASS=****
-\end{verbatim}
+  \end{bash}
+\end{english}
 
 Недостаток способа в том, что в env-файле появляется дополнительная
 логика. Легко забыть \spverb|export| перед переменной, и приложение не прочитает
@@ -723,13 +809,15 @@ DB_PASS=****
 установлен, локальная переменная сама переходит в окружение. Перед тем, как
 читать переменные из файла, флаг возводят в истину, а затем снова в ложь.
 
-\begin{verbatim}
+\begin{english}
+  \begin{bash}
 set -a
 source ENV
 printenv | grep DB
 # prints all the vars
 set +a
-\end{verbatim}
+  \end{bash}
+\end{english}
 
 Выражение \spverb|set| противоречиво: параметр с минусом включает параметр, а с
 плюсом~--- отключает. Это исключение, которое придется запомнить.
@@ -743,7 +831,8 @@ set +a
 \spverb|ENV| несет в себе базовые параметры. В \spverb|ENV_TEST| поместим новое
 значение \spverb|DB_NAME=test|. Затем прочитаем оба файла.
 
-\begin{verbatim}
+\begin{english}
+  \begin{bash}
 set -a
 source ENV
 source ENV_TEST
@@ -751,7 +840,8 @@ set +a
 
 echo $DB_NAME
 test
-\end{verbatim}
+  \end{bash}
+\end{english}
 
 Читатель заметит, что env-файлы противоречивы. Мы сказали, что переменные
 снимают зависимость от файлов, но в итоге поместили переменные в файл. Какой в
@@ -773,7 +863,8 @@ Clojure это гостевая платформа. Язык не предлаг
 Статический метод \spverb|getenv| вернет либо одну переменную по имени, либо
 словарь всех переменных, если имя не указали.
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 ;; a single variable
 (System/getenv "HOME")
 "/Users/ivan"
@@ -781,7 +872,8 @@ Clojure это гостевая платформа. Язык не предлаг
 ;; all variables
 (System/getenv)
 {"JAVA_ARCH" "x86_64", "LANG" "en_US.UTF-8"} ;; truncated
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Во втором случае получили не Clojure-, а Java-коллекцию. Это постоянная версия
 \spverb|java.util.Map|. Поэтому переменные нельзя изменить после запуска JVM.
@@ -793,7 +885,8 @@ Clojure пользуются кейвордами и записью <<kebab-case
 
 Напишем функцию для перевода ключа:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (require '[clojure.string :as str])
 
 (defn remap-key [^String key]
@@ -801,20 +894,24 @@ Clojure пользуются кейвордами и записью <<kebab-case
       str/lower-case
       (str/replace #"_" "-")
       keyword))
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 \noindent
 и убедимся в ее работе:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (remap-key "DB_PORT")
 :db-port
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Функция \spverb|remap-env| проходит по Java-коллекции и возвращает ее
 <<кложурную>> версию с привычными ключами:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (defn remap-env [env]
   (reduce
    (fn [acc [k v]]
@@ -822,12 +919,14 @@ Clojure пользуются кейвордами и записью <<kebab-case
        (assoc acc key v)))
    {}
    env))
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Итоговый словарь может оказаться большим. Современные системы хранят в памяти до
 сотни переменных. Приведем небольшую часть словаря:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (remap-env (System/getenv))
 
 {:home "/Users/ivan"
@@ -836,7 +935,8 @@ Clojure пользуются кейвордами и записью <<kebab-case
  :java-arch "x86_64"
  :term-program "iTerm.app"
  :shell "/bin/zsh"}
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Теперь когда переменные это обычный словарь, его двигают по тому же
 конвейеру. Это вывод типов и валидация спекой. Поскольку все значения строки,
@@ -844,7 +944,8 @@ Clojure пользуются кейвордами и записью <<kebab-case
 будет спека, которая работает и с числами для JSON, и с текстом для переменных
 среды. Вот как выглядит умный парсер числа:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (s/def ::->int
   (s/conformer
    (fn [value]
@@ -855,7 +956,8 @@ Clojure пользуются кейвордами и записью <<kebab-case
             (catch Exception e
               ::s/invalid))
        :else ::s/invalid))))
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 С этой спекой можно менять источник параметров без изменений в коде.
 
@@ -876,12 +978,14 @@ Clojure пользуются кейвордами и записью <<kebab-case
 форму-список. Каждый элемент списка это примитив Clojure: символ, кейворд,
 вектор и так далее. Для спеки \spverb|::config| получим список:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (clojure.spec.alpha/keys
  :req-un [:book.config/server_port
           :book.config/db
           :book.config/event])
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Обратите внимание: это \emph{список}, а не код. Нужные нам ключи это третий
 элемент формы, вектор после \spverb|:req-un|. В общем случае следует учесть и
@@ -893,7 +997,8 @@ Clojure пользуются кейвордами и записью <<kebab-case
 значения. Для ключей \spverb|-un| отбросим пространство, потому что в
 конфигурации ими не пользуются. Все вместе дает нам следующую функцию:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (defn spec->keys
   [spec-keys]
   (let [form (s/form spec-keys)
@@ -904,26 +1009,31 @@ Clojure пользуются кейвордами и записью <<kebab-case
             opt
             (map ->unqualify opt-un)
             (map ->unqualify req-un))))
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 \noindent
 Проверим спеку загрузчика:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (spec->keys ::config)
 (:server_port :db :event)
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 \noindent
 Перепишем чтение переменных в словарь:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (defn read-env-vars []
   (let [cfg-keys (spec->keys ::config)]
     (-> (System/getenv)
         (remap-env)
         (select-keys cfg-keys))))
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 \noindent
 Так мы получим только полезные ключи, то есть те, что указаны в спеке.
@@ -933,12 +1043,14 @@ Clojure пользуются кейвордами и записью <<kebab-case
 Доработаем загрузчик так, чтобы он работал с переменными среды. Замените первые
 два шага на \spverb|read-env-vars|:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (defn load-config! []
   (-> (read-env-vars)
       (coerce-config)
       (set-config!)))
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Сделайте так, чтобы источник данных можно было задать параметром. Например,
 \spverb|:source "/path/to/config.json"| означает считать файл, а
@@ -959,28 +1071,33 @@ Clojure пользуются кейвордами и записью <<kebab-case
 двойное подчеркивание означает вложенную структуру. Поместим в файл
 \spverb|ENV_NEST| следующие переменные:
 
-\begin{verbatim}
+\begin{english}
+  \begin{bash}
 DB__NAME=book
 DB__USER=ivan
 DB__PASS=****
 HTTP__PORT=8080
 HTTP__HOST=api.random.com
-\end{verbatim}
+  \end{bash}
+\end{english}
 
 \noindent
 Прочитаем его и запустим REPL с новой средой:
 
-\begin{verbatim}
+\begin{english}
+  \begin{bash}
 set -a
 source ENV_NEST
 lein repl
-\end{verbatim}
+  \end{bash}
+\end{english}
 
 Изменим функции раздора ключа и обхода окружения. Функция
 \spverb|remap-key-nest| принимает ключ-строку и возвращает вектор составных
 частей:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (def ->keywords (partial map keyword))
 
 (defn remap-key-nest
@@ -993,12 +1110,14 @@ lein repl
 
 (remap-key-nest "DB__PORT")
 ;; (:db :port)
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Новая функция обхода отличается тем, что делает не \spverb|assoc|, а
 \spverb|assoc-in|, что порождает вложенность:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (defn remap-env-nest
   [env]
   (reduce
@@ -1007,19 +1126,22 @@ lein repl
        (assoc-in acc key-path v)))
    {}
    env))
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Код ниже вернет сгруппированные параметры, как и задумано. Для удобства приведем
 его подмножество:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (-> (System/getenv)
     (remap-env-nest)
     (select-keys [:db :http]))
 
 {:db {:user "ivan", :pass "****", :name "book"},
  :http {:port "8080", :host "api.random.com"}}
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 \noindent
 Дальше действуем как обычно: пишем спеку, выводим типы из строк и так далее.
@@ -1039,9 +1161,11 @@ lein repl
 \spverb|envsubst| из пакета \spverb|GNU gettext| это простая шаблонная
 система. Чтобы установить \spverb|gettext|, выполните в терминале команду
 
-\begin{verbatim}
+\begin{english}
+  \begin{bash}
 <manager> install gettext
-\end{verbatim}
+  \end{bash}
+\end{english}
 
 \noindent
 , где \spverb|<manager>| это менеджер пакетов вашей системы (\spverb|brew|,
@@ -1051,7 +1175,10 @@ lein repl
 среды. Утилита заменяет выражения \spverb|$VAR_NAME| на значения одноименной
 переменной. Напишем шаблон конфигурации:
 
-\begin{verbatim}
+%% TODO: json maybe?
+
+\begin{english}
+  \begin{bash}
 cat config.template.json
 {
     "server_port": $HTTP_PORT,
@@ -1066,12 +1193,14 @@ cat config.template.json
         "$EVENT_END"
     ]
 }
-\end{verbatim}
+  \end{bash}
+\end{english}
 
 \noindent
 Поместим переменные в отдельный файл:
 
-\begin{verbatim}
+\begin{english}
+  \begin{bash}
 cat ENV_TPL
 
 DB_NAME=book
@@ -1080,12 +1209,14 @@ DB_PASS='*(&fd}A53z#$!'
 HTTP_PORT=8080
 EVENT_START='2019-07-05T12:00:00'
 EVENT_END='2019-07-12T23:59:59'
-\end{verbatim}
+  \end{bash}
+\end{english}
 
 \noindent
 Считаем переменные и <<отрендерим>> шаблон:
 
-\begin{verbatim}
+\begin{english}
+  \begin{bash}
 source ENV_TPL
 cat config.template.json | envsubst
 {
@@ -1101,14 +1232,17 @@ cat config.template.json | envsubst
         "2019-07-12T23:59:59"
     ]
 }
-\end{verbatim}
+  \end{bash}
+\end{english}
 
 \noindent
 Чтобы записать результат в файл, добавьте в конец оператор вывода:
 
-\begin{verbatim}
+\begin{english}
+  \begin{bash}
 cat config.template.json | envsubst > config.ready.json
-\end{verbatim}
+  \end{bash}
+\end{english}
 
 Способ с \spverb|envsubst| на первый взгляд примитивен, но полезен на
 практике. Принцип шаблона снимает вопрос о структуре данных. Переменные хранят
@@ -1138,34 +1272,40 @@ cat config.template.json | envsubst > config.ready.json
 не пароль, а имя переменной, например \spverb|"DB_PASS"|. Напишем спеку, которая
 выводит значение переменной по ее имени:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (s/def ::->env
   (s/conformer
    (fn [varname]
      (or (System/getenv varname)
          ::s/invalid))))
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Если переменную не задали, вывод вернет ошибку. Прежде чем подключиться к базе,
 отбросим пустые символы по краям и убедимся, что строка не пустая.
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (s/def ::db-password
   (s/and ::->env
          string?
          (s/conformer str/trim)
          not-empty))
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Быстрая проверка. Запустим REPL с переменной \spverb|DB_PASS| и
 прочитаем ее спекой:
 
-\begin{verbatim}
+\begin{english}
+  \begin{bash}
 DB_PASS='*(&fd}A53z#$!' lein repl
 
 (s/conform ::db-password "DB_PASS")
 "*(&fd}A53z#$!"
-\end{verbatim}
+  \end{bash}
+\end{english}
 
 Чтобы вынести параметр из файла в переменную, замените его значение на имя
 переменной. Обновите спеку этого поля: добавьте \spverb|::->env| в начало
@@ -1186,7 +1326,8 @@ DB_PASS='*(&fd}A53z#$!' lein repl
 Добавим тег \spverb|#env|, который вернет значение переменной по ее имени. Имя
 переменной может быть строкой или символом. Определим функцию:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (defn tag-env
   [varname]
   (cond
@@ -1196,12 +1337,14 @@ DB_PASS='*(&fd}A53z#$!' lein repl
     (System/getenv varname)
     :else
     (throw (new Exception "wrong var type"))))
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 \noindent
 Прочитаем edn-строку с новым тегом:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (require '[clojure.edn :as edn])
 
 (edn/read-string
@@ -1209,25 +1352,30 @@ DB_PASS='*(&fd}A53z#$!' lein repl
  "{:db-password #env DB_PASS}")
 
 ;; {:db-password "*(&fd}A53z#$!"}
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Чтобы не передавать теги каждый раз, объявим \spverb|partial| от
 \spverb|edn/read-string|. Получим функцию, которая принимает только текст:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (def read-config
   (partial edn/read-string
            {:readers {'env tag-env}}))
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Чтобы прочесть edn-файл с особыми тегами, считайте его содержимое в строку и
 передайте в \spverb|read-config|:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (-> "/path/to/config.edn"
     slurp
     read-config)
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 YAML устроен похожим образом: его стандарт предусматривает теги. Тег начинается
 с одного или двух восклицательных знаков в зависимости от семантики. Стандартные
@@ -1238,19 +1386,22 @@ YAML устроен похожим образом: его стандарт пр�
 тегами. Среди прочих он предлагает \spverb|!envvar|. Тег возвращает значение
 переменной по ее имени. Опишем конфигурацию в файле \spverb|config.yaml|:
 
-\begin{verbatim}
+\begin{english}
+  \begin{yaml}
 server_port: 8080
 db:
   dbtype:   mysql
   dbname:   book
   user:     !envvar DB_USER
   password: !envvar DB_PASS
-\end{verbatim}
+  \end{yaml}
+\end{english}
 
 Подключим библиотеку и прочтем конфигурацию. На месте тегов получим значения
 среды:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (require '[yummy.config :as yummy])
 (yummy/load-config {:path "config.yaml"})
 
@@ -1259,7 +1410,8 @@ db:
       :dbname "book"
       :user "ivan"
       :password "*(&fd}A53z#$!"}}
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Мы подробно рассмотрим \spverb|yummy| в другом разделе главы.
 
@@ -1311,12 +1463,14 @@ YAML-файле встречается тег \spverb|!envvar|, то библи�
 Разработчики придумали уловки, чтобы обойти это ограничение. Например, поставить
 одноименное поле перед тем, к которому относится комментарий.
 
-\begin{verbatim}
+\begin{english}
+  \begin{json}
 {
     "server_port": "A port which the web-server is bound to.",
     "server_port": 8080
 }
-\end{verbatim}
+  \end{json}
+\end{english}
 
 Расчет сделан на то, что библиотека обходит поля по очереди, и второе поле
 заменит первое. Стандарт JSON ничего об этом не говорит; двойное поле остается
@@ -1342,7 +1496,8 @@ JSON выгодно отличается от многословного XML, к
 \noindent
 \begin{tabular}{ @{}p{5cm} @{}p{5cm} }
 
-\begin{verbatim}
+\begin{english}
+  \begin{yaml}
 server_port: 8080
 db:
   dbtype:   mysql
@@ -1352,11 +1507,13 @@ db:
 event:
   - 2019-07-05T12:00:00
   - 2019-07-12T23:59:59
-\end{verbatim}
+  \end{yaml}
+\end{english}
 
 &
 
-\begin{verbatim}
+\begin{english}
+  \begin{json}
 {
     "server_port": 8080,
     "db": {
@@ -1370,7 +1527,8 @@ event:
         "2019-07-12T23:59:59"
     ]
 }
-\end{verbatim}
+  \end{json}
+\end{english}
 
 \end{tabular}
 
@@ -1383,18 +1541,22 @@ event:
 не скобки. Запятые не обязательны там, где язык выводит их логически. Например,
 массив чисел в одну строку выглядит как в JSON:
 
-\begin{verbatim}
+\begin{english}
+  \begin{yaml}
 numbers: [1, 2, 3]
-\end{verbatim}
+  \end{yaml}
+\end{english}
 
 При записи в столбик скобки и запятые отпадают:
 
-\begin{verbatim}
+\begin{english}
+  \begin{yaml}
 numbers:
   - 1
   - 2
   - 3
-\end{verbatim}
+  \end{yaml}
+\end{english}
 
 YAML поддерживает комментарии в стиле Python (решетка). За это формат любят
 DevOps-инженеры. Программы вроде Docker-compose и Kubernetes работают на
@@ -1403,7 +1565,8 @@ YAML-файлах.
 В отличии от JSON, YAML предлагает синтаксис для многострочного текста. Его
 проще читать и копировать, чем одну строку с вкраплениями \spverb|\n|.
 
-\begin{verbatim}
+\begin{english}
+  \begin{yaml}
 description: |
   To resolve the error, please do the following:
 
@@ -1412,7 +1575,8 @@ description: |
   - Walk for a while.
 
   Then try again.
-\end{verbatim}
+  \end{yaml}
+\end{english}
 
 Язык официально поддерживает теги.
 
@@ -1426,22 +1590,26 @@ description: |
 структуре. Предположим, в поле \spverb|phrases| перечислены фразы, которые
 увидит пользователь:
 
-\begin{verbatim}
+\begin{english}
+  \begin{yaml}
 phrases:
   - Welcome aboard!
   - See you soon!
   - Warning: wrong email address.
-\end{verbatim}
+  \end{yaml}
+\end{english}
 
 Из-за двоеточия в последней строке парсер решит, что это вложенный словарь. В
 результате получим неверную структуру:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 {:phrases
  ["Welcome aboard!"
   "See you soon!"
   {:Warning "wrong email address."}]}
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Другие примеры: версия продукта \spverb|3.3| это число, но \spverb|3.3.1|~---
 строка. Телефон \spverb|+79625241745| это число, потому что знак плюса считается
@@ -1471,13 +1639,15 @@ phrases:
 
 Пример-комбо с разными типами, коллекциями и тегами:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 {:task-state #{:pending :in-progress :done}
  :account-ids [1001 1002 1003]
  :server {:host "127.0.0.1" :port 8080}
  :date-range [#inst "2019-07-01" #inst "2019-07-31"]
  :cassandra-id #uuid "26577362-902e-49e3-83fb-9106be7f60e1"}
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 EDN-данные не отличаются от кода. Если скопировать данные в REPL или модуль,
 компилятор выполнит их. И наоборот: вывод REPL можно скопировать в файл для
@@ -1487,12 +1657,14 @@ EDN-данные не отличаются от кода. Если скопир�
 шагам: <<напечатать>> данные в строку и записать ее в файл. В примере ниже
 результат \spverb|get-huge-dataset| пишут в файл \spverb|dataset.edn|:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (-> (get-huge-dataset)
     pr-str
     (as-> dump
         (spit "dataset.edn" dump)))
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 EDN поддерживает не только обычные комментарии. Тег \spverb|#_| игнорирует
 следующий за ним элемент. Элементом может быть что угодно, в том числе
@@ -1503,11 +1675,13 @@ EDN поддерживает не только обычные комментар
 игнорируем пользователя Ioann. Если поставить обычный комментарий (точка с
 запятой), он заденет закрывающие скобки, и выражение не будет закончено.
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 {:users [{:id 1 :name "Ivan"}
          {:id 2 :name "Juan"}
          #_{:id 3 :name "Ioann"}]}
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 EDN это удачный выбор, когда и бекенд, и фронтенд работают на едином стеке
 Clojure и ClojureScript.
@@ -1563,27 +1737,33 @@ Java-машины. Свойства это аналог среды окруже�
 параметром \spverb|-D| при запуске программы. Пример ниже запускает
 скомпилированный jar-файл со свойством \spverb|conf|:
 
-\begin{verbatim}
+\begin{english}
+  \begin{bash}
 java -Dconf="/path/to/config.properties" -jar project.jar
-\end{verbatim}
+  \end{bash}
+\end{english}
 
 Файлы \spverb|.properties| это пары \spverb|поле=значение| по одной на
 строку. Поля похожи на домены: это лексемы, разделенные точкой. Лексемы убывают
 по старшинству:
 
-\begin{verbatim}
+\begin{english}
+  \begin{ini}
 db.type=mysql
 db.host=127.0.0.1
 db.pool.connections=8
-\end{verbatim}
+  \end{ini}
+\end{english}
 
 Библиотека трактует точки как вложенные словари. Файл вернет структуру:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 {:db {:type "mysql"
       :host "127.0.0.1"
       :pool {:connections 8}}}
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Получив конфигурацию из ресурса или property-файла, \spverb|cprop| ищет
 \emph{переопределения} в переменных среды. Для них работают те же правила, что и
@@ -1593,11 +1773,13 @@ db.pool.connections=8
 
 Нестандартные пути к ресурсу и файлу задают ключами:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (load-config
  :resource "private/config.edn"
  :file "/path/custom/config.edn")
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Для тонкой работы \spverb|cprop| предлагает модуль \spverb|cprop.source|. Его
 функция \spverb|from-env| вернет словарь всех переменных среды,
@@ -1607,7 +1789,8 @@ db.pool.connections=8
 Ключ \spverb|:merge| объединяет конфигурацию с любым источником. Убер-пример из
 документации:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (load-config
  :resource "path/within/classpath/to.edn"
  :file "/path/to/some.edn"
@@ -1617,7 +1800,8 @@ db.pool.connections=8
          (from-props-file "/path/to/some.properties")
          (from-system-props)
          (from-env)])
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 В вектор \spverb|:merge| ставят любое выражение, которое вернет словарь. В общем
 случае \spverb|(load-config)| без параметров будет достаточным решением.
@@ -1646,38 +1830,46 @@ db.pool.connections=8
 
 Функция \spverb|read-config| читает файл или ресурс EDN:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (require '[aero.core :refer (read-config)])
 
 (read-config "config.edn")
 (read-config (clojure.java.io/resource "config.edn"))
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Главное в библиотеке это теги, которые вносят дополнительную логику. Разберем
 основные из них. Тег \spverb|#env| заменяет имя переменной среды на ее
 значение. Мы написали такой же:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 {:db {:passwod #env DB_PASS}}
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Тег \spverb|#envf| форматирует строку переменными среды. Предположим, параметры
 базы заданы отдельными полями, но вы предпочитаете JDBC URI~--- длинную строку,
 похожую на веб-адрес. Чтобы не дублировать данные, адрес вычисляют на базе
 исходных полей:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 {:db-uri #envf ["jdbc:postgresql://%s/%s?user=%s"
                 DB_HOST DB_NAME DB_USER]}
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Тег \spverb|#or| похож на одноименную форму Clojure и в основном нужен для
 значений по умолчанию. Пусть в env-файле не задан порт базы данных. Чтобы
 избежать неочевидности, укажем стандартный порт:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 {:db {:port #or [#env DB_PORT 5432]}}
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Оператор \spverb|#profile| предлагает интересный способ взять значение по
 \emph{профилилю}. Значение за тегом должно быть словарем. Ключи словаря это
@@ -1687,36 +1879,42 @@ db.pool.connections=8
 Пример ниже показывает, как определить имя базы по профилю. Без профиля мы
 получим \spverb|"book"|, но для \spverb|:test| имя станет \spverb|"book_test"|:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 {:db {:name #profile {:default "book"
                       :dev     "book_dev"
                       :test    "book_test"}}}
 
 (read-config "aero.test.edn" {:profile :test})
 {:db {:name "book_test"}}
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Тег \spverb|#include| помещает в конфигурацию другой edn-файл. В нем тоже могут
 быть теги, и библиотека выполнит их рекурсивно. К импорту прибегают, когда
 конфигурация становится большой.
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 {:queue #include "message-queue.edn"}
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Тег \spverb|#ref| ставит ссылку на любое место конфигурации. Это вектор ключей,
 который обычно передают в \spverb|get-in|. Ссылка позволяет избежать
 дублирования данных. Например, сторонний компонент нуждается в пользователе, под
 которым мы подключаемся к базе данных:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 ;; config.edn
 {:db {:user #env DB_USER}
  :worker {:user #ref [:db :user]}}
 
 ;; result
 {:db {:user "ivan"}, :worker {:user "ivan"}}
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Эти и другие теги комбинируют и добавляют собственные.
 
@@ -1760,64 +1958,80 @@ db.pool.connections=8
 параметрах, либо библиотека ищет его по определенному имени в переменных среды
 или свойствах JVM. Вариант, когда путь задан явно:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (require '[yummy.config :refer [load-config]])
 
 (load-config {:path "config.yaml"})
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Во втором случае вместо пути задали \emph{имя программы}. \spverb|Yummy| ищет
 путь к файлу в переменной среды \spverb|<program>_CONFIGURATION| или свойстве
 \spverb|<program>.configuration|:
 
-\begin{verbatim}
+\begin{english}
+  \begin{bash}
 export BOOK_CONFIGURATION=config.yaml
-\end{verbatim}
+  \end{bash}
+\end{english}
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (load-config {:program-name :book})
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Библиотека расширяет YAML несколькими тегами. Это знакомый вам \spverb|!envvar|
 для переменных среды:
 
-\begin{verbatim}
+\begin{english}
+  \begin{yaml}
 db:
   password: !envvar DB_PASS
-\end{verbatim}
+  \end{yaml}
+\end{english}
 
 Тег \spverb|!keyword| полезен, когда вместо строки ожидают кейворд:
 
-\begin{verbatim}
+\begin{english}
+  \begin{yaml}
 states:
   - !keyword task/pending
   - !keyword task/in-progress
   - !keyword task/done
-\end{verbatim}
+  \end{yaml}
+\end{english}
 
 Результат:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 {:states [:task/pending :task/in-progress :task/done]}
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Тег \spverb|!uuid| аналогичен \spverb|#uuid| для EDN. Он возвращает объект
 \spverb|java.util.UUID| из строки:
 
-\begin{verbatim}
+\begin{english}
+  \begin{yaml}
 system-user: !uuid cb7aa305-997c-4d53-a61a-38e0d8628dbb
-\end{verbatim}
+  \end{yaml}
+\end{english}
 
 Тег \spverb|!slurp| читает текст из стороннего файла. Это полезно для
 сертификатов шифрования. Их содержимое это длинная строка, которую неудобно
 хранить в общей конфигурации.
 
-\begin{verbatim}
+\begin{english}
+  \begin{yaml}
 tls:
   auth: !slurp "certs/ca.pem"
   cert: !slurp "certs/cert.pem"
   pkey: !slurp "certs/key.pk8"
-\end{verbatim}
+  \end{yaml}
+\end{english}
 
 В ключах \spverb|:auth|, \spverb|:cert| и \spverb|:pkey| будет содержимое файлов
 из папки \spverb|certs|.
@@ -1828,10 +2042,12 @@ tls:
 исключение. \spverb|Yummy| пользуется \spverb|expound|, чтобы улучшить отчет об
 ошибке.
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (load-config {:program-name :book
               :spec ::config})
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Словарь опцией принимает параметр \spverb|:die-fn|. Это функция, которая
 сработает, если любая из стадий завершится с ошибкой. Функция принимает два
@@ -1843,7 +2059,8 @@ tls:
 конфигурации. В интерактивном сеансе наша \spverb|die-fn| только печатает текст
 и ошибку:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (load-config
  {:program-name :book
   :spec ::config
@@ -1851,18 +2068,21 @@ tls:
             (binding [*out* *err*]
               (println msg)
               (println (ex-message e))))})
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 В боевом режиме запишем исключение в лог и завершим программу.
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (load-config
  {:program-name :book
   :spec ::config
   :die-fn (fn [e msg]
             (log/errorf e "Config error")
             (System/exit 1))})
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Из недостатков \spverb|yummy| отметим, что для валидации используется
 \spverb|s/assert|. Функция не выводит новые значения, как это делает
