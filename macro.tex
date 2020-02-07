@@ -5,10 +5,7 @@
 
 \newcommand{\chart}[1]{\vspace{1em}\input{#1}\vspace{1em}}
 
-\newcommand{\footurl}[1]{%
-  \footnote{\StrSubstitute{#1}{https://}{}}
-  \marginpar{\vspace{-5mm}\qrcode[height=10mm]{#1}}
-}
+\newcommand{\footurl}[1]{\footnote{\StrSubstitute{#1}{https://}{}}}
 
 \newminted[clojure]{clojure}{}
 
