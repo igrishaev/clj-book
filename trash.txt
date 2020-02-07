@@ -248,3 +248,6 @@ https://github.com/pygments/pygments/blob/48e55050f8bec34d57a1a86e06e779c6288b83
 - set margins
 - remove unused packages
 - add Antony
+
+\begin{verbatim} \begin{code}{clojure}
+\end{verbatim} \end{code}
