@@ -889,6 +889,8 @@ Mount помещает ссылки на эти функции в атом \spve
 Чтобы запустить только нужные компоненты, их передают в функцию. Важно:
 компонент должен быть не значением, а объектом \spverb|Var|.
 
+%% TODO aligment
+
 \begin{english}
   \begin{clojure}
 (mount/start #'book.systems.mount.config/config
@@ -1226,10 +1228,10 @@ org.eclipse.jetty.server.Server
 \begin{english}
   \begin{clojure}
 (-> s-stopped (assoc :server nil) type)
-book.systems.comp.server.Server
+;; book.systems.comp.server.Server
 
 (-> s-stopped (dissoc :server) type)
-clojure.lang.PersistentArrayMap
+;; clojure.lang.PersistentArrayMap
   \end{clojure}
 \end{english}
 
@@ -1241,11 +1243,6 @@ clojure.lang.PersistentArrayMap
 аргумента и логикой. Для аргумента с типом \spverb|Server| методы \spverb|start|
 и \spverb|stop| выполнят одно, для \spverb|DB| или \spverb|Worker|~---
 другое. По умолчанию \spverb|start| и \spverb|stop| просто вернут объект.
-
-
-%%  Это
-%% значит, что если метод start вернул не компонент, а словарь, мы не сможем
-%% вызвать правильный stop для этого словаря.
 
 Приведем неудачный пример. Его метод \spverb|start| возвращает словарь с полем
 \spverb|server|:
@@ -1261,6 +1258,8 @@ clojure.lang.PersistentArrayMap
     nil))
   \end{clojure}
 \end{english}
+
+%% TODO better explanation
 
 Сервер запустится без ошибок. Но переменная \spverb|bs-started| уже не запись, а
 словарь. Метод \spverb|stop| словаря вернет его же без каких либо
@@ -1443,13 +1442,13 @@ clojure.lang.PersistentArrayMap
 В логах PostgreSQL увидим записи:
 
 \begin{english}
-  \begin{clojure}
+  \begin{sql}
 BEGIN
 select * from requests limit 1 for update
 UPDATE requests SET is_processed = $1 WHERE id = $2
 DETAIL:  parameters: $1 = 'f', $2 = '3'
 COMMIT
-  \end{clojure}
+  \end{sql}
 \end{english}
 
 Запросы \spverb|select| и \spverb|update| действительно сработали в транзакции.
@@ -1589,7 +1588,7 @@ COMMIT
                component/start)
         worker (-> worker-opt
                    make-worker
-                   (assoc :db db) ;; !!!
+                   (assoc :db db) ;; <= note this
                    component/start)]
     {:db db :worker worker}))
   \end{clojure}
@@ -1822,10 +1821,10 @@ used to start all the components running, then it is discarded. (В промыш
 как Java-приложение.
 
 \begin{english}
-  \begin{clojure}
+  \begin{bash}
 lein uberjar
 java -jar target/book-standalone.jar
-  \end{clojure}
+  \end{bash}
 \end{english}
 
 Нажмите \spverb|Ctrl-C|. Приложение завершится не сразу, и вы увидите логи о
