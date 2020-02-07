@@ -251,3 +251,6 @@ https://github.com/pygments/pygments/blob/48e55050f8bec34d57a1a86e06e779c6288b83
 
 \begin{verbatim} \begin{code}{clojure}
 \end{verbatim} \end{code}
+
+
+{:content-type "text/plain"} {"content-type" "text/plain"}
