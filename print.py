@@ -11,10 +11,16 @@ GRAY = "#555"
 class PrintStyle(Style):
     default_style = "bw"
     styles = {
+
+        # JSON
+        Name.Tag:               GRAY,
+
+        # Clojure
         Keyword:                "bold",
         Generic.Emph:           "noitalic",
         String:                 "nobold",
         String.Symbol:          GRAY,
         Comment:                "noitalic " + GRAY,
         Name.Function:          "bold",
+
     }
