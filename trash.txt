@@ -268,3 +268,16 @@ http://dkhramov.dp.ua/Comp.CyrillicInListingsTex
 %% \begin{minted}[linenos,breaklines]{text}
 
 https://stackoverflow.com/questions/6886024/how-to-replace-a-search-with-multiple-lines-in-emacs
+
+%% a5paper
+%% \usepackage{lmodern}
+
+\begin{verbatim}
+
+\begin{english}
+  \begin{clojure}
+
+\end{verbatim}
+
+  \end{clojure}
+\end{english}
