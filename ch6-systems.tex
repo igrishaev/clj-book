@@ -193,7 +193,8 @@ sql-миграциями, получим готовую базу без стро
 их запуска. В примере ниже один контейнер \spverb|postgres|, которому заданы
 порты, пути и переменные среды.
 
-\begin{verbatim}
+\begin{english}
+  \begin{yaml}
 version: '2'
 services:
   postgres:
@@ -206,12 +207,14 @@ services:
       POSTGRES_DB: book
       POSTGRES_USER: book
       POSTGRES_PASSWORD: book
-\end{verbatim}
+  \end{yaml}
+\end{english}
 
 В папке \spverb|initdb.d| лежат sql-файлы для старта базы. Достаточно файла
 \spverb|01.init.sql| с одной таблицей:
 
-\begin{verbatim}
+\begin{english}
+  \begin{sql}
 drop table if exists requests;
 create table requests (
     id            serial primary key,
@@ -224,7 +227,8 @@ create table requests (
     lat           float,
     lon           float
 );
-\end{verbatim}
+  \end{sql}
+\end{english}
 
 Если запустить \spverb|docker-compose up|, поднимется сервер PostgreSQL на порту
 5432 с базой \spverb|book|. Этого хватит для дальнейшей работы. Больше мы не
@@ -258,7 +262,8 @@ Mount прост, поэтому удобен для начинающих.
 \spverb|src/book/systems/mount/server.clj|. \spverb|App| это примитивное
 приложение, которое всегда вернет статус 200.
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (ns book.systems.mount.server
   (:require
    [mount.core :as mount :refer [defstate]]
@@ -269,15 +274,18 @@ Mount прост, поэтому удобен для начинающих.
 (defstate server
   :start (run-jetty app {:join? false :port 8080})
   :stop (.stop server))
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 В макросе \spverb|defstate| фазы отделены ключами \spverb|:start| и
 \spverb|:stop|. Пока что мы только объявили состояние, но ничего не
 включили. Если выполнить \spverb|server|, увидим следующее:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 #DerefableState[{:status :pending, :val nil}]
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Чтобы запустить компонент, выполните \spverb|(mount/start)|. Функция пробегает
 по всем сущностями и включает их. Выражение \spverb|(run-jetty ...)| под ключом
@@ -285,20 +293,24 @@ Mount прост, поэтому удобен для начинающих.
 покажет приветствие по адресу \spverb|http://127.0.0.1:8080|. Переменная
 \spverb|server| станет эксемпляром \spverb|Server| из пакета \spverb|jetty|:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (type server)
 org.eclipse.jetty.server.Server
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Чтобы выключить систему, выполните \spverb|(mount/stop)|. Обратите внимание, что
 в выражении \spverb|(.stop server)| сущность обращается к самой себе. После
 остановки \spverb|server| станет особым значением, которое означает завершение.
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (mount/stop)
 (type server)
-mount.core.NotStartedState
-\end{verbatim}
+;; mount.core.NotStartedState
+  \end{clojure}
+\end{english}
 
 Так строят систему. Сперва находят сущности, которые работают на протяжении всей
 программы. В основном это сетевые подключения или фоновые задачи. Затем выносят
@@ -316,7 +328,8 @@ mount.core.NotStartedState
 читает EDN-файл, проверяет спекой и возвращает данные. Замените \spverb|:start|
 на вызов \spverb|Yummy|, \spverb|Aero| или свое решение.
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (ns book.systems.mount.config
   (:require
    [mount.core :as mount :refer [defstate]]
@@ -332,7 +345,8 @@ mount.core.NotStartedState
       edn/read-string
       (as-> config
           (s/conform ::config config))))
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 Компоненту не нужна фаза \spverb|:stop|, потому что он не хранит открытые
 ресурсы. Улучшим сервер так, чтобы он зависел от конфигурации. Для этого заменим
@@ -376,10 +390,12 @@ mount.core.NotStartedState
 реляционным базам данных. Это набор функций, которые работают одинаково для
 разных баз. Например, выражения:
 
-\begin{verbatim}
+\begin{english}
+  \begin{clojure}
 (jdbc/get-by-id db :users 42)
 (jdbc/insert! db :users {:name "Ivan" :email "ivan@test.com"})
-\end{verbatim}
+  \end{clojure}
+\end{english}
 
 \noindent
 прочитают и запишут пользователя в PostgreSQL, MySQL или Oracle. Для каждого

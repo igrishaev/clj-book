@@ -1,6 +1,4 @@
 
-\newenvironment{code}[1]{\VerbatimEnvironment\begin{minted}{#1}}{\end{minted}}
-
 \newenvironment{teaser}{\vspace{-3em}\itshape}{\vspace{1em}}
 
 \newcommand{\page}[1]{(с.~\pageref{#1})}
@@ -11,3 +9,15 @@
   \footnote{\StrSubstitute{#1}{https://}{}}
   \marginpar{\vspace{-5mm}\qrcode[height=10mm]{#1}}
 }
+
+\newminted[clojure]{clojure}{}
+
+\newminted[json]{json}{}
+
+\newminted[yaml]{yaml}{}
+
+\newminted[bash]{bash}{}
+
+\newminted[sql]{sql}{}
+
+\newenvironment{english}{\begin{otherlanguage}{english}}{\end{otherlanguage}}

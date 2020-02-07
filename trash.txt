@@ -212,6 +212,16 @@ https://help.farbox.com/pygments.html
 https://github.com/gpoore/minted/issues/176
 https://quantixed.org/2018/10/23/new-lexicon-how-to-add-a-custom-minted-lexer-in-overleaf/
 https://github.com/pygments/pygments/blob/48e55050f8bec34d57a1a86e06e779c6288b8341/pygments/lexers/jvm.py
+https://pbelmans.ncag.info/blog/2011/03/06/how-to-change-pygments-styles-and-a-university-of-antwerp-style/
+https://github.com/pygments/pygments/blob/master/pygments/styles/bw.py
+https://github.com/pbelmans/ua-pygments-style
+
+https://tex.stackexchange.com/questions/444122/pass-parameter-1-to-minteds-mintinline-when-1-begins-with
+https://tex.stackexchange.com/questions/394072/own-command-for-mintinline-cannot-handle-hash-character
+
+http://dkhramov.dp.ua/Comp.CyrillicInListingsTex
+
+\newenvironment{code}[1]{\VerbatimEnvironment\begin{otherlanguage}{english}\begin{minted}{#1}}{\end{minted}\end{otherlanguage}}
 
 \usepackage{minted}
 \usemintedstyle{bw}
@@ -254,3 +264,5 @@ https://github.com/pygments/pygments/blob/48e55050f8bec34d57a1a86e06e779c6288b83
 
 
 {:content-type "text/plain"} {"content-type" "text/plain"}
+
+%% \begin{minted}[linenos,breaklines]{text}

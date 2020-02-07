@@ -1,5 +1,14 @@
 
+PWD = $(shell pwd)
+PYG := /usr/local/lib/python2.7/site-packages/pygments
+
 all: git-commit pdf-build pdf-open
+
+pyg-install:
+	ln -s ${PWD}/your.py ${PYG}/styles/
+
+pyg-clear:
+	rm -rf _minted-main
 
 git-commit:
 	git rev-parse --short HEAD > .commit
