@@ -1,5 +1,5 @@
 
-\documentclass[10pt]{book} %,draft
+\documentclass[10pt,draft]{book} %,draft
 
 \usepackage{tikz}
 \usepackage{tocloft}
@@ -32,11 +32,11 @@
 \usepackage{xstring}
 
 \geometry{
-  papersize={145mm,210mm},
-  left=20mm,
-  right=15mm,
-  top=15mm,
-  bottom=20mm
+  papersize={145mm,210mm}, % 140x200 + 5mm bleed
+  left   = 20mm,           % 20mm + 0mm bleed
+  right  = 20mm,           % 15mm + 5mm bleed
+  top    = 20mm,           % 15mm + 5mm bleed
+  bottom = 25mm            % 20mm + 5mm bleed
 }
 
 %% \geometry{showframe}
@@ -80,7 +80,7 @@
 %% \include{ch4-mutability}
 %% \include{ch5-config}
 %% \include{ch6-systems}
-\include{ch7-tests}
+%% \include{ch7-tests}
 
 \backmatter
 \include{afterword}
