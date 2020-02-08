@@ -7,6 +7,7 @@ from pygments.token import Keyword, Name, Comment, String, Error, \
      Number, Operator, Generic
 
 GRAY = "#555"
+LIGHTGRAY = "#eee"
 
 class PrintStyle(Style):
     default_style = "bw"
@@ -14,6 +15,10 @@ class PrintStyle(Style):
 
         # JSON
         Name.Tag:               GRAY,
+
+        # diff
+        Generic.Deleted:        "bg:" + LIGHTGRAY,
+        Generic.Inserted:       "bg:",
 
         # Clojure
         Keyword:                "bold",
