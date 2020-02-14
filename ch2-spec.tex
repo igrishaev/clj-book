@@ -2214,10 +2214,36 @@ nil - failed: inst? at: [:start]
   \end{clojure}
 \end{english}
 
-В поле \spverb|data| словарь из функции \spverb|s/explain-data|. Чтобы получить
-данные исключения, его ловят и передают в функцию \spverb|(ex-data e)|.
+В поле \spverb|data| отчет из функции \spverb|s/explain-data|. Чтобы получить
+данные исключения, его передают в функцию \spverb|(ex-data e)|.
 
-%% --------------
+\subsection{Документация}
+
+Функциональная спека улучшает документацию. Функция \spverb|doc| из модуля
+\spverb|clojure.repl| выводит справку о запрошенной функции. С появлением Spec
+ее поведение изменилось. Кроме документации она выводит спеку функции, если она
+задана. Вот как выглядит справка lkz \spverb|date-range-sec| после того, как
+объявили спеку:
+
+\begin{english}
+  \begin{clojure}
+(clojure.repl/doc date-range-sec)
+-------------------------
+([date1 date2])
+  Return the difference between two dates in seconds.
+Spec
+  args: (cat :start inst? :end inst?)
+  ret: int?
+  \end{clojure}
+\end{english}
+
+На функцию \spverb|doc| полагаются IDE и редакторы, чтобы подсказывать аргументы
+в коде. Утилиты для документации, например
+Autodoc\footurl{https://github.com/tomfaulhaber/autodoc} или
+Codox\footurl{https://github.com/weavejester/codox}, добавляют спеки в
+HTML-файлы.
+
+%% ---------------
 
 \subsection{Производительность}
 
@@ -2257,30 +2283,6 @@ nil - failed: inst? at: [:start]
 кода в сто раз~--- слишком дорогая цена. Наоборот, во время тестов нас не
 волнует скорость. Код покрывают как можно б\'{о}льшим числом проверок, чтобы
 поймать все ошибки.
-
-\subsection{Документация}
-
-Функциональная спека улучшает документацию. Функция \spverb|doc| из модуля
-\spverb|clojure.repl| выводит на экран справку о запрошенной функции. С
-появлением clojure.spec ее поведение изменилось. Кроме документации она выводит
-спеку функции, если она задана. Вот как выглядит справка \spverb|date-range-sec|
-после того, как мы объявили спеку:
-
-\begin{english}
-  \begin{clojure}
-(clojure.repl/doc date-range-sec)
--------------------------
-([date1 date2])
-  Return the difference between two dates in seconds.
-Spec
-  args: (cat :start inst? :end inst?)
-  ret: int?
-  \end{clojure}
-\end{english}
-
-На функцию \spverb|doc| полагаются IDE и редакторы, чтобы подсказывать аргументы
-в коде. Утилиты для документации, например \spverb|autodoc| или \spverb|codox|,
-тоже учитывают спеки функций.
 
 \section{Переиспользование спек}
 
