@@ -285,3 +285,5 @@ https://stackoverflow.com/questions/6886024/how-to-replace-a-search-with-multipl
 %% Это
 %% значит, что если метод start вернул не компонент, а словарь, мы не сможем
 %% вызвать правильный stop для этого словаря.
+
+- add eng
