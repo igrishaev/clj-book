@@ -287,3 +287,4 @@ https://stackoverflow.com/questions/6886024/how-to-replace-a-search-with-multipl
 %% вызвать правильный stop для этого словаря.
 
 - add eng
+- например
