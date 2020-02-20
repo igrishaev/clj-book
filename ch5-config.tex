@@ -262,21 +262,33 @@ Clojure, и у DevOps уже написаны скрипты на Python для 
   \end{clojure}
 \end{english}
 
-%% -----------------
+Вывод типов и проверка займут больше места. Это самый важный этап: нельзя
+допустить, чтобы приложение начало работу с неверными параметрами. Логика
+\spverb|coerce-config| в том, чтобы пропустить данные из файла через
+\spverb|s/conform|. Ее вызов потенциально несет исключения, поэтому оборачиваем
+в \spverb|try/catch|. Если получили ключ \spverb|:invalid|, формируем отчет об
+ошибке и завершаем программу. Для отчета возьмем библиотеку \spverb|expound|.
 
-Стадия вывода типов и проверки займет больше места. Это самый важный этап:
-нельзя допустить, чтобы приложение начало работу с неверными параметрами.
-
-Логика \spverb|coerce-config| проста. Мы получаем чистые данные из исходных
-функцией \spverb|s/conform|. Ее вызов потенциально несет исключения, поэтому
-оборачиваем в \spverb|try/catch|. Если получили ключ \spverb|:invalid|,
-формируем отчет об ошибке и выводим в терминал. Для отчета возьмем библиотеку
-\spverb|expound|.
+%% -------------------
 
 \begin{english}
   \begin{clojure}
 (require '[clojure.spec.alpha :as s])
 (require '[expound.alpha :as expound])
+
+
+(defn coerce-config [config]
+  (let [[e result] (pcall s/conform ::config config)]
+    (cond
+      (some? e)
+      (exit 1 "Wrong config values: %s" (ex-message e))
+
+      (= result ::s/invalid)
+      (let [report (expound/expound-str ::config config)]
+        (exit 1 "Invalid config values: %s %s" \newline report))
+
+      :else result)))
+
 
 (defn coerce-config [config]
   (try
