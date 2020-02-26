@@ -885,7 +885,8 @@ Spec предлагает такие возможности. Это функци
   \end{clojure}
 \end{english}
 
-Топология результата будет другой, и это нужно учесть:
+Топология результата будет другой, и это нужно учесть. Если передать поле
+\spverb|:port| в подключение, получим ошибку типов.
 
 \begin{english}
   \begin{clojure}
@@ -894,7 +895,129 @@ Spec предлагает такие возможности. Это функци
   \end{clojure}
 \end{english}
 
-%% TODO s/unform
+\section{Обратное действие}
+
+Spec предлагает функцию \spverb|unform| с противоположным смыслом. По спеке и
+результату \spverb|conform| она вернет исходное значение. Выше мы получили
+словарь, где поле \spverb|:port| это вектор. Чтобы вернуться к прежней структуре,
+выполните:
+
+\begin{english}
+  \begin{clojure}
+(s/unform ::conn {:port [:num 9090]})
+{:port 9090}
+  \end{clojure}
+\end{english}
+
+Если передать случай со строкой, получим ошибку:
+
+\begin{english}
+  \begin{clojure}
+(s/unform ::conn {:port [:string 9090]})
+;; Execution error (IllegalStateException)
+;; no unform fn for conformer
+  \end{clojure}
+\end{english}
+
+Дело в том, что для тега \spverb|:num| мы задали предикат. Он не выводит новое
+значение, поэтому для предиката операция \spverb|unform| отбросит тег и вернет
+значение. Тег \spverb|:string| указывает на спеку типа \spverb|conformer|,
+которая меняет значение. Чтобы выполнить \spverb|unform|, необходимо сказать ей,
+как это сделать.
+
+Мы задали \spverb|::->int| макросом \spverb|with-conformer|, который сводится к
+вызову \spverb|s/conformer|. Первый его аргумент это функция, которая выводит
+число из строки. К ней обращается \spverb|s/conform|, когда его вызывают. Второй
+необязательный аргумент это функция с обратным эффектом: по результату
+\spverb|conform| вернуть прежнее значение. Функция сработает в момент
+\spverb|s/unform|.
+
+Изменим \spverb|::->int|, чтобы он поддерживал \spverb|unform|:
+
+\begin{english}
+  \begin{clojure}
+(s/def ::->int
+  (s/and
+   ::ne-string
+   (s/conformer
+    (fn [string]
+      (Integer/parseInt string))
+    (fn [integer]
+      (str integer)))))
+  \end{clojure}
+\end{english}
+
+Теперь порт со строкой не вызовет ошибки:
+
+\begin{english}
+  \begin{clojure}
+(s/unform ::conn {:port [:string 9090]})
+{:port "9090"}
+  \end{clojure}
+\end{english}
+
+\spverb|Unform| полезен, если вы утратили исходные данные, но сохранили их
+\spverb|conform|-вариант.
+
+Читатель заметит, что наша цель была вывести порт из строки, однако из-за
+\spverb|conform| и \spverb|unform| все пошло не так. \spverb|Conform| вывел тип,
+но добавил в результат теги, из-за чего изменилась структура. \spverb|Unform|
+убрал теги, но вернул строку на место числа. Какой в этом смысл?
+
+Если коротко, \spverb|conform| и теги незаменимы для парсинга данных и их
+обхода. Далее мы покажем, как с помощью \spverb|conform| получить синтаксическое
+дерево, без которого не обходится ни один компилятор. Что касается
+\spverb|unform|, то его поведение можно исправить хитростью.
+
+В новой спеке \spverb|::->int| мы честно переводим число в строку. Если вернуть
+число без изменений, оно встанет на место \spverb|:port| в итоговом словаре:
+
+\begin{english}
+  \begin{clojure}
+(s/def ::->int
+  (s/and
+   ::ne-string
+   (s/conformer
+    (fn [string]
+      (Integer/parseInt string))
+    (fn [integer]
+      integer))))
+
+(s/unform ::conn {:port [:string 9090]})
+{:port 9090}
+  \end{clojure}
+\end{english}
+
+Для большей краткости вторым аргументом в \spverb|s/conformer| передают
+\spverb|identity|~--- функцию, которая вернет переданный ей аргумент. С таким
+подходом \spverb|unform| всегда вернет то, что получили на этапе
+\spverb|conform|. Полный цикл \spverb|con|- и \spverb|unform|:
+
+\begin{english}
+  \begin{clojure}
+(->> {:port "9090"}
+     (s/conform ::conn)
+     (s/unform ::conn))
+{:port 9090}
+  \end{clojure}
+\end{english}
+
+Чтобы не забыть действие \spverb|unfrom| в спеке, сделайте его частью макроса
+\spverb|with-conformer|:
+
+\begin{english}
+  \begin{clojure}
+(defmacro with-conformer
+  [[bind] & body]
+  `(s/conformer
+    (fn [~bind]
+      (try
+        ~@body
+        (catch Exception e#
+          ::s/invalid)))
+    identity))
+  \end{clojure}
+\end{english}
 
 \section{Анализ ошибок}
 
@@ -2291,6 +2414,8 @@ HTML-файлы.
 
 \section{Переиспользование спек}
 
+%% TODO !!!!!!
+
 В Clojure принято снабжать библиотеки спеками, чтобы помочь другим. Если
 библиотека активно работает с какой-то структурой данных, опишите ее
 спекой. Хорошим примером служит JDBC\footurl{https://github.com/clojure/java.jdbc},
@@ -2338,8 +2463,7 @@ HTML-файлы.
   \end{clojure}
 \end{english}
 
-Эту технику мы детально рассмотрим в главе про
-конфигурацию \page{chapter-config}.
+Эту технику мы рассмотрим в главе про конфигурацию \page{chapter-config}.
 
 Иногда спеки выносят в отдельную библиотеку. Так поступили разработчики
 Alia\footurl{https://github.com/mpenet/alia}~--- клиента для БД
