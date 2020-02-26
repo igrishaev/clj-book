@@ -2461,9 +2461,29 @@ HTML-файлы.
   \end{clojure}
 \end{english}
 
-Вопросы конфигурации мы рассмотрим в отдельной главе \page{chapter-config}.
+\label{jdbc-conform-warning}
 
-%% TODO jdbc conform
+Будьте внимательны с \spverb|::jdbc/db-spec|. Это сложная спека с макросами
+\spverb|s/or|, которые порождают развилки. Если передать ее в
+\spverb|s/conform|, получим результат с тегами:
+
+\begin{english}
+  \begin{clojure}
+(s/conform ::config config)
+{:db
+ [:friendly
+  {:dbtype   [:name "mysql"]
+   :host     "127.0.0.1"
+   :port     [:port 3306]
+   :dbname   "project"
+   :user     "user"
+   :password "********"
+   :useSSL   true}]}
+  \end{clojure}
+\end{english}
+
+Такой вектор не работает с \spverb|jdbc/query| и другими функциями JDBC. Мы
+ограничились \spverb|s/valid?|, чтобы оставить структуру прежней.
 
 Иногда спеки выносят в отдельную библиотеку. Так поступили разработчики
 Alia\footurl{https://github.com/mpenet/alia}~--- клиента для БД
