@@ -771,7 +771,7 @@ Spec предлагает такие возможности. Это функци
 \begin{english}
   \begin{clojure}
 (defmacro with-conformer
-  [bind & body]
+  [[bind] & body]
   `(s/conformer
     (fn [~bind]
       (try
@@ -789,7 +789,7 @@ Spec предлагает такие возможности. Это функци
 (s/def ::->int
   (s/and
    ::ne-string
-   (with-conformer val
+   (with-conformer [val]
      (Integer/parseInt val))))
   \end{clojure}
 \end{english}
@@ -802,7 +802,7 @@ Spec предлагает такие возможности. Это функци
 (s/def ::->bool
   (s/and
    ->lower
-   (with-conformer val
+   (with-conformer [val]
      (case val
        ("true"  "1" "on"  "yes") true
        ("false" "0" "off" "no" ) false))))
@@ -1484,7 +1484,7 @@ $\langle$номер, емейл, статус$\rangle$. Все значения 
   \begin{clojure}
 (s/def :user/status
   (s/and ->lower
-         (with-conformer val
+         (with-conformer [val]
            (case val
              "active"  :USER_ACTIVE
              "pending" :USER_PENDING))))
@@ -1718,7 +1718,7 @@ port=8080
   (s/and
    #(str/starts-with? % "[")
    #(str/ends-with? % "]")
-   (with-conformer line
+   (with-conformer [line]
      (subs line 1 (dec (count line))))))
   \end{clojure}
 \end{english}
@@ -1728,7 +1728,7 @@ port=8080
 \begin{english}
   \begin{clojure}
 (s/def :ini/title
-  (with-conformer line
+  (with-conformer [line]
     (or (second (re-matches #"^\[(.+)\]$" line))
         ::s/invalid)))
   \end{clojure}
@@ -1742,7 +1742,7 @@ port=8080
 \begin{english}
   \begin{clojure}
 (s/def :ini/field
-  (with-conformer line
+  (with-conformer [line]
     (let [pair (str/split line #"=" 2)]
       (if (= (count pair) 2)
         pair
