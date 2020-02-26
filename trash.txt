@@ -299,3 +299,22 @@ https://stackoverflow.com/questions/6886024/how-to-replace-a-search-with-multipl
 бросит исключение, а поместит его в переменную. Затем пойдет в обратном порядке
 и выключит все, что успел включить. И только потом бросит исключение, которое
 поймал.
+
+
+(defn ->conformer
+  ([f]
+   (->conformer f nil))
+  ([f unf]
+   (s/conformer
+    (fn [x]
+      (try
+        (f x)
+        (catch Throwable e
+          ::s/invalid)))
+    (or unf identity))))
+
+
+(defmacro with-conformer
+  [[bind] & body]
+  `(->conformer
+    (fn [~bind] ~@body)))
