@@ -318,3 +318,13 @@ https://stackoverflow.com/questions/6886024/how-to-replace-a-search-with-multipl
   [[bind] & body]
   `(->conformer
     (fn [~bind] ~@body)))
+
+
+%% TODO s/unform jdbc
+%% Для подключения к базе данных укажем готовую спеку из JDBC:
+%% \begin{english}
+%%   \begin{clojure}
+%% (require '[clojure.java.jdbc.spec :as jdbc])
+%% (s/def ::db ::jdbc/db-spec)
+%%   \end{clojure}
+%% \end{english}
