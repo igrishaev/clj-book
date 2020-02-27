@@ -330,12 +330,22 @@ Clojure, и у DevOps уже написаны скрипты на Python для 
   \end{clojure}
 \end{english}
 
-Для подключения к базе данных укажем готовую спеку из JDBC:
+\noindent
+Спека подключения к базе данных. Напомним, что \spverb|::ne-string| означает
+непустую строку.
 
 \begin{english}
   \begin{clojure}
-(require '[clojure.java.jdbc.spec :as jdbc])
-(s/def ::db ::jdbc/db-spec)
+(s/def :db/dbtype   #{"mysql"})
+(s/def :db/dbname   ::ne-string)
+(s/def :db/user     ::ne-string)
+(s/def :db/password ::ne-string)
+
+(s/def ::db
+  (s/keys :req-un [:db/dbtype
+                   :db/dbname
+                   :db/user
+                   :db/password]))
   \end{clojure}
 \end{english}
 
@@ -411,8 +421,6 @@ Clojure, и у DevOps уже написаны скрипты на Python для 
   \end{clojure}
 \end{english}
 
-%% TODO s/unform
-
 \subsection{Работа над ошибками}
 
 Мы написали загрузчик конфигурации. Он удобен в поддержке: каждый шаг это
@@ -449,10 +457,17 @@ Clojure, и у DevOps уже написаны скрипты на Python для 
 Более удачное решение~--- передать в \spverb|load-config!| дополнительные
 параметры. Назовем один из них \spverb|:die-fn|. Это функция, которая принимает
 исключение. В боевом запуске <<die function>> завершает JVM, а в разработке
-пишет сообщение в REPL.
-
-Доработайте загрузчик так, чтобы он поддерживал параметр
+пишет сообщение в REPL. Доработайте загрузчик так, чтобы он поддерживал параметр
 \spverb|:die-fn|. Продумайте поведение по умолчанию, если он не задан.
+
+Для вывода типов загрузчик опирается на \spverb|s/conform|. В главе про Spec мы
+рассмотрели случай, когда \spverb|s/conform| добавляет логические теги и тем
+самым меняет структуру данных \page{jdbc-conform-warning}. Если заменить спеку
+\spverb|::db| на \spverb|::jdbc/db-spec|, получим тот самый случай. Чтобы
+избежать этого, мы задали свою версию \spverb|::db| без макросов \spverb|s/or|.
+
+По-другому типы выводят с помощью \emph{тегов}. Эту технику мы обсудим в
+следующих разделах главы.
 
 \section{Подробнее о переменных среды}
 
