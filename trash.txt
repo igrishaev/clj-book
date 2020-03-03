@@ -328,3 +328,14 @@ https://stackoverflow.com/questions/6886024/how-to-replace-a-search-with-multipl
 %% (s/def ::db ::jdbc/db-spec)
 %%   \end{clojure}
 %% \end{english}
+
+
+int-in-range?
+invalid?
+inst-in-range?
+
+автор надеется
+
+blocked highligh
+
+например
