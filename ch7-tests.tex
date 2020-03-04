@@ -1734,19 +1734,15 @@ lein test :integration
   \end{clojure}
 \end{english}
 
-%% -------------
-
 \subsection{Тесты в deps.edn}
 
-Не все Clojure-проекты используют \spverb|lein|; некоторые перешли на
-\spverb|deps.edn|\footurl{https://clojure.org/guides/deps\_and\_cli}. Это
-утилита, разработанная в фирме Cognitect. Основная задача утилиты~--- управлять
-зависимостями проекта. С версии 1.9 \spverb|deps.edn| идет в поставке Clojure.
+Не все проекты на Clojure используют Lein; некоторые перешли на
+Deps.edn\footurl{https://clojure.org/guides/deps\_and\_cli}. Это утилита для
+управления зависимостями. С версии 1.9 Deps.edn идет в поставке Clojure.
 
-Если проект работает на \spverb|deps|, мы теряем возможности \spverb|lein|. В
-том числе это прогон тестов, команда \spverb|lein test|. Чтобы компенсировать
-потери, в \spverb|deps| подключают сторонние библиотеки. Проект
-\spverb|test-runner|\footurl{https://github.com/cognitect-labs/test-runner}
+Если проект работает на Deps, мы теряем возможности Lein, в том числе прогон
+тестов. Чтобы компенсировать потери, в Deps подключают сторонние
+библиотеки. Проект Test-runner\footurl{https://github.com/cognitect-labs/test-runner}
 делает то же, что и \spverb|lein test|: находит тесты, запускает их и выводит
 отчет.
 
@@ -1765,17 +1761,18 @@ lein test :integration
   \end{clojure}
 \end{english}
 
-Ключ \spverb|:aliases| это то же самое, что профили в \spverb|lein|:
-дополнительные опции, которые включаются, если указан этот профиль. Ключ
-\spverb|:extra-paths| это список путей для поиска файлов с кодом. Поле
-\spverb|:extra-deps| указывает зависимости, которые подхватит проект при
-старте. Поскольку \spverb|test-runner| нужен только для тестов, нет смысла
+Ключ \spverb|:aliases| это то же самое, что профили в \spverb|lein|: опции,
+которые включаются, если указан профиль. Ключ \spverb|:extra-paths| это список
+путей для поиска файлов с кодом. Поле \spverb|:extra-deps| указывает зависимости
+в дополнение к основным. Test-runner нужен только для тестов, поэтому не нужно
 вносить его в глобальные зависимости.
 
-Библиотека скачивается прямиком с GitHub; поле \spverb|:sha| означает номер
-коммита. Это коренное отличие \spverb|deps| от \spverb|lein|: репозиторием может
-быть GitHub. Ключ \spverb|:main-opts| задает входную точку программы. Это
-функция \spverb|-main| из модуля \spverb|cognitect.test-runner|.
+%% ---------------
+
+Библиотека загружается с GitHub; поле \spverb|:sha| означает номер коммита. Это
+коренное отличие \spverb|deps| от \spverb|lein|: репозиторием может быть
+GitHub. Ключ \spverb|:main-opts| задает входную точку программы. Это функция
+\spverb|-main| из модуля \spverb|cognitect.test-runner|.
 
 Библиотека предлагает ключи для выборки тестов с логикой <<только с этим тегом>>
 (\spverb|-i|, include, включить) или <<без этого тега>> (\spverb|-e|, exclude,
