@@ -339,3 +339,9 @@ inst-in-range?
 blocked highligh
 
 например
+
+ё
+
+вс\"{е}
+
+ispell
