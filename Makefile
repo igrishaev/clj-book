@@ -18,3 +18,6 @@ pdf-build:
 
 pdf-open:
 	open main.pdf
+
+stats:
+	find . -name '*.tex' | xargs wc -l
