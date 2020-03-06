@@ -334,13 +334,10 @@ int-in-range?
 invalid?
 inst-in-range?
 
-автор надеется
-
-blocked highligh
-
-например
-
-ё
+- автор надеется
+- blocked highligh
+- например
+- ё
 
 вс\"{е}
 
