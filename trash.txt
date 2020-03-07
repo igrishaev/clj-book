@@ -335,8 +335,11 @@ https://stackoverflow.com/questions/6886024/how-to-replace-a-search-with-multipl
 - ё
 - вс\"{е}
 
-int-in-range?
-invalid?
+- int-in-range?
+- invalid?
+
+(s/def ::age
+  (partial s/int-in-range? 0 150))
 
 print
 

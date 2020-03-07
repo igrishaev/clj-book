@@ -281,7 +281,7 @@ Clojure, и у DevOps уже написаны скрипты на Python для 
       (some? e)
       (exit 1 "Wrong config values: %s" (ex-message e))
 
-      (= result ::s/invalid)
+      (s/invalid? result)
       (let [report (expound/expound-str ::config config)]
         (exit 1 "Invalid config values: %s %s" \newline report))
 

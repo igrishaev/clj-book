@@ -2,7 +2,7 @@
 PWD = $(shell pwd)
 PYG := /usr/local/lib/python2.7/site-packages/pygments
 
-all: git-commit pdf-build pdf-open
+all: pyg-clear git-commit pdf-build pdf-open
 
 pyg-install:
 	ln -s ${PWD}/print.py ${PYG}/styles/
@@ -21,3 +21,5 @@ pdf-open:
 
 stats:
 	find . -name '*.tex' | xargs wc -l
+
+release: all all all
