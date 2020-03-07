@@ -20,6 +20,7 @@ pdf-open:
 	open main.pdf
 
 stats:
-	find . -name '*.tex' | xargs wc -l
+	find . -name '*.tex' | xargs wc -cl
 
-release: all all all
+warnings:
+	egrep -A 0 -B 1 -i 'overfull|underfull' main.log
