@@ -23,4 +23,4 @@ stats:
 	find . -name '*.tex' | xargs wc -cl
 
 warnings:
-	egrep -A 0 -B 1 -i 'overfull|underfull' main.log
+	egrep -A 1 -B 1 -i 'overfull|underfull' main.log
