@@ -1,5 +1,5 @@
 
-\documentclass[10pt]{book} % ,draft
+\documentclass[10pt,draft]{book} % ,draft
 
 \usepackage{tikz}
 \usepackage{tocloft}
@@ -45,8 +45,6 @@
 %% debug frames
 %% \geometry{showframe}
 
-\input{charts}
-
 \setlength{\parskip}{0.32em}
 
 \pagestyle{plain}
@@ -56,7 +54,8 @@
 \widowpenalty 10000
 \clubpenalty 10000
 
-\input macro
+\input{charts}
+\input{macro}
 
 \author{Иван Гришаев}
 \title{Язык Clojure}
@@ -64,17 +63,14 @@
 
 \begin{document}
 
-\maketitle
-
 \input{hyphenation}
+
+\maketitle
 
 \input{abstract}
 
-\clearpage
-\tableofcontents
-\clearpage
-
 \frontmatter
+\tableofcontents
 \include{about}
 
 \mainmatter
