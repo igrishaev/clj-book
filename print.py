@@ -13,6 +13,10 @@ class PrintStyle(Style):
     default_style = "bw"
     styles = {
 
+        # HTTP
+        Name.Attribute:         GRAY,
+        Keyword.Reserved:       "nobold",
+
         # JSON
         Name.Tag:               GRAY,
 

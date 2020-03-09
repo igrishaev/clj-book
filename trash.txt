@@ -319,6 +319,13 @@ https://stackoverflow.com/questions/6886024/how-to-replace-a-search-with-multipl
   `(->conformer
     (fn [~bind] ~@body)))
 
+Классы одного фреймворка не работаю с другим и наоборот. Рассмотрим язык Python
+и фреймворки Django и Flask. Оба следуют схеме, что мы описали. Запрос в Django
+представлен классом \spverb|django.http.HttpRequest|, а во Flask~---
+\spverb|flask.Request|. Одного взгляда достаточно, чтобы увидеть, насколько они
+отличаются. У классов разные методы и поля. То, что есть в первом классе,
+отсутствует во втором. Использовать \spverb|flask.Request| в проекте на Django
+невозможно.
 
 %% TODO s/unform jdbc
 %% Для подключения к базе данных укажем готовую спеку из JDBC:
