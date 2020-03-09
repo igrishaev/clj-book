@@ -348,9 +348,9 @@ https://stackoverflow.com/questions/6886024/how-to-replace-a-search-with-multipl
 (s/def ::age
   (partial s/int-in-range? 0 150))
 
-print
-
 paging
 https://tex.stackexchange.com/questions/19738/
 
+print
 ispell
+don't split code
