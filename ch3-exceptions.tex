@@ -775,21 +775,20 @@ INFO: A message from my module
 
 %% ---------------
 
-В Clojure логирование устроено из двух уровней. Верхний уровень~--- это макросы
-\spverb|log/info|, \spverb|log/error| и другие. Второй уровень называют
+В Clojure логирование устроено из двух уровней. Первый это входная точка,
+макросы \spverb|log/info|, \spverb|log/error| и другие. Второй уровень называют
 бекендом. Под ним понимают Java-библиотеку, которая выполняет основную работу:
 пишет сообщения в файлы, отправляет их по сети и так далее.
 
-Это устройство несет преимущества. Исторически сложилось так, что для Java
-написали много библиотек логирования. Каждая из них предлагает свои классы и
-методы. Если проект использует конкретный Java-бекенд, не получится его сменить
+Такое устройство несет преимущества. Исторически сложилось так, что для Java
+написано много библиотек логирования. Каждая из них предлагает свои классы и
+методы. Если проект использует конкретный Java-бекенд, не получится сменить его
 без правок в коде.
 
-В Clojure эту проблему решили на уровне дизайна. При старте модуль
-\spverb|logging| ищет библиотеки \spverb|Logback|, \spverb|Log4j| и другие. Если
-ничего не найдено, он использует стандартный пакет
-\spverb|java.util.logging|. Вызов \spverb|log/info| сводится к вызову класса из
-найденной библиотеки.
+В Clojure эту проблему решили дизайном. При старте модуль \spverb|logging| ищет
+библиотеки \spverb|Logback|, \spverb|Log4j| и другие. Если ничего не найдено, он
+использует стандартный пакет \spverb|java.util.logging|. Вызов \spverb|log/info|
+сводится к вызову класса из найденной библиотеки.
 
 Чтобы нужный бекенд <<подхватился>>, добавьте его в зависимости. Особенно
 популярен проект \spverb|Logback|. От аналогов его отличает большой выбор
@@ -812,10 +811,10 @@ INFO: A message from my module
   \begin{xml}
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+  <appender name="STDOUT" class="...ConsoleAppender">
     <encoder>
       <charset>UTF-8</charset>
-      <pattern>%date{ISO8601} %-5level %logger{36} - %msg %n</pattern>
+      <pattern>%date %-5level %logger{36} - %msg %n</pattern>
     </encoder>
   </appender>
   <root level="INFO">
@@ -825,11 +824,11 @@ INFO: A message from my module
   \end{xml}
 \end{english}
 
-Мы задали appender для вывода в консоль. Под тегом \spverb|pattern| указан
+Мы задали appender для вывода в консоль. В теге \spverb|pattern| указан
 шаблон сообщения. Параметры шаблона начинаются со знака процента. Подстановка
-\spverb|\%msg| означает текст сообщения, \spverb|\%date{ISO8601}|~--- дату и ее
-формат в фигурных скобках. Залогируйте что-нибудь в новом сеансе REPL. Сообщение
-изменится:
+\spverb|\%msg| означает сообщение, \spverb|\%date|~--- дату. Ее формат
+задают в фигурных скобках, например \spverb|%date{ISO8601}|. Залогируйте
+что-нибудь в REPL. Вывод изменится:
 
 \begin{english}
   \begin{clojure}
@@ -846,9 +845,9 @@ INFO: A message from my module
 
 \begin{english}
   \begin{clojure}
-(log/error e "Error while processing the request")
+(log/error e "HTTP Error")
 
-2019-05-03 17:41:03,913 ERROR book.exceptions - Error while processing the request
+2019-05-03 17:41:03,913 ERROR book.exceptions - HTTP Error
 clojure.lang.ExceptionInfo: Get user info error
     at java.lang.Thread.run(Thread.java:745)
 Caused by: clojure.lang.ExceptionInfo: Auth error
@@ -859,6 +858,8 @@ Caused by: clojure.lang.ExceptionInfo: HTTP error
     ... 31 common frames omitted
   \end{clojure}
 \end{english}
+
+%% -------------
 
 Для экономии мы удалили часть трейса. Из примера видно, что цепочка состоит из
 трех звеньев~--- как и задали \spverb|e|. Проблема в том, что у каждого звена
