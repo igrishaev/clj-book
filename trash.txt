@@ -348,6 +348,14 @@ https://stackoverflow.com/questions/6886024/how-to-replace-a-search-with-multipl
 (s/def ::age
   (partial s/int-in-range? 0 150))
 
+%% \widowpenalty=10000
+%% \clubpenalty=10000
+%% \tolerance=500
+%% \hyphenpenalty=500
+
+%% \sloppy
+%% \everypar{\looseness=-1}
+
 paging
 https://tex.stackexchange.com/questions/19738/
 
