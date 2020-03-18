@@ -336,17 +336,17 @@ https://stackoverflow.com/questions/6886024/how-to-replace-a-search-with-multipl
 %%   \end{clojure}
 %% \end{english}
 
-- автор надеется
-- blocked highligh
-- например
 - ё
 - вс\"{е}
-
 - int-in-range?
 - invalid?
-
-(s/def ::age
-  (partial s/int-in-range? 0 150))
+- minted for inline code
+- print
+- ispell
+- don't split code
+- вернет
+- об\"{е}ртка
+- index
 
 %% \widowpenalty=10000
 %% \clubpenalty=10000
@@ -355,15 +355,3 @@ https://stackoverflow.com/questions/6886024/how-to-replace-a-search-with-multipl
 
 %% \sloppy
 %% \everypar{\looseness=-1}
-
-paging
-https://tex.stackexchange.com/questions/19738/
-
-print
-ispell
-don't split code
-
-вернет
-об\"{е}ртка
-
-index
