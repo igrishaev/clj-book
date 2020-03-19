@@ -347,6 +347,7 @@ https://stackoverflow.com/questions/6886024/how-to-replace-a-search-with-multipl
 - вернет
 - об\"{е}ртка
 - index
+- code references [n]
 
 %% \widowpenalty=10000
 %% \clubpenalty=10000
