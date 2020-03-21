@@ -338,14 +338,15 @@ https://stackoverflow.com/questions/6886024/how-to-replace-a-search-with-multipl
 
 - ё
 - вс\"{е}
+- еще
+- вернет
+- об\"{е}ртка
 - int-in-range?
 - invalid?
 - minted for inline code
 - print
 - ispell
 - don't split code
-- вернет
-- об\"{е}ртка
 - index
 - code references [n]
 
