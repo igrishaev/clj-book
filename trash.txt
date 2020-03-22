@@ -349,6 +349,10 @@ https://stackoverflow.com/questions/6886024/how-to-replace-a-search-with-multipl
 - don't split code
 - index
 - code references [n]
+- yaml highlightign
+
+Сравните данные в YAML и JSON - пониже
+
 
 %% \widowpenalty=10000
 %% \clubpenalty=10000

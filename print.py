@@ -6,7 +6,7 @@ from pygments.style import Style
 from pygments.token import Keyword, Name, Comment, String, Error, \
      Number, Operator, Generic
 
-GRAY = "#444"
+GRAY = "#555"
 LIGHTGRAY = "#eee"
 
 class PrintStyle(Style):
