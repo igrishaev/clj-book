@@ -361,3 +361,14 @@ https://stackoverflow.com/questions/6886024/how-to-replace-a-search-with-multipl
 
 %% \sloppy
 %% \everypar{\looseness=-1}
+
+\begin{english}
+  \begin{clojure}
+(let [ns-symbols (->> config
+                      keys
+                      (map namespace)
+                      (map symbol))]
+  (doseq [ns-symbol ns-symbols]
+    (require ns-symbol)))
+  \end{clojure}
+\end{english}
