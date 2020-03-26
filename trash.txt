@@ -336,6 +336,9 @@ https://stackoverflow.com/questions/6886024/how-to-replace-a-search-with-multipl
 %%   \end{clojure}
 %% \end{english}
 
+- нее
+- ее
+- идет
 - Разберемся
 - ё
 - вс\"{е}
