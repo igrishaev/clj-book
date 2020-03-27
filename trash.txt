@@ -379,3 +379,28 @@ https://stackoverflow.com/questions/6886024/how-to-replace-a-search-with-multipl
 
 
 При ручном запуске рушатся зависимости
+
+\noindent
+\begin{tabular}{ @{}p{5.0cm} @{}p{5.0cm} }
+
+\begin{english}
+  \begin{clojure}
+;; why this?
+(assoc this :server nil)
+
+
+  \end{clojure}
+\end{english}
+
+&
+
+\begin{english}
+  \begin{clojure}
+;; but not this?
+(dissoc this :server)
+  \end{clojure}
+\end{english}
+
+\end{tabular}
+
+\vspace{-2em}
