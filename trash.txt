@@ -347,6 +347,8 @@ https://stackoverflow.com/questions/6886024/how-to-replace-a-search-with-multipl
 - еще
 - вернет
 - об\"{е}ртка
+- отчет
+- разберемся
 
 - int-in-range?
 - invalid?
