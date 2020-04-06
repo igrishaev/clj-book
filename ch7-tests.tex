@@ -3505,23 +3505,51 @@ Safari, добавьте его ключ в вектор \spverb|driver-type|.
   \end{clojure}
 \end{english}
 
-%% TODO
+Библиотека Spy\footurl{https://github.com/alexanderjamesking/spy} работает
+по-другому. Одноименная функция возвращает <<шпионскую>> версию исходной. Шпион
+вед\"{е}т себя как оригинал, но накапливает аргументы и результаты. Вызов
+исходной функции не влияет на шпионский клон.
 
-%% Библиотека Spy\footurl{https://github.com/alexanderjamesking/spy} работает
-%% похожим образом. На функцию садят <<шпиона>>, который копит данные о вызове.
 
-%% \begin{english}
-%%   \begin{clojure}
-%% (defn adder [x y] (+ x y))
-%% (def spy-adder (spy/spy adder))
+\begin{english}
+  \begin{clojure}
+(require '[spy.core :as spy])
 
-%% (testing "calling the function"
-%%   (is (= 3 (spy-adder 1 2))))
+(def spy+ (spy/spy +))
+(mapv spy+ [1 2 3] [4 5 6])
 
-%% (testing "calls to the spy can be accessed via spy/calls"
-%%   (is (= [[1 2]] (spy/calls spy-adder))))
-%%   \end{clojure}
-%% \end{english}
+(spy/calls spy+)
+;; [(1 4) (2 5) (3 6)]
+(spy/responses spy+)
+;; [5 7 9]
+  \end{clojure}
+\end{english}
+
+Spy полезен, когда функции передают в параметрах. В широком смысле техника
+называется <<dependency indirection>>, обратные зависимости. Не старший объект
+знает, что вызывать, а наоборот~--- ему говорят, с чем работать. Предположим, мы
+пишем тесты на чтение конфигурации с параметром \spverb|:die-fn|. Если ошибок
+нет, функция смерти не вызывается. Если в конфигурации ошибка, должен быть вызов
+с~исключением и меткой.
+
+\begin{english}
+  \begin{clojure}
+(require '[spy.assert :as assert])
+
+(deftest test-config-error-die-fn-called
+  (let [spy-die-fn (spy/spy)]
+    (load-config {:program-name :test
+                  :spec ::broken-config
+                  :die-fn spy-die-fn})
+    (assert/called? spy-die-fn)))
+  \end{clojure}
+\end{english}
+
+Об\"{е}ртка \spverb|spy| может быть без аргументов. В этом случае она верн\"{е}т
+функцию произвольной арности. Модуль \spverb|assert| предлагает макросы для
+проверок в тестах: вызвано хотя бы раз, точное число раз, именно с этими
+аргументами и так далее. На нижнем уровне они сводятся к~\spverb|is| с~понятным
+сообщением.
 
 \subsection{Альтернативный синтаксис}
 
