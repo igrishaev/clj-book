@@ -373,17 +373,11 @@ https://stackoverflow.com/questions/6886024/how-to-replace-a-search-with-multipl
 TODO
 
 - например
-- 80% тесты
-- invalid?
-- minted for inline code
-- print
-- ispell
 - don't split code
-- index
-- code references [n]
-- yaml highlightign
 - bash $ or >
 - keep Raven?
+- index
+- ispell
 
 - Сравните данные в YAML и JSON - пониже
 - При ручном запуске рушатся зависимости
