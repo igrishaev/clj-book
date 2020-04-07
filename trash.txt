@@ -373,8 +373,6 @@ https://stackoverflow.com/questions/6886024/how-to-replace-a-search-with-multipl
 
 TODO
 
-- ё
-- вернется
 - придется
 - нее
 - ее
@@ -382,7 +380,6 @@ TODO
 - Разберемся
 - вс\"{е}
 - еще
-- вернет
 - об\"{е}ртка
 - отчет
 - разберемся
