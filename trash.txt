@@ -377,7 +377,6 @@ TODO
 - ее
 - вс\"{е}
 - еще
-- об\"{е}ртка
 - прием
 
 - keyword headers (stringify)
