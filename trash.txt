@@ -380,7 +380,6 @@ TODO
 - еще
 - об\"{е}ртка
 - прием
-- задает
 
 - keyword headers (stringify)
 - qr codes
