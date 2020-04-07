@@ -372,13 +372,6 @@ https://stackoverflow.com/questions/6886024/how-to-replace-a-search-with-multipl
 
 TODO
 
-- keyword headers (stringify)
-- qr codes
-- code highlight
-- set margins
-- remove unused packages
-- add Antony
-- номера строк!!!
 - add eng
 - например
 - 80% тесты
@@ -397,3 +390,4 @@ TODO
 - Сравните данные в YAML и JSON - пониже
 - При ручном запуске рушатся зависимости
 - которые входят в граф связей
+- заголовок

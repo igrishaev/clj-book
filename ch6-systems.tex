@@ -1449,13 +1449,13 @@ COMMIT
 \spverb|DB|, который мы только что написали. Реализуем \spverb|Lifecycle|:
 
 \begin{english}
-  \begin{clojure}
+  \begin{clojure/lines}
 (defrecord Worker
   [options flag task db]
   component/Lifecycle
   (start [this]
     (let [flag (atom true)
-          this (assoc this :flag flag) ;; [1]
+          this (assoc this :flag flag)
           task (make-task this)]
       (assoc this :task task)))
 
@@ -1465,10 +1465,10 @@ COMMIT
       (log/info "Waiting for the task to complete")
       (Thread/sleep 300))
     (assoc this :flag nil :task nil)))
-  \end{clojure}
+  \end{clojure/lines}
 \end{english}
 
-Обратите внимание на строку \coderef{1}: мы дополняем \spverb|this| флагом
+Обратите внимание на строку 6: мы дополняем \spverb|this| флагом
 состояния. Метод \spverb|make-task| ожидает \spverb|this| с заполненным слотом
 \spverb|flag|. Если строку убрать, \spverb|make-task| получит запись с пустым
 флагом.

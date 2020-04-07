@@ -1461,21 +1461,21 @@ patch>>\footurl{https://en.wikipedia.org/wiki/Monkey\_patch}. Термин оз�
 Реализация:
 
 \begin{english}
-  \begin{clojure}
+  \begin{clojure/lines}
 (defn install-better-logging []
   (alter-var-root
    (var clojure.tools.logging/log*)
-   (fn [log*] ;; [1]
+   (fn [log*] ;; origin function
      (fn [logger level throwable message]
        (if throwable
          (let [ex-out (with-out-str (ex-print throwable))
                message* (str message \newline ex-out)]
            (log* logger level nil message*))
          (log* logger level throwable message))))))
-  \end{clojure}
+  \end{clojure/lines}
 \end{english}
 
-Хитрость в строке с комментарием \spverb|[1]|. Анонимная функция в
+Хитрость кроется в параметре \spverb|log*| \coderef{4}. Анонимная функция в
 \spverb|alter-var-root| принимает текущее значение переменной. Это исходная
 функция \spverb|clojure.tools.logging/log*|, и параметр \spverb|log*| ссылается
 на не\"{е}. Новая функция замкнута на \spverb|log*| и может е\"{е} вызывать.
