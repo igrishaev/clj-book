@@ -499,7 +499,7 @@ COMMAND_MODE=unix2003
 
 \begin{english}
   \begin{bash}
-> FOO=42
+$ FOO=42
   \end{bash}
 \end{english}
 
@@ -508,7 +508,7 @@ COMMAND_MODE=unix2003
 
 \begin{english}
   \begin{bash}
-> echo $FOO
+$ echo $FOO
 42
   \end{bash}
 \end{english}
@@ -520,8 +520,8 @@ COMMAND_MODE=unix2003
 
 \begin{english}
   \begin{bash}
-> sh
-> echo $FOO
+$ sh
+$ echo $FOO
   \end{bash}
 \end{english}
 
@@ -533,13 +533,13 @@ COMMAND_MODE=unix2003
 
 \begin{english}
   \begin{bash}
-> export FOO=42
+$ export FOO=42
 
-> printenv | grep FOO
+$ printenv | grep FOO
 FOO=42
 
-> sh
-> echo $FOO
+$ sh
+$ echo $FOO
 42
   \end{bash}
 \end{english}
@@ -550,7 +550,7 @@ FOO=42
 
 \begin{english}
   \begin{bash}
-> BAR=99 printenv | grep BAR
+$ BAR=99 printenv | grep BAR
 BAR=99
   \end{bash}
 \end{english}
@@ -565,7 +565,7 @@ BAR=99
 
 \begin{english}
   \begin{bash}
-> export PGHOST=host.com PGDATABASE=project
+$ export PGHOST=host.com PGDATABASE=project
   \end{bash}
 \end{english}
 
@@ -618,7 +618,7 @@ BAR=99
 
 \begin{english}
   \begin{bash}
-> docker run \
+$ docker run \
   -e POSTGRES_DB=book \
   -e POSTGRES_USER=ivan \
   -e POSTGRES_PASSWORD=**** \
@@ -758,8 +758,8 @@ DB_PASS=****
 
 \begin{english}
   \begin{bash}
-> source ENV
-> echo $DB_NAME
+$ source ENV
+$ echo $DB_NAME
 book
   \end{bash}
 \end{english}
@@ -771,8 +771,8 @@ book
 
 \begin{english}
   \begin{bash}
-> source ENV
-> printenv | grep DB
+$ source ENV
+$ printenv | grep DB
 # exit 1
   \end{bash}
 \end{english}
@@ -783,13 +783,13 @@ book
 
 \begin{english}
   \begin{bash}
-> cat ENV
+$ cat ENV
 export DB_NAME=book
 export DB_USER=ivan
 export DB_PASS=****
 
-> source ENV
-> printenv | grep DB
+$ source ENV
+$ printenv | grep DB
 DB_NAME=book
 DB_USER=ivan
 DB_PASS=****
@@ -806,11 +806,11 @@ DB_PASS=****
 
 \begin{english}
   \begin{bash}
-> set -a
-> source ENV
-> printenv | grep DB
+$ set -a
+$ source ENV
+$ printenv | grep DB
 # prints all the vars
-> set +a
+$ set +a
   \end{bash}
 \end{english}
 
@@ -828,12 +828,12 @@ DB_PASS=****
 
 \begin{english}
   \begin{bash}
-> set -a
-> source ENV
-> source ENV_TEST
-> set +a
+$ set -a
+$ source ENV
+$ source ENV_TEST
+$ set +a
 
-> echo $DB_NAME
+$ echo $DB_NAME
 test
   \end{bash}
 \end{english}
@@ -1081,9 +1081,9 @@ HTTP__HOST=api.random.com
 
 \begin{english}
   \begin{bash}
-> set -a
-> source ENV_NEST
-> lein repl
+$ set -a
+$ source ENV_NEST
+$ lein repl
   \end{bash}
 \end{english}
 
@@ -1154,7 +1154,7 @@ HTTP__HOST=api.random.com
 
 \begin{english}
   \begin{bash}
-> <manager> install gettext
+$ <manager> install gettext
   \end{bash}
 \end{english}
 
@@ -1191,7 +1191,7 @@ HTTP__HOST=api.random.com
 
 \begin{english}
   \begin{bash}
-> cat ENV_TPL
+$ cat ENV_TPL
 DB_NAME=book
 DB_USER=ivan
 DB_PASS='*(&fd}A53z#$!'
@@ -1206,8 +1206,8 @@ EVENT_END='2019-07-12T23:59:59'
 
 \begin{english}
   \begin{bash}
-> source ENV_TPL
-> cat config.tpl.json | envsubst
+$ source ENV_TPL
+$ cat config.tpl.json | envsubst
 {
     "server_port": 8080,
     "db": {
@@ -1230,7 +1230,7 @@ EVENT_END='2019-07-12T23:59:59'
 
 \begin{english}
   \begin{bash}
-> cat config.tpl.json | envsubst > config.ready.json
+$ cat config.tpl.json | envsubst > config.ready.json
   \end{bash}
 \end{english}
 
@@ -1708,7 +1708,7 @@ property-файлу и загружает его.
 
 \begin{english}
   \begin{bash}
-> java -Dconf="/path/to/config.properties" -jar project.jar
+$ java -Dconf="/path/to/config.properties" -jar project.jar
   \end{bash}
 \end{english}
 

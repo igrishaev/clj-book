@@ -372,8 +372,6 @@ https://stackoverflow.com/questions/6886024/how-to-replace-a-search-with-multipl
 
 TODO
 
-- don't split code
-- bash $ or >
 - keep Raven?
 - титул
 - index
