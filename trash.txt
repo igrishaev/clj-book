@@ -376,7 +376,6 @@ TODO
 - нее
 - ее
 - вс\"{е}
-- прием
 
 - keyword headers (stringify)
 - qr codes
