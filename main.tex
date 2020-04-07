@@ -1,5 +1,5 @@
 
-\documentclass[10pt]{book} % ,draft
+\documentclass[10pt,draft]{book} % ,draft
 
 \usepackage{tikz}
 \usepackage{tocloft}
@@ -21,8 +21,10 @@
 % to have bold tt fonts in code listings
 \usepackage{bold-extra}
 
-\usepackage{minted}
+\usepackage[newfloat=true]{minted}
 \usemintedstyle{print}
+
+\SetupFloatingEnvironment{listing}{placement=H}
 
 % to have ' and ` in verbatim
 \usepackage{textcomp}
