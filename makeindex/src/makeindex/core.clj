@@ -4,6 +4,7 @@
   (:gen-class))
 
 (def path-in "/Users/ivan/work/clj-book/main.idx")
+(def path-out "/Users/ivan/work/clj-book/main.ind")
 
 (def re-line #"^\\indexentry\s\{(.+)\}\{(\d+)\}$")
 
@@ -34,7 +35,7 @@
 (defn lines->tree [parsed]
   (reduce
    (fn [index [terms page]]
-     (update-in index (conj terms :__pages) (fnil conj []) page))
+     (update-in index (conj terms :__pages) conj page))
    {}
    parsed))
 
@@ -51,8 +52,8 @@
 
 (defn print-tree [tree & [{level :level
                            :as opt
-                           :or {level 0}
-                           }]]
+                           :or {level 0}}]]
+
   (doseq [[term childs] (sort-by first tree)]
 
     (let [{:keys [after wrap func wrap-pages]} (get level-rules level)
@@ -68,7 +69,7 @@
       (when-let [pages (:__pages childs)]
         (print " ")
         (when w3 (print w3))
-        (print (str/join ", " pages))
+        (print (str/join ", " (sort (set pages))))
         (when w4 (print w4)))
 
       (println)
@@ -81,19 +82,20 @@
         (println after)))))
 
 
+(defn save-file [tree]
+  (let [out (with-out-str
+              (println "\\begin{theindex}")
+              (print-tree tree)
+              (println "\\end{theindex}"))]
+    (spit path-out out)))
+
+
 (defn aaaaa []
   (->> path-in
        path->lines
        (map line->terms-page)
        lines->tree
-       print-tree
-       )
-  )
-
-
-
-
-
+       save-file))
 
 
 #_
