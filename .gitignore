@@ -6,3 +6,6 @@ _minted-main/
 trash.tex
 *.toc
 .commit
+*.idx
+*.ilg
+*.ind

@@ -36,6 +36,17 @@
 % extra space at the end of macros
 \usepackage{xspace}
 
+
+% index
+\usepackage{index}
+\newindex{default}{idx}{ind}{Предметный указатель}
+\usepackage[
+  unbalanced,
+  itemlayout=abshang,
+  indentunit=0.25em,
+  totoc
+]{idxlayout}
+
 \geometry{
   papersize={145mm,210mm}, % 140x200 + 5mm bleed
   left   = 20mm,           % 20mm + 0mm bleed
@@ -63,6 +74,8 @@
 \title{Clojure на работе}
 \date{}
 
+%% \makeindex
+
 \begin{document}
 
 \input{hyphenation}
@@ -80,11 +93,13 @@
 %% \include{ch2-spec}
 %% \include{ch3-exceptions}
 %% \include{ch4-mutability}
-\include{ch5-config}
+%% \include{ch5-config}
 %% \include{ch6-systems}
 %% \include{ch7-tests}
 
 \backmatter
 \include{afterword}
+
+\printindex
 
 \end{document}
