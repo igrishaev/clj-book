@@ -3,11 +3,11 @@
    [clojure.string :as str])
   (:gen-class))
 
-(def path-in "/Users/ivan/work/clj-book/_main.idx")
+(def path-in "/Users/ivan/work/clj-book/main.idx")
 
 (def re-line #"^\\indexentry\s\{(.+)\}\{(\d+)\}$")
 
-(def wrap-pages ["{\\slshape " "}"])
+(def wrap-pages ["\\hfill{\\slshape " "}"])
 
 (def level-rules
   {0 {:wrap ["\\textbf{" "}"]
