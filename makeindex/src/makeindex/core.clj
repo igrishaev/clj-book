@@ -26,7 +26,7 @@
 (defn line->terms-page [line]
   (when-let [result (re-matches re-line line)]
     (let [[_ str-terms str-page] result
-          terms (str/split str-terms #"!")
+          terms (str/split str-terms #"(?<!\")!")
           [[T]] terms
           page (Integer/parseInt str-page)]
       [(into [T] terms) page])))
