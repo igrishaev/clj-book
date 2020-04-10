@@ -4,6 +4,10 @@ PYG := /usr/local/lib/python2.7/site-packages/pygments
 
 all: pyg-clear git-commit pdf-build pdf-open
 
+.PHONY: index
+index:
+	cd makeindex && clojure -m makeindex.core ${PWD}/main.idx ${PWD}/main.ind
+
 pyg-install:
 	ln -s ${PWD}/print.py ${PYG}/styles/
 

@@ -32,12 +32,12 @@
       [(into [T] terms) page])))
 
 
-(defn lines->tree [parsed]
+(defn lines->tree [lines]
   (reduce
    (fn [index [terms page]]
      (update-in index (conj terms :__pages) conj page))
    {}
-   parsed))
+   (map line->terms-page lines)))
 
 
 (defn path->lines [path]
@@ -82,7 +82,7 @@
         (println after)))))
 
 
-(defn save-file [tree]
+(defn save-file [tree file-out]
   (let [out (with-out-str
               (println "\\begin{theindex}")
               (print-tree tree)
@@ -90,20 +90,16 @@
     (spit path-out out)))
 
 
-(defn aaaaa []
-  (->> path-in
-       path->lines
-       (map line->terms-page)
-       lines->tree
-       save-file))
+(defn process-files [file-in file-out]
+  (-> file-in
+      path->lines
+      lines->tree
+      (save-file file-out)))
 
 
-#_
 (defn -main
-  "I don't do a whole lot ... yet."
-  [& args]
-  (println "Hello, World!"))
-
-
-#_
-(str/split "foo!bar\"!test" #"(?<!\")!")
+  [& [file-in file-out]]
+  (println ".idx:" file-in)
+  (println ".ind:" file-out)
+  (process-files file-in file-out)
+  (println "done"))
