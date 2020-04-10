@@ -23,11 +23,17 @@
       :wrap-pages wrap-pages}})
 
 
+(defn unquote* [term]
+  (-> term
+      (str/replace #"\"!" "!")))
+
+
 (defn line->terms-page [line]
   (when-let [result (re-matches re-line line)]
     (let [[_ str-terms str-page] result
           terms (str/split str-terms #"(?<!\")!")
-          [[T]] terms
+          terms (mapv unquote* terms)
+          T (-> terms first first str/upper-case)
           page (Integer/parseInt str-page)]
       [(into [T] terms) page])))
 
@@ -50,11 +56,16 @@
   (str/join (repeat n str)))
 
 
+(defn term-sorter
+  [[term _]]
+  (str/upper-case term))
+
+
 (defn print-tree [tree & [{level :level
                            :as opt
                            :or {level 0}}]]
 
-  (doseq [[term childs] (sort-by first tree)]
+  (doseq [[term childs] (sort-by term-sorter tree)]
 
     (let [{:keys [after wrap func wrap-pages]} (get level-rules level)
           [w1 w2] wrap
@@ -103,3 +114,8 @@
   (println ".ind:" file-out)
   (process-files file-in file-out)
   (println "done"))
+
+
+#_
+(-main "/Users/ivan/work/clj-book/main.idx"
+       "/Users/ivan/work/clj-book/main.ind")

@@ -372,10 +372,12 @@ https://stackoverflow.com/questions/6886024/how-to-replace-a-search-with-multipl
 
 TODO
 
-свертка
+имен
 запрещен
 нем
 защищенный
+подчеркивание
+решетка
 
 CIDER
 
