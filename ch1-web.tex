@@ -897,15 +897,12 @@ Compojure решает проблему вложенных путей. Расс�
 Это был простой роутинг на Bidi. Теперь рассмотрим товары, их
 просмотр и изменение. Новое дерево выглядит так:
 
-%% ---------------
-
 \begin{english}
   \begin{clojure}
 (def routes
-  ["/" {["content/order/" :id]
-        {"/view" {:get  :page-view}
-         "/edit" {:get  :page-form
-                  :post :page-save}}}])
+  [["/content/order/" :id] {"/view" {:get  :page-view}
+                            "/edit" {:get  :page-form
+                                     :post :page-save}}])
   \end{clojure}
 \end{english}
 
@@ -918,14 +915,17 @@ Compojure решает проблему вложенных путей. Расс�
 \index{языки!HTML}
 
 Расширим мультиметод страницами. \spverb|Page-view| находит товар по номеру и
-верстает его HTML-страницу. Если товара нет, вернем ответ 404 <<не найдено>>.
+верстает его HTML-страницу. Если товара нет, верн\"{е}м ответ 404 <<не
+найдено>>.
 
 \begin{english}
   \begin{clojure}
 (defmethod multi-handler :page-view
   [request]
-  (if-let [order (some-> request :route-params
-                         :id get-order-by-id)]
+  (if-let [order (some-> request
+                         :route-params
+                         :id
+                         get-order-by-id)]
     {:status 200
      :headers {"content-type" "text/html"}
      :body (render-order-page {:order order})}

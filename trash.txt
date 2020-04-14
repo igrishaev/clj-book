@@ -393,6 +393,7 @@ TODO
 вернет
 берет
 Свое
+вернем
 
 CIDER
 ch1: static files
