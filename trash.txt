@@ -315,6 +315,11 @@ https://stackoverflow.com/questions/6886024/how-to-replace-a-search-with-multipl
 отсутствует во втором. Использовать \spverb|flask.Request| в проекте на Django
 невозможно.
 
+Результат каждого шага проверяют по разным критериям. Когда из
+\spverb|Content-Length| получают число, учитывают ошибку в разборе
+строки. Результат \spverb|-42| неверный, потому что число байт не может быть
+отрицательным.
+
 %% TODO s/unform jdbc
 %% Для подключения к базе данных укажем готовую спеку из JDBC:
 %% \begin{english}
