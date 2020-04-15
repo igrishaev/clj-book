@@ -401,6 +401,7 @@ TODO
 счет
 четких
 пришел
+серьезный
 
 CIDER
 ch1: static files

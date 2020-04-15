@@ -1927,34 +1927,36 @@ middleware под названием \spverb|wrap-routes|. Оно принима
 
 \begin{english}
   \begin{clojure}
-(defroutes account-routes
-  (with-context "/account" []
-    (GET "/cart" request (account-cart request))
-    (GET "/orders" request (account-orders request))
-    (GET "/profile" request (account-profile request))))
+(defroutes app-account
+  (GET "/cart"    _ "cart")
+  (GET "/orders"  _ "orders")
+  (GET "/profile" _ "profile"))
   \end{clojure}
 \end{english}
 
 \noindent
-Обернем е\"{е} в проверку доступа:
+Смонтируем е\"{е} на префикс \spverb|/account| и оберн\"{е}м в проверку доступа.
 
 \begin{english}
   \begin{clojure}
 (defroutes app
-  (GET "/" request (page-index request))
-  (GET "/help" request (page-help request))
-  (wrap-routes account-routes wrap-auth-user-only))
+  (GET "/"     _ "index")
+  (GET "/help" _ "help")
+  (context "/account" []
+    (wrap-routes app-account wrap-auth-user-only)))
   \end{clojure}
 \end{english}
 
 \index{функции!wrap-routes}
 
 Теперь \spverb|wrap-auth-user-only| сработает только для путей, которые
-начинаются с \spverb|/account/|. На главной и справочной страницах проверки
+начинаются с \spverb|/account|. На главной и справочной страницах проверки
 доступа не будет.
 
 Middleware, которое принимает middleware~--- довольно крутая абстракция. Если вы
-поняли, как оно работает, примите поздравления. Это серьезный рубеж.
+поняли, как оно работает, примите поздравления: это серь\"{е}зный рубеж.
+
+%% --------------
 
 \section{Другие библиотеки}
 
