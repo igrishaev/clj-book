@@ -395,6 +395,8 @@ TODO
 Свое
 вернем
 звездочкой
+счет
+вернем
 
 CIDER
 ch1: static files
