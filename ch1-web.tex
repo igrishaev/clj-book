@@ -1615,68 +1615,31 @@ curl --request POST \
 \spverb|:params|. Объясним, зачем это нужно.
 
 Поле \spverb|:params| это общий аккумулятор параметров. Его наполняют и другие
-врапперы, например \spverb|wrap-params|.
+врапперы, например \spverb|wrap-params|. Некоторые API не зависят от метода и
+принимают запросы одновременно через GET или POST. Соответственно, данные
+находятся в адресной строке или теле запроса. Независимо от подхода получим
+одинаковый словарь \spverb|:params|.
 
+У гибридного способа преимущество: запросы на чтение выполняют через GET, чтобы
+применить кеширование на уровне HTTP. Запросы на изменение выполняют через POST,
+который никогда не кешируется.
 
-
-Иногда нам неважно, откуда пришли
-параметры: из адресной строки, тела или JSON. В коде мы просто черпаем данные из
-\spverb|:params|.
-
-В других случаях важно, чтобы параметры не смешивались и не заменяли друг
-друга. Чтобы прочесть только те данные, что пришли в JSON, обратимся к полю
-\spverb|:json-params| или \spverb|:body|. Каким враппером пользоваться, зависит
-от конкретного случая.
+В других API важно, чтобы параметры не смешивались и не заменяли друг
+друга. Предположим, наш сервис работает строго по методу POST. Чтобы прочесть
+только те данные, что пришли в JSON, обратимся к полю \spverb|:json-params| или
+\spverb|:body|. Каким враппером пользоваться~--- \spverb|wrap-json-body| или
+\spverb|wrap-json-params|~--- зависит от конкретного случая.
 
 \index{middleware!wrap-json-params}
 
-Вспомним, что \spverb|:params| это словарь с ключам-строками. Чтобы слияние
-прошло правильно, \spverb|wrap-json-params| оставляет ключи строками. Исправьте
-ключи с помощью \spverb|wrap-keyword-params| после разбора JSON.
+Заметим, что \spverb|:params| это словарь с ключам-строками. Чтобы слияние
+прошло правильно, \spverb|wrap-json-params| тоже оставляет ключи
+строками. Исправьте ключи с помощью \spverb|wrap-keyword-params| уже после
+слияния.
 
-Разработчики не случайно выделяют поле \spverb|:json-params|. Данные в JSON не
-обязательно словарь: это может быть массив, который нельзя объединить со
-словарем. На этот случай данные хранят в отдельном поле.
-
-Пример, когда клиент передает данные гибридно: \spverb|username| в JSON и
-\spverb|city| в параметрах строки. Обратите внимание на стек middleware. Сначала
-парсят параметры адреса \coderef{12}, затем тело \coderef{11}. Оба словаря
-оседают в \spverb|:params|. После накопления исправляют тип ключей \coderef{10}.
-
-\begin{english}
-  \begin{clojure/lines}
-(defn page-params [request]
-  (let [{:keys [params]} request
-        {:keys [username city]} params]
-    (create-user username city)
-    {:status 201
-     :body {:code "CREATED"
-            :message "User created"}}))
-
-(def app (-> page-params
-             wrap-keyword-params
-             wrap-json-params
-             wrap-params
-             wrap-json-response))
-  \end{clojure/lines}
-\end{english}
-
-\noindent
-Пример такого запроса:
-
-\begin{english}
-  \begin{bash}
-curl --request POST \
-     --header "Content-Type: application/json" \
-     --data '{"username":"John"}' \
-     http://localhost:8080/?city=NY
-  \end{bash}
-\end{english}
-
-Из-за того, что поля приходят из разных источников, может возникнуть
-путаница. Избегайте случаев, когда в \spverb|:params| валится вс\"{е} подряд. При
-работе над API читайте один источник: \spverb|:query-params| для GET,
-\spverb|:form|- или \spverb|:json-params| для POST.
+Middleware не случайно выделяет поле \spverb|:json-params|. Данные в JSON не
+всегда словарь: это может быть массив, который нельзя объединить со
+словар\"{е}м. На этот случай данные хранят в отдельном поле.
 
 \subsection{Свои middleware}
 
