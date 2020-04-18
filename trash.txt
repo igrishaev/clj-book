@@ -320,6 +320,9 @@ https://stackoverflow.com/questions/6886024/how-to-replace-a-search-with-multipl
 строки. Результат \spverb|-42| неверный, потому что число байт не может быть
 отрицательным.
 
+В Clojure пространства нужны, чтобы разделить одноим\"{е}нные поля у разных
+сущностей, например \spverb|:user/name| и \spverb|:project/name|.
+
 %% TODO s/unform jdbc
 %% Для подключения к базе данных укажем готовую спеку из JDBC:
 %% \begin{english}
