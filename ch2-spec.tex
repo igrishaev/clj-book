@@ -2598,13 +2598,10 @@ Spec
 \end{english}
 
 \index{библиотеки!Autodoc}
-\index{библиотеки!Codox}
 
 На функцию \spverb|doc| полагаются IDE и редакторы, чтобы подсказывать аргументы
-в коде. Утилиты для документации вроде
-Autodoc\footurl{https://github.com/tomfaulhaber/autodoc} или
-Codox\footurl{https://github.com/weavejester/codox} добавляют спеки в
-HTML-файлы.
+в коде. Утилита для сборки документации Autodoc\footurl{https://github.com/tomfaulhaber/autodoc}
+добавляет спеки в HTML-файлы.
 
 \subsection{Производительность}
 
@@ -2657,10 +2654,11 @@ HTML-файлы.
 \index{повторное использование}
 \index{библиотеки!JDBC}
 
-В Clojure принято снабжать библиотеки спеками, чтобы помочь другим. Если
-библиотека активно работает с какой-то структурой данных, опишите е\"{е}
-спекой. Хорошим примером служит JDBC\footurl{https://github.com/clojure/java.jdbc},
-об\"{е}ртка для реляционных баз данных.
+В Clojure принято снабжать библиотеки спеками, чтобы помочь другим
+разработчикам. Если библиотека активно работает с какой-то структурой данных,
+опишите е\"{е} спекой. Хорошим примером служит
+JDBC\footurl{https://github.com/clojure/java.jdbc}, об\"{е}ртка для реляционных
+баз данных.
 
 Подключение к базе задают словарем с ключами \spverb|:host|, \spverb|:port|,
 \spverb|:user| и другими. Обычно словарь читают из конфигурации. Перед
@@ -2681,13 +2679,12 @@ HTML-файлы.
       :port 3306
       :dbname "project"
       :user "user"
-      :password "********"
-      :useSSL true}}
+      :password "********"}}
   \end{clojure}
 \end{english}
 
 Ключи \spverb|:dbtype|, \spverb|:host| и другие уже описаны в библиотеке. Один
-из модулей JDBC несет спеки подключения и основных функций. Используем их
+из модулей JDBC нес\"{е}т спеки подключения и основных функций. Используем их
 повторно:
 
 \begin{english}
@@ -2714,10 +2711,10 @@ HTML-файлы.
 
 Будьте внимательны с \spverb|::jdbc/db-spec|: это сложная спека с макросами
 \spverb|s/or|, которые порождают развилки. Если передать е\"{е} в
-\spverb|s/conform|, получим результат с тегами:
+\spverb|s/conform|, получим поля с тегами (строки 3, 4, 6):
 
 \begin{english}
-  \begin{clojure}
+  \begin{clojure/lines}
 (s/conform ::config config)
 {:db
  [:friendly
@@ -2726,9 +2723,8 @@ HTML-файлы.
    :port     [:port 3306]
    :dbname   "project"
    :user     "user"
-   :password "********"
-   :useSSL   true}]}
-  \end{clojure}
+   :password "********"}]}
+  \end{clojure/lines}
 \end{english}
 
 Результат не работает с \spverb|jdbc/query| и другими функциями JDBC. Мы
