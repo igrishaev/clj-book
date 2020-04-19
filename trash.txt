@@ -407,8 +407,7 @@ TODO
 серьезный
 Задает
 
-CIDER
-ch1: static files
+clojure inline
 
 - spverb
 - титул
