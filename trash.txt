@@ -383,8 +383,12 @@ TODO
 дает
 Остается
 Подойдет
+трех
 
 clojure inline
+
+(s/check-asserts true)
+(s/assert ::post {:title ""})
 
 - spverb
 - титул
