@@ -380,6 +380,10 @@ https://stackoverflow.com/questions/6886024/how-to-replace-a-search-with-multipl
 
 TODO
 
+дает
+Остается
+Подойдет
+
 clojure inline
 
 - spverb
