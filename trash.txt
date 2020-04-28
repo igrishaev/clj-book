@@ -381,6 +381,8 @@ https://stackoverflow.com/questions/6886024/how-to-replace-a-search-with-multipl
 TODO
 
 ё
+тяжелых
+
 qr
 
 clojure inline
@@ -388,7 +390,6 @@ clojure inline
 (s/check-asserts true)
 (s/assert ::post {:title ""})
 
-- ё
 - spverb
 - титул
 - keep Raven?
