@@ -382,13 +382,7 @@ TODO
 
 ё
 
-qr
-
-clojure inline
-
-(s/check-asserts true)
-(s/assert ::post {:title ""})
-
+- qr
+- clojure inline
 - титул
-- keep Raven?
 - ispell
