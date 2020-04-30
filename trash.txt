@@ -377,11 +377,16 @@ https://stackoverflow.com/questions/6886024/how-to-replace-a-search-with-multipl
 
 \vspace{-2em}
 
+this (assoc this :flag flag)   ;; (1)
+\ding{192}
+
+-------------
 
 TODO
 
 ё
 
+- lines or labels
 - qr
 - clojure inline
 - титул
