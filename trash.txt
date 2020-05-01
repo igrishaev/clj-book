@@ -385,7 +385,6 @@ this (assoc this :flag flag)   ;; (1)
 TODO
 
 ё
-черным
 
 - lines or labels
 - qr
