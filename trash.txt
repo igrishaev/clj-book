@@ -389,7 +389,11 @@ this (assoc this :flag flag)   ;; (1)
 TODO
 
 ё
+учётом
+упрощённое
 
+- grep 42
+- yaml highlight
 - test selector regex
 - dynamic set! binding
 - component with-meta?
