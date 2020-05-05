@@ -389,6 +389,12 @@ this (assoc this :flag flag)   ;; (1)
 TODO
 
 ё
+обертки
+пройдет
+Подберем
+зеленым
+Надежный
+расчетов
 
 - test selector regex
 - dynamic set! binding
