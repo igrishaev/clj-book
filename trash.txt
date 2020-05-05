@@ -396,6 +396,9 @@ TODO
 Надежный
 расчетов
 пройдет
+объема
+зеленый
+желтым
 
 - test selector regex
 - dynamic set! binding
