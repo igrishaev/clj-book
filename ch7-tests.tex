@@ -854,16 +854,16 @@ IDE.
 не сработал, в отчёте будет сообщение, в которое он обёрнут.
 
 Макросы \verb|testing| могут быть вложенными. Каждое сообщение наращивает
-последнее через пробел. Тест ниже проверяет, что API \verb|createUser| вносит
+предыдущее через пробел. Тест ниже проверяет, что API \verb|createUser| вносит
 пользователя в базу. Дополнительно мы убеждаемся, что пароль в базе
-зашифрован. Если отбросить основной код, получим скелет из форм
-\verb|testing|:
+зашифрован. Если отбросить основной код, получим скелет из форм \verb|testing|,
+из которых понятны наши намерения.
 
 \begin{english}
   \begin{clojure}
 (deftest test-some-api
   (testing "API call" ...
-    (testing "HTTP response" ...))
+    (testing "HTTP response is OK" ...))
   (testing "DB checks:" ...
     (testing "common user fields" ...)
     (testing "password is hashed" ...)))
@@ -874,27 +874,57 @@ IDE.
 
 \index{исключения!в тестах}
 
-Мы всё ещё не разобрались, как тестировать код с исключениями. Хотелось бы
+Мы всё ещё не выясняли, как тестировать код с исключениями. Хотелось бы
 убедиться, что вызов \verb|(->fahr nil)| бросит ошибку, а не вернёт
-\verb|nil|. Если проверки нет, код не защищен от таких изменений:
+\verb|nil|. Если проверки нет, код не защищён от подобных изменений:
+
+\noindent
+\begin{tabular}{ @{}p{5cm} @{}p{5cm} }
 
 \begin{english}
   \begin{clojure}
+;; before
+(defn ->fahr [cel]
+  (+ (* cel 1.8) 32))
+  \end{clojure}
+\end{english}
+
+&
+
+\begin{english}
+  \begin{clojure}
+;; after
 (defn ->fahr [cel]
   (when cel
     (+ (* cel 1.8) 32)))
   \end{clojure}
 \end{english}
 
+\end{tabular}
+
 \index{nil}
 
+\noindent
 В этом случае \verb|nil| провалится ниже по стеку вызовов, что усложнит поиск
 причины.
 
-Обёртка \verb|try/catch| внутри теста решает проблему лишь отчасти. В
-таком виде \verb|(is true)| действительно сработает. Если заменить
+Наивный способ~--- обернуть вызов в \spverb|try| и добавить утверждение в ветку
+\spverb|catch|:
+
+\begin{english}
+  \begin{clojure}
+(deftest test-fahr-nil
+  (try
+    (->fahr nil)
+    (catch Throwable e
+      (is true))))
+  \end{clojure}
+\end{english}
+
+Отчасти это решает проблему: в случае ошибки \verb|(is true)| действительно
+сработает. Однако \verb|try| не имеет обратной проверки. Если исправить
 \verb|(->fahr nil)| на \verb|(->fahr 1)|, исключения не будет, и тело
-\verb|(catch...)| не получит управление. Если исключение ожидают, но его нет,
+\verb|(catch...)| не получит управление. Когда исключение ожидают, но его нет,
 это \emph{тоже ошибка}.
 
 \index{классы!NullPointerException}
@@ -909,10 +939,9 @@ IDE.
   \end{clojure}
 \end{english}
 
-Макрос \verb|(is (thrown?...))| решает эту проблему. Форма \verb|thrown?|
+Макрос \verb|(is (thrown?...))| лишён этих недостатков. Форма \verb|thrown?|
 принимает класс исключения и произвольное тело. Если брошено исключение этого
-класса (с учётом наследования), внешний \verb|is| сработает
-положительно.
+класса (с учётом наследования), внешний \verb|is| сработает положительно:
 
 \begin{english}
   \begin{clojure}
@@ -928,10 +957,11 @@ IDE.
 \index{NPE}
 
 Иногда проверки на класс не хватает. В больших участках кода \verb|NPE|
-возникает на разных уровнях. Предположим, кто-то изменил \verb|->fahr| так,
-что для \verb|nil| получим \verb|nil|. Этим мы расширим область ошибки: ниже
-\verb|NPE| возникает не в \verb|->fahr|, а в функции сложения. Это приводит
-к ложному тестированию: на самом деле происходит не то, что ожидают.
+возникает на разных уровнях. Предположим, кто-то изменил \verb|->fahr| так, что
+для \verb|nil| получим \verb|nil| (колонка справа в таблице). Этим мы расширим
+область ошибки: теперь \verb|NPE| возникнет не в \verb|->fahr|, а в функции
+сложения. Это приводит к~ложному тестированию: на самом деле происходит не то,
+что ожидают.
 
 \begin{english}
   \begin{clojure}
@@ -953,7 +983,7 @@ IDE.
   (if (number? cel)
     (+ (* cel 1.8) 32)
     (throw (new IllegalArgumentException
-            "Fahrenheit temperature should be a real number"))))
+            "Fahrenheit temperature must be a real number"))))
   \end{clojure}
 \end{english}
 
@@ -992,7 +1022,7 @@ IDE.
 Макрос \verb|are| (анг. множественная форма <<is>>) выполняет несколько
 \verb|is| по шаблону. Он принимает форму связывания, шаблон и аргументы. Число
 аргументов должно быть кратно переменным из формы связывания. На каждом шаге
-макрос связывает часть аргументов с переменными и выполняет шаблон:
+макрос связывает часть аргументов с~переменными и выполняет шаблон:
 
 \begin{english}
   \begin{clojure}
@@ -1031,11 +1061,10 @@ IDE.
 \begin{english}
   \begin{clojure}
 (def params-variations
-  [[{:name nil} "Empty name"]
-   [{:name (apply str (repeat 999 "A"))} "Name is too long"]
+  [[{:name nil}      "Empty name"]
    [{:email "dunno"} "Wrong email"]
-   [{:email nil} "No email"]
-   [{:extra 42} "Extra field"]])
+   [{:email nil}     "No email"]
+   [{:something 42}  "Extra field"]])
   \end{clojure}
 \end{english}
 
