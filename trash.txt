@@ -399,6 +399,7 @@ TODO
 объема
 зеленый
 желтым
+Все вместе
 
 - test selector regex
 - dynamic set! binding
