@@ -389,15 +389,6 @@ this (assoc this :flag flag)   ;; (1)
 TODO
 
 ё
-упрощённое
-измененные
-передаём
-заменен
-Проведем
-версткой
-подчеркиванием
-Обернем
-поймете
 
 - test selector regex
 - dynamic set! binding
