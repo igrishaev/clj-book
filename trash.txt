@@ -386,6 +386,11 @@ this (assoc this :flag flag)   ;; (1)
 
 -------------
 
+Package microtype Warning: You are using the `ragged2e' package.
+(microtype)                Adjustment of interword spacing may lead to
+(microtype)                undesired results when used with `ragged2e'.
+(microtype)                In this case, disable the `spacing' option.
+
 TODO
 
 ё
