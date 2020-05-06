@@ -395,12 +395,6 @@ TODO
 
 ё
 
-
-объемах
-щелкает
-нашел
-вернемся
-
 - test selector regex
 - dynamic set! binding
 - component with-meta?
