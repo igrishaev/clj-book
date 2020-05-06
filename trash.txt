@@ -405,6 +405,9 @@ TODO
 зеленый
 желтым
 Все вместе
+черного
+надежней
+
 
 - test selector regex
 - dynamic set! binding
