@@ -413,6 +413,8 @@ TODO
 влечет
 Начнем
 объемах
+щелкает
+нашел
 
 - test selector regex
 - dynamic set! binding
