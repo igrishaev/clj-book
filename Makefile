@@ -38,3 +38,7 @@ stats:
 
 warnings:
 	egrep -A 1 -B 1 -i 'overfull|underfull' main.log
+
+.PHONY: refs
+refs:
+	grep -A 1 -B 1 -i 'LaTeX Warning: Reference' main.log
