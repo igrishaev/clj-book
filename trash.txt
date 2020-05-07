@@ -394,6 +394,7 @@ Package microtype Warning: You are using the `ragged2e' package.
 TODO
 
 ё
+отдает
 
 - test selector regex
 - dynamic set! binding
