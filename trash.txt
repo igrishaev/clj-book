@@ -395,15 +395,15 @@ TODO
 
 ё
 
+- check index
+
 - test selector regex
 - dynamic set! binding
 - component with-meta?
 - system test http
 
-- grep 42
-- yaml highlight
-- lines or labels
 - qr
+- grep 42
 - clojure inline
 - титул
 - ispell
