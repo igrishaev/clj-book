@@ -36,9 +36,10 @@ pdf-open:
 stats:
 	find . -name '*.tex' | xargs wc -cl
 
-warnings:
+.PHONY: comp
+comp:
 	egrep -A 1 -B 1 -i 'overfull|underfull' main.log
 
-.PHONY: refs
-refs:
-	grep -A 1 -B 1 -i 'LaTeX Warning: Reference' main.log
+.PHONY: warn
+warn:
+	grep -A 1 -B 1 -i 'Warning' main.log

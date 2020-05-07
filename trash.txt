@@ -397,8 +397,6 @@ TODO
 
 ё
 
-- There were undefined references.
-
 - remove dots in file tree
 - check index
 
