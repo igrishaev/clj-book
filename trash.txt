@@ -395,6 +395,9 @@ TODO
 
 ё
 
+- There were undefined references.
+
+- remove dots in file tree
 - check index
 
 - test selector regex
@@ -402,7 +405,7 @@ TODO
 - component with-meta?
 - system test http
 
-- qr
+- qr codes?
 - grep 42
 - clojure inline
 - титул
