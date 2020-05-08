@@ -1848,12 +1848,33 @@ patch>>\footurl{https://en.wikipedia.org/wiki/Monkey\_patch}[Monkey patch]. Те
   \end{clojure}
 \end{english}
 
-С помощью \verb|set!| нельзя изменить свои переменные, даже если они с
-<<ушками>> и помечены как динамические. Пример ниже бросит исключение:
+Внутри \verb|binding| форма \verb|set!| работает как оператор
+присваивания. Переменная должна быть динамической:
+
+\begin{english}
+  \begin{clojure}
+(def ^:dynamic *rate*)
+(def ^:dynamic *days*)
+
+(binding [*rate* 0
+          *days* 0]
+  (when-let [rate (calc-date)]
+    (set! *rate* rate))
+  (when-let [days (calc-days)]
+    (set! *days* days))
+  (* *rate* *days*))
+;; 12
+  \end{clojure}
+\end{english}
+
+\noindent
+За пределами \verb|binding| вызов \verb|set!| обернётся ошибкой, даже если
+переменная с~<<ушками>>:
 
 \begin{english}
   \begin{clojure}
 (def ^:dynaimc *data* nil)
+
 (set! *data* {:user 1})
 ;; Unhandled java.lang.IllegalStateException
 ;; Can't change/establish root binding of: *data* with set
