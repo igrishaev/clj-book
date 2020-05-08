@@ -400,9 +400,7 @@ TODO
 - remove dots in file tree
 
 - test selector regex
-- dynamic set! binding
 - component with-meta?
-- system test http
 
 - grep 42
 - clojure inline

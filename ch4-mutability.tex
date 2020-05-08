@@ -1858,9 +1858,9 @@ patch>>\footurl{https://en.wikipedia.org/wiki/Monkey\_patch}[Monkey patch]. Те
 
 (binding [*rate* 0
           *days* 0]
-  (when-let [rate (calc-date)]
+  (when-let [rate (calc-date)] ;; 3
     (set! *rate* rate))
-  (when-let [days (calc-days)]
+  (when-let [days (calc-days)] ;; 4
     (set! *days* days))
   (* *rate* *days*))
 ;; 12
