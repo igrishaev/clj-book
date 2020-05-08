@@ -17,9 +17,19 @@
   shrink=10
 ]{microtype}
 
+% for QR codes in
+\usepackage{qrcode}
+
 % to have bold tt fonts in code listings
 \usepackage{bold-extra}
 
+% better macro args
+\usepackage{xparse}
+
+% better margin notes
+\usepackage{marginnote}
+
+% file trees
 \usepackage{dirtree}
 
 \usepackage[newfloat=true]{minted}
@@ -47,7 +57,10 @@
   totoc
 ]{idxlayout}
 
+\usepackage{setspace}
+
 \geometry{
+  marginparwidth=12mm,
   papersize={145mm,210mm}, % 140x200 + 5mm bleed
   left   = 20mm,           % 20mm + 0mm bleed
   right  = 20mm,           % 15mm + 5mm bleed
@@ -87,12 +100,12 @@
 \include{about}
 
 \mainmatter
-\include{ch1-web}
-\include{ch2-spec}
-\include{ch3-exceptions}
-\include{ch4-mutability}
-\include{ch5-config}
-\include{ch6-systems}
+%% \include{ch1-web}
+%% \include{ch2-spec}
+%% \include{ch3-exceptions}
+%% \include{ch4-mutability}
+%% \include{ch5-config}
+%% \include{ch6-systems}
 \include{ch7-tests}
 
 \backmatter

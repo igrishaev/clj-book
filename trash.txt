@@ -398,14 +398,12 @@ TODO
 ё
 
 - remove dots in file tree
-- check index
 
 - test selector regex
 - dynamic set! binding
 - component with-meta?
 - system test http
 
-- qr codes?
 - grep 42
 - clojure inline
 - титул
