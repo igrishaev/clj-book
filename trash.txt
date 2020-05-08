@@ -399,7 +399,6 @@ TODO
 
 - remove dots in file tree
 
-- test selector regex
 - component with-meta?
 
 - grep 42
