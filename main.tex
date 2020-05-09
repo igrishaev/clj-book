@@ -1,11 +1,13 @@
 
-\documentclass[10pt,draft]{book}
+\documentclass[10pt,draft]{book} % ,draft
 
 \usepackage{tikz}
 \usepackage{tocloft}
 \usepackage{geometry}
 \usepackage[utf8]{inputenc}
 \usepackage[english,russian]{babel}
+
+% http://www.khirevich.com/latex/microtype/
 \usepackage[
   activate={true, nocompatibility},
   final,
@@ -78,8 +80,12 @@
 
 \setcounter{tocdepth}{1}
 
-\widowpenalty 10000
-\clubpenalty 10000
+\widowpenalty=10000
+\clubpenalty=10000
+\tolerance=500
+\hyphenpenalty=500
+\hfuzz=0.5pt
+\emergencystretch=5pt
 
 \input{charts}
 \input{macro}
@@ -87,6 +93,8 @@
 \author{Иван Гришаев}
 \title{Clojure на производстве}
 \date{}
+
+%% \overfullrule=1mm
 
 \begin{document}
 
@@ -101,7 +109,7 @@
 \include{about}
 
 \mainmatter
-%% \include{ch1-web}
+\include{ch1-web}
 %% \include{ch2-spec}
 %% \include{ch3-exceptions}
 %% \include{ch4-mutability}
