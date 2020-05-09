@@ -399,8 +399,6 @@ TODO
 
 - remove dots in file tree
 
-- component with-meta?
-
 - grep 42
 - clojure inline
 - титул
