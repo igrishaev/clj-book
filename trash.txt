@@ -397,8 +397,6 @@ TODO
 
 ё
 
-- remove dots in file tree
-
 - grep 42
 - clojure inline
 - титул
