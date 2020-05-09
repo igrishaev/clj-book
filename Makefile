@@ -2,7 +2,7 @@
 PWD = $(shell pwd)
 PYG := /usr/local/lib/python2.7/site-packages/pygments
 
-all: git-commit pdf-build1 pdf-open
+all: git-commit pdf-build1
 
 build: clear git-commit pdf-build1 pdf-build2 index pdf-build3 pdf-open
 
