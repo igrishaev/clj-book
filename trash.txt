@@ -439,8 +439,8 @@ Package microtype Warning: You are using the `ragged2e' package.
 TODO
 
 ё
+определенный
 
-- overflows
 - prepositions
 - code lines
 - qr position
