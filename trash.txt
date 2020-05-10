@@ -1,4 +1,32 @@
 
+\noindent
+\begin{tabular}{ @{}p{5.2cm} @{}p{5.2cm} }
+
+\begin{english}
+  \begin{clojure/lines}
+;; bad
+(deftest test-page-index
+  (let [resp (page-index {...})
+        {:keys [status]} resp]
+    (is (= 200 status))))
+  \end{clojure/lines}
+\end{english}
+
+&
+
+\begin{english}
+  \begin{clojure}
+;; good
+(deftest test-page-index
+  (let [resp (entire-app {...})
+        {:keys [status]} resp]
+    (is (= 200 status))))
+  \end{clojure}
+\end{english}
+
+\end{tabular}
+
+
 Underfull \hbox (badness 1496) in paragraph at lines 444--448
 Underfull \hbox (badness 1102) in paragraph at lines 864--867
 Overfull \hbox (3.72946pt too wide) in paragraph at lines 1247--1249
@@ -411,6 +439,7 @@ Package microtype Warning: You are using the `ragged2e' package.
 TODO
 
 ё
+сокращенная
 
 - overflows
 - prepositions
