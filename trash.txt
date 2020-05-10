@@ -443,6 +443,8 @@ TODO
 подчеркиваниями
 перестает
 
+- ch6 todos
+
 - prepositions
 - par lines
 - qr position
