@@ -25,7 +25,7 @@ pyg-install:
 	ln -s ${PWD}/print.py ${PYG}/styles/
 
 git-commit:
-	git rev-parse --short HEAD > .commit
+	git log -1 --format='%h %at' > .commit
 
 pdf-build1 pdf-build2 pdf-build3:
 	pdflatex -shell-escape -halt-on-error main.tex
