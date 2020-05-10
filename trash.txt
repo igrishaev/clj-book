@@ -417,6 +417,8 @@ TODO
 - code lines
 - qr position
 
+- font encoding?
+
 - grep 42
 - clojure inline
 - титул

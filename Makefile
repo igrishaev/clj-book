@@ -43,4 +43,4 @@ lines:
 
 .PHONY: warn
 warn:
-	grep -A 1 -B 1 -i 'Warning' main.log
+	grep -A 0 -B 0 -i 'Warning' main.log
