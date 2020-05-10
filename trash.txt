@@ -1,4 +1,10 @@
 
+Underfull \hbox (badness 1496) in paragraph at lines 444--448
+Underfull \hbox (badness 1102) in paragraph at lines 864--867
+Overfull \hbox (3.72946pt too wide) in paragraph at lines 1247--1249
+Underfull \hbox (badness 1348) in paragraph at lines 1408--1411
+Underfull \hbox (badness 1173) in paragraph at lines 1519--1521
+
 `\(.+?\)`
 \\hl{\1}
 
