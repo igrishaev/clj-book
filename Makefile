@@ -38,7 +38,8 @@ stats:
 
 .PHONY: full
 full:
-	egrep -A 1 -B 1 -i 'overfull|underfull' main.log
+	grep -A 1 -B 1 -i 'in paragraph at lines' main.log | less
+
 
 .PHONY: warn
 warn:
