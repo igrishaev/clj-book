@@ -409,6 +409,7 @@ TODO
 - overflows
 - prepositions
 - code lines
+- qr position
 
 - grep 42
 - clojure inline

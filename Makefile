@@ -36,9 +36,9 @@ pdf-open:
 stats:
 	find . -name '*.tex' | xargs wc -cl
 
-.PHONY: full
-full:
-	grep -A 1 -B 1 -i 'in paragraph at lines' main.log | less
+.PHONY: lines
+lines:
+	grep -A 0 -B 0 -i 'in paragraph at lines' main.log | less
 
 
 .PHONY: warn
