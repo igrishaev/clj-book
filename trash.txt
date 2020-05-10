@@ -383,6 +383,10 @@ this (assoc this :flag flag)   ;; (1)
 (binding [*exit* nil] (set! *exit* 100) *exit*)
 
 (-> #'rand-uuid meta :ns ns-name str (clojure.string/starts-with? "partner-api."))
+-------------
+
+Оператор \verb|@| мы обсудим в
+следующей главе на примере атома \page{deref-intro}.
 
 -------------
 
