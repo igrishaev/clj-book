@@ -441,9 +441,10 @@ TODO
 ё
 определенный
 подчеркиваниями
+перестает
 
 - prepositions
-- code lines
+- par lines
 - qr position
 
 - font encoding?
