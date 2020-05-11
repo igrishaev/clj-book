@@ -5,6 +5,7 @@
 - qr position
 
 - font encoding?
+- drop some libs in ch1?
 
 - grep 42
 - clojure inline
