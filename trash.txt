@@ -444,7 +444,6 @@ TODO
 перестает
 перестает
 
-- prepositions
 - par lines
 - qr position
 
