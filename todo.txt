@@ -8,5 +8,6 @@
 
 - grep 42
 - clojure inline
+- white pages
 - титул
 - ispell
