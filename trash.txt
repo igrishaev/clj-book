@@ -438,3 +438,5 @@ Package microtype Warning: You are using the `ragged2e' package.
 
 
      :headers {"content-type" "text/plain"}
+
+%% (require '[clojure.string :as str])
