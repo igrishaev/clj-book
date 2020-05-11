@@ -860,14 +860,13 @@ Compojure решает проблему вложенных путей. Расс�
 
 \index{мультиметоды!multi-handler}
 
-%% -----------------
-
 Обработчик запроса это мультиметод. Функция-диспатчер просто ключ
 \verb|:handler|.
 
 \begin{english}
   \begin{clojure}
-(defmulti multi-handler :handler)
+(defmulti multi-handler
+  :handler)
 
 (defmethod multi-handler :page-index
   [request]
@@ -1142,7 +1141,9 @@ HTTP предусматривает данные в адреснй строке.
   \begin{clojure}
 (require '[ring.middleware.keyword-params
            :refer [wrap-keyword-params]])
-(def app (wrap-keyword-params (wrap-params app-naked)))
+
+(def app (wrap-keyword-params
+           (wrap-params app-naked)))
   \end{clojure}
 \end{english}
 
@@ -1536,22 +1537,28 @@ Middleware \verb|wrap-json-response| упрощает возврат JSON-дан
 добавляют заголовок \verb|Content-Type| с типом \verb|application/json|.
 
 Рассмотрим API для чтения пользователя. Если нашли его по номеру, вернём
-словарь полей. Если нет, в ответе структура ошибки. В обоих случаях не нужно
-кодировать данные вручную~--- это делает \verb|wrap-json-response|.
+словарь полей. Если нет, в ответе структура ошибки.
 
 \begin{english}
   \begin{clojure}
-(require '[ring.middleware.json
-           :refer [wrap-json-response]])
-
 (defn page-data [request]
   (let [user-id (-> request :params :id)]
     (if-let [user (get-user-by-id user-id)]
       {:status 200 :body user}
       {:status 404
        :body {:error_code "MISSING_USER"
-              :error_message "No such user"
-              :error_data {:id user-id}}})))
+              :error_message "No such user"}})))
+  \end{clojure}
+\end{english}
+
+\noindent
+В обоих случаях не нужно кодировать данные вручную~--- это делает
+\verb|wrap-json-response|.
+
+\begin{english}
+  \begin{clojure}
+(require '[ring.middleware.json
+           :refer [wrap-json-response]])
 
 (def app (-> page-data
              wrap-params+
@@ -1636,9 +1643,9 @@ curl --request POST \
 строками. Исправьте ключи с помощью \verb|wrap-keyword-params| уже после
 слияния.
 
-Middleware не случайно выделяет поле \verb|:json-params|. Данные в~JSON не
-всегда словарь: это может быть массив, который нельзя объединить со
-словарём. На этот случай данные хранят в отдельном поле.
+Middleware не случайно выделяет поле \verb|:json-params|. Дело в том, что данные
+в~JSON не всегда словарь: это может быть массив, который нельзя объединить с
+\verb|:params|. На этот случай данные хранят в~отдельном поле.
 
 \subsection{Свои middleware}
 
@@ -2066,6 +2073,8 @@ Ring допускает, чтобы телом ответа был файл, э�
 которые входят в ресурсы, вы должны собрать проект заново.
 
 \index{middleware!wrap-resource}
+
+%% ----------------
 
 Для ресурсов служит похожее middleware \verb|wrap-resource|:
 
