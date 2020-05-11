@@ -1,0 +1,16 @@
+
+ё
+определенный
+подчеркиваниями
+перестает
+перестает
+
+- par lines
+- qr position
+
+- font encoding?
+
+- grep 42
+- clojure inline
+- титул
+- ispell

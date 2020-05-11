@@ -435,21 +435,3 @@ Package microtype Warning: You are using the `ragged2e' package.
 (microtype)                In this case, disable the `spacing' option.
 
 \textquotesingle  \textasciigrave
-
-TODO
-
-ё
-определенный
-подчеркиваниями
-перестает
-перестает
-
-- par lines
-- qr position
-
-- font encoding?
-
-- grep 42
-- clojure inline
-- титул
-- ispell
