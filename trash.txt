@@ -442,8 +442,7 @@ TODO
 определенный
 подчеркиваниями
 перестает
-
-- ch6 todos
+перестает
 
 - prepositions
 - par lines
