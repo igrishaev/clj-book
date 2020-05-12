@@ -1299,6 +1299,20 @@ middleware.
   (fn [request]
     (try
       (handler request)
+  \end{clojure/lines}
+\end{english}
+
+\wavebottom
+
+Обратите внимание, что запрос к Sentry тоже обёрнут в \verb|try/catch|. Sentry
+это отдельный сервис, который может быть недоступен. В этом случае в лог пишут
+оба исключения: и первичное, и связанное с Sentry. Если вы забыли, как работают
+декораторы и middleware, вернитесь к~главе про веб-резработку \page{decorator}.
+
+\wavetop
+
+\begin{english}
+  \begin{minted}[linenos, firstnumber=8]{clojure}
       (catch Exception e
         (let [event (-> nil
                         (r/add-exception! e)
@@ -1306,22 +1320,10 @@ middleware.
                         (r/add-extra! {:something "else"}))]
           (try
             @(r/capture! DSN event)
-            (catch Exception e-sentry
-              (log/errorf e-sentry "Sentry error: %s" DSN)
-              (log/error e "Request failed"))
-            (finally
-              {:status 500
-               :body "Internal error, please try later"})))))))
-  \end{clojure/lines}
+  \end{minted}
 \end{english}
 
-Обратите внимание, что запрос к Sentry тоже обёрнут в \verb|try/catch|. Sentry
-это отдельный сервис, который может быть недоступен. В этом случае в лог пишут
-оба исключения: и первичное, и связанное с Sentry. Если вы забыли, как работают
-декораторы и middleware, вернитесь к~главе про веб-резработку \page{decorator}.
-
-\index{библиотеки!Manifold}
-\index{асинхронность}
+\wavebottom
 
 Для полной картины мы передаём в Sentry не просто исключение, а событие
 \coderef{9}. Мы наращиваем его исключением, запросом Ring и произвольными
@@ -1329,6 +1331,21 @@ middleware.
 полями. Raven предлагает функции, чтобы добавить теги, пользователя и другие
 сущности.
 
+\wavetop
+
+\begin{english}
+  \begin{minted}[linenos, firstnumber=15]{clojure}
+            (catch Exception e-sentry
+              (log/errorf e-sentry "Sentry error: %s" DSN)
+              (log/error e "Request failed"))
+            (finally
+              {:status 500
+               :body "Internal error, please try later"})))))))
+  \end{minted}
+\end{english}
+
+\index{библиотеки!Manifold}
+\index{асинхронность}
 \index{синтаксис!@ (дереф)}
 
 Объясним оператор \verb|@| перед вызовом \verb|r/capture!| \coderef{14}. Функция
@@ -1402,6 +1419,8 @@ class AccountHandler(RequestHandler):
 форме.
 
 \index{Pyramid of Doom}
+
+%% --------------
 
 Вариант с каскадом \verb|if/else| работает, но выглядит громоздко. По-другому
 его называют <<Pyramid of Doom>>. Чем ниже вложенность, тем больше проблем у
