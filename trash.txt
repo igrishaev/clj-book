@@ -440,3 +440,19 @@ Package microtype Warning: You are using the `ragged2e' package.
      :headers {"content-type" "text/plain"}
 
 %% (require '[clojure.string :as str])
+
+
++А так~--- напечатать построчно (получим столбик тех же строк):
+
++\begin{figure}[ht!]
++  \small
+
+-;; Get user info error
+-;; Auth error
+-;; HTTP error
+
++Clojure, и это сбивает с толку. Шумные трейсы~--- справедливый упрёк в адрес
+
++\begin{center}
++  \uwave{\hspace{5cm}}
++\end{center}

@@ -1,5 +1,10 @@
 
 ё
+упрек
+
+- figure font size
+- разрыв кода
+- строки в разрывах
 
 - par lines
 - qr position

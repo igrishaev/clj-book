@@ -65,7 +65,8 @@
 
 \index{языки!Clojure}
 
-\begin{figure}[hb!]
+\begin{figure}[ht!]
+  \small
   \chart{chart-ex-tree}
   \caption{Базовые классы исключений}
   \label{fig:exceptions}
@@ -754,10 +755,9 @@ Divide by zero
   \end{clojure}
 \end{english}
 
-%% ------------------
 
 \noindent
-А так напечатать построчно:
+А так~--- напечатать построчно (получим столбик тех же строк):
 
 \index{печать!исключений}
 
@@ -765,9 +765,6 @@ Divide by zero
   \begin{clojure}
 (doseq [e (ex-chain e)]
   (-> e ex-message println))
-;; Get user info error
-;; Auth error
-;; HTTP error
   \end{clojure}
 \end{english}
 
@@ -830,7 +827,7 @@ Divide by zero
 
 Мы сократили трейс, чтобы не тратить на него бумагу. В реальности трейсы
 занимают несколько экранов. Они показывают Java-код, который получился из
-Clojure, и это сбивает с толку. Шумные трейсы~--- справедливый упрек в адрес
+Clojure, и это сбивает с толку. Шумные трейсы~--- справедливый упрёк в адрес
 Clojure. С другой стороны, ими страдают многие JVM-языки.
 
 \index{модули!clojure.stacktrace}
@@ -1243,6 +1240,8 @@ Raven\footurl{https://github.com/exoscale/raven}[Exoscale Raven][15mm]. Перв
 (raven/capture! DSN e)
   \end{clojure}
 \end{english}
+
+%% -------------------
 
 Откройте событие в Sentry и промотайте вниз. В секции \verb|extra| появится
 ключ \verb|:via| с детальной информацией (приведём фрагмент):
