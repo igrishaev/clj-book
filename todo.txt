@@ -4,6 +4,7 @@
 упрек
 выдает
 приведет
+четкий
 
 - listing refs
 - figure font size
