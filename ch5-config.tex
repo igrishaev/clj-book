@@ -1378,15 +1378,21 @@ EVENT_END='2019-07-12T23:59:59'
   \end{bash}
 \end{english}
 
-%% -----------------
-
 \noindent
-Считаем их и <<отрендерим>> шаблон:
+Считаем их и отрендерим шаблон:
 
 \begin{english}
   \begin{bash}
 $ source ENV_TPL
 $ cat config.tpl.json | envsubst
+  \end{bash}
+\end{english}
+
+\begin{listing}[ht!]
+  \small
+
+\begin{english}
+  \begin{json}
 {
     "server_port": 8080,
     "db": {
@@ -1400,12 +1406,18 @@ $ cat config.tpl.json | envsubst
         "2019-07-12T23:59:59"
     ]
 }
-  \end{bash}
+  \end{json}
 \end{english}
 
+\caption{Конфигурация после подстановки переменных}
+\label{fig:json-render}
+
+\end{listing}
+
 \noindent
-Подстановка прошла успешно. Чтобы записать результат в файл, добавьте
-в конец оператор вывода:
+Подстановка прошла успешно (результат рендера в~листинге
+\ref{fig:json-render}). Чтобы записать результат в~файл, добавьте в конец
+оператор вывода:
 
 \begin{english}
   \begin{bash}
