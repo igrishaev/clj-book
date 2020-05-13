@@ -457,6 +457,7 @@ Package microtype Warning: You are using the `ragged2e' package.
 +  \uwave{\hspace{5cm}}
 +\end{center}
 
+-----------------
 
 \begin{listing}[ht!]
   \small
@@ -470,3 +471,24 @@ Package microtype Warning: You are using the `ragged2e' package.
 \label{fig:}
 
 \end{listing}
+
+------------------
+
+\noindent
+\begin{tabular}{ @{}p{5cm} @{}p{5cm} }
+
+\begin{english}
+  \begin{clojure}
+  \end{clojure}
+\end{english}
+
+&
+
+\begin{english}
+  \begin{clojure}
+  \end{clojure}
+\end{english}
+
+\end{tabular}
+
+------------------
