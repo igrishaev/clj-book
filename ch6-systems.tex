@@ -1467,16 +1467,23 @@ JDBC-спека с открытым пулом. Принцип его работ
   \end{clojure}
 \end{english}
 
-%% -------------
-
 В теле \verb|defrecord|, сразу после \verb|stop|, реализуем новый
 протокол. Методы сводятся к функциям JDBC, в которые передаём слот
-\verb|db-spec| и~аргументы.
+\verb|db-spec| и~аргументы. Сначала компонент реализует \verb|Lifecycle| как
+обычно:
 
 \begin{english}
   \begin{clojure}
 (defrecord DB [options db-spec]
   ;; ...component/Lifecycle
+  \end{clojure}
+\end{english}
+
+\noindent
+Далее следует частный протокол:
+
+\begin{english}
+  \begin{clojure}
   IDB
   (query [this sql-params]
     (jdbc/query db-spec sql-params))
