@@ -462,11 +462,6 @@ Package microtype Warning: You are using the `ragged2e' package.
 \begin{listing}[ht!]
   \small
 
-\begin{english}
-  \begin{clojure}
-  \end{clojure}
-\end{english}
-
 \caption{}
 \label{fig:}
 
