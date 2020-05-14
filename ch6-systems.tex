@@ -2077,8 +2077,6 @@ Clojure:
   \end{clojure}
 \end{english}
 
-%% ---------------
-
 Когда компонентов много, зависимости вносят шум, и код трудно читать. В примере
 выше мы сперва получаем компонент из конструктора, а затем вешаем на него
 зависимости. Последний шаг можно сдвинуть в конструктор. Он вернёт
@@ -2088,9 +2086,7 @@ Clojure:
 \begin{english}
   \begin{clojure}
 (defn make-worker [config]
-  (-> config
-      map->Worker
-      (component/using [:db])))
+  (-> config map->Worker (component/using [:db])))
   \end{clojure}
 \end{english}
 
@@ -2280,10 +2276,9 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
 
 \textbf{Проброс} означает, что отдельные компоненты передают в запросе. Вариант
 имеет право на жизнь, потому что запрос это часть сервера, а сервер это
-компонент. Поэтому сервер имеет право добавить поля запросу.
-
-Чтобы компонент базы стал доступен серверу, подключим его в~зависимости. Изменим
-слоты сервера и конструктор:
+компонент. Поэтому сервер имеет право добавить поля запросу. Чтобы компонент
+базы стал доступен серверу, подключим его в~зависимости. Изменим слоты сервера и
+конструктор:
 
 \begin{english}
   \begin{clojure}
@@ -2323,9 +2318,8 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
 
 \begin{english}
   \begin{clojure}
-(defn app [request]
-  (let [{:keys [db]} request
-        data (db/query db "select * from requests")]
+(defn app [{:keys [db]}]
+  (let [data (db/query db "select * from requests")]
     {:status 200
      :body (with-out-str
              (clojure.pprint/pprint data))}))
@@ -2392,8 +2386,7 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
 (defrecord Server
   [options server web])
 
-(defn make-server
-  [options]
+(defn make-server [options]
   (-> (map->Server {:options options})
       (component/using [:web])))
   \end{clojure}
@@ -2640,7 +2633,7 @@ Defrecord это рекомендуемый способ работать с Com
   \end{clojure}
 \end{english}
 
-Чтобы убедиться, что компонент нагружен всем необходимым, исследуем его
+Чтобы убедиться, что компонент обладает всем необходимым, исследуем его
 метаданные после \verb|init|:
 
 \begin{english}
@@ -3025,6 +3018,8 @@ Mount \page{mount-selective}. Функция \verb|init| принимает не
 namespaces>> или аналогичную.
 
 \index{пространства имён}
+
+%% ------------
 
 Integrant предлагает функцию \verb|load-namespaces| для автоматической
 загрузки модулей. На вход подают конфигурацию системы. Для каждого ключа функция
