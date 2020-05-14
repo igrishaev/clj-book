@@ -325,8 +325,6 @@ create table requests (
 \index{хардкод}
 \index{конфигурация!в Mount}
 
-%% ----------------
-
 Сущность \verb|config| это упрощённый загрузчик конфигурации. Для краткости
 опустим перехват ошибок и другие детали. Фаза \verb|:start| читает файл
 EDN. Замените \verb|edn/read-string| на Yummy, Aero или своё
@@ -335,16 +333,9 @@ EDN. Замените \verb|edn/read-string| на Yummy, Aero или своё
 
 \begin{english}
   \begin{clojure}
-(ns book.systems.mount.config
-  (:require
-   [mount.core :as mount :refer [defstate]]
-   [clojure.edn :as edn]))
-
 (defstate config
   :start
-  (-> "system.config.edn"
-      slurp
-      edn/read-string))
+  (-> "system.config.edn" slurp edn/read-string))
   \end{clojure}
 \end{english}
 
@@ -527,7 +518,6 @@ HTTP-клиент:
   \begin{clojure}
 (ns book.systems.mount.worker
   (:require
-   [mount.core :as mount :refer [defstate]]
    [clojure.java.jdbc :as jdbc]
    [clj-http.client :as client]
    [clojure.tools.logging :as log]
@@ -635,24 +625,23 @@ IP. Пока что мы не знаем, как работает поиск, н
 \begin{english}
   \begin{clojure}
 (def query
-  "SELECT * FROM requests
-   WHERE NOT is_processed
+  "SELECT * FROM requests WHERE NOT is_processed
    LIMIT 1 FOR UPDATE;")
   \end{clojure}
 \end{english}
 
 \verb|FOR UPDATE| работает только в транзакции, поэтому тело функции обернуто
-в \verb|(jdbc/with-db-transaction)|. Это макрос, внутри которого доступно
-транзакционное соединение с базой. На него указывает символ \verb|tx|. В
-функции JDBC мы передаем \verb|tx|, а не \verb|db| (строки 3 и 12).
+в~\verb|(jdbc/with-db-transaction)|. Это макрос, внутри которого доступно
+транзакционное соединение с базой. На него указывает символ~\verb|tx|. В~функции
+JDBC мы передаем \verb|tx|, а~не~\verb|db| (строки 3 и 12).
 
 \index{функции!get-ip-info}
 \index{сайты!iplocation.com}
 
-Напишем функцию \verb|get-ip-info|. Она обращается к сервису, который
-принимает IP и возвращает сведения о нём в JSON. В нашем случае это сайт
-\verb|iplocation.com|. В промышленных системах базы адресов покупают и
-запускают локально, чтобы не зависеть от сторонних служб.
+Напишем функцию \verb|get-ip-info|. Она обращается к сервису, который принимает
+IP и возвращает сведения о нём в JSON. В нашем случае это сайт
+\verb|iplocation.com|. В промышленных системах базы адресов разворачивают
+локально, чтобы не зависеть от сторонних служб.
 
 \begin{english}
   \begin{clojure}
@@ -759,6 +748,8 @@ IP. Пока что мы не знаем, как работает поиск, н
 вызываем \verb|(mount/start)|, система угадывает порядок запуска:
 \verb|config|~\arr{} \verb|db|~\arr{} \verb|worker|. Если переставить любые два
 элемента, произойдёт сбой. Как это работает?
+
+%% ----------------
 
 Чтобы вычислить порядок, Mount полагается на компилятор Clojure. Пространства
 имён зависят друг от друга, как компоненты в системе. Компилятор ищет в теле
