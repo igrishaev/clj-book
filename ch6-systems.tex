@@ -1320,10 +1320,14 @@ Component не терпит глобального состояния. В биб
 
 \begin{english}
   \begin{clojure}
-(-> s-stopped (assoc :server nil) type)
+(-> s-stopped
+    (assoc :server nil)
+    type)
 ;; book.systems.comp.server.Server
 
-(-> s-stopped (dissoc :server) type)
+(-> s-stopped
+    (dissoc :server)
+    type)
 ;; clojure.lang.PersistentArrayMap
   \end{clojure}
 \end{english}
@@ -1343,8 +1347,6 @@ Component не терпит глобального состояния. В биб
 словарём. Словарь не реализует \verb|Lifecycle| напрямую, поэтому поиск пойдет
 вверх по дереву наследования. В результате он разрешится в \verb|Object|,
 который молча вернет \verb|this|.
-
-%% ----------------
 
 Привёдем неудачный компонент. Его метод \verb|start| вернёт словарь с~полем
 \verb|server|:
@@ -1369,9 +1371,11 @@ Component не терпит глобального состояния. В биб
   \begin{clojure}
 (def bs-created (map->BadServer
                   {:options {:port 8080 :join? false}}))
+
 (def bs-started (component/start bs-created))
 (type bs-started)
 ;; clojure.lang.PersistentArrayMap
+
 (component/stop bs-started)
 ;; does nothing, the server still works
   \end{clojure}
@@ -1462,6 +1466,8 @@ JDBC-спека с открытым пулом. Принцип его работ
   (update! [this table set-map where-clause]))
   \end{clojure}
 \end{english}
+
+%% -------------
 
 В теле \verb|defrecord|, сразу после \verb|stop|, реализуем новый
 протокол. Методы сводятся к функциям JDBC, в которые передаём слот
