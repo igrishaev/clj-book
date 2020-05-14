@@ -1603,7 +1603,7 @@ COMMIT
 
 \subsection{Воркер}
 
-Напишем компонент воркера. Объявим модуль и подключим зависимости:
+Напишем компонент воркера. Объявим модуль и зависимости:
 
 \begin{english}
   \begin{clojure}
@@ -1611,8 +1611,7 @@ COMMIT
   (:require
    [com.stuartsierra.component :as component]
    [book.systems.comp.db :as db]
-   [clj-http.client :as client]
-   [clojure.tools.logging :as log]))
+   [clj-http.client :as client]))
   \end{clojure}
 \end{english}
 
@@ -1641,7 +1640,9 @@ COMMIT
   \begin{clojure/lines}
 (defrecord Worker
   [options flag task db]
+
   component/Lifecycle
+
   (start [this]
     (let [flag (atom true)
           this (assoc this :flag flag)
@@ -1657,7 +1658,7 @@ COMMIT
   \end{clojure/lines}
 \end{english}
 
-Обратите внимание на строку~6: мы дополняем \verb|this| флагом
+Обратите внимание на строку~8: мы дополняем \verb|this| флагом
 состояния. Метод \verb|make-task| ожидает \verb|this| с заполненным слотом
 \verb|flag|. Если строку убрать, \verb|make-task| получит запись с пустым
 флагом.
@@ -2075,6 +2076,8 @@ Clojure:
           (make-worker worker) [:db]))
   \end{clojure}
 \end{english}
+
+%% ---------------
 
 Когда компонентов много, зависимости вносят шум, и код трудно читать. В примере
 выше мы сперва получаем компонент из конструктора, а затем вешаем на него
