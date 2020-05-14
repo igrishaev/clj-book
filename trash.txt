@@ -472,6 +472,18 @@ Package microtype Warning: You are using the `ragged2e' package.
 
 \end{listing}
 
+-----------------
+
+\begin{figure}[h!]
+  \small
+
+\chart{}
+
+\caption{}
+\label{fig:}
+
+\end{figure}
+
 ------------------
 
 \noindent
