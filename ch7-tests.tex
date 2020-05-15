@@ -1509,26 +1509,32 @@ expected: 200
 \index{изображения}
 \index{классы!PngImage}
 
-Внутри теста мы вызываем \verb|plot-chart| с текущим временным
-файлом. Убедимся, что функция действительно записала в него картинку. Класс
-\verb|PngImage| предлагает простейший парсер PNG. Прочитаем разрешение файла и
-сверим с образцом.
-
-%% ------------
+Внутри теста мы вызываем \verb|plot-chart| с некоторым набором данных и текущим
+временным файлом.
 
 \begin{english}
-  \begin{clojure}
+  \begin{minted}[linenos, firstnumber=1]{clojure}
 (import 'javax.imageio.ImageIO)
 
 (deftest test-plot-chart-png
   (let [dataset [[...] [...] [...]]
         filepath (.getAbsolutePath *tmp-file*)]
     (plot-chart dataset filepath)
+  \end{minted}
+\end{english}
+
+\noindent
+Убедимся, что функция действительно записала в него картинку. Класс
+\verb|PngImage| предлагает простейший парсер PNG. Прочитаем разрешение файла и
+сверим с образцом.
+
+\begin{english}
+  \begin{minted}[linenos, firstnumber=7]{clojure}
     (let [png (ImageIO/read *tmp-file*)
           width (.getWidth png)
           height (.getHeight png)])
     (is (= [640 480] [width height]))))
-  \end{clojure}
+  \end{minted}
 \end{english}
 
 \index{базы данных!Cassandra}
@@ -1706,6 +1712,8 @@ assertion. Назовем фикстуру \verb|fix-this-is-fine|%
 
 \noindent
 С её помощью мы пройдем тест Оруэлла:
+
+%% -------------------
 
 \begin{english}
   \begin{clojure}
