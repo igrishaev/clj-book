@@ -6,22 +6,16 @@
 приведет
 четкий
 
-- remove waves
 - dirtree margin
 
-- listing refs
-- figure font size
-- разрыв кода
-- строки в разрывах
-
-- par lines
 - qr position
 
 - font encoding?
 - drop some libs in ch1?
 
 - grep 42
-- clojure inline
 - white pages
+
 - титул
+
 - ispell

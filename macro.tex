@@ -22,11 +22,9 @@
 
 \newcommand{\chart}[1]{\input{#1}}
 
-\def\wavetop{{\centering\uwave{\hspace{3cm}}\par}\vspace{-0.5em}}
+\def\wavetop{{\noindent\centering\raisebox{-0em}[0em][0em]{\uwave{\hspace{3cm}}}\par}}
 
-\def\wavebottom{\vspace{-1.5em}{\centering\uwave{\hspace{3cm}}\par}\vspace{1em}}
-
-\def\wave{{\centering\uwave{\hspace{3cm}}\par}}
+\def\wavebottom{{\noindent\centering\raisebox{0.9em}[0em][0em]{\uwave{\hspace{3cm}}}\par}}
 
 % -7.3mm
 \NewDocumentCommand{\footurl}{ m O{} O{1mm} }{%
