@@ -6,6 +6,8 @@
 приведет
 четкий
 
+- remove waves
+
 - listing refs
 - figure font size
 - разрыв кода
