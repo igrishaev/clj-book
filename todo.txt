@@ -1,21 +1,11 @@
 
 ё
-Все в порядке
-
-
-приведет
-четкий
 
 - dirtree margin
-
 - qr position
-
 - font encoding?
 - drop some libs in ch1?
-
 - grep 42
 - white pages
-
 - титул
-
 - ispell
