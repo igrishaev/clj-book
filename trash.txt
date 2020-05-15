@@ -458,6 +458,12 @@ Package microtype Warning: You are using the `ragged2e' package.
 +\end{center}
 
 -----------------
+  \begin{minted}[linenos, firstnumber=7]{clojure}
+  \end{minted}
+
+-----------------
+
+-----------------
 
 \begin{listing}[ht!]
   \small

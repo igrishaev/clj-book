@@ -3615,56 +3615,55 @@ JSON-схемой. Преимущества спеки в том, что она 
 в базу пользователя с открытым и закрытым ключом. Для краткости пропустим
 вставку заказов.
 
-%% ---------------------
-
 \begin{english}
-  \begin{clojure}
+  \begin{minted}[linenos, firstnumber=1]{clojure}
 (deftest test-api-orders-ok
   (let [public-key "my_public_key"
         secret-key "slk6Da7sD2G4g"
-
         {:keys [db]} system/system
         _ (jdbc/insert! db :users {:public_key public-key
                                    :secret_key secret-key})
-        ;; ...
-  \end{clojure}
+  \end{minted}
 \end{english}
+
+\wavebottom
 
 Предполагается, что внутри теста система уже работает за счёт фикстуры. Её ключ
 \verb|db| ссылается на открытое подключение к базе. Далее составим параметры запроса
 HTTP. Закрытый ключ не участвует в параметрах~--- с его помощью получим их
 отпечаток (хэш):
 
+\wavetop
+
 \begin{english}
-  \begin{clojure}
-        ;; ...
+  \begin{minted}[linenos, firstnumber=7]{clojure}
         params {:command :listOrders
                 :public_key public-key
                 :order "date_created"
                 :sort "desc"}
-
         signature (params->sha256hmac params secret-key)
         auth-header (str "HMAC_SHA256=" signature)
-        ;; ...
-  \end{clojure}
+  \end{minted}
 \end{english}
+
+\wavebottom
 
 Из отпечатка строим заголовок авторизации и передаём в HTTP-клиент. В этот
 момент происходит настоящий сетевой запрос. Сервер вычисляет сигнатуру и
 сравнивает с той, что прислал клиент. Если они равны, получим статус 200 и JSON
 с заказами в~теле ответа.
 
+\wavetop
+
 \begin{english}
-  \begin{clojure}
-        ;; ...
+  \begin{minted}[linenos, firstnumber=13]{clojure}
         response (client/get "http://127.0.0.1:8080/api"
                    {:query-params params
                     :headers {:authentication auth-header}})
         {:keys [status body]} response]
-
     (is (= 200 status))
     (is (= {:orders [...]} body))))
-  \end{clojure}
+  \end{minted}
 \end{english}
 
 Даже в сокращении тест занимает много места. Чтобы улучшить читаемость, выносите
@@ -3809,6 +3808,8 @@ HTTP. Закрытый ключ не участвует в параметрах~
 задать в опциях библиотеки, но проще положить его в \verb|PATH|.
 
 \index{переменные!PATH}
+
+%% ----------------
 
 Напишем первый тест. Представим, что локальный сервер работает на порту
 8080. Тест открывает форму входа, заполняет поля и~нажимает кнопку
