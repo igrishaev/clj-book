@@ -2,7 +2,6 @@
 ё
 
 - qr position
-- drop some libs in ch1?
 - титул
 - ispell
 - cover
