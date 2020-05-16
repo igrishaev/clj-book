@@ -111,21 +111,31 @@
 \input{abstract}
 
 \frontmatter
+
+%% https://tex.stackexchange.com/questions/41555/
+\cleardoublepage
+\pagenumbering{gobble}
 \tableofcontents
-\include{about}
+
+\clearpage
+\input{about}
+
+\cleardoublepage
+\pagenumbering{arabic}
+
+\blank
 
 \mainmatter
-\include{ch1-web}
-\include{ch2-spec}
-\include{ch3-exceptions}
-\include{ch4-mutability}
-\include{ch5-config}
-\include{ch6-systems}
-\include{ch7-tests}
+      \include{ch1-web}
+\blank\include{ch2-spec}
+\blank\include{ch3-exceptions}
+\blank\include{ch4-mutability}
+\blank\include{ch5-config}
+\blank\include{ch6-systems}
+\blank\include{ch7-tests}
 
 \backmatter
 \include{afterword}
-
-\printindex
+\blank\printindex
 
 \end{document}
