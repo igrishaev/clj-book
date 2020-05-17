@@ -5,6 +5,5 @@
 - javax.imageio.ImageIO waves
 - monkey patch
 - русские ссылки
-- титул
 - ispell
 - cover
