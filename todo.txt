@@ -2,7 +2,6 @@
 ё
 Назовем
 
-- javax.imageio.ImageIO waves
 - monkey patch
 - русские ссылки
 - ispell
