@@ -1,7 +1,10 @@
 
 ё
+Назовем
 
-- qr position
+- javax.imageio.ImageIO waves
+- monkey patch
+- русские ссылки
 - титул
 - ispell
 - cover
