@@ -1,7 +1,6 @@
 _minted-main/
 *.aux
 *.log
-*.pdf
 .DS_Store
 trash.tex
 *.toc
@@ -9,3 +8,4 @@ trash.tex
 *.idx
 *.ilg
 *.ind
+main.pdf
