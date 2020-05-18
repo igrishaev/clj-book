@@ -1,5 +1,5 @@
 
-\documentclass[10pt]{book} % ,draft
+\documentclass[10pt,draft]{book} % ,draft
 
 \usepackage{tikz}
 \usepackage{tocloft}
@@ -136,6 +136,9 @@
 
 \backmatter
 \include{afterword}
-\blank\printindex
+
+% https://tex.stackexchange.com/questions/203720/
+\makeatletter\@openrightfalse\makeatother
+\printindex
 
 \end{document}

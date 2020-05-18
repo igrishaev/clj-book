@@ -5,7 +5,7 @@ DOC = main
 
 all: git-commit pdf-build1
 
-build: clear git-commit pdf-build1 pdf-build2 index pdf-build3 pdf-open
+build: clear git-commit pdf-build1 index pdf-build2 pdf-build3 pdf-open
 
 .PHONY: index
 index:
