@@ -1,6 +1,5 @@
 
 ё
 
-- logo 1.5
 - ispell
 - cover
