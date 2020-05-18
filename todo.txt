@@ -1,7 +1,5 @@
 
 ё
 
-- monkey patch
-- русские ссылки
 - ispell
 - cover
