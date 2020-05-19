@@ -1,5 +1,5 @@
 
 ё
 
-- ispell
+- remove logo
 - cover
