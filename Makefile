@@ -3,9 +3,13 @@ PWD = $(shell pwd)
 PYG := /usr/local/lib/python2.7/site-packages/pygments
 DOC = main
 
-all: git-commit pdf-build1
+# default draft build
+.PHONY: draft
+draft: git-commit pdf-build1
 
-build: clear git-commit pdf-build1 index pdf-build2 pdf-build3 pdf-open
+# release build
+.PHONY: build
+build: clear git-commit pdf-build1 index pdf-build2 pdf-build3 lines refs pdf-open
 
 .PHONY: index
 index:
@@ -40,12 +44,12 @@ stats:
 
 .PHONY: lines
 lines:
-	grep -A 0 -B 0 -i 'in paragraph at lines' ${DOC}.log
+	! grep -A 0 -B 0 -i 'in paragraph at lines' ${DOC}.log
 
 .PHONY: warn
 warn:
-	grep -A 0 -B 0 -i 'Warning' ${DOC}.log
+	! grep -A 0 -B 0 -i 'Warning' ${DOC}.log
 
 .PHONY: refs
 refs:
-	grep -A 0 -B 0 -i 'LaTeX Warning: Reference' ${DOC}.log
+	! grep -A 0 -B 0 -i 'LaTeX Warning: Reference' ${DOC}.log
