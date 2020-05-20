@@ -1220,7 +1220,7 @@ middleware в Django, промышленном фреймворке на Python.
 
 \index{middleware!порядок}
 
-Теперь посмотрим на форму \verb|(def app...)| выше. В неё закралась
+Теперь посмотрим на форму \clojureinline{(def app ...)} выше. В неё закралась
 \textbf{ошибка}. Запрос движется снизу вверх, поэтому \verb|wrap-keyword-params|
 сработает раньше \coderef{4}. Он попытается найти \verb|:params| в запросе, но
 безуспешно. Далее сработает \verb|wrap-params| \coderef{3}. Он заполнит поле
@@ -2000,10 +2000,10 @@ Ring допускает, чтобы телом ответа был файл, э�
   \begin{clojure}
 (require '[clojure.java.io :as io])
 
-(defn page-terminals [request]
+(defn page-terminals
+  [request]
   {:status 200
    :headers {"content-type" "application/json"}
-   ;; :body (new java.io.File "terminals.json")
    :body (io/file "terminals.json")})
   \end{clojure}
 \end{english}
