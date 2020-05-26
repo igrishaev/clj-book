@@ -40,7 +40,7 @@ pdf-open:
 	open ${DOC}.pdf
 
 stats:
-	find . -name '*.tex' | xargs wc -cl
+	find . -name '*.tex' | xargs wc -ml
 
 .PHONY: lines
 lines:
