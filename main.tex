@@ -80,6 +80,7 @@
 \setlength{\parskip}{0.32em}
 
 \pagestyle{plain}
+\pagenumbering{arabic}
 
 \setcounter{tocdepth}{1}
 
@@ -105,23 +106,14 @@
 
 \input{abstract}
 
-\frontmatter
-
 %% https://tex.stackexchange.com/questions/41555/
 \cleardoublepage
-\pagenumbering{gobble}
 \tableofcontents
 
 \clearpage
 \input{about}
 
-\cleardoublepage
-\pagenumbering{arabic}
-
-\blank
-
-\mainmatter
-      \include{ch1-web}
+\blank\include{ch1-web}
 \blank\include{ch2-spec}
 \blank\include{ch3-exceptions}
 \blank\include{ch4-mutability}
