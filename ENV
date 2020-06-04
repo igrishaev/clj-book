@@ -1,0 +1,6 @@
+
+export PUBLISHER='<<Геликон-Плюс>>'
+export COMMIT_HASH=`git log -1 --format='%h'`
+export COMMIT_TS=`git log -1 --format='%at'`
+
+export MODE='web'
