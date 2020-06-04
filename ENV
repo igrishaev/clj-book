@@ -3,4 +3,15 @@ export PUBLISHER='<<Геликон-Плюс>>'
 export COMMIT_HASH=`git log -1 --format='%h'`
 export COMMIT_TS=`git log -1 --format='%at'`
 
-export MODE='web'
+export MODE='ebook'
+
+export DOCUMENT='report'
+# export FONT='10pt'
+
+export GEOMTRY='geom-tablet'
+# export DRAFT=',draft'
+
+export DRAFT=
+
+# export DOCUMENT='report'
+# export FONT='10pt'

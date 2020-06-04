@@ -5,11 +5,11 @@ DOC = main
 
 # default draft build
 .PHONY: draft
-draft: config pdf-build1
+draft: pdf-build1
 
 # release build
 .PHONY: build
-build: clear config pdf-build1 index pdf-build2 pdf-build3 lines refs pdf-open
+build: clear pdf-build1 index pdf-build2 pdf-build3 lines refs pdf-open
 
 .PHONY: index
 index:
@@ -26,14 +26,13 @@ clear:
 	rm -f *.toc
 	rm -f *.pyg
 	rm -rf _minted-${DOC}
-	rm -f config.tex
 	rm -f *.out
 
 pyg-install:
 	ln -s ${PWD}/print.py ${PYG}/styles/
 
 pdf-build1 pdf-build2 pdf-build3:
-	pdflatex -shell-escape -halt-on-error ${DOC}.tex
+	envsubst < ${DOC}.tex | pdflatex -shell-escape -halt-on-error -jobname=${DOC}
 
 pdf-open:
 	open ${DOC}.pdf
@@ -52,7 +51,3 @@ warn:
 .PHONY: refs
 refs:
 	! grep -A 0 -B 0 -i 'LaTeX Warning: Reference' ${DOC}.log
-
-.PHONY: config
-config:
-	envsubst < config.tpl.tex > config.tex

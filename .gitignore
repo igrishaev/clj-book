@@ -13,5 +13,4 @@ cover.pdf
 *.pyg
 *.idlk
 *.pdf
-config.tex
-main.out
+*.out
