@@ -44,7 +44,14 @@
 \input{DT}
 
 \usepackage[newfloat=true]{minted}
+
+\ifx\mode\print
 \usemintedstyle{print}
+\fi
+
+\ifx\mode\web
+\usemintedstyle{default}
+\fi
 
 \SetupFloatingEnvironment{listing}{placement=H}
 
@@ -71,6 +78,17 @@
 \usepackage{setspace}
 
 \input{config}
+
+\ifx\mode\print
+\else
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=blue,
+    urlcolor=blue,
+}
+\fi
 
 %% geometry presets
 %% \input{geom-140x200-bleed}
@@ -116,12 +134,12 @@
 \input{about}
 
 \blank\include{ch1-web}
-\blank\include{ch2-spec}
-\blank\include{ch3-exceptions}
-\blank\include{ch4-mutability}
-\blank\include{ch5-config}
-\blank\include{ch6-systems}
-\blank\include{ch7-tests}
+%% \blank\include{ch2-spec}
+%% \blank\include{ch3-exceptions}
+%% \blank\include{ch4-mutability}
+%% \blank\include{ch5-config}
+%% \blank\include{ch6-systems}
+%% \blank\include{ch7-tests}
 
 \backmatter
 \include{afterword}

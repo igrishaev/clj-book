@@ -27,6 +27,7 @@ clear:
 	rm -f *.pyg
 	rm -rf _minted-${DOC}
 	rm -f config.tex
+	rm -f *.out
 
 pyg-install:
 	ln -s ${PWD}/print.py ${PYG}/styles/
@@ -54,4 +55,4 @@ refs:
 
 .PHONY: config
 config:
-	source ./ENV && envsubst < config.tpl.tex > config.tex
+	envsubst < config.tpl.tex > config.tex
