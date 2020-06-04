@@ -1,17 +1,23 @@
 
-export PUBLISHER='<<Геликон-Плюс>>'
+# export DRAFT=',draft'
+# export DRAFT=
+
+# common
+export FONT='10pt'
 export COMMIT_HASH=`git log -1 --format='%h'`
 export COMMIT_TS=`git log -1 --format='%at'`
 
+# formats
 export MODE='ebook'
-
 export DOCUMENT='report'
-# export FONT='10pt'
-
 export GEOMTRY='geom-tablet'
-# export DRAFT=',draft'
 
-export DRAFT=
+export MODE='print'
+export DOCUMENT='book'
 
-# export DOCUMENT='report'
-# export FONT='10pt'
+# publishers
+export PUBLISHER='<<Геликон-Плюс>>'
+export GEOMTRY='geom-140x200-bleed'
+
+export PUBLISHER='<<Rider\'{o}>>'
+export GEOMTRY='geom-145x205-no-bleed'
