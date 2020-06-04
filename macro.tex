@@ -28,8 +28,6 @@
 
 \def\blank{\clearpage{\pagestyle{empty}\cleardoublepage}}
 
-% -7.3mm
-
 \ifx\mode\print
 \NewDocumentCommand{\footurl}{ m m O{} O{1mm} }{%
   #1\footnote{\StrSubstitute{#2}{https://}{}}%
