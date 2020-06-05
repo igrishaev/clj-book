@@ -16,15 +16,15 @@
 
 \ifx\mode\print
 \newcommand{\page}[1]{(с.~\pageref{#1})}
+\newcommand{\fig}[1]{(рис.~\ref{#1})}
+\newcommand{\lis}[1]{(листинг~\ref{#1})}
 \fi
 
 \ifx\mode\ebook
 \newcommand{\page}[1]{\hyperref[#1]{\uline{(с.~\pageref{#1})}}}
+\newcommand{\fig}[1]{\hyperref[#1]{\uline{(рис.~\ref{#1})}}}
+\newcommand{\lis}[1]{\hyperref[#1]{\uline{(листинг~\ref{#1})}}}
 \fi
-
-\newcommand{\fig}[1]{(рис.~\ref{#1})}
-
-\newcommand{\lis}[1]{(листинг~\ref{#1})}
 
 \newcommand{\chart}[1]{\input{#1}}
 
@@ -45,8 +45,19 @@
 \NewDocumentCommand{\footurl}{ m m O{} O{} }{\href{#2}{\uline{#1}}}
 \fi
 
+\newcommand{\smartlink}[2]{%
+\ifx\mode\print
+\texttt{#1}%
+\fi
+\ifx\mode\ebook
+\href{#2}{\uline{#1}}%
+\fi
+}
 
-%% \newcommand{\tuple}[1]{$\langle$#1$\rangle$}
+\def\emaillink{\smartlink{\email}{mailto:\email}}
+
+\def\sitelink{\smartlink{\domain}{https://\domain}}
+
 \newcommand{\tuple}[1]{\{#1\}}
 
 \newminted[clojure]{clojure}{}

@@ -1,4 +1,7 @@
 
+export DOMAIN='grishaev.me'
+export EMAIL='ivan@grishaev.me'
+
 # export DRAFT=',draft'
 export DRAFT=
 
