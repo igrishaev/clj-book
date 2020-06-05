@@ -7,6 +7,18 @@
 \usepackage[utf8]{inputenc}
 \usepackage[english,russian]{babel}
 
+% for proper ' and `
+\usepackage{textcomp}
+\usepackage{upquote}
+
+% to replace strings
+\usepackage{xstring}
+
+% extra space at the end of macros
+\usepackage{xspace}
+
+% env vars
+\def\empty{\xspace}
 \def\print{print}
 \def\ebook{ebook}
 
@@ -62,16 +74,6 @@
 \fi
 
 \SetupFloatingEnvironment{listing}{placement=H}
-
-% for proper ' and `
-\usepackage{textcomp}
-\usepackage{upquote}
-
-% to replace strings
-\usepackage{xstring}
-
-% extra space at the end of macros
-\usepackage{xspace}
 
 % index
 \usepackage{index}

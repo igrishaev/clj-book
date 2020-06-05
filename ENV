@@ -7,11 +7,6 @@ export FONT='10pt'
 export COMMIT_HASH=`git log -1 --format='%h'`
 export COMMIT_TS=`git log -1 --format='%at'`
 
-# formats
-export MODE='ebook'
-export DOCUMENT='report'
-export GEOMTRY='geom-tablet'
-
 export MODE='print'
 export DOCUMENT='book'
 
@@ -19,5 +14,12 @@ export DOCUMENT='book'
 export PUBLISHER='<<Геликон-Плюс>>'
 export GEOMTRY='geom-140x200-bleed'
 
-export PUBLISHER='<<Rider\'{o}>>'
+export PUBLISHER="<<Rider\'{o}>>"
 export GEOMTRY='geom-145x205-no-bleed'
+
+# formats
+export MODE='ebook'
+export DOCUMENT='report'
+export GEOMTRY='geom-tablet'
+
+# export PUBLISHER=
