@@ -522,3 +522,7 @@ Package microtype Warning: You are using the `ragged2e' package.
 }
 
 %% \newcommand{\tuple}[1]{$\langle$#1$\rangle$}
+
+\setminted{numbersep=1mm}
+
+xleftmargin=\parindent

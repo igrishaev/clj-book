@@ -1503,14 +1503,14 @@ expected: 200
 временным файлом.
 
 \begin{english}
-  \begin{minted}[linenos, firstnumber=1]{clojure}
+  \begin{clojure/lines*}{firstnumber=1}
 (import 'javax.imageio.ImageIO)
 
 (deftest test-plot-chart-png
   (let [dataset [[...] [...] [...]]
         filepath (.getAbsolutePath *tmp-file*)]
     (plot-chart dataset filepath)
-  \end{minted}
+  \end{clojure/lines*}
 \end{english}
 
 \wavebottom
@@ -1523,12 +1523,12 @@ expected: 200
 \wavetop
 
 \begin{english}
-  \begin{minted}[linenos, firstnumber=7]{clojure}
+  \begin{clojure/lines*}{firstnumber=7}
     (let [png (ImageIO/read *tmp-file*)
           width (.getWidth png)
           height (.getHeight png)])
     (is (= [640 480] [width height]))))
-  \end{minted}
+  \end{clojure/lines*}
 \end{english}
 
 \index{базы данных!Cassandra}
@@ -3599,14 +3599,14 @@ JSON-схемой. Преимущества спеки в том, что она 
 вставку заказов.
 
 \begin{english}
-  \begin{minted}[linenos, firstnumber=1]{clojure}
+  \begin{clojure/lines*}{firstnumber=1}
 (deftest test-api-orders-ok
   (let [public-key "my_public_key"
         secret-key "slk6Da7sD2G4g"
         {:keys [db]} system/system
         _ (jdbc/insert! db :users {:public_key public-key
                                    :secret_key secret-key})
-  \end{minted}
+  \end{clojure/lines*}
 \end{english}
 
 \wavebottom
@@ -3619,14 +3619,14 @@ HTTP. Закрытый ключ не участвует в параметрах~
 \wavetop
 
 \begin{english}
-  \begin{minted}[linenos, firstnumber=7]{clojure}
+  \begin{clojure/lines*}{firstnumber=7}
         params {:command :listOrders
                 :public_key public-key
                 :order "date_created"
                 :sort "desc"}
         signature (params->sha256hmac params secret-key)
         auth-header (str "HMAC_SHA256=" signature)
-  \end{minted}
+  \end{clojure/lines*}
 \end{english}
 
 \wavebottom
@@ -3639,14 +3639,14 @@ HTTP. Закрытый ключ не участвует в параметрах~
 \wavetop
 
 \begin{english}
-  \begin{minted}[linenos, firstnumber=13]{clojure}
+  \begin{clojure/lines*}{firstnumber=13}
         response (client/get "http://127.0.0.1:8080/api"
                    {:query-params params
                     :headers {:authentication auth-header}})
         {:keys [status body]} response]
     (is (= 200 status))
     (is (= {:orders [...]} body))))
-  \end{minted}
+  \end{clojure/lines*}
 \end{english}
 
 Даже в сокращении тест занимает много места. Чтобы улучшить читаемость, выносите

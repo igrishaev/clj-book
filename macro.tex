@@ -62,11 +62,19 @@
 
 \newminted[clojure]{clojure}{}
 
-\newminted[clojure/lines]{clojure}{linenos=true}
+\ifx\mode\print
+\def\codeindent{0mm}
+\fi
 
-\newminted[python/lines]{python}{linenos=true}
+\ifx\mode\ebook
+\def\codeindent{\parindent}
+\fi
 
-\newminted[json/lines]{json}{linenos=true}
+\newminted[clojure/lines]{clojure}{linenos, xleftmargin=\codeindent}
+
+\newminted[python/lines]{python}{linenos, xleftmargin=\codeindent}
+
+\newminted[json/lines]{json}{linenos, xleftmargin=\codeindent}
 
 \newmintinline{clojure}{}
 

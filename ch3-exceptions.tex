@@ -1284,7 +1284,7 @@ Ring-приложения. Он ловит ошибки, отправляет и
 middleware.
 
 \begin{english}
-  \begin{clojure/lines}
+  \begin{clojure/lines*}{firstnumber=1}
 (require '[raven.client :as r])
 
 (defn wrap-exception
@@ -1292,7 +1292,7 @@ middleware.
   (fn [request]
     (try
       (handler request)
-  \end{clojure/lines}
+  \end{clojure/lines*}
 \end{english}
 
 \wavebottom
@@ -1305,7 +1305,7 @@ middleware.
 \wavetop
 
 \begin{english}
-  \begin{minted}[linenos, firstnumber=8]{clojure}
+  \begin{clojure/lines*}{firstnumber=8}
       (catch Exception e
         (let [event (-> nil
                         (r/add-exception! e)
@@ -1313,7 +1313,7 @@ middleware.
                         (r/add-extra! {:something "else"}))]
           (try
             @(r/capture! DSN event)
-  \end{minted}
+  \end{clojure/lines*}
 \end{english}
 
 \wavebottom
@@ -1327,14 +1327,14 @@ middleware.
 \wavetop
 
 \begin{english}
-  \begin{minted}[linenos, firstnumber=15]{clojure}
+  \begin{clojure/lines*}{firstnumber=15}
             (catch Exception e-sentry
               (log/errorf e-sentry "Sentry error: %s" DSN)
               (log/error e "Request failed"))
             (finally
               {:status 500
                :body "Internal error, please try later"})))))))
-  \end{minted}
+  \end{clojure/lines*}
 \end{english}
 
 \index{библиотеки!Manifold}
