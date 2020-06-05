@@ -1,6 +1,6 @@
 
 # export DRAFT=',draft'
-# export DRAFT=
+export DRAFT=
 
 # common
 export FONT='10pt'

@@ -14,7 +14,13 @@
 
 \newcommand{\eng}[1]{(анг.~<<#1>>)}
 
+\ifx\mode\print
 \newcommand{\page}[1]{(с.~\pageref{#1})}
+\fi
+
+\ifx\mode\ebook
+\newcommand{\page}[1]{\hyperref[#1]{\uline{(с.~\pageref{#1})}}}
+\fi
 
 \newcommand{\fig}[1]{(рис.~\ref{#1})}
 

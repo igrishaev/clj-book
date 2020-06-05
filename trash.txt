@@ -512,3 +512,11 @@ Package microtype Warning: You are using the `ragged2e' package.
 
 \ifx\mode\web
 \fi
+
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=blue,
+    urlcolor=blue,
+}
