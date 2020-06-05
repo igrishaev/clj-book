@@ -25,4 +25,4 @@ export MODE='ebook'
 export DOCUMENT='report'
 export GEOMTRY='geom-tablet'
 
-# export PUBLISHER=
+export PUBLISHER=

@@ -18,7 +18,7 @@
 \usepackage{xspace}
 
 % const
-\def\empty{\xspace}
+\def\dummy{\xspace}
 \def\print{print}
 \def\ebook{ebook}
 
@@ -68,13 +68,7 @@
 
 \usepackage[newfloat=true]{minted}
 
-\ifx\mode\print
 \usemintedstyle{print}
-\fi
-
-\ifx\mode\ebook
-\usemintedstyle{default}
-\fi
 
 \SetupFloatingEnvironment{listing}{placement=H}
 
