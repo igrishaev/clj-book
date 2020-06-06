@@ -13,8 +13,10 @@ export COMMIT_TS=`git log -1 --format='%at'`
 export MODE='print'
 export DOCUMENT='book'
 
-# device
-export DEVICE=tablet
+
+export GEOMTRY='geom-tablet'
+export COVER='media/cover_tablet.pdf'export DEVICE=kindle
+
 
 # publishers
 export PUBLISHER='<<Геликон-Плюс>>'
@@ -23,10 +25,18 @@ export GEOMTRY='geom-140x200-bleed'
 export PUBLISHER="<<Rider\'{o}>>"
 export GEOMTRY='geom-145x205-no-bleed'
 
-# formats
+# tablet
+export PUBLISHER=
 export MODE='ebook'
+export DEVICE=tablet
 export DOCUMENT='report'
 export GEOMTRY='geom-tablet'
 export COVER='media/cover_tablet.pdf'
 
+# kindle
 export PUBLISHER=
+export MODE='ebook'
+export DEVICE=kindle
+export DOCUMENT=report
+export GEOMTRY=geom-kindle
+export COVER='media/cover_kindle.pdf'
