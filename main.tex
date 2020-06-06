@@ -25,7 +25,7 @@
 \def\ebook{ebook}
 \def\tablet{tablet}
 \def\kindle{kindle}
-\def\phone{kindle}
+\def\phone{phone}
 
 
 %%
@@ -144,10 +144,30 @@
 \usepackage{fancyhdr}
 \fancypagestyle{plain}{
   \fancyhf{}
-  \fancyfoot[C]{\footnotesize\thepage}}
+  \fancyfoot[C]{\small\thepage}}
 \pagestyle{plain}
 
 \fi
+
+
+%%
+%% Phone (todo reduce copy & paste)
+%%
+\ifx\device\phone
+
+%% Remove labels for subchapters
+\usepackage{titlesec}
+\titlelabel{}
+
+%% Small page numbers
+\usepackage{fancyhdr}
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \fancyfoot[C]{\tiny\thepage}}
+\pagestyle{plain}
+
+\fi
+
 
 
 \begin{document}

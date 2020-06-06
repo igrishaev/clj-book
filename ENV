@@ -40,3 +40,11 @@ export DEVICE=kindle
 export DOCUMENT=report
 export GEOMTRY=geom-kindle
 export COVER='media/cover_kindle.pdf'
+
+# phone
+export PUBLISHER=
+export MODE='ebook'
+export DEVICE=phone
+export DOCUMENT=report
+export GEOMTRY=geom-phone
+export COVER='media/cover_phone.pdf'
