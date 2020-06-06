@@ -17,7 +17,9 @@
 % extra space at the end of macros
 \usepackage{xspace}
 
-% const
+%%
+%% Constants
+%%
 \def\dummy{\xspace}
 \def\print{print}
 \def\ebook{ebook}
@@ -25,7 +27,10 @@
 \def\kindle{kindle}
 \def\phone{kindle}
 
-% env vars
+
+%%
+%% Env variables
+%%
 \def\device{$DEVICE}
 \def\domain{$DOMAIN}
 \def\email{$EMAIL}
@@ -33,6 +38,7 @@
 \def\commithash{$COMMIT_HASH\xspace}
 \def\committs{$COMMIT_TS\xspace}
 \def\mode{$MODE}
+
 
 % http://www.khirevich.com/latex/microtype/
 \usepackage[
@@ -91,7 +97,6 @@
 \ifx\mode\print
 \else
 \usepackage[hidelinks]{hyperref}
-%% \hypersetup{colorlinks=false}
 \fi
 
 %% geometry presets
@@ -124,6 +129,26 @@
 \ifx\mode\ebook
 \usepackage{pdfpages}
 \fi
+
+
+%%
+%% Kindle
+%%
+\ifx\device\kindle
+
+%% Remove labels for subchapters
+\usepackage{titlesec}
+\titlelabel{}
+
+%% Small page numbers
+\usepackage{fancyhdr}
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \fancyfoot[C]{\footnotesize\thepage}}
+\pagestyle{plain}
+
+\fi
+
 
 \begin{document}
 
