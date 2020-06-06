@@ -13,6 +13,9 @@ export COMMIT_TS=`git log -1 --format='%at'`
 export MODE='print'
 export DOCUMENT='book'
 
+# device
+export DEVICE=tablet
+
 # publishers
 export PUBLISHER='<<Геликон-Плюс>>'
 export GEOMTRY='geom-140x200-bleed'
@@ -24,5 +27,6 @@ export GEOMTRY='geom-145x205-no-bleed'
 export MODE='ebook'
 export DOCUMENT='report'
 export GEOMTRY='geom-tablet'
+export COVER='media/cover_tablet.pdf'
 
 export PUBLISHER=

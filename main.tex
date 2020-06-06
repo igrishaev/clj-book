@@ -21,8 +21,12 @@
 \def\dummy{\xspace}
 \def\print{print}
 \def\ebook{ebook}
+\def\tablet{tablet}
+\def\kindle{kindle}
+\def\phone{kindle}
 
 % env vars
+\def\device{$DEVICE}
 \def\domain{$DOMAIN}
 \def\email{$EMAIL}
 \def\publisher{$PUBLISHER\xspace}
@@ -117,11 +121,21 @@
 \title{Clojure на производстве}
 \date{}
 
+\ifx\mode\ebook
+\usepackage{pdfpages}
+\fi
+
 \begin{document}
 
 \input{hyphenation}
 
+\ifx\mode\print
 \input{title}
+\fi
+
+\ifx\mode\ebook
+\includepdf[pages={1}]{$COVER}
+\fi
 
 \input{abstract}
 
