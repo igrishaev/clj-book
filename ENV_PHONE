@@ -1,0 +1,10 @@
+source ENV
+
+# phone
+export PUBLISHER=
+export MODE='ebook'
+export DEVICE=phone
+export DEVICE_TYPE=mobile
+export DOCUMENT=report
+export GEOMTRY=geom-phone
+export COVER='media/cover_phone.pdf'

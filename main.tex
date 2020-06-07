@@ -26,11 +26,13 @@
 \def\tablet{tablet}
 \def\kindle{kindle}
 \def\phone{phone}
+\def\mobile{mobile}
 
 
 %%
 %% Env variables
 %%
+\def\devicetype{$DEVICE_TYPE}
 \def\device{$DEVICE}
 \def\domain{$DOMAIN}
 \def\email{$EMAIL}
@@ -76,10 +78,9 @@
 \usepackage{dirtree}
 \input{DT}
 
+% code highlight
 \usepackage[newfloat=true]{minted}
-
 \usemintedstyle{print}
-
 \SetupFloatingEnvironment{listing}{placement=H}
 
 % index
@@ -94,16 +95,14 @@
 
 \usepackage{setspace}
 
-\ifx\mode\print
-\else
+\ifx\mode\ebook
 \usepackage[hidelinks]{hyperref}
 \fi
 
 %% geometry presets
 \input{$GEOMTRY}
 
-%% debug frames
-%% \geometry{showframe}
+%% \geometry{showframe} %% debug frames
 
 \setlength{\parskip}{0.32em}
 
@@ -130,30 +129,10 @@
 \usepackage{pdfpages}
 \fi
 
-
 %%
-%% Kindle
+%% Kindle or Phone
 %%
-\ifx\device\kindle
-
-%% Remove labels for subchapters
-\usepackage{titlesec}
-\titlelabel{}
-
-%% Small page numbers
-\usepackage{fancyhdr}
-\fancypagestyle{plain}{
-  \fancyhf{}
-  \fancyfoot[C]{\small\thepage}}
-\pagestyle{plain}
-
-\fi
-
-
-%%
-%% Phone (todo reduce copy & paste)
-%%
-\ifx\device\phone
+\ifx\devicetype\mobile
 
 %% Remove labels for subchapters
 \usepackage{titlesec}
@@ -167,8 +146,6 @@
 \pagestyle{plain}
 
 \fi
-
-
 
 \begin{document}
 

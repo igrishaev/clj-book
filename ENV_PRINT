@@ -1,0 +1,14 @@
+source ENV
+
+# print
+export MODE='print'
+export DOCUMENT='book'
+export DEVICE=
+export DEVICE_TYPE=
+export COVER=
+
+export PUBLISHER='<<Геликон-Плюс>>'
+export GEOMTRY='geom-145x205-no-bleed'
+
+# export PUBLISHER="<<Rider\'{o}>>"
+# export GEOMTRY='geom-140x200-bleed'

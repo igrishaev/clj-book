@@ -1,0 +1,10 @@
+source ENV
+
+# tablet
+export PUBLISHER=
+export MODE='ebook'
+export DEVICE=tablet
+export DEVICE_TYPE=
+export DOCUMENT='report'
+export GEOMTRY='geom-tablet'
+export COVER='media/cover_tablet.pdf'
