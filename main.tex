@@ -83,6 +83,10 @@
 \usemintedstyle{print}
 \SetupFloatingEnvironment{listing}{placement=H}
 
+\ifx\devicetype\mobile
+\setminted{breaklines=true}
+\fi
+
 % index
 \usepackage{index}
 \newindex{default}{idx}{ind}{Предметный указатель}
