@@ -2415,9 +2415,8 @@ HTTP-клиента. Однако тесты на исключениях дал�
 (defn sites-handler* [{:keys [uri]}]
   (case uri
     "/search/v1"
-    {:status 200
-     :body [{:name "Cafe1" :address "..."}
-            {:name "Cafe2" :address "..."}]}
+    {:status 200 :body [{:name "Cafe1" :address "..."}
+                        {:name "Cafe2" :address "..."}]}
     {:status 404 :body "page not found"}))
   \end{clojure}
 \end{english}
