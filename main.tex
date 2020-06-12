@@ -152,6 +152,11 @@
 
 \fi
 
+
+%% add space b/w number and footnote
+\let\oldfootnote\footnote
+\renewcommand\footnote[1]{\oldfootnote{\hspace{1mm}#1}}
+
 \begin{document}
 
 \input{hyphenation}
