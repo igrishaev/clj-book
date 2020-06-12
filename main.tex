@@ -58,6 +58,8 @@
 % better captions
 \usepackage[font=small]{caption}
 
+\captionsetup{labelsep=period}
+
 \captionsetup[listing]{name=Листинг}
 
 % wavy lines
@@ -182,12 +184,12 @@
 \clearpage
 \input{about}
 
-\blank\include{ch1-web}
+%% \blank\include{ch1-web}
 %% \blank\include{ch2-spec}
 %% \blank\include{ch3-exceptions}
 %% \blank\include{ch4-mutability}
 %% \blank\include{ch5-config}
-%% \blank\include{ch6-systems}
+\blank\include{ch6-systems}
 %% \blank\include{ch7-tests}
 
 \ifx\mode\print
