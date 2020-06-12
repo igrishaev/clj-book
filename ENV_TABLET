@@ -6,5 +6,5 @@ export MODE='ebook'
 export DEVICE=tablet
 export DEVICE_TYPE=
 export DOCUMENT='report'
-export GEOMTRY='geom-tablet'
+export GEOMETRY='geom-tablet'
 export COVER='media/cover_tablet.pdf'

@@ -1,0 +1,4 @@
+source ENV_PRINT
+
+export PUBLISHER='helicon'
+export GEOMETRY='geom-140x200-bleed'

@@ -20,13 +20,14 @@
 %%
 %% Constants
 %%
-\def\dummy{\xspace}
 \def\print{print}
 \def\ebook{ebook}
 \def\tablet{tablet}
 \def\kindle{kindle}
 \def\phone{phone}
 \def\mobile{mobile}
+\def\ridero{ridero}
+\def\helicon{helicon}
 
 
 %%
@@ -36,7 +37,7 @@
 \def\device{$DEVICE}
 \def\domain{$DOMAIN}
 \def\email{$EMAIL}
-\def\publisher{$PUBLISHER\xspace}
+\def\publisher{$PUBLISHER}
 \def\commithash{$COMMIT_HASH\xspace}
 \def\committs{$COMMIT_TS\xspace}
 \def\mode{$MODE}
@@ -104,7 +105,7 @@
 \fi
 
 %% geometry presets
-\input{$GEOMTRY}
+\input{$GEOMETRY}
 
 %% \geometry{showframe} %% debug frames
 
@@ -177,12 +178,12 @@
 \input{about}
 
 \blank\include{ch1-web}
-\blank\include{ch2-spec}
-\blank\include{ch3-exceptions}
-\blank\include{ch4-mutability}
-\blank\include{ch5-config}
-\blank\include{ch6-systems}
-\blank\include{ch7-tests}
+%% \blank\include{ch2-spec}
+%% \blank\include{ch3-exceptions}
+%% \blank\include{ch4-mutability}
+%% \blank\include{ch5-config}
+%% \blank\include{ch6-systems}
+%% \blank\include{ch7-tests}
 
 \ifx\mode\print
 \backmatter

@@ -6,5 +6,5 @@ export MODE='ebook'
 export DEVICE=kindle
 export DEVICE_TYPE=mobile
 export DOCUMENT=report
-export GEOMTRY=geom-kindle
+export GEOMETRY=geom-kindle
 export COVER='media/cover_kindle.pdf'
