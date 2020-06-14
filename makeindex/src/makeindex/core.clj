@@ -3,6 +3,11 @@
    [clojure.string :as str])
   (:gen-class))
 
+
+(def ebook?
+  (-> (System/getenv "MODE")
+      (= "ebook")))
+
 (def path-in "/Users/ivan/work/clj-book/main.idx")
 (def path-out "/Users/ivan/work/clj-book/main.ind")
 
@@ -61,6 +66,9 @@
   (str/upper-case term))
 
 
+(def join (partial str/join ", "))
+
+
 (defn print-tree [tree & [{level :level
                            :as opt
                            :or {level 0}}]]
@@ -80,7 +88,13 @@
       (when-let [pages (:__pages childs)]
         (print " ")
         (when w3 (print w3))
-        (print (str/join ", " (sort (set pages))))
+
+        (print (join
+                (for [page (sort (set pages))]
+                  (if ebook?
+                    (format "\\hyperlink{page.%s}{%s}" page page)
+                    page))))
+
         (when w4 (print w4)))
 
       (println)
