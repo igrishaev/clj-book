@@ -177,7 +177,6 @@ Docker ищет образы в открытом репозитории. В нё
 миграциями, получим готовую базу. При этом мы не написали ни строчки кода,
 а~только указали настройки.
 
-
 \index{утилиты!docker-compose}
 
 В комплекте с Docker идёт утилита \verb|docker-compose|. Она запускает
@@ -230,7 +229,7 @@ create table requests (
 Если запустить \verb|docker-compose up|, поднимется сервер PostgreSQL на порту
 5432 с базой \verb|book|. Этого хватит для дальнейшей работы. Больше мы не
 будем говорить о Docker, поскольку это тема отдельной книги. Все детали вы
-найдёте\footurl{на сайте проекта}{https://docker.com}[Docker][-10mm].
+найдёте \footurl{на сайте проекта}{https://docker.com}[Docker][-10mm].
 
 \section{Mount}
 
@@ -1084,7 +1083,7 @@ Mount отреагирует на перезагрузку модуля?
 
 \index{библиотеки!Component}
 
-Библиотека \footurl{Component}{https://github.com/stuartsierra/component}[Component][1mm] тоже
+Библиотека \footurl{Component}{https://github.com/stuartsierra/component}[Compo-\\*nent][1mm] тоже
 описывает систему и компоненты. Это небольшой фреймворк, где главную роль играет
 не объём кода, а идея. Дизайн Component в корне отличается от Mount, который мы
 рассмотрели.
@@ -2512,7 +2511,8 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
 \begin{english}
   \begin{clojure}
 (start [this]
-  (let [server (or server (run-jetty app options))]
+  (let [server (or server
+                   (run-jetty app options))]
     (assoc this :server server)))
   \end{clojure}
 \end{english}
