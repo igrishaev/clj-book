@@ -526,3 +526,10 @@ Package microtype Warning: You are using the `ragged2e' package.
 \setminted{numbersep=1mm}
 
 xleftmargin=\parindent
+
+%% \begin{listing}[ht!]
+%%   \small
+
+%% \caption{Интеграционный тест с Etaoin}
+%% \label{fig:etaoin-test}
+%% \end{listing}

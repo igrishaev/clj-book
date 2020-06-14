@@ -3643,7 +3643,7 @@ JSON-схемой. Преимущества спеки в том, что она 
 \wavetop
 
 \begin{english}
-  \begin{clojure/lines*}{firstnumber=13}
+  \begin{clojure/lines*}{firstnumber=14}
         response (client/get "http://127.0.0.1:8080/api"
                    {:query-params params
                     :headers {:authentication auth-header}})
@@ -3652,8 +3652,6 @@ JSON-схемой. Преимущества спеки в том, что она 
     (is (= {:orders [...]} body))))
   \end{clojure/lines*}
 \end{english}
-
-%% --------------
 
 Даже в сокращении тест занимает много места. Чтобы улучшить читаемость, выносите
 как можно большей действий в фикстуры и~вспомогательные функции. Например,
@@ -3798,12 +3796,9 @@ JSON-схемой. Преимущества спеки в том, что она 
 
 Напишем первый тест. Представим, что локальный сервер работает на порту
 8080. Тест открывает форму входа, заполняет поля и~нажимает кнопку
-Login. Браузер обновляет страницу, появляется приветствие. Видны элементы,
-которые прежде были скрыты (ссылки My profile, Logout). Изучите код
-теста из листинга~\ref{fig:etaoin-test}.
+Login. Браузер обновляет страницу, появляется приветствие. Видны элементы
+интерфейса, которые прежде были скрыты (ссылки My profile, Logout).
 
-\begin{listing}[ht!]
-  \small
 
 \begin{english}
   \begin{clojure}
@@ -3823,17 +3818,13 @@ Login. Браузер обновляет страницу, появляется 
   \end{clojure}
 \end{english}
 
-\caption{Интеграционный тест с Etaoin}
-\label{fig:etaoin-test}
-
-\end{listing}
-
 Разберём отдельные выражения. Форма \verb|with-chrome|~--- это макрос, который
 запускает Chrome на время исполнения кода. Макрос нужен, чтобы выключить драйвер
 при выходе или в случае ошибки. Без него пришлось бы добавить
 \verb|try/finally|, что порождает вложенность и~в~целом неудобно:
 
 \index{вложенность}
+\index{браузеры}
 
 \begin{english}
   \begin{clojure}
@@ -3846,7 +3837,8 @@ Login. Браузер обновляет страницу, появляется 
   \end{clojure}
 \end{english}
 
-\index{браузеры}
+Выражение \verb|(e/quit driver)| освобождает занятые ресурсы: закрывает окно
+браузера и завершает процесс драйвера.
 
 Функция \verb|wait-visible| ждёт до тех пор, пока элемент не появится на
 экране. Отрисовка страницы~--- это долгая операция. Из-за особенностей
@@ -3864,8 +3856,8 @@ Login. Браузер обновляет страницу, появляется 
 \index{селекторы!XPath}
 
 Драйвер ищет элементы на странице с помощью \emph{селекторов}. Это выражения на
-языках \footurl{CSS}{https://www.w3schools.com/cssref/css\_selectors.asp}[CSS][-30mm] и
-\footurl{XPath}{https://www.w3schools.com/xml/xpath\_syntax.asp}[XPath][-5mm]. Мы не
+языках \footurl{CSS}{https://www.w3schools.com/cssref/css\_selectors.asp}[CSS][0mm] и
+\footurl{XPath}{https://www.w3schools.com/xml/xpath\_syntax.asp}[XPath][24mm]. Мы не
 будем разбирать их синтаксис: это долго и заслуживает отдельной главы.
 
 Для краткости рассмотрим альтернативу: на элемент можно сослаться по
@@ -4024,7 +4016,7 @@ Safari, добавьте его ключ в вектор \verb|driver-type|.
 На минуту вернёмся к мокам~--- подмене функций через \verb|with-redefs|. Макрос
 слишком многословен, чтобы работать с ним напрямую. Появились библиотеки,
 которые описывают мокинг короче и выразительнее. Одна из них называется
-\footurl{Mockery}{https://github.com/igrishaev/mockery}[Mockery][-5mm].
+\footurl{Mockery}{https://github.com/igrishaev/mockery}[Mockery][-3mm].
 Библиотека предлагает макрос \verb|with-mock|:
 
 \begin{english}
