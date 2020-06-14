@@ -8,9 +8,6 @@
   (-> (System/getenv "MODE")
       (= "ebook")))
 
-(def path-in "/Users/ivan/work/clj-book/main.idx")
-(def path-out "/Users/ivan/work/clj-book/main.ind")
-
 (def re-line #"^\\indexentry\s\{(.+)\}\{(\d+)\}$")
 
 (def wrap-pages ["\\hfill{\\slshape " "}"])
@@ -112,7 +109,7 @@
               (println "\\begin{theindex}")
               (print-tree tree)
               (println "\\end{theindex}"))]
-    (spit path-out out)))
+    (spit file-out out)))
 
 
 (defn process-files [file-in file-out]
