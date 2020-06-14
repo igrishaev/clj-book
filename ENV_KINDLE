@@ -8,3 +8,4 @@ export DEVICE_TYPE=mobile
 export DOCUMENT=report
 export GEOMETRY=geom-kindle
 export COVER='media/cover_kindle.pdf'
+export JOB='clojure_kindle'

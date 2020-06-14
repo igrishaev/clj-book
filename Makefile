@@ -1,7 +1,6 @@
 
 PWD = $(shell pwd)
 PYG := /usr/local/lib/python2.7/site-packages/pygments
-DOC = main
 
 # default draft build
 .PHONY: draft
@@ -13,7 +12,7 @@ build: clear pdf-build1 index pdf-build2 pdf-build3 lines refs pdf-open
 
 .PHONY: index
 index:
-	cd makeindex && clojure -m makeindex.core ${PWD}/${DOC}.idx ${PWD}/${DOC}.ind
+	cd makeindex && clojure -m makeindex.core ${PWD}/${JOB}.idx ${PWD}/${JOB}.ind
 
 .PHONY: clear
 clear:
@@ -22,32 +21,32 @@ clear:
 	rm -f *.idx
 	rm -f *.ind
 	rm -f *.log
-	rm -f ${DOC}.pdf
+	rm -f ${JOB}.pdf
 	rm -f *.toc
 	rm -f *.pyg
-	rm -rf _minted-${DOC}
+	rm -rf _minted-*
 	rm -f *.out
 
 pyg-install:
 	ln -s ${PWD}/print.py ${PYG}/styles/
 
 pdf-build1 pdf-build2 pdf-build3:
-	envsubst < ${DOC}.tex | pdflatex -shell-escape -halt-on-error -jobname=${DOC}
+	envsubst < main.tex | pdflatex -shell-escape -halt-on-error -jobname=${JOB}
 
 pdf-open:
-	open ${DOC}.pdf
+	open ${JOB}.pdf
 
 stats:
 	find . -name '*.tex' | xargs wc -ml
 
 .PHONY: lines
 lines:
-	! grep -A 0 -B 0 -i 'in paragraph at lines' ${DOC}.log
+	! grep -A 0 -B 0 -i 'in paragraph at lines' ${JOB}.log
 
 .PHONY: warn
 warn:
-	! grep -A 0 -B 0 -i 'Warning' ${DOC}.log
+	! grep -A 0 -B 0 -i 'Warning' ${JOB}.log
 
 .PHONY: refs
 refs:
-	! grep -A 0 -B 0 -i 'LaTeX Warning: Reference' ${DOC}.log
+	! grep -A 0 -B 0 -i 'LaTeX Warning: Reference' ${JOB}.log

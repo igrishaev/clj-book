@@ -8,3 +8,4 @@ export DEVICE_TYPE=
 export DOCUMENT='report'
 export GEOMETRY='geom-tablet'
 export COVER='media/cover_tablet.pdf'
+export JOB='clojure_tablet'

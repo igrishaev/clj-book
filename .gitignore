@@ -1,4 +1,4 @@
-_minted-main/
+_minted-*
 *.aux
 *.log
 .DS_Store

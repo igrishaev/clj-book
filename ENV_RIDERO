@@ -2,3 +2,4 @@ source ENV_PRINT
 
 export PUBLISHER='ridero'
 export GEOMETRY='geom-145x205-no-bleed'
+export JOB='clojure_ridero'

@@ -8,3 +8,4 @@ export DEVICE_TYPE=mobile
 export DOCUMENT=report
 export GEOMETRY=geom-phone
 export COVER='media/cover_phone.pdf'
+export JOB='clojure_phone'
