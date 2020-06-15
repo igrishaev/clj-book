@@ -134,9 +134,7 @@
 \title{Clojure на производстве}
 \date{}
 
-\ifx\mode\ebook
 \usepackage{pdfpages}
-\fi
 
 %%
 %% Kindle or Phone
@@ -173,7 +171,11 @@
 \includepdf[pages={1}]{$COVER}
 \fi
 
+\ifx\publisher\ridero
+\includepdf[pages={1}]{media/ridero_opening.pdf}
+\else
 \input{abstract}
+\fi
 
 %%
 %% ToC https://tex.stackexchange.com/questions/41555/
