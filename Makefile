@@ -8,7 +8,7 @@ draft: pdf-build1
 
 # release build
 .PHONY: build
-build: clear pdf-build1 index pdf-build2 pdf-build3 lines refs pdf-open
+build: clear pdf-build1 index pdf-build2 pdf-build3 refs lines pdf-open
 
 .PHONY: index
 index:
