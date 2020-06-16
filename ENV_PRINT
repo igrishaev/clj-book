@@ -1,8 +1,11 @@
 source ENV
 
-# print
 export MODE='print'
 export DOCUMENT='book'
 export DEVICE=
 export DEVICE_TYPE=
 export COVER=
+
+export PUBLISHER=
+export GEOMETRY='geom-print'
+export JOB='clojure_print'
