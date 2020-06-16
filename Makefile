@@ -8,7 +8,11 @@ draft: pdf-build1
 
 # release build
 .PHONY: build
-build: clear pdf-build1 index pdf-build2 pdf-build3 refs lines pdf-open
+build: clear pdf-build1 index pdf-build2 pdf-build3 refs lines tag-job pdf-open
+
+.PHONY: tag-job
+tag-job:
+	cp ${JOB}.pdf ${JOB}_${COMMIT_HASH}_${COMMIT_TS}.pdf
 
 .PHONY: index
 index:
