@@ -159,6 +159,10 @@
 \let\oldfootnote\footnote
 \renewcommand\footnote[1]{\oldfootnote{\hspace{1mm}#1}}
 
+\ifx\mode\ebook
+\setlength{\cftbeforetoctitleskip}{0pt}
+\fi
+
 \begin{document}
 
 \input{hyphenation}
