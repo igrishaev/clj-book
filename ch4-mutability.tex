@@ -127,26 +127,26 @@ def foo(bar=[]):
 Это привычка из императивного прошлого. Атом-аккумулятор лишний, достаточно
 \verb|map| или \verb|for|:
 
+\begin{english}
+
 \noindent
 \begin{tabular}{ @{}p{5cm} @{}p{5cm} }
 
-\begin{english}
   \begin{clojure}
 (map (partial * 2)
      [1 2 3 4 5])
   \end{clojure}
-\end{english}
 
 &
 
-\begin{english}
   \begin{clojure}
 (for [n [1 2 3 4 5]]
   (* n 2))
   \end{clojure}
-\end{english}
 
 \end{tabular}
+
+\end{english}
 
 Оба выражения короче и понятней. Не нужно создавать вектор и добавлять в него
 элементы~--- это делают функции. Если обход коллекции завязан на
@@ -720,7 +720,6 @@ Current: 1, timeout: 5000 ;; 2
 вычислений.
 
 \begin{listing}[ht!]
-  \small
 
 \begin{english}
   \begin{clojure}
@@ -1153,12 +1152,13 @@ Current: 1, timeout: 5000 ;; 2
 \verb|reduce| меняет её функциями \verb|conj!| и~аналогами. Сравним
 обычный \verb|reduce| и его мутабельную версию:
 
+\begin{english}
+
 \noindent
 \begin{tabular}{ @{}p{5cm} @{}p{5cm} }
 
 \linegap
 
-\begin{english}
   \begin{clojure}
 (reduce
  (fn [result n]
@@ -1166,11 +1166,9 @@ Current: 1, timeout: 5000 ;; 2
  []
  nums)
   \end{clojure}
-\end{english}
 
 &
 
-\begin{english}
   \begin{clojure}
 (persistent!
  (reduce
@@ -1179,9 +1177,10 @@ Current: 1, timeout: 5000 ;; 2
   (transient [])
   nums))
   \end{clojure}
-\end{english}
 
 \end{tabular}
+
+\end{english}
 
 Второй \verb|reduce| пришлось обернуть в \verb|persistent!|. В случае с
 \verb|loop| мы втянули \verb|persistent!| внутрь и изолировали изменения. В
@@ -1712,28 +1711,29 @@ Clojure намеренно скрывает от нас стадию перем�
 \noindent
 Вывод с различными значениями \verb|*print-level*|:
 
+\begin{english}
+
 \noindent
 \begin{tabular}{ @{}p{5cm} @{}p{5cm} }
 
-\begin{english}
+
   \begin{clojure}
 (set! *print-level* 4)
 (println data)
 ;; {:foo {:bar #}}
   \end{clojure}
-\end{english}
 
 &
 
-\begin{english}
   \begin{clojure}
 (set! *print-level* 2)
 (println data)
 ;; {:foo #}
   \end{clojure}
-\end{english}
 
 \end{tabular}
+
+\end{english}
 
 \noindent
 При нулевом уровне увидим только \verb|#|.
@@ -1809,7 +1809,6 @@ Clojure намеренно скрывает от нас стадию перем�
 и~позицию в~нём. Эти сведения используют плагины для навигации по коду.
 
 \begin{listing}[ht!]
-  \small
 
 \begin{english}
   \begin{clojure}
@@ -2203,28 +2202,28 @@ Clojure предлагает несколько форм, чтобы выпол�
 
 \index{middleware!wrap-locale}
 
+%% \begin{english}
+
 \noindent
 \begin{tabular}{ @{}p{5cm} @{}p{5cm} }
 
-\begin{english}
   \begin{clojure}
 (with-locale :en
   (tr :ui/add-to-cart))
 ;; "Add to Cart"
   \end{clojure}
-\end{english}
 
 &
 
-%% \begin{english}
   \begin{clojure}
 (with-locale :ru
   (tr :ui/add-to-cart))
 ;; "Добавить в корзину"
   \end{clojure}
-%% \end{english}
 
 \end{tabular}
+
+%% \end{english}
 
 Напишем middleware, чтобы определить локаль. Для простоты решим, что это
 параметр \verb|lang| из адресной строки. Если параметра нет, берём локаль по

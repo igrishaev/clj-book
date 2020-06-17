@@ -1,5 +1,5 @@
 
-\documentclass[$FONT $DRAFT]{$DOCUMENT} % ,draft
+\documentclass[$FONT $DRAFT]{$DOCUMENT}
 
 \usepackage{tikz}
 \usepackage{tocloft}
@@ -38,8 +38,8 @@
 \def\domain{$DOMAIN}
 \def\email{$EMAIL}
 \def\publisher{$PUBLISHER}
-\def\commithash{$COMMIT_HASH\xspace}
-\def\committs{$COMMIT_TS\xspace}
+\def\commithash{$COMMIT_HASH}
+\def\committs{$COMMIT_TS}
 \def\mode{$MODE}
 
 
@@ -56,7 +56,7 @@
 ]{microtype}
 
 % better captions
-\usepackage[font=small]{caption}
+\usepackage{caption} % [font=small]
 
 \captionsetup{labelsep=period}
 

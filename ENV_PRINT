@@ -1,7 +1,7 @@
 source ENV
 
 export MODE='print'
-export DOCUMENT='book'
+export DOCUMENT='extbook'
 export DEVICE=
 export DEVICE_TYPE=
 export COVER=

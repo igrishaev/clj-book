@@ -64,7 +64,6 @@
 способом.
 
 \begin{figure}[ht!]
-  \small
   \chart{chart-ex-tree}
   \caption{Базовые классы исключений}
   \label{fig:exceptions}
@@ -532,26 +531,26 @@ Value error, a: 1, b: null
 словаря или вектора сообщит переменным \verb|nil|, если поля не совпали. Оба
 \verb|let| ниже произведут вектор из трёх \verb|nil|.
 
+\begin{english}
+
 \noindent
 \begin{tabular}{ @{}p{5cm} @{}p{5cm} }
 
-\begin{english}
   \begin{clojure}
 (let [{:keys [a b c]} nil]
   [a b c])
   \end{clojure}
-\end{english}
 
 &
 
-\begin{english}
   \begin{clojure}
 (let [[a b c] nil]
   [a b c])
   \end{clojure}
-\end{english}
 
 \end{tabular}
+
+\end{english}
 
 \index{nil!punning}
 
@@ -1232,7 +1231,6 @@ HTTP-запроса, стек-трейс и другие.
 \end{english}
 
 \begin{listing}[ht!]
-  \small
 
 \begin{english}
   \begin{json}
@@ -1414,7 +1412,6 @@ class AccountHandler(RequestHandler):
 \lis{fig:clj-pyramid}.
 
 \begin{listing}[ht!]
-  \small
 
 \begin{english}
   \begin{clojure}
@@ -1531,7 +1528,6 @@ middleware добавляют декоратор, который ловит та
 возникло исключение \lis{fig:write-file}.
 
 \begin{listing}[ht!]
-  \small
 
 \begin{english}
   \begin{clojure}

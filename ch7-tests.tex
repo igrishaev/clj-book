@@ -878,29 +878,30 @@ IDE.
 убедиться, что вызов \verb|(->fahr nil)| бросит ошибку, а не вернёт
 \verb|nil|. Если проверки нет, код не защищён от подобных изменений:
 
+\begin{english}
+
 \noindent
 \begin{tabular}{ @{}p{5cm} @{}p{5cm} }
 
-\begin{english}
+
   \begin{clojure}
 ;; before
 (defn ->fahr [cel]
   (+ (* cel 1.8) 32))
   \end{clojure}
-\end{english}
 
 &
 
-\begin{english}
   \begin{clojure}
 ;; after
 (defn ->fahr [cel]
   (when cel
     (+ (* cel 1.8) 32)))
   \end{clojure}
-\end{english}
 
 \end{tabular}
+
+\end{english}
 
 \index{nil}
 
@@ -1153,26 +1154,26 @@ Emacs предлагает навигацию по коду командой \ve
 это скаляр, а действительное~--- выражение, поэтому хочется записать их как слева.
 Увы, придётся побороть себя и писать по образцу справа:
 
+\begin{english}
+
 \noindent
 \begin{tabular}{ @{}p{5cm} @{}p{5cm} }
 
-\begin{english}
   \begin{clojure}
 ;; wrong
 (= (int (->fahr 20)) 68)
   \end{clojure}
-\end{english}
 
 &
 
-\begin{english}
   \begin{clojure}
 ;; correct
 (= 68 (int (->fahr 20)))
   \end{clojure}
-\end{english}
 
 \end{tabular}
+
+\end{english}
 
 \index{библиотеки!JUnit}
 
@@ -1192,10 +1193,11 @@ Emacs предлагает навигацию по коду командой \ve
 путаницу. Согласно ему, нормальным считается статус 404 (expected), а не 200
 (actual). Вариант справа выводит статусы правильно.
 
+\begin{english}
+
 \noindent
 \begin{tabular}{ @{}p{5cm} @{}p{5cm} }
 
-\begin{english}
   \begin{clojure}
 ;; wrong
 (is (= (:status response)
@@ -1207,11 +1209,9 @@ expected: 404
     diff: - 404
           + 200
   \end{clojure}
-\end{english}
 
 &
 
-\begin{english}
   \begin{clojure}
 ;; correct
 (is (= 200
@@ -1223,9 +1223,10 @@ expected: 200
     diff: - 200
           + 404
   \end{clojure}
-\end{english}
 
 \end{tabular}
+
+\end{english}
 
 \section{Фикстуры}
 

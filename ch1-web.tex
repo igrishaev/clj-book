@@ -1401,35 +1401,33 @@ middleware зависят друг от друга, их можно <<схлоп
 
 \else
 
+\begin{english}
+
 \noindent
 \begin{tabular}{ @{}p{3.2cm} @{}p{3.5cm} @{}p{3.5cm} }
 
-\begin{english}
   \begin{clojure}
 (comp foo bar)
   \end{clojure}
-\end{english}
 
 &
 
-\begin{english}
   \begin{clojure}
 (fn [x]
   (foo (bar x)))
   \end{clojure}
-\end{english}
 
 &
 
-\begin{english}
   \begin{clojure}
 (fn [x] (-> x
             bar
             foo))
   \end{clojure}
-\end{english}
 
 \end{tabular}
+
+\end{english}
 
 \fi
 
