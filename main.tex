@@ -163,6 +163,11 @@
 \setlength{\cftbeforetoctitleskip}{0pt}
 \fi
 
+\ifx\mode\print
+\setlength{\cftbeforetoctitleskip}{40pt}
+\setlength{\cftparskip}{1pt}
+\fi
+
 \begin{document}
 
 \input{hyphenation}
