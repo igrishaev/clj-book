@@ -3555,7 +3555,8 @@ JSON-схемой. Преимущества спеки в том, что она 
 
 \begin{english}
   \begin{clojure}
-(defn fix-system [t]
+(defn fix-system
+  [t]
   (system/start!)
   (t)
   (system/stop!))
@@ -3572,7 +3573,8 @@ JSON-схемой. Преимущества спеки в том, что она 
 
 \begin{english}
   \begin{clojure}
-(defn fix-db-data [t]
+(defn fix-db-data
+  [t]
   (let [{:keys [db]} system/system]
     (prepare-test-data db)
     (t)

@@ -1890,7 +1890,8 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 
 \begin{english}
   \begin{clojure}
-(defn get-common-message [problem]
+(defn get-common-message
+  [problem]
   (let [{:keys [in val]} problem
         field (->> in
                    reverse

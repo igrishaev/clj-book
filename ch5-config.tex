@@ -824,15 +824,21 @@ for (env, fn) in env_mapping.iteritems():
 \begin{tabular}{ @{}p{5cm} @{}p{5cm} }
 
   \begin{clojure}
-"DB_NAME=book"
-;; {:db-name "book"}
+DB_NAME=book
+DB_PASS=pass
+
+{:db-name "book"
+ :db-pass "pass"}
   \end{clojure}
 
 &
 
   \begin{clojure}
-"DB__NAME=book"
-;; {:db {:name "book"}}
+DB__NAME=book
+DB__PASS=pass
+
+{:db {:name "book"
+      :pass "pass"}}
   \end{clojure}
 
 \end{tabular}

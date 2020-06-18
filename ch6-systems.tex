@@ -752,7 +752,8 @@ IP и возвращает сведения о нём в JSON. В нашем с�
 (ns book.systems.mount.worker
   (:require
    [book.systems.mount.db :refer [db]]
-   [book.systems.mount.config :refer [config]]))
+   [book.systems.mount.config
+     :refer [config]]))
   \end{clojure}
 \end{english}
 
@@ -761,7 +762,7 @@ IP и возвращает сведения о нём в JSON. В нашем с�
 
 \index{граф зависимостей}
 
-\begin{figure}[ht!]
+\begin{figure}[h!]
 \chart{chart-sys-2}
 \end{figure}
 
@@ -779,7 +780,7 @@ IP и возвращает сведения о нём в JSON. В нашем с�
 \noindent
 Что с точки зрения компилятора:
 
-\begin{figure}[ht!]
+\begin{figure}[h!]
 \chart{chart-sys-3}
 \end{figure}
 

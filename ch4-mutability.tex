@@ -784,7 +784,8 @@ Current: 1, timeout: 5000 ;; 2
 (defn wrap-page-counter
   [handler]
   (fn [request]
-    (let [{:keys [request-method uri]} request]
+    (let [{:keys [uri
+                  request-method]} request]
       (when (= request-method :get)
         (swap! page-counter update uri (fnil inc 0)))
       (handler request))))
@@ -1704,7 +1705,9 @@ Clojure намеренно скрывает от нас стадию перем�
 
 \begin{english}
   \begin{clojure}
-(def data {:foo {:bar {:baz [42]}}})
+(def data {:foo
+            {:bar
+              {:baz [42]}}})
   \end{clojure}
 \end{english}
 
