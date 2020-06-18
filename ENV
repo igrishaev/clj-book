@@ -5,3 +5,4 @@ export EMAIL='ivan@grishaev.me'
 export COMMIT_HASH=`git log -1 --format='%h'`
 export COMMIT_TS=`git log -1 --format='%at'`
 export DRAFT=
+export QR=true
