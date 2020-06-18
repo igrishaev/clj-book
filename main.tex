@@ -1,5 +1,5 @@
 
-\documentclass[$FONT $DRAFT]{$DOCUMENT} % ,draft
+\documentclass[10pt $DRAFT]{$DOCUMENT} % ,draft
 
 \usepackage{tikz}
 \usepackage{tocloft}
@@ -38,8 +38,8 @@
 \def\domain{$DOMAIN}
 \def\email{$EMAIL}
 \def\publisher{$PUBLISHER}
-\def\commithash{$COMMIT_HASH\xspace}
-\def\committs{$COMMIT_TS\xspace}
+\def\commithash{$COMMIT_HASH}
+\def\committs{$COMMIT_TS}
 \def\mode{$MODE}
 
 
@@ -159,9 +159,15 @@
 \let\oldfootnote\footnote
 \renewcommand\footnote[1]{\oldfootnote{\hspace{1mm}#1}}
 
+
+%% for ebook, remove top margin for ToC
 \ifx\mode\ebook
 \setlength{\cftbeforetoctitleskip}{0pt}
 \fi
+
+
+%% reduce size of the main font
+\let\normalsize\small
 
 \begin{document}
 
