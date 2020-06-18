@@ -789,55 +789,55 @@ for (env, fn) in env_mapping.iteritems():
 \index{вложенность}
 \index{коллекции!вложенность}
 
+\begin{english}
+
 \noindent
 \begin{tabular}{ @{}p{5cm} @{}p{5cm} }
 
-\begin{english}
   \begin{clojure}
 ;; so-so
 {:db-name "book"
  :db-user "ivan"
  :db-pass "****"}
   \end{clojure}
-\end{english}
 
 &
 
-\begin{english}
   \begin{clojure}
 ;; better
 {:db {:name "book"
       :user "ivan"
       :pass "****"}}
   \end{clojure}
-\end{english}
 
 \end{tabular}
+
+\end{english}
 
 В разных системах вложенные переменные читают по-разному. Например, одинарное
 подчёркивание разделяет лексемы, но не меняет структуру. Двойное подчёркивание
 означает вложенность:
 
+\begin{english}
+
 \noindent
 \begin{tabular}{ @{}p{5cm} @{}p{5cm} }
 
-\begin{english}
   \begin{clojure}
 "DB_NAME=book"
 ;; {:db-name "book"}
   \end{clojure}
-\end{english}
 
 &
 
-\begin{english}
   \begin{clojure}
 "DB__NAME=book"
 ;; {:db {:name "book"}}
   \end{clojure}
-\end{english}
 
 \end{tabular}
+
+\end{english}
 
 \index{коллекции!массив}
 
@@ -1671,10 +1671,11 @@ JSON выгодно отличается от многословного XML, к
 
 Сравните данные в JSON и YAML. Вторая запись короче и визуально спокойнее:
 
+\begin{english}
+
 \noindent
 \begin{tabular}{ @{}p{6cm} @{}p{4cm} }
 
-\begin{english}
   \begin{json}
 {
     "server_port": 8080,
@@ -1690,13 +1691,11 @@ JSON выгодно отличается от многословного XML, к
     ]
 }
   \end{json}
-\end{english}
 
 &
 
 \linegap
 
-\begin{english}
   \begin{yaml}
 server_port: 8080
 db:
@@ -1708,9 +1707,10 @@ event:
   - 2019-07-05T12:00:00
   - 2019-07-12T23:59:59
   \end{yaml}
-\end{english}
 
 \end{tabular}
+
+\end{english}
 
 \subsection{YAML}
 

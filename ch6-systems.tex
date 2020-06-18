@@ -761,7 +761,7 @@ IP и возвращает сведения о нём в JSON. В нашем с�
 
 \index{граф зависимостей}
 
-\begin{figure}[H]
+\begin{figure}[ht!]
 \chart{chart-sys-2}
 \end{figure}
 
@@ -779,7 +779,7 @@ IP и возвращает сведения о нём в JSON. В нашем с�
 \noindent
 Что с точки зрения компилятора:
 
-\begin{figure}[H]
+\begin{figure}[ht!]
 \chart{chart-sys-3}
 \end{figure}
 
@@ -1278,26 +1278,26 @@ Component не терпит глобального состояния. В биб
 \verb|assoc| на \verb|dissoc|? Зачем хранить \verb|nil|, когда можно
 отсоединить поле?
 
+\begin{english}
+
 \noindent
 \begin{tabular}{ @{}p{5cm} @{}p{5cm} }
 
-\begin{english}
   \begin{clojure}
 ;; why this?
 (assoc this :server nil)
   \end{clojure}
-\end{english}
 
 &
 
-\begin{english}
   \begin{clojure}
 ;; but not this?
 (dissoc this :server)
   \end{clojure}
-\end{english}
 
 \end{tabular}
+
+\end{english}
 
 Причина в том, как устроены записи и слоты. Запись сохраняет уникальные свойства
 до тех пор, пока её слоты на месте. Если забрать у записи слот через
