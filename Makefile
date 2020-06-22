@@ -58,5 +58,6 @@ refs:
 docker-build:
 	docker build -t cljbook .
 
+
 docker-run:
-	docker run -v $(CURDIR)/book/:/cljbook/book/ cljbook
+	docker run -it --rm -v $(CURDIR)/book:/book -w /book cljbook:latest pdflatex --shell-escape test.tex
