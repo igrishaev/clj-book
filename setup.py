@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='pygments-print',
+    name='pyg-print',
     version='0.1',
     description='Custom style for pygments.',
     keywords='pygments style print',
@@ -16,7 +16,7 @@ setup(
     install_requires=['pygments == 2.5.2'],
 
     entry_points='''[pygments.styles]
-                    print=pygments_print:PrintStyle''',
+                    print=pyg_print:PrintStyle''',
 
     classifiers=[
         'Development Status :: 3 - Alpha',
