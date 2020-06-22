@@ -54,10 +54,10 @@ warn:
 refs:
 	! grep -A 0 -B 0 -i 'LaTeX Warning: Reference' ${JOB}.log
 
-
+.PHONY: docker-build
 docker-build:
 	docker build -t cljbook .
 
-
+.PHONY: docker-run
 docker-run:
 	docker run -it --rm -v $(CURDIR)/book:/book -w /book cljbook:latest pdflatex --shell-escape test.tex
