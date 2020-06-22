@@ -53,3 +53,10 @@ warn:
 .PHONY: refs
 refs:
 	! grep -A 0 -B 0 -i 'LaTeX Warning: Reference' ${JOB}.log
+
+
+docker-build:
+	docker build -t cljbook .
+
+docker-run:
+	docker run -v $(CURDIR)/book/:/cljbook/book/ cljbook
