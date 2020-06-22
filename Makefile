@@ -1,6 +1,5 @@
 
 PWD = $(shell pwd)
-PYG := /usr/local/lib/python2.7/site-packages/pygments
 
 # default draft build
 .PHONY: draft
@@ -31,8 +30,8 @@ clear:
 	rm -rf _minted-*
 	rm -f *.out
 
-pyg-install:
-	ln -s ${PWD}/print.py ${PYG}/styles/
+pyg-print-install:
+	cd ./pyg_print && python setup.py install
 
 pdf-build1 pdf-build2 pdf-build3:
 	envsubst < main.tex | pdflatex -shell-escape -halt-on-error -jobname=${JOB}

@@ -16,7 +16,7 @@ setup(
     install_requires=['pygments == 2.5.2'],
 
     entry_points='''[pygments.styles]
-                    print=pyg_print:PrintStyle''',
+                    print=pyg_print_style:PrintStyle''',
 
     classifiers=[
         'Development Status :: 3 - Alpha',
