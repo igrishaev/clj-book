@@ -61,3 +61,7 @@ docker-build:
 .PHONY: docker-run
 docker-run:
 	docker run -it --rm -v $(CURDIR)/book:/book -w /book cljbook:latest pdflatex --shell-escape test.tex
+
+.PHONY: docker-build-draft
+docker-build-draft:
+	docker run -it --rm -v $(CURDIR)/:/book -w /book cljbook:latest make draft
