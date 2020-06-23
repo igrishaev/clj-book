@@ -19,4 +19,13 @@ RUN apt-get install -y \
     texlive-lang-cyrillic \
     texlive-fonts-extra \
     git \
-    cm-super
+    cm-super \
+    openjdk-8-jdk
+
+RUN mkdir /clojure
+WORKDIR /clojure
+RUN curl -O https://download.clojure.org/install/linux-install-1.10.1.536.sh
+RUN chmod +x linux-install-1.10.1.536.sh
+RUN ./linux-install-1.10.1.536.sh
+WORKDIR /
+RUN rm -rf /clojure
