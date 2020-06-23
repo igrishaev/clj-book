@@ -1,6 +1,9 @@
 
 PWD = $(shell pwd)
 
+COMMIT_HASH = $(shell git log -1 --format='%h')
+COMMIT_TS = $(shell git log -1 --format='%at')
+
 # default draft build
 .PHONY: draft
 draft: pdf-build1
@@ -34,6 +37,8 @@ pyg-print-install:
 	cd ./pyg_print && python setup.py install
 
 pdf-build1 pdf-build2 pdf-build3:
+	COMMIT_HASH=${COMMIT_HASH} \
+	COMMIT_TS=${COMMIT_TS} \
 	envsubst < main.tex | pdflatex -shell-escape -halt-on-error -jobname=${JOB}
 
 stats:
@@ -64,8 +69,15 @@ docker-run:
 
 .PHONY: docker-build-draft
 docker-build-draft:
-	docker run -it --rm -v $(CURDIR)/:/book -w /book ${IMAGE}:build make draft
-
+	docker run -it --rm \
+	-e COMMIT_HASH=${COMMIT_HASH} \
+	-e COMMIT_TS=${COMMIT_TS} \
+	--env-file=ENV \
+	--env-file=ENV_PRINT \
+	-v $(CURDIR)/:/book \
+	-w /book ${IMAGE}:build \
+	make draft
+	
 .PHONY: docker-build-clean
 docker-build-clean:
 	docker run -it --rm -v $(CURDIR)/:/book -w /book ${IMAGE}:build make build

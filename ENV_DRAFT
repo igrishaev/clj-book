@@ -1,3 +1,2 @@
-
-export DRAFT=',draft'
-export QR=
+DRAFT=,draft
+QR=

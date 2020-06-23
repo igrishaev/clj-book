@@ -1,5 +1,3 @@
-source ENV_PRINT
-
-export PUBLISHER='ridero'
-export GEOMETRY='geom-ridero'
-export JOB='clojure_ridero'
+PUBLISHER=ridero
+GEOMETRY=geom-ridero
+JOB=clojure_ridero

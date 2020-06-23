@@ -1,5 +1,3 @@
-source ENV_PRINT
-
-export PUBLISHER='helicon'
-export GEOMETRY='geom-helicon'
-export JOB='clojure_helicon'
+PUBLISHER=helicon
+GEOMETRY=geom-helicon
+JOB=clojure_helicon

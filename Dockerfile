@@ -21,6 +21,7 @@ RUN mktextfm lati0900
 RUN mktextfm labx0900
 RUN mktextfm larm1200
 RUN mktextfm labx1200
+RUN mktextfm cmttb10
 
 RUN mkdir /workdir
 WORKDIR /workdir
@@ -31,5 +32,3 @@ RUN make pyg-print-install
 
 WORKDIR /
 RUN rm -rf /workdir
-
-ENTRYPOINT ["/bin/bash", "-c", "source /book/ENV_PRINT && \"$@\"", "-s"]

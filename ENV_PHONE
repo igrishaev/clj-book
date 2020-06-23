@@ -1,11 +1,8 @@
-source ENV
-
-# phone
-export PUBLISHER=
-export MODE='ebook'
-export DEVICE=phone
-export DEVICE_TYPE=mobile
-export DOCUMENT=report
-export GEOMETRY=geom-phone
-export COVER='media/cover_phone.pdf'
-export JOB='clojure_phone'
+PUBLISHER=
+MODE=ebook
+DEVICE=phone
+DEVICE_TYPE=mobile
+DOCUMENT=report
+GEOMETRY=geom-phone
+COVER=media/cover_phone.pdf
+JOB=clojure_phone
