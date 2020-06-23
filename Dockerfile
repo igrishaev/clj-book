@@ -1,22 +1,6 @@
-FROM ubuntu:18.04
+# Book-related stuff
 
-ENV TZ=Europe/Moscow
-
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime
-RUN echo $TZ > /etc/timezone
-
-RUN apt-get update
-RUN apt-get install -y \
-    texlive-latex-extra \
-    make \
-    gettext \
-    python \
-    python-setuptools \
-    python-pygments \
-    texlive-lang-cyrillic \
-    texlive-fonts-extra \
-    git \
-    cm-super
+FROM clj-book:ubuntu
 
 RUN mktextfm larm0900
 RUN mktextfm larm1000

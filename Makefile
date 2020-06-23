@@ -54,14 +54,17 @@ warn:
 refs:
 	! grep -A 0 -B 0 -i 'LaTeX Warning: Reference' ${JOB}.log
 
+IMAGE := clj-book
+
 .PHONY: docker-build
 docker-build:
-	docker build -t cljbook .
+	docker build -t ${IMAGE}:ubuntu -f Dockerfile.ubuntu .
+	docker build -t ${IMAGE}:build .
 
 .PHONY: docker-run
 docker-run:
-	docker run -it --rm -v $(CURDIR)/book:/book -w /book cljbook:latest pdflatex --shell-escape test.tex
+	docker run -it --rm -v $(CURDIR)/book:/book -w /book ${IMAGE}:build pdflatex --shell-escape test.tex
 
 .PHONY: docker-build-draft
 docker-build-draft:
-	docker run -it --rm -v $(CURDIR)/:/book -w /book cljbook:latest make draft
+	docker run -it --rm -v $(CURDIR)/:/book -w /book ${IMAGE}:build make draft
