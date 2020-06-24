@@ -7,7 +7,7 @@ draft: pdf-build1
 
 # release build
 .PHONY: build
-build: clear pdf-build1 index pdf-build2 pdf-build3 refs lines tag-job pdf-open
+build: clear pdf-build1 index pdf-build2 pdf-build3 refs lines tag-job
 
 .PHONY: tag-job
 tag-job:
@@ -35,9 +35,6 @@ pyg-print-install:
 
 pdf-build1 pdf-build2 pdf-build3:
 	envsubst < main.tex | pdflatex -shell-escape -halt-on-error -jobname=${JOB}
-
-pdf-open:
-	open ${JOB}.pdf
 
 stats:
 	find . -name '*.tex' | xargs wc -ml
@@ -68,3 +65,7 @@ docker-run:
 .PHONY: docker-build-draft
 docker-build-draft:
 	docker run -it --rm -v $(CURDIR)/:/book -w /book ${IMAGE}:build make draft
+
+.PHONY: docker-build-clean
+docker-build-clean:
+	docker run -it --rm -v $(CURDIR)/:/book -w /book ${IMAGE}:build make build
