@@ -67,30 +67,30 @@ docker-build:
 docker-run:
 	docker run -it --rm -v $(CURDIR)/book:/book -w /book ${IMAGE}:build pdflatex --shell-escape test.tex
 
+DOCKER_BUILD_PRE=docker run -it --rm -e COMMIT_HASH=${COMMIT_HASH} -e COMMIT_TS=${COMMIT_TS} --env-file=ENV
+DOCKER_BUILD_POST=-v $(CURDIR)/:/book -w /book ${IMAGE}:build
+
 .PHONY: docker-build-draft
 docker-build-draft:
-	docker run -it --rm \
-	-e COMMIT_HASH=${COMMIT_HASH} \
-	-e COMMIT_TS=${COMMIT_TS} \
-	--env-file=ENV \
-	--env-file=ENV_PRINT \
-	-v $(CURDIR)/:/book \
-	-w /book \
-	${IMAGE}:build \
-	make draft
+	${DOCKER_BUILD_PRE}	--env-file=ENV_PRINT ${DOCKER_BUILD_POST} make draft
+
+.PHONY: docker-build-print
+docker-build-print:
+	${DOCKER_BUILD_PRE}	--env-file=ENV_PRINT ${DOCKER_BUILD_POST} make build
+
+
+.PHONY: docker-build-ridero
+docker-build-ridero:
+	${DOCKER_BUILD_PRE}	--env-file=ENV_PRINT --env-file=ENV_RIDERO ${DOCKER_BUILD_POST} make build
+
+.PHONY: docker-build-tablet
+docker-build-tablet:
+	${DOCKER_BUILD_PRE}	--env-file=ENV_TABLET ${DOCKER_BUILD_POST} make build
 
 .PHONY: docker-build-kindle
 docker-build-kindle:
-	docker run -it --rm \
-	-e COMMIT_HASH=${COMMIT_HASH} \
-	-e COMMIT_TS=${COMMIT_TS} \
-	--env-file=ENV \
-	--env-file=ENV_KINDLE \
-	-v $(CURDIR)/:/book \
-	-w /book \
-	${IMAGE}:build \
-	make build
+	${DOCKER_BUILD_PRE}	--env-file=ENV_KINDLE ${DOCKER_BUILD_POST} make build
 
-.PHONY: docker-build-clean
-docker-build-clean:
-	docker run -it --rm -v $(CURDIR)/:/book -w /book ${IMAGE}:build make build
+.PHONY: docker-build-phone
+docker-build-phone:
+	${DOCKER_BUILD_PRE}	--env-file=ENV_PHONE ${DOCKER_BUILD_POST} make build
