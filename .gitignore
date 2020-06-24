@@ -12,9 +12,12 @@ main.pdf
 cover.pdf
 *.pyg
 *.idlk
-*.pdf
 *.out
 photos
 pyg_print/build/
 pyg_print/dist/
 pyg_print/pyg_print.egg-info/
+media/sent/
+media/corr/
+book/test.pdf
+/*.pdf
