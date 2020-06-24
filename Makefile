@@ -79,6 +79,18 @@ docker-build-draft:
 	${IMAGE}:build \
 	make draft
 
+.PHONY: docker-build-kindle
+docker-build-kindle:
+	docker run -it --rm \
+	-e COMMIT_HASH=${COMMIT_HASH} \
+	-e COMMIT_TS=${COMMIT_TS} \
+	--env-file=ENV \
+	--env-file=ENV_KINDLE \
+	-v $(CURDIR)/:/book \
+	-w /book \
+	${IMAGE}:build \
+	make build
+
 .PHONY: docker-build-clean
 docker-build-clean:
 	docker run -it --rm -v $(CURDIR)/:/book -w /book ${IMAGE}:build make build
