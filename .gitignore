@@ -19,5 +19,4 @@ pyg_print/dist/
 pyg_print/pyg_print.egg-info/
 media/sent/
 media/corr/
-book/test.pdf
 /*.pdf

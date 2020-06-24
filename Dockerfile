@@ -22,6 +22,7 @@ RUN mktextfm labx0900
 RUN mktextfm larm1200
 RUN mktextfm labx1200
 RUN mktextfm cmttb10
+RUN mktextfm latt0800
 
 RUN mkdir /workdir
 WORKDIR /workdir
