@@ -75,9 +75,10 @@ docker-build-draft:
 	--env-file=ENV \
 	--env-file=ENV_PRINT \
 	-v $(CURDIR)/:/book \
-	-w /book ${IMAGE}:build \
+	-w /book \
+	${IMAGE}:build \
 	make draft
-	
+
 .PHONY: docker-build-clean
 docker-build-clean:
 	docker run -it --rm -v $(CURDIR)/:/book -w /book ${IMAGE}:build make build
