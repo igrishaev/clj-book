@@ -1232,7 +1232,7 @@ Compojure решает проблему вложенных путей. Расс�
                             [:title
                              :description
                              :price])
-        location (str "/content/order/
+        location (str "/content/order/"
                       order-id
                       "/view")]
     (jdbc/update! *db*
