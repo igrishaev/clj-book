@@ -1187,10 +1187,10 @@ Compojure решает проблему вложенных путей. Расс�
                    :id
                    get-order-by-id)]
     {:status 200
-     :headers
-     {"content-type" "text/html"}
-     :body
-     (render-order-page {:order order})}
+     :headers {"content-type"
+               "text/html"}
+     :body (render-order-page
+             {:order order})}
     page-404))
   \end{clojure}
 \end{english}
@@ -1725,8 +1725,8 @@ Set-Cookie: visited=true;
      :cookies cookies*
      :body
      (if seen?
-         "Already seen."
-         "The first time you see it!")}))
+       "Already seen."
+       "The first time you see it!")}))
 
 (def app (-> page-seen
              wrap-cookies))
@@ -1800,10 +1800,10 @@ document.cookie
 
 \begin{english}
   \begin{clojure}
-(let [cookies* (assoc cookies
-                      "seen"
-                      {:value true
-                       :http-only true})]
+(let [cookies*
+      (assoc cookies "seen"
+        {:value true
+         :http-only true})]
   ...)
   \end{clojure}
 \end{english}
@@ -2093,13 +2093,13 @@ malformed>>.
 утилита \verb|cURL| или графическое приложение
 \footurl{Postman}{https://www.postman.com}[Post\-man][-8mm]. Пример с \verb|cURL|:
 
-%% ------------ TODO mobile
-
 \begin{english}
   \begin{bash}
-curl --request POST \
-     --header "Content-Type: application/json" \
-     --data '{"username":"John","city":"NY"}' \
+curl --request POST
+     --header "Content-Type:
+                 application/json"
+     --data '{"username":"John",
+                      "city":"NY"}'
      http://localhost:8080/
   \end{bash}
 \end{english}
