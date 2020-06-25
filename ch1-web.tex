@@ -826,7 +826,7 @@ Clojure) регистр имеет значение. Ring приводит за�
                   get-user-by-id)
          {:keys [fname lname]} user]
      {:status 200
-      :body (format "User is %s %s"
+      :body(format "User is %s %s"
                     fname lname)}))
   \end{clojure}
 \end{english}
@@ -1027,9 +1027,8 @@ Compojure решает проблему вложенных путей. Расс�
   \begin{clojure}
 (let [request {:request-method :get
                :uri "/test"}]
-  (bidi/match-route* routes
-                     (:uri request)
-                     request))
+  (bidi/match-route*
+    routes (:uri request) request))
 
 {:request-method :get
  :uri "/test"
@@ -1065,9 +1064,7 @@ Compojure решает проблему вложенных путей. Расс�
   (fn [req]
     (let [{:keys [uri]} req
            req* (bidi/match-route*
-                                  routes
-                                  uri
-                                  req)]
+                  routes uri req)]
       (handler req*))))
   \end{clojure}
 \end{english}
@@ -1189,10 +1186,11 @@ Compojure решает проблему вложенных путей. Расс�
                    :route-params
                    :id
                    get-order-by-id)]
-    %% ------------ TODO mobile
     {:status 200
-     :headers {"content-type" "text/html"}
-     :body (render-order-page {:order order})}
+     :headers
+     {"content-type" "text/html"}
+     :body
+     (render-order-page {:order order})}
     page-404))
   \end{clojure}
 \end{english}
@@ -1263,7 +1261,6 @@ Compojure решает проблему вложенных путей. Расс�
 
 \fi
 
-%% ------------ MOBILE CODE WRAP
 
 \index{HTTP!перенаправление}
 
@@ -1414,12 +1411,26 @@ HTTP предусматривает данные в адресной строк�
 
 \index{middleware!wrap-params}
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(require '[ring.middleware.params
+           :refer [wrap-params]])
+(def final-app (wrap-params app))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (require '[ring.middleware.params :refer [wrap-params]])
 (def final-app (wrap-params app))
   \end{clojure}
 \end{english}
+
+\fi
 
 Чтобы не запутаться в именах, придерживайтесь правил. Исходное приложение
 называйте \verb|app-naked| или \verb|app-raw| (голое, сырое), а~финальное~---
@@ -1435,6 +1446,18 @@ HTTP предусматривает данные в адресной строк�
 параметр \verb|who| задавал имя, кого приветствовать:
 \verb|/hello?who=John|. Добраться до него можно так:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn page-hello [req]
+  (let [who (get-in req [:params "who"])]
+    ...))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn page-hello [request]
@@ -1442,6 +1465,8 @@ HTTP предусматривает данные в адресной строк�
     ...))
   \end{clojure}
 \end{english}
+
+\fi
 
 \index{классы!Keyword}
 
@@ -1562,11 +1587,24 @@ middleware зависят друг от друга, их можно <<схлоп
 \index{clojure.core!comp}
 \index{функции!композиция}
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(def wrap-params+
+  (comp wrap-params wrap-keyword-params))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (def wrap-params+ (comp wrap-params wrap-keyword-params))
   \end{clojure}
 \end{english}
+
+\fi
 
 Разберёмся, почему аргументы \verb|comp| идут в таком порядке. Обозначим
 их \verb|foo| и \verb|bar| и перепишем выражение несколько раз. В каждом
@@ -1668,6 +1706,35 @@ Set-Cookie: visited=true;
 
 \index{модули!ring.middleware.cookies}
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure/lines}
+(require '[ring.middleware.cookies
+           :refer [wrap-cookies]])
+
+(defn page-seen [request]
+  (let [{:keys [cookies]} request
+        seen-path ["seen" :value]
+        seen? (get-in cookies
+                      seen-path)
+        cookies* (assoc-in cookies
+                           seen-path
+                           true)]
+    {:status 200
+     :cookies cookies*
+     :body
+     (if seen?
+         "Already seen."
+         "The first time you see it!")}))
+
+(def app (-> page-seen
+             wrap-cookies))
+  \end{clojure/lines}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure/lines}
 (require '[ring.middleware.cookies
@@ -1688,6 +1755,8 @@ Set-Cookie: visited=true;
              wrap-cookies))
   \end{clojure/lines}
 \end{english}
+
+\fi
 
 Замечание: переменная со звёздочкой на конце означает новую версию исходной
 переменной \coderef{8}. Например, такой же словарь, но с новым ключом. Вместо
@@ -1727,6 +1796,20 @@ document.cookie
 \noindent
 Измените переменную \verb|cookies*| так, чтобы у~\verb|seen| был атрибут:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(let [cookies* (assoc cookies
+                      "seen"
+                      {:value true
+                       :http-only true})]
+  ...)
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (let [cookies* (assoc cookies "seen"
@@ -1734,6 +1817,8 @@ document.cookie
   ...)
   \end{clojure}
 \end{english}
+
+\fi
 
 Теперь JavaScript не увидит значение \verb|seen|:
 
@@ -1806,6 +1891,31 @@ HTTP не предполагает связи между двумя запрос
 
 \index{модули!ring.middleware.session}
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(require '[ring.middleware.session
+           :refer [wrap-session]])
+
+(defn page-counter [request]
+  (let [{:keys [session]} request
+        session* (update session
+                         :counter
+                         (fnil inc 0))
+        counter (:counter session*)]
+    {:status 200
+     :session session*
+     :body (format "Seen %s time(s)"
+                   counter)}))
+
+(def app (-> page-counter
+             wrap-session))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (require '[ring.middleware.session :refer [wrap-session]])
@@ -1821,6 +1931,8 @@ HTTP не предполагает связи между двумя запрос
              wrap-session))
   \end{clojure}
 \end{english}
+
+\fi
 
 Запустите приложение и откройте браузер. Обновите страницу, и~счётчик в
 сообщении увеличится с каждым просмотром. Проделайте то же самое в другом
@@ -1867,6 +1979,24 @@ Middleware \verb|wrap-json-response| упрощает возврат JSON-дан
 Рассмотрим API для чтения пользователя. Если нашли его по номеру, вернём
 словарь полей. Если нет, в ответе структура ошибки.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn page-data [request]
+  (let [user-id (-> request :params :id)
+        user (get-user-by-id user-id)]
+    (if user
+      {:status 200 :body user}
+      {:status 404
+       :body
+       {:error_code "MISSING_USER"
+        :error_msg "No such user"}})))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn page-data [request]
@@ -1878,6 +2008,8 @@ Middleware \verb|wrap-json-response| упрощает возврат JSON-дан
               :error_message "No such user"}})))
   \end{clojure}
 \end{english}
+
+\fi
 
 \noindent
 В обоих случаях не нужно кодировать данные вручную~--- это делает
@@ -1911,6 +2043,30 @@ malformed>>.
 внимание: middleware принимает дополнительные параметры. Флаг \verb|:keywords? true|
 означает, что ключи словаря станут кейвордами.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(require '[ring.middleware.json
+           :refer [wrap-json-body]])
+
+(defn page-body [request]
+  (let [{:keys [body]} request
+        {:keys [username city]} body]
+    (create-user username city)
+    {:status 200
+     :body {:code "CREATED"
+            :message "User created"}}))
+
+(def app
+  (->
+    page-body
+    (wrap-json-body {:keywords? true})))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (require '[ring.middleware.json :refer [wrap-json-body]])
@@ -1928,12 +2084,16 @@ malformed>>.
   \end{clojure}
 \end{english}
 
+\fi
+
 \index{утилиты!cURL}
 \index{HTTP!POST}
 
 Чтобы отправить JSON серверу, понадобится специальная программа. Это может быть
 утилита \verb|cURL| или графическое приложение
 \footurl{Postman}{https://www.postman.com}[Post\-man][-8mm]. Пример с \verb|cURL|:
+
+%% ------------ TODO mobile
 
 \begin{english}
   \begin{bash}
@@ -2000,6 +2160,26 @@ Middleware не случайно выделяет поле \verb|:json-params|. 
 
 \index{функции!stringify-keys}
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(require '[clojure.walk
+           :refer [keywordize-keys
+                   stringify-keys]])
+
+(defn wrap-headers-kw [handler]
+  (fn [request]
+    (-> request
+        (update :headers keywordize-keys)
+        handler
+        (update :headers
+                stringify-keys))))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (require '[clojure.walk :refer
@@ -2014,10 +2194,30 @@ Middleware не случайно выделяет поле \verb|:json-params|. 
   \end{clojure}
 \end{english}
 
+\fi
+
 Ниже по стеку приложение работает с заголовками как с кейвордами. В примере мы
 находим заголовок \verb|host| с помощью \verb|:keys|, что не сработало бы
 для строк. В заголовках ответа тоже кейворд. Убедитесь, что браузер покажет
 сообщение жирным шрифтом, потому что тип содержимого HTML.
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn app* [request]
+  (let [{:keys [headers]} request
+        {:keys [host]} headers]
+    {:status 200
+     :headers {:content-type "text/html"}
+     :body (str "<h1>Host header:" host
+                "</h1>")}))
+
+(def app (wrap-headers-kw app*))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -2031,6 +2231,8 @@ Middleware не случайно выделяет поле \verb|:json-params|. 
 (def app (wrap-headers-kw app*))
   \end{clojure}
 \end{english}
+
+\fi
 
 По аналогии можно сменить тип ключей для словаря \verb|:cookie|.
 
@@ -2057,6 +2259,34 @@ id вернётся в ответе. Его пишут в лог, чтобы п�
 Напишем обёртку для id. Заголовки~--- это кейворды, потому что выше по стеку
 \verb|wrap-headers-kw|.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(import 'java.util.UUID)
+
+(defn wrap-request-id [handler]
+  (fn [request]
+    (let [uuid (or
+                (get-in request
+                        [:headers
+                         :x-request-id])
+                (str
+                  (UUID/randomUUID)))]
+      (-> request
+          (assoc-in [:headers
+                     :x-request-id] uuid)
+          (assoc :request-id uuid)
+          handler
+          (assoc :request-id uuid)
+          (assoc-in [:headers
+                     :x-request-id]
+                    uuid)))))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (import 'java.util.UUID)
@@ -2074,6 +2304,8 @@ id вернётся в ответе. Его пишут в лог, чтобы п�
   \end{clojure}
 \end{english}
 
+\fi
+
 \index{clojure.core!get-in}
 \index{clojure.core!assoc}
 \index{clojure.core!dissoc}
@@ -2084,6 +2316,19 @@ Id хранят в заголовках, но дублируют в запрос
 
 \index{логирование!HTTP}
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn some-handler [req]
+  (let [{:keys [params request-id]} req]
+    (log/info "Request id: %s"
+              request-id)))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn some-handler [request]
@@ -2091,6 +2336,8 @@ Id хранят в заголовках, но дублируют в запрос
     (log/info "Request id: %s" request-id)))
   \end{clojure}
 \end{english}
+
+\fi
 
 \subsubsection*{Текущий пользователь}
 
@@ -2105,6 +2352,26 @@ Id хранят в заголовках, но дублируют в запрос
 
 \index{middleware!wrap-current-user}
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn wrap-current-user [handler]
+  (fn [request]
+    (let [user-id (-> request
+                      :session
+                      :user-id)
+          user (when user-id
+                 (-> user-id
+                     get-user-by-id))]
+      (-> request
+          (assoc :user user)
+          handler))))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn wrap-current-user [handler]
@@ -2117,6 +2384,8 @@ Id хранят в заголовках, но дублируют в запрос
           handler))))
   \end{clojure}
 \end{english}
+
+\fi
 
 \index{безопасность!сессия}
 \index{HTTP!безопасность}
@@ -2155,6 +2424,23 @@ middleware ниже по стеку не сработает.
 \index{middleware!wrap-auth-user-only}
 \index{HTTP!авторизация}
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn wrap-auth-user-only [handler]
+  (fn [request]
+    (if (:user request)
+      (handler request)
+      {:status 403
+       :headers
+       {"content-type" "text/plain"}
+       :body "Sign in to get access."})))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn wrap-auth-user-only [handler]
@@ -2166,6 +2452,8 @@ middleware ниже по стеку не сработает.
        :body "Please sign in to access this page."})))
   \end{clojure}
 \end{english}
+
+\fi
 
 Переход к следующему middleware под условием. Если пользователь не
 авторизован, звенья ниже \verb|wrap-auth-user-only| будут отброшены.
@@ -2194,6 +2482,30 @@ middleware ниже по стеку не сработает.
 
 \index{middleware!wrap-exception}
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn wrap-exception [handler]
+  (fn [{:keys [uri request-method]
+        :as request}]
+    (try
+      (handler request)
+      (catch Throwable e
+        (log/errorf
+          e
+          "Error, method %s, path %s"
+          request-method
+          uri)
+          {:status 500
+           :headers
+           {"content-type" "text/plain"}
+           :body "Sorry, try later."}))))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn wrap-exception [handler]
@@ -2209,6 +2521,8 @@ middleware ниже по стеку не сработает.
            :body "Sorry, please try later."})))))
   \end{clojure}
 \end{english}
+
+\fi
 
 \index{логирование!HTTP}
 
@@ -2268,6 +2582,21 @@ middleware под названием \verb|wrap-routes|. Оно принимае
 \noindent
 Смонтируем её на префикс \verb|/account| и обернём в проверку доступа.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defroutes app
+  (GET "/"     _ "index")
+  (GET "/help" _ "help")
+  (context "/account" []
+    (wrap-routes app-account
+                 wrap-auth-user-only)))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defroutes app
@@ -2277,6 +2606,8 @@ middleware под названием \verb|wrap-routes|. Оно принимае
     (wrap-routes app-account wrap-auth-user-only)))
   \end{clojure}
 \end{english}
+
+\fi
 
 \index{функции!wrap-routes}
 
@@ -2305,6 +2636,20 @@ Middleware, которое принимает middleware,~--- довольно �
 Наивное решение в том, чтобы прочитать файл функцией \verb|slurp| и~вернуть
 его содержимое:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn page-terminals [request]
+  {:status 200
+   :headers
+   {"content-type" "application/json"}
+   :body (slurp "terminals.json")})
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn page-terminals [request]
@@ -2313,6 +2658,8 @@ Middleware, которое принимает middleware,~--- довольно �
    :body (slurp "terminals.json")})
   \end{clojure}
 \end{english}
+
+\fi
 
 Недостаток в том, что мы читаем файл в память целиком. Чем больше файл, тем
 больше ресурсов мы потребляем. Если клиент читает данные медленно, данные будут
@@ -2338,6 +2685,23 @@ Ring допускает, чтобы телом ответа был файл, э�
 \verb|java.io.File|. Чтобы получить объект файла, путь к нему передают
 в~конструктор класса или функцию \verb|file| из модуля \verb|clojure.java.io|:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(require '[clojure.java.io :as io])
+
+(defn page-terminals
+  [request]
+  {:status 200
+   :headers
+   {"content-type" "application/json"}
+   :body (io/file "terminals.json")})
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (require '[clojure.java.io :as io])
@@ -2350,6 +2714,8 @@ Ring допускает, чтобы телом ответа был файл, э�
   \end{clojure}
 \end{english}
 
+\fi
+
 \index{заголовки!Content-Length}
 
 Если тело~--- это файл, сервер отдаёт содержимое малыми порциями по мере того, как
@@ -2357,6 +2723,20 @@ Ring допускает, чтобы телом ответа был файл, э�
 \verb|Content-Length| с размером файла.
 
 Когда файлов несколько, плодить правило на каждый из них утомительно:
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defroutes app
+  (GET "/terminals.json"
+       req (page-terminals req))
+  (GET "/departments.json"
+       req (page-departments req)))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -2366,11 +2746,28 @@ Ring допускает, чтобы телом ответа был файл, э�
   \end{clojure}
 \end{english}
 
+\fi
+
 \index{middleware!wrap-file}
 
 Очевидно, можно сопоставить путь к файлу и директорию, где он находится. Для
 этого служит middleware \verb|wrap-file|. Оно устроено так, что если запрос не
 подошёл основному приложению, middleware выполнит поиск файла в указанной папке.
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(require '[ring.middleware.file
+           :refer [wrap-file]])
+
+(def app
+  (-> app-naked
+      (wrap-file "/var/www/public")))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -2380,6 +2777,8 @@ Ring допускает, чтобы телом ответа был файл, э�
              (wrap-file "/var/www/public")))
   \end{clojure}
 \end{english}
+
+\fi
 
 Запрос \verb|/terminals.json| проскочит мимо app, но разрешится в
 одноимённый файл по пути \verb|/var/www/public/terminals.json|. Со
@@ -2431,6 +2830,27 @@ Ring допускает, чтобы телом ответа был файл, э�
 бинарный поток. Чтобы определить тип по расширению файла, добавьте ещё одно
 middleware \verb|wrap-content-type|:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(require '[ring.middleware.content-type
+           :refer [wrap-content-type]])
+
+(def mime-types
+      {"json" "application/json"
+       "png" "image/png"
+       "xls" "application/vnd.ms-excel"})
+
+(def app
+  (-> app-naked
+      (wrap-content-type
+        {:mime-types mime-types})))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (require '[ring.middleware.content-type
@@ -2445,6 +2865,8 @@ middleware \verb|wrap-content-type|:
           "xls" "application/vnd.ms-excel"}})))
   \end{clojure}
 \end{english}
+
+\fi
 
 Параметр \verb|:mime-types| принимает словарь
 \footurl{MIME-типов}{https://en.wikipedia.org/wiki/MIME}[MIME types][-5mm] и
@@ -2482,6 +2904,27 @@ HTTP. Потребитель считает его по мере загрузк�
 Яндекса переходят в наш ответ. Это касается и заголовков, но мы возвращаем их не
 все, а подмножество (в нашем случае \verb|Content-Type|).
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(require '[clj-http.client :as client])
+
+(defn app-proxy [req]
+  (let [resp (client/get "https://ya.ru"
+                         {:stream? true})
+        {status :status
+         headers :headers
+         body :body} resp]
+    {:status status
+     :headers (select-keys
+                headers ["Content-Type"])
+     :body body}))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (require '[clj-http.client :as client])
@@ -2490,15 +2933,34 @@ HTTP. Потребитель считает его по мере загрузк�
   (let [response (client/get "https://ya.ru" {:stream? true})
         {:keys [status headers body]} response
         headers* (select-keys headers ["Content-Type"])]
-    {:status 200
+    {:status status
      :headers headers*
      :body body}))
   \end{clojure}
 \end{english}
 
+\fi
+
 Запустите \verb|app-proxy| в браузере. Вы увидите главную страницу Яндекса,
 хотя адрес по-прежнему \verb|localhost|. Код \verb|app-proxy| можно выразить
 короче с помощью стрелочного оператора:
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn app-proxy [request]
+  (-> "https://ya.ru"
+      (client/get {:stream? true})
+      (select-keys [:status
+                    :body :headers])
+      (update :headers
+              select-keys
+              ["Content-Type"])))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -2509,6 +2971,8 @@ HTTP. Потребитель считает его по мере загрузк�
       (update :headers select-keys ["Content-Type"])))
   \end{clojure}
 \end{english}
+
+\fi
 
 Доработайте прокси, чтобы он работал с разными сайтами. Добавьте поддержку форм
 методом POST, опробуйте загрузку файлов. Какие ещё заголовки понадобятся
