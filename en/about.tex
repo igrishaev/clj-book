@@ -1,68 +1,65 @@
 
-\section*{Об этой книге}
+\section*{About This Book}
 
-У вас в руках книга о языке программирования Clojure. Это современный диалект
-Лиспа на платформе JVM. От устаревших диалектов он отличается тем, что делает
-ставку на функциональный подход и~неизменяемость данных. Язык устроен так, чтобы
-решать сложные задачи простым способом.
+You are reading a book about the Clojure programming language. It is the modern dialect of Lisp on the JVM platform. 
+Clojure differs from obsolete dialects in that it relies on a functional approach and ~data immutability. 
+The language was designed to offer simple solutions to complex problems.
 
-Эта книга~--- не перевод, она изначально написана на русском языке. Вы не найдёте
-тяжёлых предложений, в которых слышна английская речь. Вам не придётся читать
-<<маркер>> вместо <<токен>> и~другую нелепицу. Термины написаны в том виде,
-чтобы быть понятными программисту.
+This book is originally written in Russian.
+%Вы не найдёте
+%тяжёлых предложений, в которых слышна английская речь. Вам не придётся читать
+%<<маркер>> вместо <<токен>> и~другую нелепицу. Термины написаны в том виде,
+%чтобы быть понятными программисту.
 
-В книге нет вводной части, где написано, что скачать и установить. Также мы не
-рассматриваем азы вроде чисел и строк. На тему введения в Clojure уже написаны
-статьи и посты в блогах. Будет нечестно предлагать материал, где половина
-повторяет сказанное ранее. Эта книга от начала и до конца~--- то, о чём ещё
-никто не писал.
+Our book has no introduction which would say what things you need to download and install.
+We also won't talk about nuts and bolts like numbers and strings. 
+There are tons of articles and blog posts on the topic of introduction to Clojure. 
+It would be unfair to offer you information, half of which has been said more than once. 
+I think, from cover to cover, this book contains things that no one has written about. 
 
-Другое её достоинство~--- упор на практику. Примеры кода взяты из реальных
-проектов. Все техники и приёмы автор опробовал лично. В~описании проблем мы
-отталкиваемся от того, что вас ждёт на~производстве. Покажем, где теория
-расходится с практикой и что предпочесть в таком случае.
+Our book is based on practice and this is one of its advantages. The code examples are taken from real projects. 
+The author personally used all the techniques discussed below. Describing the problem, we will take into account what tasks await you in production. 
+We'll show you where theory diverges from practice and what you need to prefer in such a situation.
 
-Коротко о том, что вас ждёт. Начнём с веб-разработки~--- вспомним протокол HTTP
-и как с ним работать в Clojure. Затем рассмотрим Clojure.spec~--- библиотеку для
-проверки данных. Третья глава расскажет про исключения, четвёртая~--- про
-изменяемые данные. Далее переходим к конфигурации. В шестой главе знакомимся с
-системами. В последней научимся писать тесты.
+Let me speak briefly about what awaits you. First, let's talk about web development: remember what HTTP protocol is and see how to work with it in Clojure. 
+After that we will look at the Clojure.spec library for validating data. 
+Chapter 3 tells about exceptions. Chapter 4 turns to mutable data.
+Then we'll go to a configuration. Chapter 6 introduces systems. Finally, the last chapter will teach you how to write tests.
 
-Даже если вы не любите Лисп и книга попала к вам случайно, не спешите её
-откладывать. Clojure~--- это новые правила и другой мир, а~книга~--- шанс туда
-попасть. Может быть, Clojure изменит ваше мнение о программировании. Обнаружит
-вопросы там, где, казалось бы, всё решено.
+Even if you don't like Lisp and have picked up this book by accident, do not rush to put it away. 
+Clojure is a different world with new rules, and our book is your chance to get there. 
+Maybe Clojure will change your mind about programming. You will find questions where, it would seem, everything has been decided.
 
-Желаем читателю терпения, чтобы прочесть книгу до конца.
+We wish you have the patience to read the book to the end.
 
 \newpage
 
-\section*{Благодарности}
+\section*{Acknowledgement}
 
-Спасибо стартапу Flyerbee, моей первой работе на Clojure. Именно там я закрепил
-скромные знания языка.
+My acknowledgement to the Flyerbee start-up where I start working with Clojure. 
+It was there that I reinforced my theoretical knowledge of this language by practice.
 
-Я счастлив работать в компании Exoscale в окружении талантливых
-инженеров. Многие вещи, не только технические, я узнал в~этом коллективе.
+Presently, I am happy to work at Exoscale, surrounded by talented engineers. 
+I learned a lot of things, not just technical, in this team.
 
-Спасибо Петру Маслову и Евгению Климову за крупные партии найденных
-опечаток. Алексей Шипилов внёс важное замечание к первой главе, Досбол
-Жантолин~--- к последней. Молодцы все, кто указал на ошибки в~комментариях
-в~блоге.
+I would like to thank Peter Maslov and Eugene Klimov for finding lots of typos. 
+My thanks to Alexey Shipilov and Dosbol Zhantolin who made important comments on the first and last chapters, respectively. 
+All readers of my blog who showed me my mistakes, well done!
 
-\ifx\publisher\ridero
-Благодарю коллектив издательства Rider\'{o} за то, что взяли рукопись в
-работу. Их усилиями вы читаете эту книгу сейчас.
-\fi
+%\ifx\publisher\ridero
+%Благодарю коллектив издательства Rider\'{o} за то, что взяли рукопись в
+%работу. Их усилиями вы читаете эту книгу сейчас.
+%\fi
 
-\ifx\publisher\helicon
-Благодарю коллектив издательства Геликон-Плюс за то, что взяли рукопись в
-работу. Их усилиями вы читаете эту книгу сейчас.
-\fi
+%\ifx\publisher\helicon
+%Благодарю коллектив издательства Геликон-Плюс за то, что взяли рукопись в
+%работу. Их усилиями вы читаете эту книгу сейчас.
+%\fi
 
-\section*{Обратная связь}
+\section*{Feedback}
 
-Автор будет признателен за указанные опечатки и неточности. Присылайте их
-по~адресу \emaillink. Возможно, в промежутках между тиражами
-получится обновить макет, и следующий читатель не~увидит ошибки, о~которой вы
-сообщили. Автор учтёт все замечания при переводе на английский язык.
+The author will be grateful for pointing out typos and inaccuracies. Please, send them to \emaillink. 
+%Возможно, в промежутках между тиражами
+%получится обновить макет, и следующий читатель не~увидит ошибки, о~которой вы
+%сообщили. 
+The author will take into consideration all your words.
