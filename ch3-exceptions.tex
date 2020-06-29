@@ -203,7 +203,7 @@ File С:/work/test.txt not found станет ясно, к~какому файл
 данные. Предположим, функция обращается в~сеть. Выразим это на псевдокоде:
 
 \index{языки!Python}
-
+%% TODO MOBILE python
 \begin{english}
   \begin{python}
 def get-user(id):
@@ -225,7 +225,7 @@ HTTP нет понятия пользователя. Известны лишь �
 Расставим в коде \verb|try/catch|. Если исключение пришло из технических недр,
 дополним его контекстом и отправим наверх. Паттерн называется \verb|re-throw|,
 повторный выброс. Новый псевдокод:
-
+%% TODO MOBILE python js?
 \begin{english}
   \begin{js}
 def get-user(id):
@@ -452,9 +452,10 @@ Divide by zero
 (defn add [a b]
   (if (and a b)
     (+ a b)
-    (let [message (format
-                    "Value error, a: %s,
-                             b: %s" a b)]
+    (let [message
+          (format
+            "Value error, a: %s, b: %s"
+            a b)]
       (throw (new Exception message)))))
   \end{clojure}
 \end{english}
@@ -480,9 +481,9 @@ Divide by zero
 
 \begin{english}
   \begin{clojure}
-Execution error at book.exceptions/add
-                     (exceptions.clj:86).
-Value error, a: 1, b: null
+;; Execution error at book.exceptions/add
+;; (exceptions.clj:86).
+;; Value error, a: 1, b: null
   \end{clojure}
 \end{english}
 
@@ -590,8 +591,7 @@ Value error, a: 1, b: null
           (ex-data e)]
       (format "HTTP error: %s %s"
         http-method http-url))))
-;; HTTP error: GET
-                https://host.com/users/42
+;; HTTP error: GET https://host.com...
   \end{clojure}
 \end{english}
 
@@ -633,7 +633,7 @@ Value error, a: 1, b: null
 \verb|let| ниже произведут вектор из трёх \verb|nil|.
 
 \begin{english}
-
+%% TODO MOBILE
 \noindent
 \begin{tabular}{ @{}p{5cm} @{}p{5cm} }
 
@@ -677,7 +677,8 @@ nil punning. \verb|Nil| дружит с коллекциями, но не раб
 
 (s/def ::data (s/coll-of int?))
 
-(when-let [explain (s/explain-data ::data
+(when-let [explain (s/explain-data
+                     ::data
                      [1 2 nil])]
   (throw (ex-info
            "Some item is not an integer"
@@ -835,14 +836,29 @@ HTTP-ответ. Согласно протоколу, ответ со стату
     (/ a b)
     (catch ArithmeticException e
       (throw (ex-info
-              "Calculation error"
-              {:a a :b b}
-              e)))))
+               "Calculation error"
+               {:a a :b b}
+               e)))))
   \end{clojure}
 \end{english}
 
 Функция \verb|ex-cause| возвращает причину исключения. Если её не было,
 получим \verb|nil|.
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(try
+  (divide 1 0)
+  (catch Exception e
+    (println (ex-message e))
+    (println (ex-message
+               (ex-cause e)))))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -853,6 +869,8 @@ HTTP-ответ. Согласно протоколу, ответ со стату
     (println (ex-message (ex-cause e)))))
   \end{clojure}
 \end{english}
+
+\fi
 
 \noindent
 Код выведет:
@@ -1030,7 +1048,8 @@ Divide by zero
   \begin{clojure}
 #error {
  :cause HTTP error
- :data {:method POST, :url http://api.site.com}
+ :data {:method POST,
+        :url http://api.site.com}
  :via
  [{:type clojure.lang.ExceptionInfo
    :message Get user info error
@@ -1502,6 +1521,20 @@ clojure.lang.ExceptionInfo
 
 Второй вызов запишет в лог следующее:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{text}
+2019-05-03 19:00:05,590 ERROR
+book.exceptions - HTTP Error 500
+clojure.lang.ExceptionInfo
+  Get user info error
+  ...
+  \end{text}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{text}
 2019-05-03 19:00:05,590 ERROR book.exceptions - HTTP Error 500
@@ -1510,6 +1543,8 @@ clojure.lang.ExceptionInfo
   ...
   \end{text}
 \end{english}
+
+\fi
 
 Доработайте \verb|log-error| так, чтобы сообщение было шаблоном, а~функция
 принимала параметры подстановки:
@@ -1675,6 +1710,32 @@ HTTP-запроса, стек-трейс и другие.
 
 \begin{listing}[ht!]
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{json}
+[ {
+  "type": "clojure.lang.ExceptionInfo",
+  "message": "Get user info error",
+  "data": {
+    "user-id": 42
+  },
+  "at": ["clojure.lang.AFn",
+         "applyToHelper", "AFn.java"...]
+}, {
+  "type": "clojure.lang.ExceptionInfo",
+  "message": "Auth error",
+  "data": {
+    "token": "........."
+  },
+  "at": ["clojure.lang.AFn",
+         "applyToHelper", "AFn.java"...]
+} ]
+  \end{json}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{json}
 [ {
@@ -1694,6 +1755,8 @@ HTTP-запроса, стек-трейс и другие.
 } ]
   \end{json}
 \end{english}
+
+\fi
 
   \caption{Пример JSON-данных исключения}
   \label{fig:ex-json-data}
@@ -1748,14 +1811,17 @@ middleware.
   \begin{clojure/lines*}{firstnumber=8}
       (catch Exception e
         (let [event
-              (-> nil
-                  (r/add-exception! e)
-                  (r/add-ring-request!
-                    request)
-                  (r/add-extra!
-                   {:something "else"}))]
+              (->
+                nil
+                (r/add-exception! e)
+                (r/add-ring-request!
+                  request)
+                (r/add-extra!
+                  {:something
+                   "else"}))]
           (try
-            @(r/capture! DSN event))))
+            @(r/capture!
+               DSN event))))
   \end{clojure/lines*}
 \end{english}
 
@@ -1784,20 +1850,23 @@ middleware.
 сущности.
 
 \wavetop
-%% TODO MOBILE имхо слишком много закрывающих скобок
+
 \ifx\devicetype\mobile
 
 \begin{english}
   \begin{clojure/lines*}{firstnumber=15}
             (catch Exception e-sentry
               (log/errorf e-sentry
-                "Sentry error: %s" DSN)
+                "Sentry error: %s"
+                DSN)
               (log/error e
                 "Request failed"))
             (finally
               {:status 500
-               :body "Internal error,
-                please try later"})))))))
+               :body
+                "Internal error,
+                please try
+                later"})))))))
   \end{clojure/lines*}
 \end{english}
 
