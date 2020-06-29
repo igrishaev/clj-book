@@ -21,3 +21,7 @@ mktextfm larm1200
 mktextfm labx1200
 mktextfm cmttb10
 mktextfm latt0800
+
+mktextfm larm0700
+mktextfm lasl1000
+mktextfm labx1000
