@@ -20,3 +20,6 @@ pyg_print/pyg_print.egg-info/
 media/sent/
 media/corr/
 /*.pdf
+.auctex-auto/
+*.fdb_latexmk
+*.fls
