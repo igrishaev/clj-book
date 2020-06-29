@@ -203,11 +203,11 @@ File С:/work/test.txt not found станет ясно, к~какому файл
 данные. Предположим, функция обращается в~сеть. Выразим это на псевдокоде:
 
 \index{языки!Python}
-%% TODO MOBILE python
 \begin{english}
   \begin{python}
 def get-user(id):
-  url = "http://api.company.com/user/" + str(id)
+  url = "http://api.company.com/" + \
+        "user/" + str(id)
   return http.GET(url).body.json()
   \end{python}
 \end{english}
@@ -230,10 +230,12 @@ HTTP нет понятия пользователя. Известны лишь �
   \begin{js}
 def get-user(id):
   try {
-    url = "http://api.company.com/user/" + str(id)
+    url = "http://api.company.com/" + \
+          "user/" + str(id)
     return http.GET(url).body.json()
   } catch error {
-    throw Error("Cannot fetch user " + str(id), cause=error)
+    throw Error("Cannot fetch user " + \
+                str(id), cause=error)
   }
   \end{js}
 \end{english}
@@ -330,8 +332,7 @@ Divide by zero
   (+ 1 nil)
   (catch ArithmeticException e
     (println "Weird arithmetics")))
-;; Execution error
-          (NullPointerException)...
+;;Execution error (NullPointerException)
   \end{clojure}
 \end{english}
 
@@ -452,11 +453,11 @@ Divide by zero
 (defn add [a b]
   (if (and a b)
     (+ a b)
-    (let [message
-          (format
-            "Value error, a: %s, b: %s"
-            a b)]
-      (throw (new Exception message)))))
+    (throw
+      (new Exception
+        (format
+          "Value error, a: %s, b: %s"
+          a b)))))
   \end{clojure}
 \end{english}
 
@@ -482,7 +483,6 @@ Divide by zero
 \begin{english}
   \begin{clojure}
 ;; Execution error at book.exceptions/add
-;; (exceptions.clj:86).
 ;; Value error, a: 1, b: null
   \end{clojure}
 \end{english}
@@ -1120,7 +1120,7 @@ Clojure. С другой стороны, ими страдают многие JV
 (clojure.stacktrace/print-throwable e)
 ;; clojure.lang.ExceptionInfo:
 ;; Get user info error
-{:user-id 42}
+;; {:user-id 42}
   \end{clojure}
 \end{english}
 
@@ -1804,14 +1804,13 @@ middleware.
 декораторы и middleware, вернитесь к~главе про веб-разработку \page{decorator}.
 
 \wavetop
-
+%% TODO code line ref
 \ifx\devicetype\mobile
 
 \begin{english}
   \begin{clojure/lines*}{firstnumber=8}
-      (catch Exception e
-        (let [event
-              (->
+(catch Exception e
+  (let [event (->
                 nil
                 (r/add-exception! e)
                 (r/add-ring-request!
@@ -1819,9 +1818,7 @@ middleware.
                 (r/add-extra!
                   {:something
                    "else"}))]
-          (try
-            @(r/capture!
-               DSN event))))
+    (try @(r/capture! DSN event))))
   \end{clojure/lines*}
 \end{english}
 
@@ -1852,21 +1849,17 @@ middleware.
 \wavetop
 
 \ifx\devicetype\mobile
-
+%% TODO code line ref
 \begin{english}
   \begin{clojure/lines*}{firstnumber=15}
-            (catch Exception e-sentry
-              (log/errorf e-sentry
-                "Sentry error: %s"
-                DSN)
-              (log/error e
-                "Request failed"))
-            (finally
-              {:status 500
-               :body
-                "Internal error,
-                please try
-                later"})))))))
+(catch Exception e-sentry
+  (log/errorf e-sentry
+    "Sentry error: %s" DSN)
+  (log/error e "Request failed"))
+(finally
+  {:status 500
+   :body  "Internal error, please try
+   later"})))))))
   \end{clojure/lines*}
 \end{english}
 
