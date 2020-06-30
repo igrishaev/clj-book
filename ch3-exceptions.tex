@@ -1810,14 +1810,13 @@ middleware.
 \begin{english}
   \begin{clojure/lines*}{firstnumber=8}
 (catch Exception e
-  (let [event (->
-                nil
-                (r/add-exception! e)
-                (r/add-ring-request!
-                  request)
-                (r/add-extra!
-                  {:something
-                   "else"}))]
+  (let [event
+        (-> nil
+            (r/add-exception! e)
+            (r/add-ring-request!
+              request)
+            (r/add-extra!
+              {:something "else"}))]
     (try @(r/capture! DSN event))))
   \end{clojure/lines*}
 \end{english}
@@ -2401,7 +2400,7 @@ Slingshot содержит макросы \verb|throw+| и \verb|try+|. Они �
 К сожалению, в SDK нет класса \verb|ChecksumError| или аналога. Вместо него
 приходит обычный \verb|AmazonS3Exception| с длинным текстом. Чтобы выделить
 наш случай, сравним сообщение с шаблоном. Вынесем проверку в функцию:
-%% TODO MOBILE
+
 \ifx\devicetype\mobile
 
 \begin{english}
