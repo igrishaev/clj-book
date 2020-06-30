@@ -53,6 +53,30 @@
 умолчанию. Функция \verb|api_call| принимает дополнительные параметры,
 объединяет со стандартными и передаёт в HTTP-клиент:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{python/lines}
+DEFAULT_PARAMS = {
+    "allow_redirects": True,
+    "timeout": 5,
+    "headers": {"Content-Type":
+                "application/json"},
+    "auth": ("username", "password"),
+}
+
+def api_call(**params):
+    api_params = DEFAULT_PARAMS
+    api_params.update(params)
+    api_url = "https://api.host.com"
+    response = requests.post(api_url,
+                   **api_params)
+    return response.json()
+  \end{python/lines}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{python/lines}
 DEFAULT_PARAMS = {
@@ -69,6 +93,8 @@ def api_call(**params):
     return resp.json()
   \end{python/lines}
 \end{english}
+
+\fi
 
 \index{передача по ссылке}
 
@@ -289,6 +315,19 @@ Clojure предлагает несколько способов менять д
 и новое значение. Оно может быть любого типа, в том числе \verb|nil|,
 коллекцией, исключением:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(reset! store nil)
+(reset! store {:items [1 2 3]})
+(reset! store (ex-info "error"
+                {:id 42}))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (reset! store nil)
@@ -296,6 +335,8 @@ Clojure предлагает несколько способов менять д
 (reset! store (ex-info "error" {:id 42}))
   \end{clojure}
 \end{english}
+\fi
+
 
 Если выполнить \verb|@store| после каждого выражения, получим то, что передали
 в \verb|reset!|. Последний случай не бросит исключение, потому что нет
@@ -430,6 +471,22 @@ Clojure предлагает несколько способов менять д
 \noindent
 Пересчёт потребления диска изменится:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(let [{:keys [action size]}
+      (get-file-event)]
+  (case action
+    :delete
+    (swap! usage update :store - size)
+    :create
+    (swap! usage update :store + size)))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (let [{:keys [action size]} (get-file-event)]
@@ -440,6 +497,8 @@ Clojure предлагает несколько способов менять д
     (swap! usage update :store + size)))
   \end{clojure}
 \end{english}
+
+\fi
 
 \index{файлы}
 
@@ -457,6 +516,20 @@ Clojure предлагает несколько способов менять д
 идентификаторов \footurl{\texttt{PID}}{https://en.wikipedia.org/wiki/Process\_identifier}[PID][-9mm]
 \coderef{5}.
 
+\ifx\devicetype\mobile
+\begin{english}
+  \begin{clojure/lines}
+(def usage-all
+  (atom {1005 {:cpu 35
+           :store 63466734
+           :memory 10442856
+           :pids #{6266, 5426,
+                   6542}}}))
+  \end{clojure/lines}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure/lines}
 (def usage-all
@@ -466,14 +539,29 @@ Clojure предлагает несколько способов менять д
                :pids #{6266, 5426, 6542}}}))
   \end{clojure/lines}
 \end{english}
+\fi
+
 
 Чтобы добавить процесс пользователю 1005, выполним \verb|swap!|:
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(swap! usage-all
+  update-in [1005 :pids] conj 9999)
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
 (swap! usage-all update-in [1005 :pids] conj 9999)
   \end{clojure}
 \end{english}
+
+\fi
 
 Это сложная комбинация: в \verb|swap!| передали функцию, которая принимает
 функцию. Разберём по шагам, что произошло.
@@ -501,11 +589,24 @@ Clojure предлагает несколько способов менять д
 \index{clojure.core!get-in}
 \index{clojure.core!update-in}
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(swap! usage-all
+  update-in [1005 :pids] disj 9999)
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (swap! usage-all update-in [1005 :pids] disj 9999)
   \end{clojure}
 \end{english}
+
+\fi
 
 Функция \verb|reset!| нужна, чтобы сбросить атом в исходное состояние. В
 других случаях важно знать текущее значение, чтобы вычислить новое. Поэтому
@@ -559,6 +660,22 @@ Clojure предлагает несколько способов менять д
 Понадобится функция \emph{медленного} сложения. Она принимает текущее значение,
 приращение и время простоя. Для ясности добавим вывод в консоль.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn +slow
+  [num delta timeout]
+  (println
+    (format "Current: %s, timeout: %s"
+      num timeout))
+  (Thread/sleep timeout)
+  (+ num delta))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn +slow
@@ -569,11 +686,26 @@ Clojure предлагает несколько способов менять д
   \end{clojure}
 \end{english}
 
+\fi
+
 \index{clojure.core!future}
 \index{футуры}
 
 Обновим атом одновременно из двух потоков. Для этого вызовем \verb|swap!| в
 футуре. В первой ждём две секунды, во второй~--- пять:
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(do (future (swap! sample update
+              :number +slow 1 2000))
+    (future (swap! sample update
+              :number +slow 2 5000)))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -581,6 +713,8 @@ Clojure предлагает несколько способов менять д
     (future (swap! sample update :number +slow 2 5000)))
   \end{clojure}
 \end{english}
+
+\fi
 
 \noindent
 Проверим атом:
@@ -627,6 +761,22 @@ Current: 1, timeout: 5000 ;; 2
 предположим, что он не может быть отрицательным. Попытка понизить его при нуле
 вызовет исключение:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(def counter (atom 2))
+(set-validator!
+  counter (complement neg?))
+;;repeat 3 times...
+(swap! counter dec)
+;;Execution error (IllegalStateException)
+;;Invalid reference state
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (def counter (atom 2))
@@ -636,6 +786,8 @@ Current: 1, timeout: 5000 ;; 2
 ;; Invalid reference state
   \end{clojure}
 \end{english}
+
+\fi
 
 Вотчеры~--- это побочные эффекты атома. Они срабатывают \emph{после того}, как атом
 перешёл в новое состояние. Вотчер задают уникальным ключом и функцией. Она
@@ -665,6 +817,26 @@ Current: 1, timeout: 5000 ;; 2
 
 \index{синтаксис!\textbf{\_} (затенение)}
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(def STORE_LIMIT (* 1024 1024 1024 25))
+;; 25 Gb
+
+(defn store-watcher
+  [_key _atom _old value]
+  (let [{:keys [store]} value]
+    (when (> store STORE_LIMIT)
+      (log/errorf
+        "Disk usage %s has
+                   reached the limit %s"
+        store STORE_LIMIT))))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (def STORE_LIMIT (* 1024 1024 1024 25)) ;; 25 Gb
@@ -678,7 +850,25 @@ Current: 1, timeout: 5000 ;; 2
   \end{clojure}
 \end{english}
 
+\fi
+
 Добавим атому вотчер с ключом \verb|:watch-store|:
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(def usage
+  (atom {:cpu 35
+         :store 63466734
+         :memory 10442856}))
+
+(add-watch usage
+  :watch-store store-watcher)
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -691,8 +881,22 @@ Current: 1, timeout: 5000 ;; 2
   \end{clojure}
 \end{english}
 
+\fi
+
 \noindent
 Если потребление диска превысит лимит, увидим запись в лог:
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(swap! usage update :store + STORE_LIMIT)
+;; Disk usage 26907012334
+;; has reached the limit 26843545600
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -700,6 +904,8 @@ Current: 1, timeout: 5000 ;; 2
 ;; Disk usage 26907012334 has reached the limit 26843545600
   \end{clojure}
 \end{english}
+
+\fi
 
 Валидацию и вотчеры рассматривают как пре- и постэффекты. Разница в том, что
 первые могут прервать исполнение, а вторые нет. У них разные задачи:
@@ -776,6 +982,27 @@ Current: 1, timeout: 5000 ;; 2
 запросами. На атомах легко сделать счётчики просмотров, сессии, кэш. Счётчик
 просмотра страниц~--- это комбинация атома и middleware:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(def page-counter
+  (atom {"/" 0}))
+
+(defn wrap-page-counter
+  [handler]
+  (fn [request]
+    (let [{:keys [uri request-method]}
+          request]
+      (when (= request-method :get)
+        (swap! page-counter
+          update uri (fnil inc 0)))
+      (handler request))))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (def page-counter
@@ -791,6 +1018,8 @@ Current: 1, timeout: 5000 ;; 2
       (handler request))))
   \end{clojure}
 \end{english}
+
+\fi
 
 \index{HTTP!GET}
 
@@ -808,6 +1037,21 @@ Current: 1, timeout: 5000 ;; 2
 страницу. Для HTML-разметки подойдут библиотека
 \footurl{Hiccup}{https://github.com/weavejester/hiccup}[Hiccup][-10mm] и аналоги.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn component-footer [uri]
+  [:div {:class "footer"}
+   (let [seen (get @page-counter uri 0)]
+     [:p [:small
+          "The page has been seen " seen
+          " time(s)."]])])
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn component-footer [uri]
@@ -816,6 +1060,8 @@ Current: 1, timeout: 5000 ;; 2
      [:p [:small "The page has been seen " seen " time(s)."]])])
   \end{clojure}
 \end{english}
+
+\fi
 
 \subsection{Замечания к атому}
 
@@ -847,6 +1093,25 @@ Current: 1, timeout: 5000 ;; 2
 
 Пример с ресурсами: на этот раз вместо атома используем другой тип хранилища:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(def vusage (volatile! nil))
+(vreset! vusage
+         {:cpu 35
+          :store 63466734
+          :memory 10442856})
+(vswap! vusage
+  update :store + (* 1024 1024 5))
+(println
+  "Disk usage is" (get @vusage :store))
+;; Disk usage is 68709614
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (def vusage (volatile! nil))
@@ -860,8 +1125,27 @@ Current: 1, timeout: 5000 ;; 2
   \end{clojure}
 \end{english}
 
+\fi
+
 \verb|Volatile| отличается от атома тем, что не контролирует запись
 из~нескольких потоков. Перепишем пример с футурами:
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(def vsample (volatile! {:number 0}))
+(do (future (vswap! vsample update
+              :number +slow 1 2000))
+    (future (vswap! vsample update
+              :number +slow 2 5000)))
+;; Current: 0, timeout: 2000
+;; Current: 0, timeout: 5000
+@vsample ;; {:number 2}
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -873,6 +1157,8 @@ Current: 1, timeout: 5000 ;; 2
 @vsample ;; {:number 2}
   \end{clojure}
 \end{english}
+
+\fi
 
 \index{clojure.core!future}
 \index{футуры}
@@ -909,6 +1195,22 @@ Current: 1, timeout: 5000 ;; 2
 Требования насквозь императивны, и выгодно задать их таким же образом. Так мы
 сделаем код ближе к бизнес-логике и облегчим поддержку. Малая часть дерева:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(def data
+  {:items [{:result {:value 74}}
+           {:result {:value 65}}]
+   :records [{:usage 99
+              :date "2018-09-09"}
+             {:usage 52
+              :date "2018-11-05"}]})
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (def data
@@ -919,10 +1221,38 @@ Current: 1, timeout: 5000 ;; 2
   \end{clojure}
 \end{english}
 
+\fi
+
 Код разбивают на блоки, где каждый из них~--- это каскад \verb|when-let|. На
 нижнем уровне мы изменяем коллекцию. Императивный стиль в данном случае удобен:
 если одно из правил станет лишним, блок удаляют. Полезно ставить над блоком
 комментарий или ссылку на документацию:
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(let [result (volatile! [])]
+
+  ;; see section 5.4 from the doc
+  (when-let [a (some-> data
+                       :items
+                       first
+                       :result
+                       :value)]
+    (when-let [b (some-> data
+                       :records
+                       last
+                       :usage)]
+      (when (> a b)
+        (vswap! result conj (* a b)))))
+
+  ;; more blocks...
+  @result)
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -938,6 +1268,8 @@ Current: 1, timeout: 5000 ;; 2
   @result)
   \end{clojure}
 \end{english}
+
+\fi
 
 \section{Переходные коллекции}
 
@@ -1013,6 +1345,21 @@ Current: 1, timeout: 5000 ;; 2
 После \verb|persistent!| коллекцию нельзя изменить. Следующий пример бросит
 исключение:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(let [params* (transient {:a 1})]
+  (assoc! params* :b 2)
+  (persistent! params*)
+  (assoc! params* :c 3))
+;; IllegalAccessError:
+;; Transient used after persistent! call
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (let [params* (transient {:a 1})]
@@ -1023,10 +1370,41 @@ Current: 1, timeout: 5000 ;; 2
   \end{clojure}
 \end{english}
 
+\fi
+
 Форма \verb|(persistent! <data*>)|, как правило, замыкает блок с~изменяемой
 переменной. Переходные коллекции помогают там, где нужен императивный
 подход. Выше мы работали с деревом и \verb|volatile| для сбора данных. Перепишем
 код на транзиентный вектор:
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(let [result* (transient [])
+      push! (fn [item]
+              (conj! result* item))]
+
+  ;; see section 5.4 from the doc:
+  ;; http://...
+  (when-let [a (some-> data
+                       :items
+                       first
+                       :result
+                       :value)]
+    (when-let [b (some-> data
+                       :records
+                       last
+                       :usage)]
+      (when (> a b)
+        (push! (* a b)))))
+
+  ;; more blocks...
+  (persistent! result*))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -1044,6 +1422,8 @@ Current: 1, timeout: 5000 ;; 2
   (persistent! result*))
   \end{clojure}
 \end{english}
+
+\fi
 
 \index{clojure.core!conj"!}
 
@@ -1154,7 +1534,7 @@ Current: 1, timeout: 5000 ;; 2
 обычный \verb|reduce| и его мутабельную версию:
 
 \begin{english}
-
+%% TODO MOBILE
 \noindent
 \begin{tabular}{ @{}p{5cm} @{}p{5cm} }
 
@@ -1262,11 +1642,24 @@ Clojure не поощряет императивный стиль, когда п
 \verb|conn| в модуле базы. Возникает проблема, как задать переменную. Начинающие
 делают это в лоб:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(def server
+  (jetty/run-jetty app {:port 8080}))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (def server (jetty/run-jetty app {:port 8080}))
   \end{clojure}
 \end{english}
+
+\fi
 
 Выражение запустит сервер при загрузке модуля. Это плохая практика, потому что в
 загрузке не должно быть побочных эффектов. С~кодом невозможно работать в REPL:
@@ -1346,6 +1739,23 @@ Clojure намеренно скрывает от нас стадию перем�
 функции. Она принимает текущее значение переменной. Когда это \verb|nil|,
 создаём и возвращаем новый сервер. Если нет, вернём текущий.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn start! []
+  (alter-var-root
+   (var server)
+   (fn [server]
+     (if-not server
+       (run-jetty app {:port 8080
+                       :join? false})
+       server))))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn start! []
@@ -1357,6 +1767,8 @@ Clojure намеренно скрывает от нас стадию перем�
        server))))
   \end{clojure}
 \end{english}
+
+\fi
 
 \noindent
 Аналогично работает \verb|stop!|: если сервер включен (не \verb|nil|),
@@ -1387,12 +1799,26 @@ Clojure намеренно скрывает от нас стадию перем�
 переменную. После запуска к базе посылают запросы. Функции \verb|query|,
 \verb|insert!| и другие из пакета JDBC принимают подключение к базе или пул:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(jdbc/query pool "select * from users")
+(jdbc/insert! pool
+  :users {:name "Ivan"})
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (jdbc/query pool "select * from users")
 (jdbc/insert! pool :users {:name "Ivan"})
   \end{clojure}
 \end{english}
+
+\fi
 
 Функция \verb|stop!| выключает пул, закрывает соединения и выставляет
 \verb|pool| в \verb|nil|. Опустим код этих функций, потому что они
@@ -1484,6 +1910,24 @@ Clojure намеренно скрывает от нас стадию перем�
 а нам нужно расставить их файле. Если ошибку легко исправить, напишем функцию со
 звёздочкой и заменим оригинал:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn read-yaml-tag*
+  "The fixed version of
+  `yamler.tags/read-yaml-tag`."
+  [stream tag]
+  ...)
+
+(alter-var-root
+ (var yamler.tags/read-yaml-tag)
+ (constantly read-yaml-tag*))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn read-yaml-tag*
@@ -1496,6 +1940,8 @@ Clojure намеренно скрывает от нас стадию перем�
  (constantly read-yaml-tag*))
   \end{clojure}
 \end{english}
+
+\fi
 
 В комментарии добавьте ссылку на артефакт (GitHub, Jira). Создайте задачу,
 чтобы удалить патч по выходу новой версии библиотеки.
@@ -1524,6 +1970,23 @@ Clojure намеренно скрывает от нас стадию перем�
 Выполните этот патч один раз в любом месте проекта. Теперь вызов
 \verb|(println data)| напечатает данные, как это делает \verb|pprint|:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(println <vector-of-dicts-of-vectors>)
+
+[{:foo 42
+  :bar [1 2 3 4 5 {:foo 42
+                   :bar [1 2 {#, #}]}]}
+ {:foo 42
+  :bar [1 2 {:foo 42
+             :bar [1 2 {#, #}]}]}]
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (println <vector-of-dicts-of-vectors>)
@@ -1532,6 +1995,8 @@ Clojure намеренно скрывает от нас стадию перем�
  {:foo 42, :bar [1 2 {:foo 42, :bar [1 2 {#, #}]}]}]
   \end{clojure}
 \end{english}
+
+\fi
 
 Функция заменит вложенные участки на символ \verb|#|, чтобы не обрушить на
 вас лавину данных. Глубину и длину печати задают особые переменные. Позже мы
@@ -1554,6 +2019,27 @@ Clojure намеренно скрывает от нас стадию перем�
 нам. Функция не вываливает стек-трейс на весь экран, а обходит цепочку. Для
 каждого звена она выводит класс, сообщение и контекст:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn ex-print
+  [^Throwable e]
+  (let [indent "  "]
+    (doseq [e (ex-chain e)]
+      (println (-> e
+                   class
+                   .getCanonicalName))
+      (print indent)
+      (println (ex-message e))
+      (when-let [data (ex-data e)]
+        (print indent)
+        (clojure.pprint/pprint data)))))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn ex-print
@@ -1568,6 +2054,8 @@ Clojure намеренно скрывает от нас стадию перем�
         (clojure.pprint/pprint data)))))
   \end{clojure}
 \end{english}
+
+\fi
 
 \noindent
 Минус в том, что вместо \verb|(log/error e)| приходится писать:
@@ -1596,11 +2084,24 @@ Clojure намеренно скрывает от нас стадию перем�
 бутылочное горлышко, через которое проходят все логи. Вот как выглядит её
 сигнатура:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn log*
+  [logger level throwable message])
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn log* [logger level throwable message])
   \end{clojure}
 \end{english}
+
+\fi
 
 Параметр \verb|throwable|~--- это исключение или \verb|nil|. Подменим
 \verb|log*| на анонимную функцию со следующей логикой:
@@ -1629,6 +2130,32 @@ Clojure намеренно скрывает от нас стадию перем�
 
 \index{функции!install-better-logging}
 
+\ifx\devicetype\mobile
+%% TODO code line ref
+\begin{english}
+  \begin{clojure/lines}
+(defn install-better-logging []
+  (alter-var-root
+   (var clojure.tools.logging/log*)
+   (fn [log*] ;; origin function
+     (fn [logger level
+          throwable message]
+       (if throwable
+         (let [ex-out (with-out-str
+                        (ex-print
+                          throwable))
+               message* (str message
+                          \newline
+                          ex-out)]
+           (log* logger
+             level nil message*))
+           (log* logger level
+             throwable message))))))
+  \end{clojure/lines}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure/lines}
 (defn install-better-logging []
@@ -1643,6 +2170,8 @@ Clojure намеренно скрывает от нас стадию перем�
          (log* logger level throwable message))))))
   \end{clojure/lines}
 \end{english}
+
+\fi
 
 Хитрость кроется в параметре \verb|log*| \coderef{4}. Анонимная функция в
 \verb|alter-var-root| принимает текущее значение переменной. Это исходная
@@ -1715,7 +2244,7 @@ Clojure намеренно скрывает от нас стадию перем�
 Вывод с различными значениями \verb|*print-level*|:
 
 \begin{english}
-
+%% TODO MOBILE
 \noindent
 \begin{tabular}{ @{}p{5cm} @{}p{5cm} }
 
@@ -1785,6 +2314,20 @@ Clojure намеренно скрывает от нас стадию перем�
 Эти и другие переменные изменяют формой \verb|set!|. Рассмотрим несколько
 примеров. Показать предупреждения, если компилятор не вывел тип:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(set! *warn-on-reflection* true)
+(def ms (System/currentTimeMillis))
+
+(.toString ms) ;; reflection warning
+(.toString ^Long ms) ;; no warning
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (set! *warn-on-reflection* true)
@@ -1794,6 +2337,8 @@ Clojure намеренно скрывает от нас стадию перем�
 (.toString ^Long ms) ;; no warning
   \end{clojure}
 \end{english}
+
+\fi
 
 \noindent
 Отключить формы \verb|assert|. Ложные выражения не вызовут ошибку:
@@ -1843,6 +2388,22 @@ Clojure намеренно скрывает от нас стадию перем�
 задаём разные переменные в зависимости от режима разработки (\verb|dev|) или
 сборки (\verb|uberjar|).
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+{:profiles
+ :dev {:global-vars
+       {*warn-on-reflection* true
+        *assert* true}}
+ :uberjar {:global-vars
+           {*warn-on-reflection* false
+            *assert* false}}}
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 {:profiles
@@ -1852,6 +2413,8 @@ Clojure намеренно скрывает от нас стадию перем�
                          *assert* false}}}
   \end{clojure}
 \end{english}
+
+\fi
 
 Внутри \verb|binding| форма \verb|set!| работает как оператор
 присваивания. Переменная должна быть динамической:
@@ -1876,6 +2439,20 @@ Clojure намеренно скрывает от нас стадию перем�
 За пределами \verb|binding| вызов \verb|set!| обернётся ошибкой, даже если
 переменная с~<<ушками>>:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(def ^:dynaimc *data* nil)
+
+(set! *data* {:user 1})
+;; Unhandled
+;; java.lang.IllegalStateException
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (def ^:dynaimc *data* nil)
@@ -1885,6 +2462,8 @@ Clojure намеренно скрывает от нас стадию перем�
 ;; Can't change/establish root binding of: *data* with set
   \end{clojure}
 \end{english}
+
+\fi
 
 \section{Изменения в контексте}
 
@@ -1958,6 +2537,18 @@ Clojure предлагает несколько форм, чтобы выпол�
 динамическая, компилятор скажет о расхождении. Сами по себе <<ушки>> не делают
 переменную динамической, это просто соглашение.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(def *server* nil)
+;; Warning: *server* not declared dynamic
+;; and thus [...]
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (def *server* nil)
@@ -1966,8 +2557,25 @@ Clojure предлагает несколько форм, чтобы выпол�
   \end{clojure}
 \end{english}
 
+\fi
+
 \noindent
 Если переменная не динамическая, \verb|binding| бросит исключение:
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(binding [*server* {:port 8080}]
+  (println *server*))
+;; Execution error
+;; (IllegalStateException)
+;; Can't dynamically bind
+;; non-dynamic var: *server*
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -1977,6 +2585,8 @@ Clojure предлагает несколько форм, чтобы выпол�
 ;; Can't dynamically bind non-dynamic var: *server*
   \end{clojure}
 \end{english}
+
+\fi
 
 \subsection{Отказ от set!}
 
@@ -2001,6 +2611,20 @@ Clojure предлагает несколько форм, чтобы выпол�
 Код ниже избавлен от недостатков. Вне \verb|binding| переменные получат
 прежние значения, а соседние потоки ничего не заметят.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(binding [*print-level* 8
+          *print-length* 4]
+  (println
+    {:foo {:bar {:baz (repeat 1)}}}))
+;; {:foo {:bar {:baz (1 1 1 1 ...)}}}
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (binding [*print-level* 8
@@ -2009,6 +2633,8 @@ Clojure предлагает несколько форм, чтобы выпол�
 ;; {:foo {:bar {:baz (1 1 1 1 ...)}}}
   \end{clojure}
 \end{english}
+
+\fi
 
 \index{clojure.core!*out*}
 \index{классы!Writer}
@@ -2046,11 +2672,24 @@ Clojure предлагает несколько форм, чтобы выпол�
 \noindent
 Сброс данных в файл:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(dump-data "sample.edn"
+  {:foo [1 2 3 {:foo [1 2 3]}]})
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (dump-data "sample.edn" {:foo [1 2 3 {:foo [1 2 3]}]})
   \end{clojure}
 \end{english}
+
+\fi
 
 \noindent
 и восстановление:
@@ -2093,6 +2732,23 @@ Clojure предлагает несколько форм, чтобы выпол�
 и тегу библиотека ищет перевод в словаре (или <<совершает lookup>>). Напишем
 наивный подход на Clojure:
 
+\ifx\devicetype\mobile
+
+%% \begin{english}
+  \begin{clojure}
+(def tr-map
+  {:en {:ui/add-to-cart "Add to Cart"}
+   :ru {:ui/add-to-cart
+        "Добавить в корзину"}})
+
+(defn tr [locale tag]
+  (or (get-in tr-map [locale tag])
+      (format "<%s%s>" locale tag)))
+  \end{clojure}
+%% \end{english}
+
+\else
+
 %% \begin{english}
   \begin{clojure}
 (def tr-map
@@ -2104,6 +2760,8 @@ Clojure предлагает несколько форм, чтобы выпол�
       (format "<%s%s>" locale tag)))
   \end{clojure}
 %% \end{english}
+
+\fi
 
 \index{локализация}
 
@@ -2158,6 +2816,23 @@ Clojure предлагает несколько форм, чтобы выпол�
 Фильтром может быть любая функция, в том числе \verb|tr|. Хотелось бы,
 чтобы шаблон выглядел как можно проще:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{htmldjango}
+<div class="widget">
+  <a href="/login">
+    {{ "ui/log-in"|tr }}
+  </a>
+  <a href="/help">
+    {{ "ui/help"|tr }}
+  </a>
+</div>
+  \end{htmldjango}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{htmldjango}
 <div class="widget">
@@ -2166,6 +2841,8 @@ Clojure предлагает несколько форм, чтобы выпол�
 </div>
   \end{htmldjango}
 \end{english}
+
+\fi
 
 Фильтр \verb|tr|~--- это функция одной переменной. Она принимает строку тега и
 возвращает перевод. Очевидно, локаль должна быть известна заранее. Сделаем так,
@@ -2204,7 +2881,7 @@ Clojure предлагает несколько форм, чтобы выпол�
 \end{english}
 
 \index{middleware!wrap-locale}
-
+%% TODO MOBILE
 %% \begin{english}
 
 \noindent
@@ -2232,6 +2909,26 @@ Clojure предлагает несколько форм, чтобы выпол�
 параметр \verb|lang| из адресной строки. Если параметра нет, берём локаль по
 умолчанию. Код ниже по стеку обёрнут в макрос \verb|with-locale|:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn request->locale [request]
+  (let [lang (get-in request
+               [:params "lang"])]
+    (keyword
+      (get #{"en" "ru"} lang "en"))))
+
+(defn wrap-locale [handler]
+  (fn [request]
+    (with-locale
+      (request->locale request)
+      (handler request))))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn request->locale [request]
@@ -2245,10 +2942,27 @@ Clojure предлагает несколько форм, чтобы выпол�
   \end{clojure}
 \end{english}
 
+\fi
+
 Напишем фильтр \verb|tr| для шаблонов. В Selmer нельзя указать кейворд,
 поэтому вместо \verb|{{ :ui/sign-in }}| пишут \verb|{{ "ui/sign-in"}}|.
 Фильтр \verb|tr| переводит строку в тег, а затем ищет по нему
 перевод. Функция \verb|add-filter!| добавляет \verb|tr| в регистр фильтров.
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(require
+ '[selmer.filters :refer [add-filter!]])
+
+(add-filter! :tr
+ (fn [line]
+   (-> line keyword tr)))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -2259,6 +2973,8 @@ Clojure предлагает несколько форм, чтобы выпол�
    (-> line keyword tr)))
   \end{clojure}
 \end{english}
+
+\fi
 
 Теперь нам не важен источник локали в переводах. В любой момент мы изменим код
 \verb|with-locale| и \verb|wrap-locale|, но это не отразится на
@@ -2336,6 +3052,21 @@ Clojure предлагает несколько форм, чтобы выпол�
 новый словарь, а комбинация \verb|var-set| и \verb|var-get| выглядит
 неуклюже:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(with-local-vars [user {:name "Ivan"}]
+  ;; won't work
+  ;; (var-set user assoc :age 33)
+  ;; ugly
+  (var-set user (assoc @user :age 33))
+  @user)
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (with-local-vars [user {:name "Ivan"}]
@@ -2344,6 +3075,8 @@ Clojure предлагает несколько форм, чтобы выпол�
   @user)
   \end{clojure}
 \end{english}
+
+\fi
 
 Макрос \verb|with-local-vars| полезен, когда логика завязана на простых типах
 (числах, строках). На локальных переменных удобно писать конечные автоматы и
@@ -2388,6 +3121,20 @@ Clojure предлагает несколько форм, чтобы выпол�
 
 \index{clojure.core!constantly}
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(with-redefs
+  [println (constantly
+             (print "fake print"))]
+  @(future (println 42)))
+;; fake print
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (with-redefs
@@ -2396,6 +3143,8 @@ Clojure предлагает несколько форм, чтобы выпол�
 ;; fake print
   \end{clojure}
 \end{english}
+
+\fi
 
 Это произошло потому, что \verb|with-redefs| повлиял в том числе и на тот
 поток, в котором исполнитель обработал задачу.
@@ -2434,6 +3183,23 @@ Clojure предлагает несколько форм, чтобы выпол�
 словарь с ключами \verb|:title|, \verb|:country|, \verb|:image_url| и
 другими. Обработчик запроса:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn location-handler [request]
+  (let [{:keys [params]} request
+        point (select-keys params
+                [:lat :lon])
+        place (geo/place-info point)]
+    (db/create-location
+      (merge place point))
+    {:status 200 :body "OK"}))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn location-handler [request]
@@ -2444,6 +3210,8 @@ Clojure предлагает несколько форм, чтобы выпол�
     {:status 200 :body "OK"}))
   \end{clojure}
 \end{english}
+
+\fi
 
 Во время поиска мобильное приложение ждёт ответа. С машинной точки зрения это
 долго, ведь сеть не гарантирует мгновенный отклик. Чем больше клиентов шлют
@@ -2461,6 +3229,26 @@ Clojure предлагает несколько форм, чтобы выпол�
 \verb|id| новой записи. Ключ нужен, чтобы позже обновить локацию данными о
 месте. Поиск данных и запись в базу протекают в~футуре.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn location-handler
+  [request]
+  (let [{:keys [params]} request
+        point (select-keys params
+                [:lat :lon])
+        row-id (db/create-point point)]
+    (future
+      (let [place (geo/place-info
+                    point)]
+        (db/update-place row-id place)))
+    {:status 200 :body "OK"}))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn location-handler
@@ -2474,6 +3262,8 @@ Clojure предлагает несколько форм, чтобы выпол�
     {:status 200 :body "OK"}))
   \end{clojure}
 \end{english}
+
+\fi
 
 Возможны и другие варианты, например фоновый обработчик или очередь задач. Но
 они дольше в реализации, а футура займёт пару строк. Это дешёвое решение,
@@ -2507,6 +3297,33 @@ Clojure предлагает несколько форм, чтобы выпол�
 положительный. Чтобы убедиться, что футура записала данные в базу, мы ждём
 и~читаем последнюю локацию. В~ней должны быть значения из геопоиска.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(deftest test-place-ok
+  (with-place-info
+    {:title "test_title"
+     :country "test_country"}
+    (let [request {:params
+                   {:lat 11.111
+                    :lon 22.222}}
+          {:keys [status]}
+          (location-handler request)]
+      (is (= 200 status))
+      (Thread/sleep 100)
+      (let [location
+            (db/get-last-location)
+            {:keys [title country]}
+            location]
+        (is (= "test_title" title))
+        (is (= "test_country"
+               country))))))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (deftest test-place-ok
@@ -2524,10 +3341,27 @@ Clojure предлагает несколько форм, чтобы выпол�
   \end{clojure}
 \end{english}
 
+\fi
+
 \index{HTTP!429}
 
 Негативный сценарий: пусть геопоиск бросит исключение с кодом 429. Это
 возможно, если превышен лимит на число запросов. Объявим исключение:
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(def ex-quota
+  (ex-info
+    "The limit of requests has been
+                                reached"
+    {:status 429
+     :body {:code :QUOTA_REACHED}}))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -2537,9 +3371,34 @@ Clojure предлагает несколько форм, чтобы выпол�
   \end{clojure}
 \end{english}
 
+\fi
+
 \noindent
 Проверим, что приложение вернёт положительный статус, но в базе нет данных о
 месте, потому что запрос геопоиску не прошёл.
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(deftest test-place-quota-reached
+  (with-place-info (throw ex-quota)
+  (let [request {:params {:lat 11.111
+                          :lon 22.222}}
+        {:keys [status body]}
+        (location-handler request)]
+      (is (= 200 status))
+      (Thread/sleep 100)
+      (let [location
+            (db/get-last-location)
+            {:keys [title country]}
+            location]
+        (is (nil? title))
+        (is (nil? country))))))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -2556,12 +3415,28 @@ Clojure предлагает несколько форм, чтобы выпол�
   \end{clojure}
 \end{english}
 
+\fi
+
 С помощью \verb|with-place-info| можно спровоцировать любое исключение. Приём
 полезен, когда \verb|catch| ожидает конкретные классы. Следующий тест имитирует
 сбой в сети. Если в приложении особая реакция на исключение, тест зафиксирует
 это. Правки в коде станут невозможны без изменений в тестах.
 
 \index{тесты!ошибки}
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(deftest test-place-conn-err
+  (with-place-info
+    (throw (new java.net.ConnectException
+             "test_timeout"))
+    ...))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -2571,6 +3446,8 @@ Clojure предлагает несколько форм, чтобы выпол�
     ...))
   \end{clojure}
 \end{english}
+
+\fi
 
 \index{моки}
 
@@ -2591,6 +3468,20 @@ Clojure предлагает несколько форм, чтобы выпол�
 Перепишем пример с \verb|geo/place-info| на \verb|with-redefs-fn|. Напомним, что
 запись \verb|#'<something>| означает \verb|(var <something>)|:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(with-redefs-fn
+  {#'geo/place-info (fn [point]
+                      {:title "test"})}
+  (fn []
+    (geo/place-info {:lat 1 :lon 2})))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (with-redefs-fn
@@ -2600,6 +3491,8 @@ Clojure предлагает несколько форм, чтобы выпол�
   \end{clojure}
 \end{english}
 
+\fi
+
 \index{синтаксис!\texttt{\#} (решётка)}
 
 \verb|With-redefs-fn|~--- это именно функция, поэтому она не может принять
@@ -2607,6 +3500,21 @@ Clojure предлагает несколько форм, чтобы выпол�
 функцию без аргументов. Если код~--- это одна большая форма (\verb|let| или
 \verb|do|), необязательно заключать её в \verb|(fn [])|. Поставьте спереди
 знак \verb|#|, чтобы превратить форму в анонимную функцию.
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(with-redefs-fn
+  {#'geo/place-info (fn [point]
+                      {:title "test"})}
+  #(let [point {:lat 1 :lon 2}
+         place (geo/place-info point)]
+     ...))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -2617,6 +3525,8 @@ Clojure предлагает несколько форм, чтобы выпол�
      ...))
   \end{clojure}
 \end{english}
+
+\fi
 
 Функция \verb|with-redefs-fn| выглядит непривычно из-за словаря и~символов
 \verb|#'|. Она не похожа на \verb|let|, \verb|binding| и другие формы
