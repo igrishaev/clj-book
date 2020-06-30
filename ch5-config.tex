@@ -219,6 +219,24 @@ Clojure и у DevOps уже написаны скрипты на Python для �
 
 \index{функции!exit}
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn exit
+  [code template & args]
+  (let [out (if (zero? code)
+              *out*
+              *err*)]
+    (binding [*out* out]
+      (println (apply format
+        template args))))
+  (System/exit code))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn exit
@@ -229,6 +247,8 @@ Clojure и у DevOps уже написаны скрипты на Python для �
   (System/exit code))
   \end{clojure}
 \end{english}
+
+\fi
 
 Переходим к загрузчику. Это набор шагов, каждый из которых принимает результат
 предыдущего. Логику каждого легко понять по имени. Вывод типов и валидацию
@@ -253,6 +273,25 @@ Clojure и у DevOps уже написаны скрипты на Python для �
 
 \index{файлы}
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(import 'java.io.File)
+
+(defn get-config-path []
+  (if-let [filepath (System/getenv
+                      "CONFIG_PATH")]
+    (if (-> filepath (new File) .exists)
+      filepath
+      (exit 1 "File %s does not exist"
+        filepath))
+    (exit 1 "File path is not set")))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (import 'java.io.File)
@@ -266,12 +305,36 @@ Clojure и у DevOps уже написаны скрипты на Python для �
   \end{clojure}
 \end{english}
 
+\fi
+
 Шаг \verb|read-config-file| читает файл по его пути. Для разбора JSON служит
 библиотека Cheshire. Функция \verb|parse-string| вернёт данные из
 строки документа.
 
 \index{библиотеки!Cheshire}
 \index{модули!cheshire.core}
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(require '[cheshire.core :as json])
+
+(defn read-config-file
+  [filepath]
+  (try
+    (-> filepath
+        slurp
+        (json/parse-string true))
+    (catch Exception e
+      (exit 1
+        "Malformed config,
+                   file: %s, error: %s"
+            filepath (ex-message e)))))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -282,10 +345,12 @@ Clojure и у DevOps уже написаны скрипты на Python для �
   (try
     (-> filepath slurp (json/parse-string true))
     (catch Exception e
-      (exit 1 "Malformed config, file: %s, error:"
+      (exit 1 "Malformed config, file: %s, error: %s"
             filepath (ex-message e)))))
   \end{clojure}
 \end{english}
+
+\fi
 
 \index{валидация}
 \index{вывод!типов}
@@ -302,6 +367,34 @@ Clojure и у DevOps уже написаны скрипты на Python для �
 программу. Для отчёта возьмём библиотеку Expound. Функция \verb|s/invalid?|~--- это
 быстрая проверка на \emph{идентичность} кейворду \verb|::s/invalid|. В отличие
 от равенства, идентичность работает быстрее.
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(require '[clojure.spec.alpha :as s])
+(require '[expound.alpha :as expound])
+
+(defn coerce-config [config]
+  (let [[e result] (pcall s/conform
+                     ::config config)]
+    (cond
+      (some? e)
+      (exit 1 "Wrong config values: %s"
+        (ex-message e))
+
+      (s/invalid? result)
+      (let [report (expound/expound-str
+                     ::config config)]
+        (exit 1
+          "Invalid config values: %s %s"
+          \newline report))
+
+      :else result)))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -321,6 +414,8 @@ Clojure и у DevOps уже написаны скрипты на Python для �
       :else result)))
   \end{clojure}
 \end{english}
+
+\fi
 
 Не хватает спеки. Откроем конфигурацию и изучим её структуру:
 
@@ -347,12 +442,26 @@ Clojure и у DevOps уже написаны скрипты на Python для �
 \noindent
 Опишем спеку сверху вниз. Это словарь с ключами:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(s/def ::config
+  (s/keys :req-un [::server_port
+                   ::db ::event]))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (s/def ::config
   (s/keys :req-un [::server_port ::db ::event]))
   \end{clojure}
 \end{english}
+
+\fi
 
 \index{даты!диапазон}
 
@@ -426,6 +535,20 @@ Clojure и у DevOps уже написаны скрипты на Python для �
 
 \index{функции!read-instant-date}
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(require '[clojure.instant :as inst])
+
+(s/def ::->date
+  (s/and ::ne-string
+    (s/conformer read-instant-date)))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (require '[clojure.instant :as inst])
@@ -434,6 +557,8 @@ Clojure и у DevOps уже написаны скрипты на Python для �
   (s/and ::ne-string (s/conformer read-instant-date)))
   \end{clojure}
 \end{english}
+
+\fi
 
 \index{классы!Date}
 \index{clojure.core!compare}
@@ -459,6 +584,21 @@ Clojure и у DevOps уже написаны скрипты на Python для �
 
 \index{clojure.core!alter-var-root}
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(def CONFIG nil)
+
+(defn set-config!
+  [config]
+  (alter-var-root (var CONFIG)
+    (constantly config)))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (def CONFIG nil)
@@ -469,12 +609,32 @@ Clojure и у DevOps уже написаны скрипты на Python для �
   \end{clojure}
 \end{english}
 
+\fi
+
 На старте программы выполните \verb|(load-config!)|, чтобы в переменной
 появилась конфигурация. Другие модули импортируют \verb|CONFIG| и читают
 нужные им ключи. Вот как запустить сервер или выполнить запрос с учётом
 конфигурации:
 
 \index{JDBC!query}
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(require
+  '[project.config :refer [CONFIG]])
+
+(jetty/run-jetty app
+  {:port (:server_port CONFIG)
+   :join? false})
+
+(jdbc/query (:db CONFIG)
+  "select * from users")
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -486,6 +646,8 @@ Clojure и у DevOps уже написаны скрипты на Python для �
 (jdbc/query (:db CONFIG) "select * from users")
   \end{clojure}
 \end{english}
+
+\fi
 
 \subsection{Работа над ошибками}
 
@@ -509,6 +671,25 @@ REPL. В~\verb|CONFIG| появится новая конфигурация.
 подмены \verb|exit|. Функция ниже не завершит JVM, а только бросит исключение
 с текстом, который передали в \verb|exit|:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn load-config-repl! []
+  (with-redefs
+    [exit
+     (fn [_ template & args]
+       (let [^String message
+             (apply format
+               template args)]
+         (throw
+           (new Exception message))))]
+    (load-config!)))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn load-config-repl! []
@@ -520,6 +701,8 @@ REPL. В~\verb|CONFIG| появится новая конфигурация.
     (load-config!)))
   \end{clojure}
 \end{english}
+
+\fi
 
 \index{die-fn}
 \index{функция смерти}
@@ -668,11 +851,24 @@ BAR=99
 \verb|PGUSER| и другие. У переменных среды выше приоритет, чем у параметров
 \verb|--host|, \verb|--user| и аналогов. Если в текущем шелле выполнить:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{bash}
+$ export PGHOST=host.com \
+    PGDATABASE=project,
+  \end{bash}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{bash}
 $ export PGHOST=host.com PGDATABASE=project,
   \end{bash}
 \end{english}
+
+\fi
 
 \noindent
 то каждая утилита PostgreSQL сработает на заданном сервере и базе. Это удобно
@@ -788,7 +984,7 @@ for (env, fn) in env_mapping.iteritems():
 
 \index{вложенность}
 \index{коллекции!вложенность}
-
+%% TODO MOBILE
 \begin{english}
 
 \noindent
@@ -817,7 +1013,7 @@ for (env, fn) in env_mapping.iteritems():
 В разных системах вложенные переменные читают по-разному. Например, одинарное
 подчёркивание разделяет лексемы, но не меняет структуру. Двойное подчёркивание
 означает вложенность:
-
+%% TODO MOBILE
 \begin{english}
 
 \noindent
@@ -999,6 +1195,24 @@ Clojure~--- это гостевая платформа, поэтому язык 
 Статический метод \verb|getenv| вернёт либо одну переменную по имени, либо
 весь словарь, если имя не указали.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+;; a single variable
+(System/getenv "HOME")
+"/Users/ivan"
+
+;; all variables
+(System/getenv)
+;; truncated
+{"JAVA_ARCH" "x86_64",
+ "LANG" "en_US.UTF-8"}
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 ;; a single variable
@@ -1010,6 +1224,8 @@ Clojure~--- это гостевая платформа, поэтому язык 
 {"JAVA_ARCH" "x86_64", "LANG" "en_US.UTF-8"} ;; truncated
   \end{clojure}
 \end{english}
+
+\fi
 
 Во втором случае получили не Clojure-, а Java-коллекцию. Это неизменяемая версия
 \verb|Map|, поэтому переменные нельзя изменить после запуска JVM.
@@ -1142,6 +1358,27 @@ Clojure~--- это гостевая платформа, поэтому язык 
 
 \index{spec!spec\arr{}keys}
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn spec->keys
+  [spec-keys]
+  (let [form (s/form spec-keys)
+        params (apply hash-map
+                 (rest form))
+        {:keys [req opt req-un opt-un]}
+        params
+        ->unqualify (comp keyword name)]
+    (concat req
+            opt
+            (map ->unqualify opt-un)
+            (map ->unqualify req-un))))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn spec->keys
@@ -1156,6 +1393,8 @@ Clojure~--- это гостевая платформа, поэтому язык 
             (map ->unqualify req-un))))
   \end{clojure}
 \end{english}
+
+\fi
 
 \noindent
 Проверим спеку загрузчика. Действительно, получим три ключа:
@@ -1287,6 +1526,24 @@ $ lein repl
 
 Код ниже вернёт параметры по группам, как и задумано. Приведём их подмножество:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(-> (System/getenv)
+    (remap-env-nest)
+    (select-keys [:db :http]))
+
+{:db {:user "ivan"
+      :pass "****"
+      :name "book"}
+ :http {:port "8080"
+        :host "api.random.com"}}
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (-> (System/getenv)
@@ -1297,6 +1554,8 @@ $ lein repl
  :http {:port "8080", :host "api.random.com"}}
   \end{clojure}
 \end{english}
+
+\fi
 
 \noindent
 Дальше действуем как обычно: пишем спеку, выводим типы из строк и так далее.
@@ -1414,11 +1673,24 @@ $ cat config.tpl.json | envsubst
 \ref{fig:json-render}). Чтобы записать результат в~файл, добавьте в конец
 оператор вывода:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{bash}
+$ cat config.tpl.json |
+    envsubst > config.ready.json
+  \end{bash}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{bash}
 $ cat config.tpl.json | envsubst > config.ready.json
   \end{bash}
 \end{english}
+
+\fi
 
 Способ с \verb|envsubst| на первый взгляд примитивен, но полезен на
 практике. Шаблон снимает вопрос о структуре: переменные становятся в нужное
@@ -1445,6 +1717,20 @@ $ cat config.tpl.json | envsubst > config.ready.json
 а имя переменной, например \verb|"DB_PASS"|. Напишем спеку, которая выводит
 значение переменной по имени:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(s/def ::->env
+  (s/conformer
+   (fn [varname]
+     (or (System/getenv varname)
+         ::s/invalid))))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (s/def ::->env
@@ -1453,6 +1739,8 @@ $ cat config.tpl.json | envsubst > config.ready.json
      (or (System/getenv varname) ::s/invalid))))
   \end{clojure}
 \end{english}
+
+\fi
 
 Если переменную не задали, вывод вернёт ошибку. Для большего контроля
 отбросим пробелы по краям и убедимся, что строка не пустая.
@@ -1501,6 +1789,26 @@ DB_PASS='*(&fd}A53z#$!' lein repl
 Добавим тег \verb|#env|, который вернёт значение переменной по имени. Имя
 может быть строкой или символом. Определим функцию:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn tag-env
+  [varname]
+  (cond
+    (symbol? varname)
+    (System/getenv (name varname))
+    (string? varname)
+    (System/getenv varname)
+    :else
+    (throw
+      (new Exception
+        "Wrong variable type"))))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn tag-env
@@ -1515,8 +1823,25 @@ DB_PASS='*(&fd}A53z#$!' lein repl
   \end{clojure}
 \end{english}
 
+\fi
+
 \noindent
 Прочитаем EDN-строку с новым тегом:
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(require '[clojure.edn :as edn])
+
+(edn/read-string
+  {:readers {'env tag-env}}
+  "{:db-password #env DB_PASS}")
+;; {:db-password "*(&fd}A53z#$!"}
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -1527,6 +1852,8 @@ DB_PASS='*(&fd}A53z#$!' lein repl
 ;; {:db-password "*(&fd}A53z#$!"}
   \end{clojure}
 \end{english}
+
+\fi
 
 Чтобы не передавать теги каждый раз, подготовим \verb|partial| от
 \verb|edn/read-string|. Новая функция принимает только строку:
@@ -1575,6 +1902,24 @@ db:
 
 Подключим библиотеку и прочитаем файл. На месте тегов получим значения среды:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(require '[yummy.config :as yummy])
+(yummy/load-config
+  {:path "config.yaml"})
+
+{:server_port 8080
+ :db {:dbtype "mysql"
+      :dbname "book"
+      :user "ivan"
+      :password "*(&fd}A53z#$!"}}
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (require '[yummy.config :as yummy])
@@ -1587,6 +1932,8 @@ db:
       :password "*(&fd}A53z#$!"}}
   \end{clojure}
 \end{english}
+\fi
+
 
 \noindent
 Мы подробно рассмотрим Yummy в следующем разделе главы.
@@ -1640,6 +1987,20 @@ PostgreSQL или Nginx~--- больше половины файла заним�
 Разработчики придумали уловки, чтобы обойти ограничение. Например, поставить
 одноимённое поле перед тем, к которому относится комментарий:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{json}
+{
+    "server_port":
+    "A port for the HTTP server.",
+    "server_port": 8080
+}
+  \end{json}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{json}
 {
@@ -1648,6 +2009,8 @@ PostgreSQL или Nginx~--- больше половины файла заним�
 }
   \end{json}
 \end{english}
+\fi
+
 
 Расчёт сделан на то, что библиотека обходит поля по очереди и~второе поле
 заменит первое. Стандарт JSON ничего не говорит о~порядке полей; приём остаётся
@@ -1680,6 +2043,7 @@ JSON выгодно отличается от многословного XML, к
 \begin{english}
 
 \noindent
+%% TODO MOBILE
 \begin{tabular}{ @{}p{6cm} @{}p{4cm} }
 
   \begin{json}
@@ -1756,6 +2120,24 @@ YAML-файлов.
 
 \begin{listing}[ht!]
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{yaml}
+description: |
+  To solve the problem,
+  please do the following:
+
+  - Press Control + Alt + Delete;
+  - Turn off your computer;
+  - Walk for a while.
+
+  Then try again.
+  \end{yaml}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{yaml}
 description: |
@@ -1768,6 +2150,8 @@ description: |
   Then try again.
   \end{yaml}
 \end{english}
+
+\fi
 
 \caption{Сообщение из нескольких строк в YAML}
 \label{fig:yaml-multi-line}
@@ -1798,6 +2182,19 @@ phrases:
 Из-за двоеточия в последней строке парсер решит, что это вложенный
 словарь. Получим неверную структуру:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+{:phrases
+ ["Welcome!"
+  "See you soon!"
+  {:Warning "wrong email address."}]}
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 {:phrases ["Welcome!"
@@ -1805,6 +2202,8 @@ phrases:
            {:Warning "wrong email address."}]}
   \end{clojure}
 \end{english}
+
+\fi
 
 Другие примеры: версия продукта \verb|3.3|~--- это число, но \verb|3.3.1|~---
 строка. Телефон \verb|+79625241745|~--- это число, потому что знак плюса считается
@@ -1840,6 +2239,26 @@ EDN предлагает списки и~множества. Словари мо
 
 Пример с разными типами, коллекциями и тегами:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+{:user/banned? false
+ :task-state
+ #{:pending :in-progress :done}
+ :account-ids
+ [1001 1002 1003 nil]
+ :server
+ {:host "127.0.0.1" :port 8080}
+ :date-range
+ [#inst "2019-07-01" #inst "2019-07-31"]
+ :cassandra-id #uuid
+ "26577362-902e-49e3-83fb-9106be7f60e1"}
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 {:user/banned? false
@@ -1850,6 +2269,8 @@ EDN предлагает списки и~множества. Словари мо
  :cassandra-id #uuid "26577362-902e-49e3-83fb-9106be7f60e1"}
   \end{clojure}
 \end{english}
+
+\fi
 
 Данные в EDN не отличаются от кода. Если скопировать их в REPL или модуль,
 компилятор выполнит их. И наоборот: вывод REPL можно записать в файл для
@@ -1942,11 +2363,25 @@ property-файлу, и загружает его.
 \index{JVM!Jar}
 \index{JVM!properties}
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{bash}
+$ java \
+   -Dconf="/path/to/config.properties" \
+   -jar project.jar
+  \end{bash}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{bash}
 $ java -Dconf="/path/to/config.properties" -jar project.jar
   \end{bash}
 \end{english}
+
+\fi
 
 Файлы \verb|.properties|~--- это пары \verb|поле=значение|, по одной на
 строку. Поля похожи на домены: это лексемы, разделённые точкой. Лексемы убывают
@@ -1996,6 +2431,27 @@ property-файл и так далее. Легко построить такую
 Ключ \verb|:merge| объединяет конфигурацию с любым источником. В~нём
 следуют выражения, которые вернут словарь. Уберпример из документации:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(load-config
+ :resource "path/within/classpath/to.edn"
+ :file "/path/to/some.edn"
+ :merge
+ [{:datomic {:url "datomic:mem://test"}}
+  (from-file "/path/to/another.edn")
+  (from-resource
+  "path/within/classpath/to-another.edn")
+  (from-props-file
+   "/path/to/some.properties")
+  (from-system-props)
+  (from-env)])
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (load-config
@@ -2009,6 +2465,8 @@ property-файл и так далее. Легко построить такую
          (from-env)])
   \end{clojure}
 \end{english}
+
+\fi
 
 Чтобы отследить загрузку, установите переменную среды \verb|DEBUG=y|. С~ней
 Cprop выводит служебную информацию: список источников, порядок загрузки,
@@ -2036,6 +2494,22 @@ EDN. Библиотека предлагает теги, с которыми ф�
 
 Функция \verb|read-config| читает файл или ресурс EDN:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(require
+  '[aero.core :refer (read-config)])
+
+(read-config "config.edn")
+(read-config
+  (clojure.java.io/resource
+    "config.edn"))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (require '[aero.core :refer (read-config)])
@@ -2044,6 +2518,8 @@ EDN. Библиотека предлагает теги, с которыми ф�
 (read-config (clojure.java.io/resource "config.edn"))
   \end{clojure}
 \end{english}
+
+\fi
 
 \index{теги!Aero}
 
@@ -2061,12 +2537,26 @@ EDN. Библиотека предлагает теги, с которыми ф�
 длинную строку, похожую на веб-адрес. Чтобы не повторяться, адрес вычисляют из
 исходных полей:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+{:db-uri
+ #envf ["jdbc:postgresql://%s/%s?user=%s"
+        DB_HOST DB_NAME DB_USER]}
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 {:db-uri #envf ["jdbc:postgresql://%s/%s?user=%s"
                 DB_HOST DB_NAME DB_USER]}
   \end{clojure}
 \end{english}
+
+\fi
 
 Тег \verb|#or| похож на аналог Clojure и нужен для значений по
 умолчанию. Пусть в файле не задан порт базы данных. Чтобы избежать ошибки,
@@ -2088,6 +2578,24 @@ EDN. Библиотека предлагает теги, с которыми ф�
 Пример ниже показывает, как найти имя базы по профилю. Без профиля получим
 \verb|"book"|, но для \verb|:test| имя станет \verb|"book_test"|:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+{:db
+ {:name
+  #profile {:default "book"
+            :dev     "book_dev"
+            :test    "book_test"}}}
+
+(read-config "aero.test.edn"
+  {:profile :test})
+{:db {:name "book_test"}}
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 {:db {:name #profile {:default "book"
@@ -2098,6 +2606,8 @@ EDN. Библиотека предлагает теги, с которыми ф�
 {:db {:name "book_test"}}
   \end{clojure}
 \end{english}
+
+\fi
 
 Тег \verb|#include| помещает в конфигурацию другой EDN-файл. В~нём тоже могут
 быть теги, и библиотека выполнит их рекурсивно. К~импорту прибегают, когда
@@ -2125,11 +2635,24 @@ EDN. Библиотека предлагает теги, с которыми ф�
 \noindent
 При чтении файла ссылка разрешается в~значение:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+{:db {:user "ivan"}
+ :worker {:user "ivan"}}
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 {:db {:user "ivan"}, :worker {:user "ivan"}}
   \end{clojure}
 \end{english}
+
+\fi
 
 Aero предлагает несложный язык описания конфигурации. Библиотека подкупает идеей
 и красотой реализации. Но в момент, когда вам захочется переехать с негибкого
@@ -2172,6 +2695,20 @@ JSON на Aero, подумайте об обратной стороне меда
 Путь к файлу либо указывают в параметрах, либо библиотека ищет его по особым
 правилам. Вариант, когда путь задан явно:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(require
+  '[yummy.config :refer [load-config]])
+
+(load-config
+  {:path "/path/to/config.yaml"})
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (require '[yummy.config :refer [load-config]])
@@ -2179,6 +2716,8 @@ JSON на Aero, подумайте об обратной стороне меда
 (load-config {:path "/path/to/config.yaml"})
   \end{clojure}
 \end{english}
+
+\fi
 
 Во втором случае вместо пути указали имя проекта. Yummy ищет путь к файлу в
 переменной среды \verb|<project>_CONFIGURATION| или свойстве
@@ -2223,20 +2762,47 @@ states:
 \noindent
 Результат:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+{:states [:task/pending
+          :task/in-progress
+          :task/done]}
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 {:states [:task/pending :task/in-progress :task/done]}
   \end{clojure}
 \end{english}
 
+\fi
+
 Тег \verb|!uuid| аналогичен \verb|#uuid| для EDN: он возвращает объект
 \verb|java.util.UUID| из строки:
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{yaml}
+system-user: !uuid
+    cb7aa305-997c-4d53-a61a-38e0d8628dbb
+  \end{yaml}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{yaml}
 system-user: !uuid cb7aa305-997c-4d53-a61a-38e0d8628dbb
   \end{yaml}
 \end{english}
+
+\fi
 
 Тег \verb|!slurp| читает файл, что полезно для сертификатов шифрования. Их
 содержимое~--- это длинная строка, которую неудобно хранить в общей конфигурации. В
@@ -2280,6 +2846,22 @@ Expound, чтобы улучшить текст об ошибке.
 мы не хотим обрывать REPL из-за ошибки в конфигурации. В интерактивном сеансе
 наша \verb|die-fn| только печатает текст и ошибку:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(load-config
+ {:program-name :book
+  :spec ::config
+  :die-fn (fn [e msg]
+            (binding [*out* *err*]
+              (println msg
+                (ex-message e))))})
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (load-config
@@ -2291,10 +2873,28 @@ Expound, чтобы улучшить текст об ошибке.
   \end{clojure}
 \end{english}
 
+\fi
+
 \noindent
 В боевом режиме запишем исключение в лог и завершим программу.
 
 \index{логирование}
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(load-config
+ {:program-name :book
+  :spec ::config
+  :die-fn (fn [e msg]
+            (log/error e
+              "Config error" msg)
+            (System/exit 1))})
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -2306,6 +2906,8 @@ Expound, чтобы улучшить текст об ошибке.
             (System/exit 1))})
   \end{clojure}
 \end{english}
+
+\fi
 
 Для валидации Yummy вызывает \verb|s/assert|. Макрос не выводит значения, как
 это делает \verb|s/conform|, а только бросает исключение. Это сделано нарочно:
