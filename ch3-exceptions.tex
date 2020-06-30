@@ -2410,8 +2410,8 @@ Slingshot содержит макросы \verb|throw+| и \verb|try+|. Они �
     (instance? AmazonS3Exception e)
     (some?
       (re-find
-        #"(?i)The Content-Md5 you
-                 specified did not match"
+        #"(?i)The Content-Md5
+            you specified did not match"
         (ex-message e)))))
   \end{clojure}
 \end{english}
