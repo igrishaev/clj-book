@@ -68,9 +68,9 @@ DEFAULT_PARAMS = {
 def api_call(**params):
     api_params = DEFAULT_PARAMS
     api_params.update(params)
-    api_url = "https://api.host.com"
-    response = requests.post(api_url,
-                   **api_params)
+    url = "https://api.host.com"
+    response = \
+      requests.post(url, **api_params)
     return response.json()
   \end{python/lines}
 \end{english}
@@ -521,10 +521,10 @@ Clojure предлагает несколько способов менять д
   \begin{clojure/lines}
 (def usage-all
   (atom {1005 {:cpu 35
-           :store 63466734
-           :memory 10442856
-           :pids #{6266, 5426,
-                   6542}}}))
+               :store 63466734
+               :memory 10442856
+               :pids #{6266 5426
+                       6542}}}))
   \end{clojure/lines}
 \end{english}
 
@@ -770,8 +770,8 @@ Current: 1, timeout: 5000 ;; 2
   counter (complement neg?))
 ;;repeat 3 times...
 (swap! counter dec)
-;;Execution error (IllegalStateException)
-;;Invalid reference state
+;; Execution error IllegalStateException
+;; Invalid reference state
   \end{clojure}
 \end{english}
 
@@ -2446,8 +2446,7 @@ Clojure намеренно скрывает от нас стадию перем�
 (def ^:dynaimc *data* nil)
 
 (set! *data* {:user 1})
-;; Unhandled
-;; java.lang.IllegalStateException
+;; Unhandled IllegalStateException
   \end{clojure}
 \end{english}
 
@@ -2543,7 +2542,6 @@ Clojure предлагает несколько форм, чтобы выпол�
   \begin{clojure}
 (def *server* nil)
 ;; Warning: *server* not declared dynamic
-;; and thus [...]
   \end{clojure}
 \end{english}
 
@@ -2568,8 +2566,7 @@ Clojure предлагает несколько форм, чтобы выпол�
   \begin{clojure}
 (binding [*server* {:port 8080}]
   (println *server*))
-;; Execution error
-;; (IllegalStateException)
+;; IllegalStateException
 ;; Can't dynamically bind
 ;; non-dynamic var: *server*
   \end{clojure}
@@ -3354,8 +3351,8 @@ Clojure предлагает несколько форм, чтобы выпол�
   \begin{clojure}
 (def ex-quota
   (ex-info
-    "The limit of requests has been
-                                reached"
+    "The limit of requests
+               has been reached"
     {:status 429
      :body {:code :QUOTA_REACHED}}))
   \end{clojure}
