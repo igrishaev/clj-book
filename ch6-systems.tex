@@ -186,6 +186,28 @@ Docker ищет образы в открытом репозитории. В нё
 
 \index{форматы!YAML}
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{yaml}
+version: '2'
+services:
+  postgres:
+    image: postgres
+    volumes:
+      - ./initdb.d:/docker-entrypoint-
+                                initdb.d
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DB: book
+      POSTGRES_USER: book
+      POSTGRES_PASSWORD: book
+  \end{yaml}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{yaml}
 version: '2'
@@ -203,10 +225,34 @@ services:
   \end{yaml}
 \end{english}
 
+\fi
+
 В папке \verb|initdb.d| находятся SQL-файлы для старта базы. Достаточно файла
 \verb|01.init.sql| с таблицей:
 
 \index{языки!SQL}
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{sql}
+drop table if exists requests;
+create table requests (
+    id            serial primary key,
+    path          text not null,
+    ip            inet not null,
+    is_processed  boolean not null
+                  default false,
+    zip           text,
+    country       text,
+    city          text,
+    lat           float,
+    lon           float
+);
+  \end{sql}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{sql}
@@ -224,6 +270,8 @@ create table requests (
 );
   \end{sql}
 \end{english}
+
+\fi
 
 Если запустить \verb|docker-compose up|, поднимется сервер PostgreSQL на порту
 5432 с базой \verb|book|. Этого хватит для дальнейшей работы. Больше мы не
@@ -253,6 +301,33 @@ create table requests (
 веб-сервера. Поместим его в модуль \verb|server.clj|. Функция \verb|app|~--- это
 примитивное приложение, которое вернёт статус 200 на все запросы.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+;; project.clj
+:dependencies [... [mount "0.1.16"]]
+
+;; server.clj
+(ns book.systems.mount.server
+  (:require
+   [mount.core :as mount
+    :refer [defstate]]
+   [ring.adapter.jetty
+    :refer [run-jetty]]))
+
+(def app (constantly
+           {:status 200 :body "Hello"}))
+
+(defstate server
+  :start (run-jetty app
+           {:join? false :port 8080})
+  :stop (.stop server))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 ;; project.clj
@@ -272,14 +347,29 @@ create table requests (
   \end{clojure}
 \end{english}
 
+\fi
+
 Пока что мы только объявили состояние, но ничего не включили. Если выполнить
 \verb|server|, увидим следующее:
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+#DerefableState[{:status :pending
+                 :val nil}]
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
 #DerefableState[{:status :pending, :val nil}]
   \end{clojure}
 \end{english}
+
+\fi
 
 Чтобы запустить компонент, выполните \verb|(mount/start)|. Функция пробегает
 по компонентам и включает их. Выражение \verb|(run-jetty ...)| под ключом
@@ -325,6 +415,20 @@ EDN. Замените \verb|edn/read-string| на Yummy, Aero или своё
 решение. Компоненту не нужна фаза \verb|:stop|, потому что он не хранит
 состояние.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defstate config
+  :start
+  (-> "system.config.edn"
+      slurp
+      edn/read-string))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defstate config
@@ -332,6 +436,8 @@ EDN. Замените \verb|edn/read-string| на Yummy, Aero или своё
   (-> "system.config.edn" slurp edn/read-string))
   \end{clojure}
 \end{english}
+
+\fi
 
 В файле \verb|system.config.edn| записан словарь, где ключ~--- это имя компонента, а
 значение~--- параметры. Поместим сервер под ключ \verb|:jetty|:
@@ -347,6 +453,19 @@ EDN. Замените \verb|edn/read-string| на Yummy, Aero или своё
 Улучшим сервер так, чтобы он зависел от конфигурации. В список \verb|:require|
 модуля добавим компонент \verb|config|:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(ns book.systems.mount.server
+ (:require
+  [book.systems.mount.config
+   :refer [config]]))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (ns book.systems.mount.server
@@ -354,6 +473,8 @@ EDN. Замените \verb|edn/read-string| на Yummy, Aero или своё
   [book.systems.mount.config :refer [config]]))
   \end{clojure}
 \end{english}
+
+\fi
 
 \noindent
 Перепишем сервер, чтобы он читал конфигурацию:
@@ -382,12 +503,26 @@ EDN. Замените \verb|edn/read-string| на Yummy, Aero или своё
 к реляционным базам данных. Это набор функций, которые работают одинаково для
 разных баз. Выражения:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(jdbc/get-by-id db :users 42)
+(jdbc/insert! db :users
+  {:name "Ivan" :email "ivan@test.com"})
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (jdbc/get-by-id db :users 42)
 (jdbc/insert! db :users {:name "Ivan" :email "ivan@test.com"})
   \end{clojure}
 \end{english}
+
+\fi
 
 \noindent
 прочитают и запишут пользователя в PostgreSQL, MySQL или Oracle. Для каждого
@@ -409,6 +544,33 @@ JDBC игнорирует другие ключи и работает напря
 Источник хранит состояние, поэтому вынесем его в компонент. Подготовим модуль
 \verb|db.clj|:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(ns book.systems.mount.db
+  (:require
+   [mount.core :as mount
+    :refer [defstate]]
+   [hikari-cp.core :as cp]
+   [book.systems.mount.config
+    :refer [config]]))
+
+(defstate db
+  :start
+  (let [{pool-opt :pool} config
+        store (cp/make-datasource
+                pool-opt)]
+    {:datasource store})
+  :stop
+  (-> db
+      :datasource
+      cp/close-datasource))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (ns book.systems.mount.db
@@ -426,6 +588,8 @@ JDBC игнорирует другие ключи и работает напря
   (-> db :datasource cp/close-datasource))
   \end{clojure}
 \end{english}
+
+\fi
 
 \index{пул соединений}
 
@@ -508,6 +672,23 @@ JDBC игнорирует другие ключи и работает напря
 Подготовим модуль воркера. Понадобится конфигурация, база данных, логирование и
 HTTP-клиент:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(ns book.systems.mount.worker
+  (:require
+   [clojure.java.jdbc :as jdbc]
+   [clj-http.client :as client]
+   [clojure.tools.logging :as log]
+   [book.systems.mount.db :refer [db]]
+   [book.systems.mount.config
+    :refer [config]]))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (ns book.systems.mount.worker
@@ -520,12 +701,37 @@ HTTP-клиент:
   \end{clojure}
 \end{english}
 
+\fi
+
 Воркер~--- это словарь с полями \verb|:flag| и \verb|:task|, состояние и
 футура. Фаза \verb|:start| готовит этот словарь. Функции \verb|make-task|
 пока что не существует, но считаем, что она вернёт футуру. В фазе \verb|:stop|
 флаг становится ложью, и мы ждём, пока футура не остановится.
 
 \index{clojure.core!realized?}
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defstate worker
+  :start
+  (let [{task-opt :worker} config
+        flag (atom true)
+        task (make-task flag task-opt)]
+    {:flag flag :task task})
+  :stop
+  (let [{:keys [flag task]} worker]
+    (reset! flag false)
+    (while (not (realized? task))
+      (log/info
+      "Waiting for the task
+                to complete")
+      (Thread/sleep 300))))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -543,6 +749,8 @@ HTTP-клиент:
       (Thread/sleep 300))))
   \end{clojure}
 \end{english}
+
+\fi
 
 Код \verb|:start| и \verb|:stop| должен быть небольшим. Чтобы упростить его,
 технические шаги выносят в функции. Если этого не сделать, логику запуска и
@@ -562,6 +770,27 @@ HTTP-клиент:
 Опишем функцию \verb|make-task|. Она принимает атом с флагом и~параметры
 EDN. Функция вернёт футуру с циклом:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure/lines}
+(defn make-task
+  [flag opt]
+  (let [{:keys [sleep]} opt]
+    (future
+      (while @flag
+        (try
+          (task-fn)
+          (catch Throwable e
+            (log/error e))
+          (finally
+            (Thread/sleep
+              sleep)))))))
+  \end{clojure/lines}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure/lines}
 (defn make-task
@@ -578,6 +807,8 @@ EDN. Функция вернёт футуру с циклом:
   \end{clojure/lines}
 \end{english}
 
+\fi
+
 Функция \verb|task-fn| выполняет бизнес-логику приложения \coderef{7}. Её
 оборачивают в \verb|try/catch|, чтобы футура не завершилась аварийно. Если
 поймали исключение, пишем его в лог. В конце итерации небольшая задержка, чтобы
@@ -590,6 +821,34 @@ IP. Пока что мы не знаем, как работает поиск, н
 с полями \verb|:city|, \verb|:country| и другими.
 
 \index{транзакции}
+
+\ifx\devicetype\mobile
+%% TODO code line ref
+\begin{english}
+  \begin{clojure/lines}
+(defn task-fn []
+ (jdbc/with-db-transaction [tx db]
+  (when-let [request
+             (first
+              (jdbc/query tx query))]
+    (let [{:keys [id ip]} request
+          info   (get-ip-info ip)
+          {zip :postal_code
+           country country_name
+           city :city lat :lat
+           lon :lng} info
+          fields {:is_processed true
+                  :zip zip
+                  :country country
+                  :city city
+                  :lat lat
+                  :lon lon}]
+      (jdbc/update! tx :requests
+        fields ["id = ?" id])))))
+  \end{clojure/lines}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure/lines}
@@ -610,11 +869,26 @@ IP. Пока что мы не знаем, как работает поиск, н
   \end{clojure/lines}
 \end{english}
 
+\fi
+
 \index{SQL!FOR UPDATE}
 
 Запрос на поиск записи мы вынесли в переменную \verb|query|, чтобы сократить
 код \verb|task-fn|. Это SQL с оператором \verb|FOR UPDATE|, который
 блокирует запись на изменение в других подключениях.
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(def query
+  "SELECT * FROM requests
+   WHERE NOT is_processed
+   LIMIT 1 FOR UPDATE;")
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -623,6 +897,8 @@ IP. Пока что мы не знаем, как работает поиск, н
    LIMIT 1 FOR UPDATE;")
   \end{clojure}
 \end{english}
+
+\fi
 
 \verb|FOR UPDATE| работает только в транзакции, поэтому тело функции обёрнуто
 в~\verb|(jdbc/with-db-transaction)|. Это макрос, внутри которого доступно
@@ -637,6 +913,20 @@ IP и возвращает сведения о нём в JSON. В нашем с�
 \verb|iplocation.com|. В промышленных системах базы адресов разворачивают
 локально, чтобы не зависеть от сторонних служб.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn get-ip-info [ip]
+  (:body (client/post
+           "https://iplocation.com"
+           {:form-params {:ip ip}
+            :as :json})))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn get-ip-info [ip]
@@ -645,6 +935,8 @@ IP и возвращает сведения о нём в JSON. В нашем с�
                        :as :json})))
   \end{clojure}
 \end{english}
+
+\fi
 
 \noindent
 Если вызвать \verb|get-ip-info| с адресом Берлина, получим словарь:
@@ -671,6 +963,29 @@ IP и возвращает сведения о нём в JSON. В нашем с�
 Мы описали последний элемент воркера, и он готов к работе. Добавим в базу
 несколько записей, запустим воркер и через некоторое время прочтём их снова.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(mount/start)
+
+(jdbc/insert! db :requests
+  {:path "/help" :ip "31.148.198.0"})
+;; wait for a while
+
+(jdbc/query db "select * from requests")
+({:path "/help"
+  :ip "31.148.198.0"
+  :is_processed true
+  :city "Pinsk"
+  :zip "225710" :id 1
+  :lon 26.0728 :lat 52.1214
+  :country "Belarus"})
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (mount/start)
@@ -684,6 +999,8 @@ IP и возвращает сведения о нём в JSON. В нашем с�
   :lon 26.0728 :lat 52.1214 :country "Belarus"})
   \end{clojure}
 \end{english}
+
+\fi
 
 Адрес \verb|31.148.198.0| разрешится в город Пинск в Беларуси. Система работает
 правильно.
@@ -786,6 +1103,19 @@ IP и возвращает сведения о нём в JSON. В нашем с�
 Компилятор не загрузит \verb|mount.worker| до тех пор, пока не разрешит
 зависимости. Он начнёт с модуля базы данных. Его упрощённое определение:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(ns book.systems.mount.db
+  (:require
+   [book.systems.mount.config
+    :refer [config]]))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (ns book.systems.mount.db
@@ -793,6 +1123,8 @@ IP и возвращает сведения о нём в JSON. В нашем с�
    [book.systems.mount.config :refer [config]]))
   \end{clojure}
 \end{english}
+
+\fi
 
 \ifx\mode\print
 
@@ -842,11 +1174,24 @@ Mount хранит сведения о компонентах в приватн�
 потребителей, но Clojure позволяет добраться до них. Когда компоненты загружены,
 выполните:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(def _state
+  @@(resolve 'mount.core/meta-state))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (def _state @@(resolve 'mount.core/meta-state))
   \end{clojure}
 \end{english}
+
+\fi
 
 \index{clojure.core!resolve}
 
@@ -1061,6 +1406,21 @@ Mount отреагирует на перезагрузку модуля?
 \verb|:stop|, компонент остановится. Ключ \verb|:noop| означает <<не делать
 ничего>>. Компонент с метаданными выглядит так:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defstate
+  ^{:on-reload :noop}
+  server
+  :start (run-jetty app
+           {:join? false :port 8080})
+  :stop (.stop server))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defstate
@@ -1070,6 +1430,8 @@ Mount отреагирует на перезагрузку модуля?
   :stop (.stop server))
   \end{clojure}
 \end{english}
+
+\fi
 
 Если вы не уверены, выбирайте \verb|:noop|: с ним загрузка кода в REPL не
 несёт побочных эффектов. Изменения в коде не всегда относятся к компоненту: это
@@ -1086,6 +1448,30 @@ Mount отреагирует на перезагрузку модуля?
 пулом соединений. Изучите пример из библиотеки
 \footurl{Clj-http}{https://github.com/dakrone/clj-http}[Clj-http][-10mm]:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(:require
+ [clj-http.conn-mgr :refer
+   [make-reusable-conn-manager
+    shutdown-manager]])
+
+;; create a new pool
+(def cm (make-reusable-conn-manager
+         {:timeout 2 :threads 3}))
+
+;; make a request within the pool
+(client/get "http://example.org/"
+            {:connection-manager cm})
+
+;; shut down the pool
+(shutdown-manager cm)
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 ;; create a new pool
@@ -1100,6 +1486,8 @@ Mount отреагирует на перезагрузку модуля?
 (clj-http.conn-mgr/shutdown-manager cm)
   \end{clojure}
 \end{english}
+
+\fi
 
 \index{пул соединений!в HTTP}
 
@@ -1178,6 +1566,21 @@ Component не терпит глобального состояния. В биб
 Перепишем систему из прошлого раздела на Component. Начнём с~веб-сервера. В
 файле \verb|server.clj| объявим пространство имён:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(ns book.systems.comp.server
+  (:require
+   [com.stuartsierra.component
+    :as component]
+   [ring.adapter.jetty
+    :refer [run-jetty]]))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (ns book.systems.comp.server
@@ -1187,10 +1590,33 @@ Component не терпит глобального состояния. В биб
   \end{clojure}
 \end{english}
 
+\fi
+
 Компонент~--- это запись с двумя слотами: \verb|options| и \verb|server|. В
 опциях записаны параметры Jetty-сервера, в \verb|server|~--- его
 экземпляр. Строка \verb|component/Lifecycle| означает протокол, который
 реализует запись. Ниже следует \emph{реализация} протокола.
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defrecord Server [options server]
+
+  component/Lifecycle
+
+  (start [this]
+    (let [server (run-jetty app
+                   options)]
+      (assoc this :server server)))
+
+  (stop [this]
+    (.stop server)
+    (assoc this :server nil)))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -1207,6 +1633,8 @@ Component не терпит глобального состояния. В биб
     (assoc this :server nil)))
   \end{clojure}
 \end{english}
+\fi
+
 
 Метод \verb|start| вернёт ту же запись, но с заполненным слотом
 \verb|:server|. В нём находится объект сервера. Метод \verb|stop| принимает
@@ -1228,6 +1656,19 @@ Component не терпит глобального состояния. В биб
 его типизированную версию. Ключи словаря совпадают со~слотами записи. Если ключ
 не найден, слот равен \verb|nil|.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(def s-created
+  (map->Server
+    {:options {:port 8080
+               :join? false}}))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (def s-created
@@ -1235,15 +1676,30 @@ Component не терпит глобального состояния. В биб
   \end{clojure}
 \end{english}
 
+\fi
+
 Переменная \verb|s-created|~--- это экземпляр записи \verb|Server|. Мы указали
 слот \verb|options|, но не \verb|server|, потому что он будет заполнен
 позже.
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(def s-started
+  (component/start s-created))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
 (def s-started (component/start s-created))
   \end{clojure}
 \end{english}
+
+\fi
 
 Это выражение вернёт \emph{запущенный} компонент. Откройте браузер по адресу
 \verb|http://127.0.0.1:8080| и проверьте, что сервер работает. У~записи
@@ -1259,12 +1715,26 @@ Component не терпит глобального состояния. В биб
 Остановите компонент. Проверьте, что страница больше не открывается, а слот
 сервера равен \verb|nil|.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(def s-stopped
+  (component/stop s-started))
+(:server s-stopped) ;; nil
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (def s-stopped (component/stop s-started))
 (:server s-stopped) ;; nil
   \end{clojure}
 \end{english}
+
+\fi
 
 Мы прошли полный цикл компонента: подготовку, запуск и остановку. Переход на
 каждую стадию даёт новый компонент. На практике компонентами не управляют
@@ -1276,11 +1746,25 @@ Component не терпит глобального состояния. В биб
 
 Вспомним, как мы создали экземпляр \verb|Server|:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(map->Server
+  {:options {:port 8080
+             :join? false}})
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (map->Server {:options {:port 8080 :join? false}})
   \end{clojure}
 \end{english}
+
+\fi
 
 \index{слоты}
 
@@ -1292,6 +1776,22 @@ Component не терпит глобального состояния. В биб
 Конструктор принимает только те аргументы, которые нужны для инициализации
 компонента. В нашем случае это \verb|options|, поэтому функция выглядит так:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn make-server
+  [options]
+  (map->Server {:options options}))
+
+(def s-created
+  (make-server {:port 8080
+                :join? false}))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn make-server
@@ -1301,6 +1801,8 @@ Component не терпит глобального состояния. В биб
 (def s-created (make-server {:port 8080 :join? false}))
   \end{clojure}
 \end{english}
+
+\fi
 
 С конструктором легче создать компонент: невозможно передать в
 \verb|map->Server| что-то лишнее. Конструктор~--- это функция, поэтому к~нему можно
@@ -1315,7 +1817,7 @@ Component не терпит глобального состояния. В биб
 отсоединить поле?
 
 \begin{english}
-
+%% TODO MOBILE
 \noindent
 \begin{tabular}{ @{}p{5cm} @{}p{5cm} }
 
@@ -1388,6 +1890,27 @@ Component не терпит глобального состояния. В биб
 результат \verb|start| в~\verb|stop|, сервер не остановится. Можно сколько
 угодно вызывать \verb|component/stop|, но это ничего не даст.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(def bs-created
+  (map->BadServer
+    {:options {:port 8080
+               :join? false}}))
+
+(def bs-started
+   (component/start bs-created))
+(type bs-started)
+;; clojure.lang.PersistentArrayMap
+
+(component/stop bs-started)
+;; does nothing, the server still works
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (def bs-created (map->BadServer
@@ -1401,6 +1924,8 @@ Component не терпит глобального состояния. В биб
 ;; does nothing, the server still works
   \end{clojure}
 \end{english}
+
+\fi
 
 В метод stop тоже закралась ошибка. При остановке компонент выключит сервер, но
 вернёт \verb|nil|. Если передать результат \verb|stop| в \verb|start|,
@@ -1432,6 +1957,27 @@ Component не терпит глобального состояния. В биб
 JDBC-спека с открытым пулом. Принцип его работы известен вам из прошлых
 разделов.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defrecord DB [options db-spec]
+  component/Lifecycle
+  (start [this]
+    (let [pool (cp/make-datasource
+                 options)]
+      (assoc this :db-spec
+        {:datasource pool})))
+  (stop [this]
+    (-> db-spec
+        :datasource
+        cp/close-datasource)
+    (assoc this :db-spec nil)))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defrecord DB [options db-spec]
@@ -1444,6 +1990,8 @@ JDBC-спека с открытым пулом. Принцип его работ
     (assoc this :db-spec nil)))
   \end{clojure}
 \end{english}
+
+\fi
 
 \noindent
 Добавим конструктор:
@@ -1461,6 +2009,19 @@ JDBC-спека с открытым пулом. Принцип его работ
 Пока что неясно, как выполнить запрос через компонент. Нас интересует слот
 \verb|db-spec|, который хранит спеку. Можно вычленить его и~передать в функцию:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(let [{:keys [db-spec]} db-started
+      users (jdbc/query db-spec
+              "select * from users")]
+  (process-users users))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (let [{:keys [db-spec]} db-started
@@ -1468,6 +2029,8 @@ JDBC-спека с открытым пулом. Принцип его работ
   (process-users users))
   \end{clojure}
 \end{english}
+
+\fi
 
 Это варварский подход: нельзя вторгаться в компонент, даже если язык предлагает
 такую возможность. Мы нарушаем идею, согласно которой компонент неделим для
@@ -1480,6 +2043,19 @@ JDBC-спека с открытым пулом. Принцип его работ
 
 \index{протоколы!IDB}
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defprotocol IDB
+  (query [this sql-params])
+  (update!
+    [this table set-map where-clause]))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defprotocol IDB
@@ -1487,6 +2063,8 @@ JDBC-спека с открытым пулом. Принцип его работ
   (update! [this table set-map where-clause]))
   \end{clojure}
 \end{english}
+
+\fi
 
 В теле \verb|defrecord|, сразу после \verb|stop|, реализуем новый
 протокол. Методы сводятся к функциям JDBC, в которые передаём слот
@@ -1503,6 +2081,23 @@ JDBC-спека с открытым пулом. Принцип его работ
 \noindent
 Далее следует частный протокол:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+  IDB
+  (query [this sql-params]
+    (jdbc/query db-spec sql-params))
+
+  (update!
+    [this table set-map where-clause]
+    (jdbc/update! db-spec
+      table set-map where-clause)))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
   IDB
@@ -1514,8 +2109,29 @@ JDBC-спека с открытым пулом. Принцип его работ
   \end{clojure}
 \end{english}
 
+\fi
+
 Компонент готов к запросам. Мы вызываем не функции JDBC, а методы
 протокола. Этим мы изолируем зависимость от JDBC и~снижаем связанность кода.
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(def db-created (make-db options))
+(def db-started
+  (component/start db-created))
+
+(query db-started "select * from users")
+(update! db-started
+  :users {:name "Ivan"} ["id = ?" 42])
+
+(def db-stopped
+  (component/stop db-started))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -1528,6 +2144,8 @@ JDBC-спека с открытым пулом. Принцип его работ
 (def db-stopped (component/stop db-started))
   \end{clojure}
 \end{english}
+
+\fi
 
 \subsection{Транзакционный компонент}
 
@@ -1559,6 +2177,24 @@ JDBC-спека с открытым пулом. Принцип его работ
 
 \begin{listing}[ht!]
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defmacro with-db-transaction
+  [[comp-tx comp-db & trx-opt] & body]
+  `(let [{db-spec# :db-spec} ~comp-db]
+     (jdbc/with-db-transaction
+       [t-conn# db-spec# ~@trx-opt]
+       (let [~comp-tx
+             (assoc ~comp-db
+               :db-spec t-conn#)]
+         ~@body))))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defmacro with-db-transaction
@@ -1570,6 +2206,8 @@ JDBC-спека с открытым пулом. Принцип его работ
          ~@body))))
   \end{clojure}
 \end{english}
+
+\fi
 
 \caption{Макрос транзакции для компонента базы}
 \label{fig:trx-macro}
@@ -1587,6 +2225,25 @@ JDBC-спека с открытым пулом. Принцип его работ
 и~\verb|set-spec|, то есть обычные <<геттер>> и <<сеттер>> из мира ООП. Разница
 в~том, что <<сеттер>> вернёт новый компонент. Макрос в~действии:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(with-db-transaction
+  [db-tx db-started]
+  (let [query "select * from requests
+               limit 1 for update"
+        result (query db-tx query)]
+    (when-let [id (some->
+                    result first :id)]
+      (update! db-tx :requests
+               {:is_processed false}
+               ["id = ?" id]))))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (with-db-transaction
@@ -1600,12 +2257,30 @@ JDBC-спека с открытым пулом. Принцип его работ
   \end{clojure}
 \end{english}
 
+\fi
+
 \noindent
 В логах PostgreSQL увидим записи:
 
 \index{SQL!BEGIN}
 \index{SQL!UPDATE}
 \index{SQL!COMMIT}
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{sql}
+BEGIN
+select * from requests
+limit 1 for update
+UPDATE requests SET is_processed = $1
+WHERE id = $2
+DETAIL:  parameters: $1 = 'f', $2 = '3'
+COMMIT
+  \end{sql}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{sql}
@@ -1617,12 +2292,29 @@ COMMIT
   \end{sql}
 \end{english}
 
+\fi
+
 \noindent
 Запросы \verb|SELECT| и \verb|UPDATE| действительно были в транзакции.
 
 \subsection{Воркер}
 
 Напишем компонент воркера. Объявим модуль и зависимости:
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(ns book.systems.comp.worker
+  (:require
+   [com.stuartsierra.component
+    :as component]
+   [book.systems.comp.db :as db]
+   [clj-http.client :as client]))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -1633,6 +2325,8 @@ COMMIT
    [clj-http.client :as client]))
   \end{clojure}
 \end{english}
+
+\fi
 
 \index{протоколы!IWorker}
 
@@ -1654,6 +2348,34 @@ COMMIT
 Запись хранит четыре слота: входные опции, флаг продолжения, футура с циклом
 (\verb|task|) и база данных. Последний слот~--- это зависимый компонент, экземпляр
 \verb|DB|, который мы только что написали. Реализуем \verb|Lifecycle|:
+%% TODO code line ref
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure/lines}
+(defrecord Worker
+  [options flag task db]
+
+  component/Lifecycle
+
+  (start [this]
+    (let [flag (atom true)
+          this (assoc this :flag flag)
+          task (make-task this)]
+      (assoc this :task task)))
+
+  (stop [this]
+    (reset! flag false)
+    (while (not (realized? task))
+      (log/info
+        "Waiting for
+             the task to complete")
+      (Thread/sleep 300))
+    (assoc this :flag nil :task nil)))
+  \end{clojure/lines}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure/lines}
@@ -1677,6 +2399,8 @@ COMMIT
   \end{clojure/lines}
 \end{english}
 
+\fi
+
 Обратите внимание на строку~8: мы дополняем \verb|this| флагом
 состояния. Метод \verb|make-task| ожидает \verb|this| с заполненным слотом
 \verb|flag|. Если строку убрать, \verb|make-task| получит запись с пустым
@@ -1690,6 +2414,32 @@ COMMIT
 передавать их в параметрах. Ниже мы перенесли код \verb|make-task| и
 \verb|task-fn| в компонент. Для краткости опустим перехват ошибок и некоторые
 детали.
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defrecord Worker
+  ;; ...component/Lifecycle
+  IWorker
+
+  (make-task [this]
+    (future
+      (while @flag    ;; ...try/catch
+        (task-fn this)))) ;; ...sleep
+
+  (task-fn [this]
+    (db/with-db-transaction [tx db]
+      (when-let [[request]
+                 (db/query tx query)]
+        ;; get fields
+        (let [fields (...))]
+          (db/update! tx :requests
+            fields ["id = ?" id]))))))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -1710,6 +2460,8 @@ COMMIT
                       fields ["id = ?" id]))))))
   \end{clojure}
 \end{english}
+
+\fi
 
 \noindent
 Добавим конструктор, и компонент готов:
@@ -1738,6 +2490,23 @@ COMMIT
 эксперимент в модуле \verb|core| с двумя компонентами. Добавьте в модуль
 конструкторы:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(ns book.systems.comp.core
+  (:require
+   [com.stuartsierra.component
+    :as component]
+   [book.systems.comp.worker
+    :refer [make-worker]]
+   [book.systems.comp.db
+    :refer [make-db]]))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (ns book.systems.comp.core
@@ -1747,6 +2516,8 @@ COMMIT
    [book.systems.comp.db :refer [make-db]]))
   \end{clojure}
 \end{english}
+
+\fi
 
 Рассмотрите систему ниже. Это функция, которая принимает конфигурацию. Мы
 вручную запускаем базу и воркер и возвращаем словарь компонентов. В десятой
@@ -1774,11 +2545,25 @@ COMMIT
 Чтобы запустить систему, передайте в функцию параметры пула и~воркера. Сохраните
 систему в переменной, чтобы выключить её позже.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(def _sys
+  (my-system-start
+    {:pool {...} :worker {...}}))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (def _sys (my-system-start {:pool {...} :worker {...}}))
   \end{clojure}
 \end{english}
+
+\fi
 
 Проверьте систему: добавьте записи в таблицу \verb|requests| и убедитесь, что
 воркер дополняет их. Функция выключения остановит компоненты в обратном порядке:
@@ -1826,6 +2611,25 @@ COMMIT
 передали вектор \verb|[:db]|, потому что так называется и слот воркера, и
 компонент системы.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn make-system
+  [config]
+  (let [{:keys [jetty pool worker]}
+        config]
+    (component/system-map
+     :server (make-server jetty)
+     :db     (make-db pool)
+     :worker (component/using
+               (make-worker worker)
+               [:db]))))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn make-system
@@ -1839,10 +2643,27 @@ COMMIT
   \end{clojure}
 \end{english}
 
+\fi
+
 \index{зависимости!Component}
 
 \noindent
 Если бы компонент назывался \verb|:storage|, мы бы задали словарь:
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(component/system-map
+ :server  (make-server jetty)
+ :storage (make-db pool)
+ :worker  (component/using
+            (make-worker worker)
+            {:db :storage}))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -1853,6 +2674,8 @@ COMMIT
            (make-worker worker) {:db :storage}))
   \end{clojure}
 \end{english}
+
+\fi
 
 Словарь полезен для сторонних компонентов. Их создатели не знают, как называются
 сущности в вашем проекте. Предположим, чужой компонент зависит от
@@ -1865,6 +2688,21 @@ COMMIT
 система сообщает их компоненту через \verb|assoc|, как мы делали это
 вручную. Аналогично работает выключение системы.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(def config {...})
+(def sys-init (make-system config))
+(def sys-started
+  (component/start sys-init))
+(def sys-stopped
+  (component/stop sys-started))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (def config {...})
@@ -1873,6 +2711,8 @@ COMMIT
 (def sys-stopped (component/stop sys-started))
   \end{clojure}
 \end{english}
+
+\fi
 
 Как и компонент, система свободно скользит по функциям \verb|start|
 и~\verb|stop| в операторе \arr. Если это не так, в системе ошибка.
@@ -1904,6 +2744,29 @@ COMMIT
 
 \index{clojure.core!alter-var-root}
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defonce system nil)
+
+(def alter-system
+  (partial alter-var-root #'system))
+
+(defn system-init [config]
+  (alter-system
+    (constantly (make-system config))))
+
+(defn system-start []
+  (alter-system component/start))
+
+(defn system-stop []
+  (alter-system component/stop))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defonce system nil)
@@ -1921,11 +2784,27 @@ COMMIT
   \end{clojure}
 \end{english}
 
+\fi
+
 \index{функции!-main}
 
 Появились рычаги, чтобы управлять системой. Функция \verb|-main|~--- это точка
 входа в программу. Она сводится к трём шагам: чтению конфигурации, подготовке и
 запуску системы.
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn -main [& args]
+  (let [config
+        (load-config "config.edn")]
+    (system-init config)
+    (system-start)))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -1935,6 +2814,8 @@ COMMIT
     (system-start)))
   \end{clojure}
 \end{english}
+
+\fi
 
 Система глобальна, но к ней нельзя обращаться напрямую. Если один компонент
 что-то ищет в недрах системы, это провал разработчика. Такой подход рушит саму
@@ -1990,6 +2871,23 @@ running, then it is discarded. (В промышленном запуске си�
 Библиотека \footurl{Signal}{https://github.com/pyr/signal}[Signal][1mm] предлагает макрос,
 чтобы связать сигнал с~реакцией на него. Подключите библиотеку в проект:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+;; project.clj
+[spootnik/signal "0.2.2"]
+
+;; src/book/systems/comp/core.clj
+(ns ...
+  (:require
+   [signal.handler :refer
+    [with-handler]]))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 ;; project.clj
@@ -2000,6 +2898,8 @@ running, then it is discarded. (В промышленном запуске си�
   (:require [signal.handler :refer [with-handler]]))
   \end{clojure}
 \end{english}
+
+\fi
 
 Расширьте функцию \verb|-main|. После запуска системы добавьте событие на
 сигналы SIGTERM и SIGHUP. Первый останавливает систему и завершает
@@ -2053,6 +2953,20 @@ $ java -jar target/book-standalone.jar
 Вернёмся к функции \verb|-main| приложения. Это входная точка программы на
 Clojure:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn -main [& args]
+  (let [config
+        (load-config "config.edn")]
+    (system-init config)
+    (system-start)))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn -main [& args]
@@ -2061,6 +2975,8 @@ Clojure:
     (system-start)))
   \end{clojure}
 \end{english}
+
+\fi
 
 У читателя, не знакомого с тонкостями JVM, возникнет вопрос: почему программа не
 завершается после вызова \verb|(system-start)|? За ним нет цикла, хука или
@@ -2102,12 +3018,27 @@ Clojure:
 <<заряженный>> компонент, и \verb|using| уйдёт из~системы. Перепишем конструктор
 воркера:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn make-worker [config]
+  (-> config
+      map->Worker
+      (component/using [:db])))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn make-worker [config]
   (-> config map->Worker (component/using [:db])))
   \end{clojure}
 \end{english}
+
+\fi
 
 \noindent
 Новая система чище и короче:
@@ -2140,12 +3071,25 @@ Clojure:
 Функция \verb|meta| вернёт метаданные объекта. Код ниже доказывает, что
 конструктор добавил зависимости:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(-> {...} make-worker meta)
+#:...component{:dependencies {:db :db}}
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (-> {...} make-worker meta)
 #:com.stuartsierra.component{:dependencies {:db :db}}
   \end{clojure}
 \end{english}
+
+\fi
 
 Другой способ увидеть их~--- задать переменной \verb|*print-meta*| истину. При
 печати объекта в REPL появятся метаданные:
@@ -2154,6 +3098,20 @@ Clojure:
 \index{печать!метаданных}
 \index{clojure.core!*print-meta*}
 \index{clojure.core!set"!}
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(set! *print-meta* true)
+
+(make-worker {...})
+^#:...component{:dependencies {:db :db}}
+#book.systems.comp.worker.Worker{...}
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -2164,6 +3122,8 @@ Clojure:
 #book.systems.comp.worker.Worker{...}
   \end{clojure}
 \end{english}
+
+\fi
 
 \subsection{Группировка слотов}
 
@@ -2242,6 +3202,27 @@ Clojure:
 \verb|worker?| истина, следующая форма добавит к вектору значения \verb|:worker|
 и \verb|(make-worker {...})|. Ниже могут идти другие флаги и~выражения.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn make-system [config]
+  (let [{:keys [features jetty
+                pool worker]} config
+        {:keys [worker?]} features
+        comps-base [:server
+                    (make-server jetty)
+                    :db (make-db pool)]
+        comps (cond-> comps-base
+                worker?
+                (conj :worker
+                  (make-worker worker)))]
+    (apply component/system-map comps)))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn make-system [config]
@@ -2256,8 +3237,26 @@ Clojure:
   \end{clojure}
 \end{english}
 
+\fi
+
 Убедимся, что флаг работает. Система~--- это запись, поэтому функция \verb|keys|
 вернёт её ключи. Слот \verb|:worker| появляется в зависимости от~флага:
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(keys (make-system
+        {:features {:worker? false}}))
+(:server :db)
+
+(keys (make-system
+        {:features {:worker? true}}))
+(:server :db :worker)
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -2268,6 +3267,8 @@ Clojure:
 (:server :db :worker)
   \end{clojure}
 \end{english}
+
+\fi
 
 Флаги облегчают работу с проектом. Некоторые компоненты сложны и требуют
 специального окружения. Если можно задать их флагом, это принесёт пользу
@@ -2316,6 +3317,26 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
 \verb|make-handler| оборачивает \verb|app| таким образом, что каждый запрос
 в~\verb|app| дополнен базой.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+;; app factory
+(defn make-handler [app db]
+  (fn [request]
+    (app (assoc request :db db))))
+
+;; Lifecycle
+(start [this]
+  (let [handler (make-handler app db)
+        server (run-jetty handler
+                 options)]
+    (assoc this :server server)))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 ;; app factory
@@ -2331,9 +3352,27 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
   \end{clojure}
 \end{english}
 
+\fi
+
 Пусть главная страница выводит данные из базы. Код ниже показывает, как
 прочитать таблицу из HTTP-запроса. Чтобы не усложнять пример вёрсткой HTML,
 вёрнем красиво напечатанные данные.
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn app [{:keys [db]}]
+  (let [data (db/query db
+               "select * from requests")]
+    {:status 200
+     :body (with-out-str
+             (clojure.pprint/pprint
+               data))}))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -2344,6 +3383,8 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
              (clojure.pprint/pprint data))}))
   \end{clojure}
 \end{english}
+
+\fi
 
 Со временем понадобятся другие компоненты, например очередь задач или
 кэш. Поступим аналогично: добавим их в зависимости серверу и пробросим в
@@ -2417,6 +3458,21 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
 Вспомним, как мы строили маршруты. Макрос \verb|defroutes| вернёт функцию,
 которая принимает запрос и возвращает ответ \page{compojure}.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defroutes app
+  (GET "/"
+    request (page-index request))
+  (GET "/hello"
+    request (page-hello request))
+  page-404)
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defroutes app
@@ -2426,11 +3482,28 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
   \end{clojure}
 \end{english}
 
+\fi
+
 Новое дерево маршрутов не статично, потому что зависит от компонента. Функция
 \verb|make-routes| принимает группировочный компонент и возвращает маршруты,
 замкнутые на нём. В функции \verb|page-index| и~другие приходят два аргумента:
 компонент и запрос. Компонент будет в том состоянии, в каком его передали в
 \verb|make-routes|:
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn make-routes [web]
+  (routes
+    (GET "/"
+      request (page-index web request))
+    (GET "/hello"
+      request (page-hello web request))))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -2441,8 +3514,24 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
   \end{clojure}
 \end{english}
 
+\fi
+
 \noindent
 Метод \verb|start| сервера строит маршруты и передаёт в \verb|run-jetty|:
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(start [this]
+  (let [routes (make-routes web)
+        server (run-jetty
+                 routes options)]
+    (assoc this :server server)))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -2453,9 +3542,28 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
   \end{clojure}
 \end{english}
 
+\fi
+
 Рассмотрим обработчик \verb|page-index|, который обращается к базе
 данных. Первый аргумент~--- это \verb|web|, хранилище компонентов. Распакуем его на
 уровне сигнатуры. Далее обращаемся к компоненту \verb|db|.
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn page-index
+  [{:keys [db]} request]
+  (let [data (db/query db
+               "select * from requests")]
+    {:status 200
+     :body (with-out-str
+             (clojure.pprint/pprint
+               data))}))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -2467,6 +3575,8 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
              (clojure.pprint/pprint data))}))
   \end{clojure}
 \end{english}
+
+\fi
 
 Проброс и замыкание решают одинаковую задачу. Разница в том, как передают
 аргументы в функцию. Проброс удобен тем, что обычно обработчик принимает один
@@ -2483,6 +3593,22 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
 До сих пор мы писали компоненты так, что их повторный запуск привёл бы к
 ошибке. Покажем это на примере веб-сервера:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(def s-started
+  (-> {:port 8088 :join? false}
+      make-server
+      component/start))
+
+(component/start s-started)
+;; BindException: Address already in use
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (def s-started (-> {:port 8088 :join? false}
@@ -2494,6 +3620,8 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
 ;; Address already in use
   \end{clojure}
 \end{english}
+
+\fi
 
 В теле \verb|start| мы не проверяем, что сервер уже работает. При попытке
 включить его повторно получим ошибку: порт занят. Это правильно: мы бы не
@@ -2510,6 +3638,21 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
 \verb|nil|, мы порождаем новый сервер и записываем в слот. В противном случае
 сервер уже запущен и~возвращают \verb|this|.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(start [this]
+  (if server
+    this
+    (let [server (run-jetty
+                   app options)]
+      (assoc this :server server))))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (start [this]
@@ -2519,6 +3662,8 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
       (assoc this :server server))))
   \end{clojure}
 \end{english}
+
+\fi
 
 \noindent
 Аналогично работает \verb|stop|: перед остановкой ресурса слот проверяют на
@@ -2536,6 +3681,20 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
 Вариант с макросом \verb|or| немного короче. Мы всегда записываем слот, но
 значение~--- это либо текущий сервер, либо новый.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(start [this]
+  (let [server (or server
+                   (run-jetty
+                     app options))]
+    (assoc this :server server)))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (start [this]
@@ -2544,6 +3703,8 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
     (assoc this :server server)))
   \end{clojure}
 \end{english}
+
+\fi
 
 \subsection{Альтернативный способ}
 
@@ -2583,6 +3744,21 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
 метаданные. Их ключи — полные символы, которые указывают на методы протокола
 \verb|Lifecycle|. В ключах пока что неизвестные функции запуска и остановки:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn init [options]
+  (with-meta {:options options}
+    {'com.stuartsierra.component/start
+     start
+     'com.stuartsierra.component/stop
+     stop}))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn init [options]
@@ -2591,6 +3767,8 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
      'com.stuartsierra.component/stop stop}))
   \end{clojure}
 \end{english}
+
+\fi
 
 Напишем запуск компонента. Функция \verb|start| принимает словарь, который мы
 вернули в \verb|init|. Для удобства назовём его \verb|this| и распакуем опции на
@@ -2628,6 +3806,24 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
 или словарём. Работает и второй способ, когда конструктор <<заряжает>>
 компонент зависимостями при создании.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn init [options]
+  (->
+    {:options options}
+    (with-meta
+     {'com.stuartsierra.component/start
+      start
+      'com.stuartsierra.component/stop
+      stop})
+    (component/using [:compA :compB])))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn init [options]
@@ -2639,9 +3835,24 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
   \end{clojure}
 \end{english}
 
+\fi
+
 \noindent
 Методам \verb|start| и \verb|stop| нужно только распаковать их на уровне
 сигнатуры:
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn start
+  [{:as this
+    :keys [compA compB options]}]
+  ...)
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -2651,8 +3862,28 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
   \end{clojure}
 \end{english}
 
+\fi
+
 Чтобы убедиться, что компонент обладает всем необходимым, исследуем его
 метаданные после \verb|init|:
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(-> (init {:port 8080})
+    meta
+    clojure.pprint/pprint)
+
+#:com.stuartsierra.component
+ {start #function[.../start]
+  stop  #function[.../stop]
+  :dependencies
+  {:compA :compA :compB :compB}}
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -2666,6 +3897,8 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
    :dependencies {:compA :compA :compB :compB}}
   \end{clojure}
 \end{english}
+
+\fi
 
 \index{метаданные}
 \index{печать!метаданных}
@@ -2781,6 +4014,19 @@ Integrant ожидает от ключа минимум два метода: з�
 подчёркиванием. По аналогии опишем базу данных. Её состояние~--- это спека JDBC с
 пулом соединений.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defmethod ig/init-key ::db
+  [_ options]
+  {:datasource
+    (cp/make-datasource options)})
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defmethod ig/init-key ::db
@@ -2789,12 +4035,28 @@ Integrant ожидает от ключа минимум два метода: з�
   \end{clojure}
 \end{english}
 
+\fi
+
 Функция \verb|init| пробегает по конфигурации и вызывает для каждого ключа
 \verb|init-key|. Получим словарь с теми же ключами, но на месте параметров
 появится состояние компонента. Сохраним запущенную систему в переменную, чтобы
 позже выключить её.
 
 \index{инициализация}
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(def _sys (ig/init config))
+
+(keys _sys)
+(:book.integrant/db
+ :book.integrant/server)
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -2805,9 +4067,29 @@ Integrant ожидает от ключа минимум два метода: з�
   \end{clojure}
 \end{english}
 
+\fi
+
 Остановка системы называется \verb|halt|. Метод \verb|halt-key!| определяет,
 как выключить компонент. Он принимает ключ и состояние, которое получили из
 метода \verb|init-key|. Опишем остановку сервера и базы:
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defmethod ig/halt-key! ::server
+  [_ server]
+  (.stop server))
+
+(defmethod ig/halt-key! ::db
+  [_ db-spec]
+  (-> db-spec
+      :datasource
+      cp/close-datasource))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -2820,6 +4102,8 @@ Integrant ожидает от ключа минимум два метода: з�
   (-> db-spec :datasource cp/close-datasource))
   \end{clojure}
 \end{english}
+
+\fi
 
 \noindent
 Функция \verb|halt!| остановит всю систему. Передайте в неё результат
@@ -2884,6 +4168,26 @@ Integrant ожидает от ключа минимум два метода: з�
 хранить. Проще всего добавить глобальную переменную и функции запуска и
 остановки.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defonce ^:private system nil)
+
+(def alter-system
+  (partial alter-var-root #'system))
+
+(defn system-start []
+  (alter-system
+    (constantly (ig/init config))))
+
+(defn system-stop []
+  (alter-system ig/halt!))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defonce ^:private system nil)
@@ -2897,6 +4201,8 @@ Integrant ожидает от ключа минимум два метода: з�
   (alter-system ig/halt!))
   \end{clojure}
 \end{english}
+
+\fi
 
 Как и в Component, система должна быть приватной. Недопустимо, чтобы потребители
 свободно обращались к ней.
@@ -2933,6 +4239,26 @@ HTTP-запроса. Обработчик может быть компонент
 \noindent
 В запуске ключа вернём обработчик запроса, замкнутый на \verb|db|:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defmethod ig/init-key ::handler
+  [_ {:keys [db]}]
+  (fn [request]
+    (let [query "select count(*) as total
+                 from requests"
+          result (jdbc/query db query)
+          total (-> result first :total)]
+      {:status 200
+       :body (format
+               "You've got %s records."
+               total)})))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defmethod ig/init-key ::handler
@@ -2946,8 +4272,26 @@ HTTP-запроса. Обработчик может быть компонент
   \end{clojure}
 \end{english}
 
+\fi
+
 \noindent
 Доработаем сервер, чтобы он зависел от обработчика:
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+{::server {:options {:port 8080
+                     :join? false}
+           :handler (ig/ref ::handler)}}
+
+(defmethod ig/init-key ::server
+  [_ {:keys [handler options]}]
+  (run-jetty handler options))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -2959,6 +4303,8 @@ HTTP-запроса. Обработчик может быть компонент
   (run-jetty handler options))
   \end{clojure}
 \end{english}
+
+\fi
 
 Браузер покажет фразу You've got N records, где \verb|N|~--- число записей
 в базе. Как и в Component, \verb|::handler| может вернуть не отдельную
@@ -2984,6 +4330,21 @@ Mount \page{mount-selective}. Функция \verb|init| принимает не
 список ключей, которые следует включить. Список готовят заранее по какому-то
 правилу. Ниже мы берём все ключи конфигурации и удаляем некоторые по условию.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(let [components (-> config keys set)
+      components
+      (cond-> components
+        (not (is-worker-supported?))
+        (disj ::worker))]
+  (ig/init config components))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (let [components (-> config keys set)
@@ -2993,6 +4354,8 @@ Mount \page{mount-selective}. Функция \verb|init| принимает не
   (ig/init config components))
   \end{clojure}
 \end{english}
+
+\fi
 
 \subsection{Потеря ключей}
 
@@ -3040,6 +4403,26 @@ Integrant предлагает функцию \verb|load-namespaces| для ав
 пространство и загружает его. Вот как выглядит промышленная система с ключами из
 разных модулей:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(def config
+  {:project.server/server
+   {:options {:port 8080 :join? false}
+    :handler (ig/ref
+               :project.handlers/index)}
+   :project.db/db {...}
+   :project.worker/worker
+   {:options {:sleep 1000}
+    :db      (ig/ref :project.db/db)}
+   :project.handlers/index
+   {:db (ig/ref :project.db/db)}})
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (def config
@@ -3054,6 +4437,8 @@ Integrant предлагает функцию \verb|load-namespaces| для ав
    {:db (ig/ref :project.db/db)}})
   \end{clojure}
 \end{english}
+
+\fi
 
 \noindent
 Чтобы загрузить все модули, которые участвуют в системе, выполните:
@@ -3083,12 +4468,26 @@ Integrant поощряет декларативный подход. Конфиг
 ясно, как выразить их в файле. Тег \verb|#ig/ref| работает как одноимённая
 функция.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+{:project.worker/worker
+ {:options {:sleep 1000}
+  :db #ig/ref :project.db/db}}
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 {:project.worker/worker {:options {:sleep 1000}
                          :db #ig/ref :project.db/db}}
   \end{clojure}
 \end{english}
+
+\fi
 
 \index{модули!clojure.edn}
 
@@ -3112,6 +4511,20 @@ Integrant предлагает свою версию \verb|read-string| для �
 
 Поместим конфигурацию в файл \verb|integrant.test.edn| (фрагмент):
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+{:project.db/db
+ {:password #env DB_PASSWORD}
+ :project.worker/worker
+ {:options {:sleep 1000}
+  :db #ig/ref :project.db/db}}
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 {:project.db/db {:password #env DB_PASSWORD}
@@ -3120,11 +4533,28 @@ Integrant предлагает свою версию \verb|read-string| для �
   \end{clojure}
 \end{english}
 
+\fi
+
 Функция \verb|ig/read-string| принимает дополнительные теги EDN. Integrant
 объединит их со своими при чтении файла. Обернём чтение конфигурации в
 функцию. Первым аргументом в \verb|ig/read-string| укажем словарь с тегом
 \verb|#env| из прошлой главы. Integrant дополнит наш словарь собственным,
 поэтому оба \verb|#ig/ref| и \verb|#env| будут работать.
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn load-config [filename]
+  (ig/read-string
+    {:readers {'env tag-env}}
+    (slurp filename)))
+
+(load-config "integrant.test.edn")
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -3136,8 +4566,26 @@ Integrant предлагает свою версию \verb|read-string| для �
   \end{clojure}
 \end{english}
 
+\fi
+
 \noindent
 Результат:
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+{:project.db/db
+ {:password "c8497b517da25"}
+ :project.worker/worker
+ {:options {:sleep 1000}
+  :db
+  #integrant.core.Ref{:key
+                      :project.db/db}}}
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -3147,6 +4595,8 @@ Integrant предлагает свою версию \verb|read-string| для �
   :db #integrant.core.Ref{:key :project.db/db}}}
   \end{clojure}
 \end{english}
+
+\fi
 
 \subsection{Наследование ключей}
 
@@ -3194,6 +4644,27 @@ Integrant работает на мультиметодах, поэтому из 
 
 \begin{listing}[ht!]
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(def config
+  {::server {:options {:port 8080
+                       :join? false}
+             :handler (ig/ref ::handler)}
+   ::db-master {;; other fields
+                :read-only false}
+   ::db-replica {;; other fields
+                 :read-only true}
+   ::worker {:options {:sleep 1000}
+             :db (ig/ref ::db-master)}
+   ::handler {:db (ig/ref
+                    ::db-replica)}})
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (def config
@@ -3208,6 +4679,8 @@ Integrant работает на мультиметодах, поэтому из 
    ::handler {:db (ig/ref ::db-replica)}})
   \end{clojure}
 \end{english}
+
+\fi
 
 \caption{Конфигурация с двумя базами и ссылками на них}
 \label{fig:config-refset}
@@ -3224,6 +4697,24 @@ Integrant работает на мультиметодах, поэтому из 
 пробегает по базам и выполняет запрос. Её запуск и остановка аналогичны
 воркеру. Пример ниже показывает, как добраться до обеих баз из параметров.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+{::db-maintenance
+ {:dbs (ig/refset ::db)}}
+
+(defmethod ig/init-key ::db-maintenance
+  [_ {:keys [dbs]}]
+  (future
+    (every-1h-interval
+      (doseq [db dbs]
+        (run-system-query db)))))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 {::db-maintenance {:dbs (ig/refset ::db)}}
@@ -3236,6 +4727,8 @@ Integrant работает на мультиметодах, поэтому из 
         (run-system-query db)))))
   \end{clojure}
 \end{english}
+
+\fi
 
 \subsection{Другие стадии компонента}
 
@@ -3274,6 +4767,22 @@ Integrant работает на мультиметодах, поэтому из 
 указать только поля доступа и, если требуется, переопределения для частных
 случаев:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+{::db {;; override the default
+       :auto-commit   true
+       :adapter       "postgresql"
+       :username      "book"
+       :password      "book"
+       :database-name "book"
+       :server-name   "127.0.0.1"}}
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 {::db {:auto-commit   true ;; override the default
@@ -3285,6 +4794,8 @@ Integrant работает на мультиметодах, поэтому из 
   \end{clojure}
 \end{english}
 
+\fi
+
 Функция \verb|ig/prep| принимает конфигурацию и готовит каждый ключ. Чтобы не
 забыть этот шаг, добавьте его в \verb|load-config|.
 
@@ -3295,6 +4806,25 @@ Integrant работает на мультиметодах, поэтому из 
 Метод \verb|ig/pre-init-spec| связывает компонент со спекой. Если метод вернул
 спеку, она проверит параметры компонента. Убедимся, что задали все поля в
 подключении к базе данных:
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(require '[clojure.spec.alpha :as s])
+
+(s/def :db/username string?)
+(s/def :db/database-name string?)
+;; host, password, etc
+
+(defmethod ig/pre-init-spec ::db [_]
+  (s/keys :req-un [:db/username
+                   :db/database-name]))
+                   ;; etc
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -3309,6 +4839,8 @@ Integrant работает на мультиметодах, поэтому из 
                    :db/database-name])) ;; etc
   \end{clojure}
 \end{english}
+
+\fi
 
 \noindent
 Если передать неверные параметры, получим ошибку Spec. Её сообщение и
@@ -3347,11 +4879,24 @@ Clojure предлагает несколько способов построи�
 Mount отталкивается от глобальных переменных. Если проект написан, как в примере
 ниже:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(def server
+  (run-jetty app {:port 8080})),
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (def server (run-jetty app {:port 8080})),
   \end{clojure}
 \end{english}
+
+\fi
 
 \noindent
 то портировать его на Mount будет легко. Переменная \verb|server| станет
