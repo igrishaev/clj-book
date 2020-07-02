@@ -58,6 +58,21 @@
 \verb|(test-fahr)| работает без ошибок, потому что расчёты верны. Если изменить
 формулу, получим исключение:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn ->fahr [cel]
+  (+ (* cel 1.9) 32))
+
+(test-fahr)
+;; Assert failed:
+;; (= (int (->fahr 20)) 68)
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn ->fahr [cel]
@@ -67,6 +82,8 @@
 ;; Assert failed: (= (int (->fahr 20)) 68)
   \end{clojure}
 \end{english}
+
+\fi
 
 Функция \verb|test-fahr| и есть тест. Она проверяет, что код \verb|->fahr|
 не изменили так, что получится другой результат. В наших интересах вызвать
@@ -93,6 +110,25 @@ $c$. Особенность задачи в том, что её логика в�
 
 \index{квадратное уравнение}
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn square-roots [a b c]
+  (let [D (- (* b b) (* 4 a c))]
+    (cond
+      (pos? D)
+      [(/ (+ (- b) (Math/sqrt D))
+          (* 2 a))
+       (/ (- (- b) (Math/sqrt D))
+          (* 2 a))]
+      (zero? D) [(/ (- b) (* 2 a))]
+      (neg? D) nil)))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn square-roots [a b c]
@@ -105,12 +141,36 @@ $c$. Особенность задачи в том, что её логика в�
   \end{clojure}
 \end{english}
 
+\fi
+
 \index{функции!square-roots}
 
 Чтобы проверить алгоритм, тест вызывает функцию \verb|square-roots| минимум три
 раза. Подберём параметры так, чтобы сработала каждая ветка. Ещё лучше, если на
 каждую ветку приходится отдельный тест, чтобы расширить его в будущем. Тесты ниже
 образуют кейс, который проверяет алгоритм целиком.
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn test-square-roots-two-roots []
+  (let [[x1 x2] (square-roots 1 -5 6)]
+    (assert
+      (= [3 2]
+         [(int x1) (int x2)]))))
+
+(defn test-square-roots-one-root []
+  (let [[x1 x2] (square-roots 1 6 9)]
+    (assert (= [-3] [(int x1)]))
+    (assert (nil? x2))))
+
+(defn test-square-roots-no-roots []
+  (assert (nil? (square-roots 2 4 7))))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -127,6 +187,8 @@ $c$. Особенность задачи в том, что её логика в�
   (assert (nil? (square-roots 2 4 7))))
   \end{clojure}
 \end{english}
+
+\fi
 
 В объектно-ориентированных языках кейсы~--- это классы, а тесты~--- их
 методы. Clojure устроена проще: тест~--- это функция, а роль кейса играет
@@ -145,6 +207,25 @@ $c$. Особенность задачи в том, что её логика в�
 поэтому её выносят в расширение фреймворка. Для нашего случая мы получили бы
 вывод:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{diff}
++(defn square-roots [a b c]
++  (let [D (- (* b b) (* 4 a c))]
++    (cond
++      (pos? D)
++      [(/ (+ (- b) (Math/sqrt D))
++          (* 2 a))
++       (/ (- (- b) (Math/sqrt D))
++          (* 2 a))]
+-      (zero? D) [(/ (- b) (* 2 a))]
+-      (neg? D) nil)))
+  \end{diff}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{diff}
 +(defn square-roots [a b c]
@@ -156,6 +237,8 @@ $c$. Особенность задачи в том, что её логика в�
 -      (neg? D) nil)))
   \end{diff}
 \end{english}
+\fi
+
 
 В функции \verb|square-roots| семь строк. При запуске теста сработали пять из
 них. Покрытие составит 5/7, что приблизительно 71\%. Считается, что покрытия
@@ -208,6 +291,29 @@ $c$. Особенность задачи в том, что её логика в�
 
 \label{hmac-sha256}
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn test-sign-params []
+  (let [secret-key "fnsd809SDf2dfs3t"
+        params
+        {:api_key "2Ag48776s634Tsdf"
+         :action :postComment
+         :post_id 217
+         :comment
+         "This is a great article!"}
+        signature "01b03dbf1fa5a4c5"]
+    (assert
+      (= (assoc params
+           :signature signature)
+         (sign-params params
+           secret-key)))))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn test-sign-params []
@@ -221,6 +327,8 @@ $c$. Особенность задачи в том, что её логика в�
                (sign-params params secret-key)))))
   \end{clojure}
 \end{english}
+
+\fi
 
 Заметим, что \verb|sign-params| работает не с числами, а с коллекциями
 и~криптографией. Это не помешало написать для неё тест. Чтобы улучшить нашу
@@ -264,6 +372,20 @@ $c$. Особенность задачи в том, что её логика в�
 
 \index{форматы!CSV}
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn process-csv [path]
+  (let [content (slurp path)]
+    (for [line (clojure.string/split
+                 content #"\n")]
+      (remap-line line))))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn process-csv [path]
@@ -273,8 +395,26 @@ $c$. Особенность задачи в том, что её логика в�
   \end{clojure}
 \end{english}
 
+\fi
+
 \noindent
 и после:
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn process-csv-content [content]
+  (for [line (clojure.string/split
+               content #"\n")]
+    (remap-line line)))
+
+(defn process-csv [path]
+  (process-csv-content (slurp path)))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -287,8 +427,30 @@ $c$. Особенность задачи в том, что её логика в�
   \end{clojure}
 \end{english}
 
+\fi
+
 Напишем тест для \verb|process-csv-content|. Не придётся создавать файл на
 диске: функция принимает строку, которую объявим на месте.
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(def CONTENT
+  (str "Ivan;ivan@test.ru;"
+       "http://example.ru"
+       \newline
+       "John;john@test.com;"
+       "http://example.com"))
+
+(assert
+  (= [{:name "Ivan" :email ...}
+      {:name "John" :email ...}]
+     (process-csv-content CONTENT)))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -302,6 +464,8 @@ $c$. Особенность задачи в том, что её логика в�
            (process-csv-content CONTENT)))
   \end{clojure}
 \end{english}
+
+\fi
 
 Другой способ в том, чтобы заменить функцию на мультиметод. Реализация зависит
 от первого аргумента. Если это файл, читаем его и~снова вызываем мультиметод со
@@ -476,6 +640,24 @@ Python, JavaScript или Clojure, но если прогон запущен с 
 \index{clojure.test!deftest}
 \index{clojure.test!is}
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(ns book.util-test
+  (:require
+   [book.util :refer [->fahr]]
+   [clojure.test :refer
+    [deftest testing is]]))
+
+(deftest test-fahr
+  (is (= 68 (int (->fahr 20))))
+  (is (= 212 (int (->fahr 100)))))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (ns book.util-test
@@ -487,6 +669,8 @@ Python, JavaScript или Clojure, но если прогон запущен с 
   (is (= 212 (int (->fahr 100)))))
   \end{clojure}
 \end{english}
+
+\fi
 
 Получился тестовый модуль. Он импортирует \verb|->fahr| и объявляет тест
 \verb|test-fahr|. Макросы \verb|is| и \verb|deftest| приходят из пакета
@@ -597,11 +781,24 @@ Tests failed.
 Выражение с \verb|:only| выполнит только указанный тест. Это полезно, когда вы
 работаете над участком кода и запускаете тест много раз.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{bash}
+$ lein test \
+    :only book.util-test/test-fahr
+  \end{bash}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{bash}
 $ lein test :only book.util-test/test-fahr
   \end{bash}
 \end{english}
+
+\fi
 
 \index{исключения!в тестах}
 
@@ -620,6 +817,27 @@ $ lein test :only book.util-test/test-fahr
 \noindent
 Отчёт будет другим:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+$ lein test
+lein test
+:only book.util-test/test-fahr-nil
+
+ERROR in test-fahr-nil Numbers.java:3849
+expected: (nil? (->fahr nil))
+  actual: java.lang.NullPointerException
+    ... ;; truncated
+
+Ran 2 tests containing 3 assertions.
+0 failures, 1 errors.
+Tests failed.
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 $ lein test
@@ -636,6 +854,8 @@ Ran 2 tests containing 3 assertions.
 Tests failed.
   \end{clojure}
 \end{english}
+
+\fi
 
 \index{NPE}
 
@@ -701,6 +921,19 @@ expected: 999
 Если вызвать тест \verb|(test-fahr-nil)|, который всё ещё неисправен,
 увидим исключение:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+ERROR in test-fahr-nil Numbers.java:3849
+expected: (nil? (->fahr nil))
+  actual: java.lang.NullPointerException
+    ... ;; truncated
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 ERROR in (test-fahr-nil) (Numbers.java:3849)
@@ -712,6 +945,8 @@ expected: (nil? (->fahr nil))
   \end{clojure}
 \end{english}
 
+\fi
+
 Это только вывод в консоль, а не брошенное исключение. Макрос \verb|deftest|
 оборачивает тело в \verb|try/catch|.
 
@@ -719,6 +954,20 @@ expected: (nil? (->fahr nil))
 которые готовят среду для теста. О фикстурах мы поговорим позже; пока что
 отметим, что функция \verb|test-vars| выполняет тесты с учётом фикстур. Она
 принимает вектор объектов \verb|Var|:
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(require
+  '[clojure.test :refer [test-vars]])
+
+(test-vars
+  [#'test-fahr #'test-fahr-nil])
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -728,11 +977,25 @@ expected: (nil? (->fahr nil))
   \end{clojure}
 \end{english}
 
+\fi
+
 \index{clojure.test!run-tests}
 
 Функция \verb|run-tests| запускает все тесты пространства (текущего или
 указанного). Технически она сводится к \verb|test-vars| со всеми переменными
 пространства:
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(require
+  '[clojure.test :refer [run-tests]])
+(run-tests)
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -741,8 +1004,22 @@ expected: (nil? (->fahr nil))
   \end{clojure}
 \end{english}
 
+\fi
+
 Ещё одна функция \verb|run-all-tests| выполняет тесты для всех загруженных
 пространств:
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(require
+  '[clojure.test :refer [run-all-tests]])
+(run-all-tests)
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -750,6 +1027,8 @@ expected: (nil? (->fahr nil))
 (run-all-tests)
   \end{clojure}
 \end{english}
+
+\fi
 
 Запустив это выражение, вы увидите, как фреймворк перебирает загруженные модули:
 
@@ -879,7 +1158,7 @@ IDE.
 \verb|nil|. Если проверки нет, код не защищён от подобных изменений:
 
 \begin{english}
-
+%% TODO MOBILE
 \noindent
 \begin{tabular}{ @{}p{5cm} @{}p{5cm} }
 
@@ -978,6 +1257,21 @@ IDE.
 исключение \verb|IllegalArgumentException|. Его дополняют сообщением о том,
 что именно не так:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn ->fahr [cel]
+  (if (number? cel)
+    (+ (* cel 1.8) 32)
+    (throw (new IllegalArgumentException
+             "Fahrenheit temperature
+              must be a real number"))))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn ->fahr [cel]
@@ -988,10 +1282,26 @@ IDE.
   \end{clojure}
 \end{english}
 
+\fi
+
 Второй шаг~--- убедиться, что исключение пришло именно из \verb|->fahr|. Форма
 \verb|(is (thrown-with-msg?...))| проверяет, что текст исключения совпадает с
 регулярным выражением. Тест ниже покрывает эти требования: другое
 \verb|IllegalArgumentException| не пройдёт проверку.
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(deftest test-fahr-nil
+  (is (thrown-with-msg?
+       IllegalArgumentException
+       #"Fahrenheit temperature"
+       (->fahr nil))))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -1001,6 +1311,8 @@ IDE.
        (->fahr nil))))
   \end{clojure}
 \end{english}
+
+\fi
 
 \subsection{Пакетная проверка}
 
@@ -1049,11 +1361,24 @@ IDE.
 обязательного поля или оно в неверном формате. В переменную \verb|params-ok|
 запишем правильные параметры:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(def params-ok {:name "John Smith"
+                :email "john@test.com"})
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (def params-ok {:name "John Smith" :email "john@test.com"})
   \end{clojure}
 \end{english}
+
+\fi
 
 Для негативных случаев объявим вектор \verb|params-variations|. Он состоит из
 пар \tuple{словарь, текст}. Словарь~--- это изменения, которые добавим к
@@ -1075,6 +1400,26 @@ IDE.
 вызов обёрнут в \verb|testing| с сообщением. Если на одном из шагов не
 сработает \verb|is|, мы узнаем причину из отчёта.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(deftest test-api-create-user-bad-params
+  (testing "Sending bad parameters"
+    (doseq [[params* description]
+            params-variations]
+      (testing description
+        (let [params
+              (merge params-ok params*)
+              response
+              (api-create-user params)
+              {:keys [status]} response]
+          (is (= 400 status)))))))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (deftest test-api-create-user-bad-params
@@ -1088,6 +1433,8 @@ IDE.
   \end{clojure}
 \end{english}
 
+\fi
+
 Тест разделяет данные и проверку, поэтому его легко поддерживать. Если в API
 появятся новые поля, расширим \verb|params-variations|, не меняя тест.
 
@@ -1097,12 +1444,28 @@ IDE.
 необязательно: фреймворк ищет тесты по метаданным, а не по имени. Выражения ниже
 останутся функцией и тестом, даже если их назвали наоборот.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+;; function
+(defn test-if-suspended [user])
+
+;; test
+(deftest is-suspended)
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn test-if-suspended [user]) ;; function
 (deftest is-suspended)          ;; test
   \end{clojure}
 \end{english}
+
+\fi
 
 Префикс необходим для навигации по коду. В модуле бывает больше тестов, чем
 умещается на экран. Вперемешку с тестами идут переменные и служебные функции. С
@@ -1155,7 +1518,7 @@ Emacs предлагает навигацию по коду командой \ve
 Увы, придётся побороть себя и писать по образцу справа:
 
 \begin{english}
-
+%% TODO MOBILE
 \noindent
 \begin{tabular}{ @{}p{5cm} @{}p{5cm} }
 
@@ -1194,7 +1557,7 @@ Emacs предлагает навигацию по коду командой \ve
 (actual). Вариант справа выводит статусы правильно.
 
 \begin{english}
-
+%% TODO MOBILE
 \noindent
 \begin{tabular}{ @{}p{5cm} @{}p{5cm} }
 
@@ -1265,6 +1628,29 @@ expected: 200
 
 \index{фикстуры!база данных}
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(def db {...}) ;; JDBC spec
+
+(defn fix-db-data [t]
+  ;; purge tables
+  (jdbc/execute! db
+    "truncate users cascade;")
+  (jdbc/execute! db
+    "truncate orders cascade;")
+  ;; add data
+  (jdbc/insert! db :users user-data)
+  (jdbc/insert! db
+    :profile profile-data)
+  ;; execute the test
+  (t))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (def db {...}) ;; JDBC spec
@@ -1281,10 +1667,31 @@ expected: 200
   \end{clojure}
 \end{english}
 
+\fi
+
 В примере мы сначала готовим окружение: чистим таблицы, вносим данные, затем
 вызываем тест. Бывает и наоборот: тест нуждается в финальных
 действиях. Предположим, мы пишем промежуточные файлы на диск. Чтобы очистить
 папку при выходе из теста, напишем фикстуру:
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(import 'java.io.File
+        'org.apache.commons.io.FileUtils)
+
+(defn clean-dir [path]
+  (FileUtils/cleanDirectory
+    (new File path)))
+
+(defn fix-clear-files [t]
+  (t)
+  (clean-dir "/tmp/tests/data"))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -1299,6 +1706,8 @@ expected: 200
   (clean-dir "/tmp/tests/data"))
   \end{clojure}
 \end{english}
+
+\fi
 
 Иногда фикстура сообщает и предварительные, и финальные шаги. В этом случае
 \verb|(t)| находится где-то посередине.
@@ -1362,6 +1771,22 @@ expected: 200
 
 \index{фикстуры!порядок}
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn fix-factory [type number]
+  (fn [t]
+    (println (format "%s %s starts"
+               type number))
+    (t)
+    (println (format "%s %s ends"
+               type number))))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn fix-factory [type number]
@@ -1371,6 +1796,8 @@ expected: 200
     (println (format "%s %s ends" type number))))
   \end{clojure}
 \end{english}
+
+\fi
 
 \noindent
 Добавим по две фикстуры каждого типа:
@@ -1425,12 +1852,26 @@ expected: 200
 \index{метаданные!в тестах}
 \index{метаданные!в пространствах}
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(keys (meta *ns*))
+(:clojure.test/each-fixtures
+ :clojure.test/once-fixtures)
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (keys (meta *ns*))
 (:clojure.test/each-fixtures :clojure.test/once-fixtures)
   \end{clojure}
 \end{english}
+
+\fi
 
 В каждом из них список функций, которые передали в \verb|use-fixtures| с
 \verb|:each| или \verb|:once|. Вызов \verb|use-fixtures| заменяет в метаданных
@@ -1479,6 +1920,28 @@ expected: 200
 \index{классы!File}
 \index{файлы!временные}
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(import 'java.io.File)
+
+(defonce ^:dynamic *tmp-file* nil)
+
+(defn fix-with-tmp-file [t]
+  (let [^File tmp-file
+        (File/createTempFile
+          "test" "img.png")]
+    (binding [*tmp-file* tmp-file]
+      (t))
+    (.delete tmp-file)))
+
+(use-fixture :each fix-with-tmp-file)
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (import 'java.io.File)
@@ -1495,6 +1958,8 @@ expected: 200
   \end{clojure}
 \end{english}
 
+\fi
+
 Частичка \verb|with| в имени фикстуры намекает на контекст. Добавляйте её,
 когда фикстура обращается к \verb|binding|, \verb|with-redefs| или аналогам.
 
@@ -1504,6 +1969,22 @@ expected: 200
 
 Внутри теста мы вызываем \verb|plot-chart| с некоторым набором данных и текущим
 временным файлом.
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure/lines*}{firstnumber=1}
+(import 'javax.imageio.ImageIO)
+
+(deftest test-plot-chart-png
+ (let [dataset [[...] [...] [...]]
+       filepath
+       (.getAbsolutePath *tmp-file*)]
+   (plot-chart dataset filepath)
+  \end{clojure/lines*}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure/lines*}{firstnumber=1}
@@ -1516,6 +1997,8 @@ expected: 200
   \end{clojure/lines*}
 \end{english}
 
+\fi
+
 \wavebottom
 
 \noindent
@@ -1525,6 +2008,19 @@ expected: 200
 
 \wavetop
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure/lines*}{firstnumber=8}
+(let [png (ImageIO/read *tmp-file*)
+      width (.getWidth png)
+      height (.getHeight png)])
+(is (= [640 480] [width height]))))
+  \end{clojure/lines*}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure/lines*}{firstnumber=7}
     (let [png (ImageIO/read *tmp-file*)
@@ -1533,6 +2029,8 @@ expected: 200
     (is (= [640 480] [width height]))))
   \end{clojure/lines*}
 \end{english}
+\fi
+
 
 \index{базы данных!Cassandra}
 \index{фикстуры!база данных}
@@ -1541,6 +2039,30 @@ expected: 200
 JDBC-драйвер. Фикстура \verb|fix-with-db| связывает \verb|*db*| с текущей
 сессией. Установка сессии~--- это дорогая операция, поэтому вынесем её в разовую
 фикстуру.
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(require '[qbits.alia :as alia])
+
+(defonce ^:dynamic *db* nil)
+
+(defn fix-with-db [t]
+  (let [cluster
+        (alia/cluster {:contact-points
+                       ["localhost"]})
+        session (alia/connect cluster)]
+    (binding [*db* session]
+      (t))
+    (.close session)
+    (.close cluster)))
+
+(use-fixture :once fix-with-db)
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -1560,12 +2082,33 @@ JDBC-драйвер. Фикстура \verb|fix-with-db| связывает \ver
   \end{clojure}
 \end{english}
 
+\fi
+
 Вторая фикстура готовит данные для каждого теста. Фикстуры \verb|:once|
 запускаются раньше, чем \verb|:each|. Подготовка данных сработает внутри
 \verb|(binding [*db* ...])| из первой фикстуры. Это значит, внутри второй мы
 свободно обращаемся к \verb|*db*| как к сессии:
 
 \index{SQL!TRUNCATE}
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn fix-db-prepare-data [t]
+  (alia/execute! *db*
+    "truncate project.users;")
+  (alia/execute! *db*
+    "truncate project.orders;")
+  (alia/execute! *db*
+    "insert into project.users...")
+  (t))
+
+(use-fixture :each fix-db-prepare-data)
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -1578,6 +2121,8 @@ JDBC-драйвер. Фикстура \verb|fix-with-db| связывает \ver
 (use-fixture :each fix-db-prepare-data)
   \end{clojure}
 \end{english}
+
+\fi
 
 \subsection{Мультификстуры}
 
@@ -1601,12 +2146,25 @@ JDBC-драйвер. Фикстура \verb|fix-with-db| связывает \ver
 и запустим один тест. С точки зрения фреймворка прошло три теста, о чём скажет
 отчёт:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{text}
+Ran 6 assertions, in 3 test functions.
+0 failures, 0 errors.
+  \end{text}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{text}
 book.util-test: Ran 6 assertions, in 3 test functions.
 0 failures, 0 errors.
   \end{text}
 \end{english}
+
+\fi
 
 На первый взгляд, в этом нет смысла. Множественный прогон не несёт пользы, а
 только потребляет ресурсы и время. Но с динамическими переменными такая фикстура
@@ -1617,6 +2175,19 @@ book.util-test: Ran 6 assertions, in 3 test functions.
 СУБД. Чтобы не дублировать тесты под каждый тип базы, логику повтора выносят в
 фикстуру. Объявим подключения к базам данных:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(def db-pg
+  {:dbtype "postgresql" :host "..."})
+(def db-mysql
+  {:dbtype "mysql"      :host "..."})
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (def db-pg    {:dbtype "postgresql" :host "..."})
@@ -1624,10 +2195,30 @@ book.util-test: Ran 6 assertions, in 3 test functions.
   \end{clojure}
 \end{english}
 
+\fi
+
 Добавим динамическую переменную \verb|*db*|. Новая фикстура перебирает
 подключения и связывает их с \verb|*db*| на каждом шаге. Когда переменная
 связана, запускается тест. Он зависит от текущего подключения и поэтому
 обращается либо в PostgreSQL, либо в MySQL.
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defonce ^:dynamic *db* nil)
+
+(defn fix-with-multi-db-backend [t]
+  (doseq [db [db-pg db-mysql]]
+    (binding [*db* db]
+      (testing
+        (format "Testing with DB %s"
+          (:dbtype *db*))
+        (t)))))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -1641,9 +2232,24 @@ book.util-test: Ran 6 assertions, in 3 test functions.
   \end{clojure}
 \end{english}
 
+\fi
+
 Вызов \verb|(t)| обёрнут в форму \verb|testing|, которая сообщает тип
 базы. Если произошла ошибка, мы узнаем, с какой базой работали в тот
 момент. Тест на чтение пользователя:
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn test-get-user-by-id
+  (let [user
+        (project.orm/get-user *db* 1)]
+    (is (= {:name "Ivan"} user))))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -1652,6 +2258,8 @@ book.util-test: Ran 6 assertions, in 3 test functions.
     (is (= {:name "Ivan"} user))))
   \end{clojure}
 \end{english}
+
+\fi
 
 Перечислим другие сценарии для мультификстур. Это могут быть интеграционные
 тесты в нескольких браузерах (Chrome, Firefox). Иногда нужно проверить, что
@@ -1742,6 +2350,22 @@ PostgreSQL. Фикстура проверяет тип подключения и
 ошибке, добавьте ложное утверждение. Обратите внимание на второй параметр
 \verb|is|. Это сообщение, которое появится в отчёте для этого утверждения.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn fix-pg-only [t]
+  (let [{:keys [dbtype]} *db*]
+    (if (= dbtype "postgresql")
+      (t)
+      (is false
+        (str "Unsupported DB "
+          dbtype)))))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn fix-pg-only [t]
@@ -1751,6 +2375,8 @@ PostgreSQL. Фикстура проверяет тип подключения и
       (is false (str "Unsupported DB " dbtype)))))
   \end{clojure}
 \end{english}
+
+\fi
 
 Каким способом зарегистрировать фикстуру~--- \verb|:once| или \verb|:each|?
 Это зависит от семантики условия. В нашем примере база не меняется от теста к
@@ -1809,12 +2435,27 @@ PostgreSQL. Фикстура проверяет тип подключения и
 метаданные переменной \verb|test-special-case|. Среди прочих полей вы найдёте
 \verb|:special| и остальные:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(meta #'test-special-case)
+{:special true
+ :backend true
+ :no-db true ...}
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (meta #'test-special-case)
 {:special true :backend true :no-db true ...}
   \end{clojure}
 \end{english}
+
+\fi
 
 По тегам можно выбрать часть тестов: только особые (\verb|special|) или на
 серверную логику (\verb|backend|). Выборка называется селектором
@@ -1886,6 +2527,19 @@ $ lein test :special
 модульные тесты. Чтобы прогнать весь проект, мы завели метку \verb|:all|,
 которая вернёт истину для любого теста.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+:test-selectors
+  {:default (complement :integration)
+   :integration :integration
+   :all (constantly true)}
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 :test-selectors {:default (complement :integration)
@@ -1893,6 +2547,8 @@ $ lein test :special
                  :all (constantly true)}
   \end{clojure}
 \end{english}
+
+\fi
 
 Селектор может быть полноценной функцией. Предположим, часть программы
 полагается на новые функции базы данных. Для каждого теста укажем минимальную
@@ -1911,6 +2567,21 @@ $ lein test :special
 Ниже селектор, который вернёт подобные тесты. Запустите их командой
 \verb|lein test :db-experimental|:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+:test-selectors
+  {:db-experimental
+   (fn [test-meta]
+     (some-> test-meta
+             :db/version
+             (>= 11)))}
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 :test-selectors {:db-experimental
@@ -1919,9 +2590,25 @@ $ lein test :special
   \end{clojure}
 \end{english}
 
+\fi
+
 Можно выбрать тесты по частичному совпадению пространства и~имени. По умолчанию
 \verb|lein| не предлагает \verb|regex|-селекторов: команда \verb|test| запускает
 конкретный тест, пространство или всё целиком. Это легко исправить селектором:
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+:test-selectors
+  {:test-api
+   (fn [m]
+     (->> m :name name
+          (re-find #"^test-api")))}
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -1930,6 +2617,8 @@ $ lein test :special
                               (re-find #"^test-api")))}
   \end{clojure}
 \end{english}
+
+\fi
 
 Он вернёт все тесты, чьи имена начинаются с \verb|test-api|. Имя переменной~--- это
 символ, поэтому приводим его к строке. Заметим, что имя не содержит
@@ -1940,6 +2629,20 @@ $ lein test :special
 \index{clojure.core!ns-name}
 \index{классы!Namespace}
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+:test-selectors
+  {:test-ns-api
+   (fn [m]
+     (->> m :ns ns-name name
+          (re-find #"^project.api")))}
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 :test-selectors {:test-ns-api
@@ -1947,6 +2650,8 @@ $ lein test :special
                               (re-find #"^project.api")))}
   \end{clojure}
 \end{english}
+
+\fi
 
 Новый селектор ищет только те тесты, чьи пространства начинаются
 с~\verb|project.api|. В него попадут условные \verb|project.api.user|,
@@ -1997,6 +2702,28 @@ $ lein test :integration
 
 Добавьте в файл \verb|deps.edn| запись:
 
+\ifx\devicetype\mobile
+%% TODO MOBILE url & sha
+\begin{english}
+  \begin{clojure}
+:aliases
+{:test
+ {:extra-paths ["test"]
+  :extra-deps
+  {com.cognitect/test-runner
+   {:git/url
+    "https://github.com/
+         cognitect-labs/test-runner.git"
+    :sha
+"209b64504cb3bd3b99ecfec7937b358a879f55c1"
+  }}
+  :main-opts
+  ["-m" "cognitect.test-runner"]}}
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 :aliases
@@ -2009,6 +2736,8 @@ $ lein test :integration
   :main-opts ["-m" "cognitect.test-runner"]}}
   \end{clojure}
 \end{english}
+
+\fi
 
 \index{алиас}
 \index{прoфили!deps}
@@ -2086,6 +2815,28 @@ API. Такой код трудно тестировать по двум при�
 \verb|view-main-page| принимает запрос с~координатами устройства, собирает
 сведения о местах и событиях и~отсылает результат:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn view-main-page [request]
+  (let [location
+        (-> request
+            :params
+            (select-keys [:lat :lon]))
+        sites
+        (get-sites-by-location location)
+        events
+        (get-events-by-location
+          location)]
+    {:status 200
+     :body {:sites sites
+            :events events}}))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn view-main-page [request]
@@ -2097,12 +2848,39 @@ API. Такой код трудно тестировать по двум при�
   \end{clojure}
 \end{english}
 
+\fi
+
 Данные о местах и событиях приходят из условных сервисов Яндекс.Карт
 и~Афиши. Функции \verb|get-sites|\textbf{...} и \verb|get-events|\textbf{...}
 общаются с ними по HTTP. Так выглядит функция \verb|get-sites-by-location| для
 поиска кафе и ресторанов в радиусе 300 метров:
 
 \index{HTTP!API}
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(ns book.views
+  (:require
+   [clj-http.client :as client]))
+
+(defn get-sites-by-location
+  [{:keys [lat lon]}]
+  (-> {:method :get
+       :url
+       "https://maps.yandex.ru/search/v1"
+       :as :json
+       :query-params
+       {:apikey "....."
+        :lat lat :lon lon :distance 300
+        :type "cafe,restaurant"}}
+      client/request
+      :body))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -2121,6 +2899,8 @@ API. Такой код трудно тестировать по двум при�
       :body))
   \end{clojure}
 \end{english}
+
+\fi
 
 Функция \verb|get-events-by-location| для событий аналогична первой. Разница в
 адресе (не \verb|maps.yandex.ru|, a \verb|events.afisha.ru|) и параметрах
@@ -2142,6 +2922,33 @@ API. Такой код трудно тестировать по двум при�
 \verb|let|. Функцию \verb|view-main-page| вызываем  внутри
 \verb|with-redefs|, иначе эффект моков теряется.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(deftest test-main-page
+  (let [sites [{:name "Cafe1"}
+               {:name "Cafe2"}]
+        events [{:name "Event1"}
+                {:name "Event2"}]]
+    (with-redefs
+      [book.views/get-sites-by-location
+       (constantly sites)
+       book.views/get-events-by-location
+       (constantly events)]
+      (let [request
+            {:params {:lat 55.751244
+                      :lon 37.618423}}
+            result
+            (view-main-page request)]
+        (is (= {:sites sites
+               :events events}
+               (:body result)))))))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (deftest test-main-page
@@ -2157,6 +2964,8 @@ API. Такой код трудно тестировать по двум при�
                (:body result)))))))
   \end{clojure}
 \end{english}
+
+\fi
 
 Мы избежали похода в сеть: тест не зависит от ключей, прав доступа и новых
 заведений. Запустите его в любое время, и результат не изменится. Теперь
@@ -2195,6 +3004,21 @@ API. Такой код трудно тестировать по двум при�
 утомительно. Поместим мок в фикстуру. Так мы снизим повторы в коде, и~ей~смогут
 пользоваться другие тесты.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn fix-mock-sites-events [t]
+  (with-redefs [...]
+    (t)))
+
+(use-fixtures :each
+  fix-mock-sites-events)
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn fix-mock-sites-events [t]
@@ -2204,6 +3028,8 @@ API. Такой код трудно тестировать по двум при�
 (use-fixtures :each fix-mock-sites-events)
   \end{clojure}
 \end{english}
+
+\fi
 
 Недостаток фикстуры в том, для всех тестов она задаёт позитивный сценарий (оба
 вызова прошли без ошибок). Для полноты картины нужно проверить ошибки.
@@ -2270,6 +3096,19 @@ API. Такой код трудно тестировать по двум при�
 аргументы вычисляются до того, как она сработает. Нельзя передать в неё код
 c~исключением. Следующий код:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(constantly
+  (throw (new Exception "error")))
+;; Execution error at...
+;; error
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (constantly (throw (new Exception "error")))
@@ -2277,6 +3116,8 @@ c~исключением. Следующий код:
 ;; error
   \end{clojure}
 \end{english}
+
+\fi
 
 \index{порядок вычислений}
 
@@ -2295,6 +3136,31 @@ c~исключением. Следующий код:
 проверяет сценарий, когда сервис кафе сработал без ошибок, а~с~событиями что-то
 не так. Если запустить тест, окажется, что главный экран не ловит исключения, и
 пользователь не получит ничего.
+%% TODO code line ref
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure/lines}
+(deftest test-sites-ok-events-err
+ (with-mock
+  book.views/get-sites-by-location
+  [...]
+  (with-mock
+   book.views/get-events-by-location
+   (throw
+    (new java.net.UnknownHostException
+      "DNS error"))
+   (let [request {...}
+         response
+         (view-main-page request)
+         {:keys [status body]}
+         response]
+     (is (= 200 status))
+     (is (= {...} body))))))
+  \end{clojure/lines}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure/lines}
@@ -2309,6 +3175,8 @@ c~исключением. Следующий код:
         (is (= {...} body))))))
   \end{clojure/lines}
 \end{english}
+
+\fi
 
 Доработайте \verb|view-main-page| так, чтобы тест получил ответ со статусом
 200 и полем \verb|:sites|. Добавьте тесты с другими комбинациями: ошибка
@@ -2413,6 +3281,25 @@ HTTP-клиента. Однако тесты на исключениях дал�
 
 \label{sites-handler}
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn sites-handler* [{:keys [uri]}]
+  (case uri
+    "/search/v1"
+    {:status 200
+     :body [{:name "Cafe1"
+             :address "..."}
+            {:name "Cafe2"
+             :address "..."}]}
+    {:status 404
+     :body "page not found"}))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn sites-handler* [{:keys [uri]}]
@@ -2423,6 +3310,8 @@ HTTP-клиента. Однако тесты на исключениях дал�
     {:status 404 :body "page not found"}))
   \end{clojure}
 \end{english}
+
+\fi
 
 \index{middleware!стабы}
 
@@ -2443,6 +3332,24 @@ JSON автоматически. Кроме того, пригодятся па�
 данные. Подключим фикстуру с ключом \verb|:once|, чтобы она сработала один
 раз:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn fix-fake-sites-server [t]
+  (let [opt {:port 8808 :join? false}
+        server
+        (run-jetty sites-handler opt)]
+    (t)
+    (.stop server)))
+
+(use-fixtures :once
+  fix-fake-sites-server)
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn fix-fake-sites-server [t]
@@ -2455,6 +3362,8 @@ JSON автоматически. Кроме того, пригодятся па�
   \end{clojure}
 \end{english}
 
+\fi
+
 \index{конфигурация}
 
 Исправим функцию \verb|get-sites-by-location| так, чтобы бекэнд обращался к
@@ -2463,11 +3372,24 @@ JSON автоматически. Кроме того, пригодятся па�
 краткости представим, что переменная \verb|config|~--- это словарь
 параметров. Полный URL для карт построим так:
 
+\ifx\devicetype\mobile
+
 \begin{english}
   \begin{clojure}
-{:url (str (:maps-base-url config ) "/search/v1")}
+{:url (str (:maps-base-url config)
+        "/search/v1")}
   \end{clojure}
 \end{english}
+
+\else
+
+\begin{english}
+  \begin{clojure}
+{:url (str (:maps-base-url config) "/search/v1")}
+  \end{clojure}
+\end{english}
+
+\fi
 
 Вернёмся к тесту главного экрана. Нам не нужны моки, поэтому уберём макросы
 \verb|with-mock|. Прямо сейчас тест не пройдёт, потому что мы решили проблему
@@ -2475,6 +3397,22 @@ JSON автоматически. Кроме того, пригодятся па�
 серверу. Чтобы проверить стаб, закомментируем события, а поле \verb|:events|
 сделаем \verb|nil|. Тест пройдёт без ошибок: в поле \verb|:sites| окажутся
 данные, что вернул стаб.
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(deftest test-main-page
+  (let [request
+        {:params {:lat 55.751244
+                  :lon 37.618423}}
+        result (view-main-page request)]
+    (is (= (:body result)
+           {:sites [...] :events nil}))))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -2485,6 +3423,8 @@ JSON автоматически. Кроме того, пригодятся па�
     (is (= (:body result) {:sites [...] :events nil}))))
   \end{clojure}
 \end{english}
+
+\fi
 
 Раскомментируйте поиск событий и напишите для него заглушку. Оформите её в
 фикстуру и убедитесь, что тест проходит.
@@ -2518,6 +3458,39 @@ JSON автоматически. Кроме того, пригодятся па�
 доступа. С координатами \tuple{42, 42} сервер отвечает с задержкой в 35
 секунд. Перепишем \verb|sites-handler*|:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn sites-handler* [request]
+  (let [{:keys [uri params]} request
+        {:keys [lat lon]} params]
+    (case uri
+      "/search/v1"
+      (case [lat lon]
+        [ "0"  "0"]
+        {:status 200 :body []}
+
+        ["66" "66"]
+        {:status 403
+         :body {:error "ACCESS_ERROR"}}
+
+        ["42" "42"]
+        (do (Thread/sleep (* 1000 35))
+            {:status 200 :body []})
+
+        {:status 200
+         :body [{:name "Cafe1"
+                 :address "..."}
+                {:name "Cafe2"
+                 :address "..."}]})
+      {:status 404
+       :body "page not found"})))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn sites-handler* [request]
@@ -2537,6 +3510,8 @@ JSON автоматически. Кроме того, пригодятся па�
   \end{clojure}
 \end{english}
 
+\fi
+
 \index{HTTP!ожидание}
 
 Напишите тесты для этих координат. Особенно интересен случай с~долгим ответом
@@ -2553,6 +3528,24 @@ JSON автоматически. Кроме того, пригодятся па�
 
 \index{недоступность}
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defonce ^:dynamic *server* nil)
+
+(defn fix-fake-sites-server [t]
+  (let [opt {:port 8808 :join? false}]
+    (binding [*server*
+              (run-jetty
+                sites-handler opt)]
+      (t)
+      (.stop *server*))))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defonce ^:dynamic *server* nil)
@@ -2565,6 +3558,8 @@ JSON автоматически. Кроме того, пригодятся па�
       (.stop *server*))))
   \end{clojure}
 \end{english}
+
+\fi
 
 Напишем тест, в котором временно отключим сервер. В конце его нужно включить,
 чтобы не задеть остальные тесты.
@@ -2624,12 +3619,26 @@ JSON автоматически. Кроме того, пригодятся па�
 
 Создайте папки и переместите ресурсы для теста:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{bash}
+$ mkdir -p env/test/resources/data
+$ mv resources/data/events.json \
+    env/test/resources/data/
+  \end{bash}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{bash}
 $ mkdir -p env/test/resources/data
 $ mv resources/data/events.json env/test/resources/data/
   \end{bash}
 \end{english}
+
+\fi
 
 \noindent
 Получилась структура:
@@ -2655,12 +3664,27 @@ $ tree env
 \noindent
 Задайте профили в проекте:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+:profiles {:test {:resource-paths
+                  ["env/test/resources"]}
+           :dev {:resource-paths
+                 ["env/test/resources"]}}
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 :profiles {:test {:resource-paths ["env/test/resources"]}
            :dev  {:resource-paths ["env/test/resources"]}}
   \end{clojure}
 \end{english}
+
+\fi
 
 На первый взгляд, странно, что для \verb|:dev| и \verb|:test| мы указали один
 и тот же путь. По умолчанию REPL запускается с профилем \verb|dev|, но не
@@ -2693,11 +3717,25 @@ REPL, но он не проходит из-за путей.
 с разными ресурсами: в первый раз как обычно, а во второй~--- с опцией
 \verb|:resource-paths|:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+:profiles
+  {:uberjar {:resource-paths
+             ["env/test/resources"]}
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 :profiles {:uberjar {:resource-paths ["env/test/resources"]}
   \end{clojure}
 \end{english}
+
+\fi
 
 После сборки сохраните файл \verb|target/uberjar/<project>.jar| в~другую папку,
 чтобы не затереть его во второй раз. Распакуйте оба архива командой \verb|jar|:
@@ -2794,6 +3832,24 @@ $ lein test
 пробегает по списку словарей; каждый словарь~--- это запись в базе. Функцию
 оборачивают в фикстуру, которая запускает тест после вставки записей:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(def db-data
+ [[:users {:name "Ivan"
+           :email "ivan@test.com"}]
+  [:users {:name "Juan"
+           :email "Juan@test.com"}]
+  [:groups {:name "Python fans"
+            :topics 6}]
+  [:groups {:name "Clojure fans"
+            :topics 7}]])
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (def db-data
@@ -2803,6 +3859,8 @@ $ lein test
    [:groups {:name "Clojure fans" :topics 7}]])
   \end{clojure}
 \end{english}
+
+\fi
 
 \index{JDBC!insert"!}
 
@@ -2831,6 +3889,28 @@ $ lein test
 
 \index{JDBC!insert-multi"!}
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(def db-data
+  [[:users [{:name "Ivan"
+             :email "ivan@test.com"}
+            {:name "Juan"
+             :email "Juan@test.com"}]]
+  [:groups [{:name "Dog fans"
+             :topics 6}
+            {:name "Cat fans"
+             :topics 7}]]])
+
+(defn load-data []
+ (doseq [[table rows] db-data]
+  (jdbc/insert-multi! *db* table rows)))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (def db-data
@@ -2844,6 +3924,8 @@ $ lein test
     (jdbc/insert-multi! *db* table rows)))
   \end{clojure}
 \end{english}
+
+\fi
 
 Структура \verb|db-data| напоминает словарь, но всё же им не является. Мы
 намеренно используем вектор, чтобы гарантировать порядок обхода. Как мы увидим
@@ -2892,6 +3974,20 @@ PostgreSQL. Укажем таблицу, путь к CSV-файлу и его с
 не только запятая, но и точка с~запятой или табуляция. Если заголовка нет,
 считается, что поля идут в том же порядке, что и в таблице.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(jdbc/execute! *db*
+ "COPY users(name, age, email)
+  FROM
+  '.../env/test/resources/data/users.csv'
+  DELIMITER ',' CSV HEADER")
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (jdbc/execute! *db*
@@ -2900,6 +3996,8 @@ PostgreSQL. Укажем таблицу, путь к CSV-файлу и его с
   DELIMITER ',' CSV HEADER")
   \end{clojure}
 \end{english}
+
+\fi
 
 Заметим, что запрос ожидает полный путь к файлу, что мешает командной
 работе. Вряд ли ваши коллеги держат проект в папке
@@ -2936,6 +4034,31 @@ PostgreSQL. Укажем таблицу, путь к CSV-файлу и его с
 декодирует данные в полёте. В конце работы закрываем соединение с базой.
 
 \index{JDBC!get-connection}
+%% TODO code line ref
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure/lines}
+(defn load-data-gz []
+  (let [conn
+        (jdbc/get-connection *db*)
+        copy (CopyManager. conn)
+        stream
+        (-> "data/users.csv.gz"
+            clojure.java.io/resource
+            clojure.java.io/file
+            FileInputStream.
+            GZIPInputStream.)]
+   (.copyIn copy
+     "COPY users(name, age, email)
+      FROM STDIN
+      (FORMAT CSV, HEADER true)"
+     stream)
+   (.close conn)))
+  \end{clojure/lines}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure/lines}
@@ -2953,6 +4076,8 @@ PostgreSQL. Укажем таблицу, путь к CSV-файлу и его с
     (.close conn)))
   \end{clojure/lines}
 \end{english}
+
+\fi
 
 Нельзя загрузить один файл сразу в несколько таблиц. Соблюдайте правило: один
 файл~--- одна таблица. Если файлов несколько, перепишите функцию так, чтобы она
@@ -2987,6 +4112,20 @@ PostgreSQL строится по шаблону \verb|<table>_<pk>_seq|, нап�
 Чтобы связать записи, задайте их PK и FK одинаковые значения. Ниже пользователь
 ссылается на группу; ключ группы взяли случайно.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(def group-id 3)
+(jdbc/insert! *db* :groups
+  {:id group-id :name "Clojure users"})
+(jdbc/insert! *db* :users
+  {:group_id group-id :name "Ivan"})
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (def group-id 3)
@@ -2994,6 +4133,8 @@ PostgreSQL строится по шаблону \verb|<table>_<pk>_seq|, нап�
 (jdbc/insert! *db* :users {:group_id group-id :name "Ivan"})
   \end{clojure}
 \end{english}
+
+\fi
 
 Проблема в том, что заданный вручную PK может вступить в~конфликт со
 счётчиком. Предположим, при вставке в \verb|groups| счётчик был равен
@@ -3004,12 +4145,26 @@ PostgreSQL строится по шаблону \verb|<table>_<pk>_seq|, нап�
 
 \index{конфликты ключей}
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{text}
+ERROR: duplicate key violates
+       unique constraint 'groups_pkey'
+DETAIL: Key (id)=(3) already exists
+  \end{text}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{text}
 ERROR: duplicate key violates unique constraint 'groups_pkey'
 DETAIL: Key (id)=(3) already exists
   \end{text}
 \end{english}
+
+\fi
 
 Ключ 3 в конфликте с записью, которую мы добавили раньше. Избежать этого можно
 двумя способами: коррекцией счётчиков и~особой загрузкой данных. Разница в том,
@@ -3018,6 +4173,29 @@ DETAIL: Key (id)=(3) already exists
 Под ручной коррекцией имеют в виду следующее. В тестовых данных явно указывают
 первичные ключи. Для удобства некоторые из них выносят в переменную. Если на
 администратора ссылаются несколько сущностей, вынесем его ключ в переменную:
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(def id-user-admin 1)
+
+(def db-data
+  [[:users [{:id id-user-admin
+             :name "Ivan"}]]
+   [:profiles [{:id 1
+                :user_id id-user-admin
+                :avatar "..."}]
+    :posts [{:id 1
+             :user_id id-user-admin
+             :title "New book"}
+            {:id 2
+             :user_id id-user-admin
+             :title "Some post"}]]])
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -3031,6 +4209,8 @@ DETAIL: Key (id)=(3) already exists
   \end{clojure}
 \end{english}
 
+\fi
+
 \index{счётчики!сброс}
 
 После вставки исправим счётчики так, чтобы они перескочили значения, которые мы
@@ -3039,6 +4219,18 @@ DETAIL: Key (id)=(3) already exists
 к числам от 1 до 7. Новые записи в \verb|users| получат ключи 101, 102 и так
 далее. Чтобы сбросить счётчик, выполните запрос:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(jdbc/execute! *db*
+  "ALTER SEQUENCE users_id_seq
+   RESTART WITH 100")
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (jdbc/execute! *db*
@@ -3046,11 +4238,31 @@ DETAIL: Key (id)=(3) already exists
   \end{clojure}
 \end{english}
 
+\fi
+
 Если первичный ключ называется \verb|id| (что рекомендуется), нужно знать
 только имя таблицы. Чтобы не перечислять таблицы вручную, получим их из массива
 \verb|db-data|. Добавьте в конец \verb|load-data| вызов функции:
 
 \index{SQL!ALTER SEQUENCE}
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn restart-db-ids []
+  (let [value 100
+        tables (set (map first db-data))
+        query "ALTER SEQUENCE %s_id_seq
+               RESTART WITH %s"]
+    (doseq [table tables]
+      (jdbc/execute! *db*
+        (format query
+          (name table) value)))))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -3062,6 +4274,8 @@ DETAIL: Key (id)=(3) already exists
       (jdbc/execute! *db* (format query (name table) value)))))
   \end{clojure}
 \end{english}
+
+\fi
 
 Он подхватит все таблицы из \verb|db-data| и выставит счётчики в 100. На
 больших данных из CSV эту цифру придётся увеличить на порядок или два. Если
@@ -3080,6 +4294,24 @@ DETAIL: Key (id)=(3) already exists
 
 \index{метаданные}
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+;; users
+^{:db/alias :users/admin}
+ {:name "Ivan" :email "ivan@test.com"}
+
+;; posts
+{:user_id :users/admin
+ :title "New book"}
+{:user_id :users/admin
+ :title "Some post"}
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 ;; users
@@ -3091,6 +4323,8 @@ DETAIL: Key (id)=(3) already exists
 {:user_id :users/admin :title "Some post"}
   \end{clojure}
 \end{english}
+
+\fi
 
 Загрузчик объявляет атом с пустым словарём и наполняет его в~процессе. Если у
 записи псевдоним, мы связываем его с ключом, который вернула база. Например, при
@@ -3109,6 +4343,19 @@ DETAIL: Key (id)=(3) already exists
 \verb|jdbc/insert!| зависит от типа базы данных. Привёдем примеры для
 популярных баз PostgreSQL и MariaDB (форк MySQL):
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(jdbc/insert! *db*
+  :users {:name "Ivan"})
+({:id 5 :name "Ivan"}) ;; for PostgreSQL
+({:generated_key 6})   ;; for MariaDB
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (jdbc/insert! *db* :users {:name "Ivan"})
@@ -3116,6 +4363,8 @@ DETAIL: Key (id)=(3) already exists
 ({:generated_key 6})   ;; for MariaDB
   \end{clojure}
 \end{english}
+
+\fi
 
 Результат вставки~--- это список с одним элементом. Если вы поддерживаете обе базы,
 пригодится универсальный поиск ключа:
@@ -3166,6 +4415,23 @@ DETAIL: Key (id)=(3) already exists
 таблицы из данных для тестов. Добавьте её в~фикстуру \verb|fix-db-data| после
 вызова \verb|(t)|.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn delete-data []
+  (let [tables (set (map first db-data))
+        tables-comma
+        (str/join "," (map name tables))
+        query
+        (format "TRUNCATE %s CASCADE"
+          tables-comma)]
+    (jdbc/execute! *db* query)))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn delete-data []
@@ -3175,6 +4441,8 @@ DETAIL: Key (id)=(3) already exists
     (jdbc/execute! *db* query)))
   \end{clojure}
 \end{english}
+
+\fi
 
 \subsubsection*{Транзакция с откатом}
 
@@ -3211,6 +4479,22 @@ ROLLBACK;
 транзакционное соединение, которое получают из JDBC-спеки. Наш макрос
 \verb|with-db-rollback| делает то же самое, но устанавливает откат:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defmacro with-db-rollback
+  [[t-conn & bindings] & body]
+  `(jdbc/with-db-transaction
+     [~t-conn ~@bindings]
+     (jdbc/db-set-rollback-only!
+       ~t-conn)
+     ~@body))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defmacro with-db-rollback
@@ -3221,8 +4505,25 @@ ROLLBACK;
   \end{clojure}
 \end{english}
 
+\fi
+
 \noindent
 Макрос в действии:
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(with-db-rollback [tx *db*]
+  (println "Inserting the data...")
+  (jdbc/insert! tx
+    :users {:name "Ivan"})
+  (let [...]
+    (do-something-with-db tx)))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -3234,6 +4535,8 @@ ROLLBACK;
   \end{clojure}
 \end{english}
 
+\fi
+
 Следите за тем, чтобы все действия с базой протекали через \verb|tx|, а~не
 \verb|*db*|. Изменения в рамках обычного соединения останутся в базе. Этим
 страдает загрузчик \verb|load-data|, который ссылается на глобальную переменную
@@ -3243,6 +4546,21 @@ ROLLBACK;
 
 Случай с параметром: \verb|load-data| принимает \verb|tx|, который мы
 установили на вершине теста.
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(deftest test-user-with-rollback
+  (with-db-rollback [tx *db*]
+    (load-data tx) ;; takes a parameter
+    (let [user
+          (get-user-by-name tx "Ivan")]
+      (is (= "Ivan" (:name user))))))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -3254,11 +4572,29 @@ ROLLBACK;
   \end{clojure}
 \end{english}
 
+\fi
+
 \index{clojure.core!binding}
 
 Вариант с динамической переменной. В этом случае мы считаем, что все функции
 ссылаются на \verb|*db*|. Внутри макроса она станет транзакционным соединением
 с откатом.
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(deftest test-user-with-rollback
+  (with-db-rollback [tx *db*]
+    (binding [*db* tx]
+      (load-data) ;; no parameters
+      (let [user
+            (get-user-by-name "Ivan")]
+        (is (= "Ivan" (:name user)))))))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -3270,6 +4606,8 @@ ROLLBACK;
         (is (= "Ivan" (:name user)))))))
   \end{clojure}
 \end{english}
+
+\fi
 
 Выбор зависит от того, как в проекте работают с базой. Решение с откатом
 подходит для Mount и похожей архитектуры, где база~--- это глобальная
@@ -3301,6 +4639,29 @@ ROLLBACK;
 
 \index{middleware}
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defroutes app-naked
+  (GET "/"
+    request (page-index request))
+  (GET "/hello"
+    request (page-hello request))
+  page-404)
+
+(def app
+  (-> app-naked
+      wrap-session
+      wrap-keyword-params
+      wrap-params
+      wrap-json-body
+      wrap-json-response))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defroutes app-naked
@@ -3318,8 +4679,25 @@ ROLLBACK;
   \end{clojure}
 \end{english}
 
+\fi
+
 Напишем несколько тестов для приложения. Для экономии места сверим только статус
 ответа, не заглядывая в \verb|body|. Проверим главную страницу:
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(deftest test-app-index
+  (let [request {:request-method :get
+                 :uri "/"}
+        response (app request)
+        {:keys [status body]} response]
+    (is (= 200 status))))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -3331,8 +4709,25 @@ ROLLBACK;
   \end{clojure}
 \end{english}
 
+\fi
+
 \noindent
 и путь, которого нет в маршрутах:
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(deftest test-app-page-not-found
+  (let [request {:request-method :get
+                 :uri "/missing"}
+        response (app request)
+        {:keys [status body]} response]
+    (is (= 404 status))))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -3343,6 +4738,8 @@ ROLLBACK;
     (is (= 404 status))))
   \end{clojure}
 \end{english}
+
+\fi
 
 \index{моки}
 
@@ -3378,12 +4775,26 @@ middleware. В боевых проектах он несёт важную лог
 тела. Если странице нужны параметры, придётся писать их вручную, что нечитаемо и
 тяжело в поддержке.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+{:request-method :get
+ :uri
+ "/users/?page=2&order=date&name=ivan"}
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 {:request-method :get
  :uri "/users/?page=2&order=date_added&name=ivan"}
   \end{clojure}
 \end{english}
+
+\fi
 
 \index{библиотеки!Ring-mock}
 
@@ -3406,11 +4817,24 @@ middleware. В боевых проектах он несёт важную лог
 \noindent
 Поиск фильмов с параметрами:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(mock/request :get "/movies"
+  {:search "batman" :page 1})
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (mock/request :get "/movies" {:search "batman" :page 1})
   \end{clojure}
 \end{english}
+
+\fi
 
 \index{HTTP!POST}
 \index{классы!ByteArrayInputStream}
@@ -3421,6 +4845,17 @@ middleware. В боевых проектах он несёт важную лог
 \verb|ByteArrayInputStream|. Заголовок \verb|Content-Type| примет значение
 \verb|application/x-www-form-urlencoded|:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(mock/request :post "/users"
+  {:name "Ivan" :email "test@test.com"})
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (mock/request :post "/users"
@@ -3428,11 +4863,26 @@ middleware. В боевых проектах он несёт важную лог
   \end{clojure}
 \end{english}
 
+\fi
+
 \index{HTTP!API}
 
 \noindent
 Случай для стороннего API. Ресурс \verb|/users| ожидает не поля формы, а~JSON.
 Функция \verb|json-body| дополняет запрос телом и заголовками:
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(-> (mock/request :post "/users")
+    (mock/json-body
+      {:name "Ivan"
+       :email "test@test.com"}))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -3440,6 +4890,8 @@ middleware. В боевых проектах он несёт важную лог
     (mock/json-body {:name "Ivan" :email "test@test.com"}))
   \end{clojure}
 \end{english}
+
+\fi
 
 \noindent
 Эти и другие функции смотрите в документации проекта.
@@ -3458,6 +4910,24 @@ middleware. В боевых проектах он несёт важную лог
 которое мы написали в качестве заглушки для поиска кафе \page{sites-handler}.
 Выполним к нему запрос:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(let [request
+      (mock/request :get "/search/v1"
+                    {:lat 11 :lon 22})
+      response (sites-handler request)
+      body
+      (-> response
+          :body
+          (json/parse-string true))]
+  (is (= {...} body)))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (let [request (mock/request :get "/search/v1"
@@ -3468,6 +4938,8 @@ middleware. В боевых проектах он несёт важную лог
   \end{clojure}
 \end{english}
 
+\fi
+
 Недостаток в том, что мы сравниваем данные как есть. Некоторые поля ответа
 меняются, например даты или \verb|id|. Мы уже выяснили, что \verb|id|~--- это
 ключ с автонумерацией. Однажды записи удалят и загрузят повторно, и номера
@@ -3476,6 +4948,21 @@ middleware. В боевых проектах он несёт важную лог
 Перед сравнением лишние поля исключают с помощью \verb|dissoc|
 и~\verb|map|. Представим, что поиск кафе вернул результат:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+{:sites [{:name "Site1"
+          :date-updated "2019-11-12"
+          :id 42}
+         {:name "Site2"
+          :date-updated "2019-11-10"
+          :id 99}]}
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 {:sites [{:name "Site1" :date-updated "2019-11-12" :id 42}
@@ -3483,10 +4970,26 @@ middleware. В боевых проектах он несёт важную лог
   \end{clojure}
 \end{english}
 
+\fi
+
 \index{итерация!for}
 
 \noindent
 Напишем функцию, которая очистит тело от лишних полей.
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn clean-sites [body]
+ (update body :sites
+  (fn [sites]
+   (for [site sites]
+    (dissoc site :id :date-updated)))))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -3498,8 +5001,22 @@ middleware. В боевых проектах он несёт важную лог
   \end{clojure}
 \end{english}
 
+\fi
+
 \noindent
 Теперь данные сравнивают не в лоб, а с помощью функции:
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(is (= {:sites [{:name "Site1"}
+                {:name "Site2"}]}
+       (clean-sites body)))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -3507,6 +5024,8 @@ middleware. В боевых проектах он несёт важную лог
        (clean-sites body)))
   \end{clojure}
 \end{english}
+
+\fi
 
 Иногда проверяют не конкретные значения, а структуру ответа. Это удобно, когда в
 ответе объёмные списки и словари. В таком случае пользуются спекой или
@@ -3517,6 +5036,22 @@ JSON-схемой. Преимущества спеки в том, что она 
 \index{spec!valid?}
 \index{spec!assert}
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(let [response (...) ;; get the response
+      body
+      (-> response
+          :body
+          (json/parse-string true))]
+  (is
+    (s/valid? :api.search/result body)))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (let [response (...) ;; get the response
@@ -3524,6 +5059,8 @@ JSON-схемой. Преимущества спеки в том, что она 
   (is (s/valid? :api.search/result body)))
   \end{clojure}
 \end{english}
+
+\fi
 
 Функция \verb|s/valid?| вернёт истину или ложь, что неудобно для тестов. Если
 данные неверны, придётся вывести их на экран для расследования. Замените
@@ -3571,6 +5108,24 @@ JSON-схемой. Преимущества спеки в том, что она 
 
 \index{NPE}
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn fix-db-data
+  [t]
+  (let [{:keys [db]} system/system]
+    (prepare-test-data db)
+    (t)
+    (clear-test-data db)))
+
+(use-fixtures :once
+  fix-system fix-db-data)
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn fix-db-data
@@ -3583,6 +5138,8 @@ JSON-схемой. Преимущества спеки в том, что она 
 (use-fixtures :once fix-system fix-db-data)
   \end{clojure}
 \end{english}
+
+\fi
 
 Фикстура \verb|fix-db-data| нарушает правило, согласно которому к~системе нельзя
 обращаться напрямую и вынимать из неё компоненты. В этом плане для тестов
@@ -3602,6 +5159,22 @@ JSON-схемой. Преимущества спеки в том, что она 
 вставку заказов. Результат вставки в~базу неважен, поэтому затеним его
 подчёркиванием.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure/lines*}{firstnumber=1}
+(deftest test-api-orders-ok
+  (let [public-key "my_public_key"
+        secret-key "slk6Da7sD2G4g"
+        {:keys [db]} system/system
+        _ (jdbc/insert! db :users
+            {:public_key public-key
+             :secret_key secret-key})
+  \end{clojure/lines*}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure/lines*}{firstnumber=1}
 (deftest test-api-orders-ok
@@ -3613,6 +5186,8 @@ JSON-схемой. Преимущества спеки в том, что она 
   \end{clojure/lines*}
 \end{english}
 
+\fi
+
 \wavebottom
 
 Предполагается, что внутри теста система уже работает за счёт фикстуры. Её ключ
@@ -3623,6 +5198,24 @@ JSON-схемой. Преимущества спеки в том, что она 
 заголовок авторизации:
 
 \wavetop
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure/lines*}{firstnumber=8}
+    params {:command :listOrders
+            :public_key public-key
+            :ordering "date_created"
+            :sort "desc"
+            :page 2}
+    signature (params->sha256hmac
+                params secret-key)
+    auth-header (str "HMAC_SHA256="
+                  signature)
+  \end{clojure/lines*}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure/lines*}{firstnumber=7}
@@ -3636,6 +5229,8 @@ JSON-схемой. Преимущества спеки в том, что она 
   \end{clojure/lines*}
 \end{english}
 
+\fi
+
 \wavebottom
 
 В третьем блоке мы передаём адрес, параметры и~заголовки в~HTTP-клиент. В~этот
@@ -3644,6 +5239,24 @@ JSON-схемой. Преимущества спеки в том, что она 
 с заказами в~теле ответа.
 
 \wavetop
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure/lines*}{firstnumber=17}
+    response
+    (client/get
+      "http://127.0.0.1:8080/api"
+      {:query-params params
+       :headers
+       {:authentication auth-header}})
+    {:keys [status body]} response]
+(is (= 200 status))
+(is (= {:orders [...]} body))))
+  \end{clojure/lines*}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure/lines*}{firstnumber=14}
@@ -3655,6 +5268,8 @@ JSON-схемой. Преимущества спеки в том, что она 
     (is (= {:orders [...]} body))))
   \end{clojure/lines*}
 \end{english}
+
+\fi
 
 Даже в сокращении тест занимает много места. Чтобы улучшить читаемость, выносите
 как можно большей действий в фикстуры и~вспомогательные функции. Например,
@@ -3682,6 +5297,28 @@ JSON-схемой. Преимущества спеки в том, что она 
 метаданных. Вынесем имя поля в отдельную переменную. Перепишем \verb|start!|,
 чтобы в метаданных системы появился флаг со значением \verb|true|.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(def state-field ::started?)
+
+(defn start! []
+  (let [sys
+        (-> system
+            component/start-system
+            (with-meta
+              {state-field true}))]
+    (alter-var-root
+      #'system (constantly sys))))
+
+(defn started? []
+  (some-> system meta (get state-field)))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (def state-field ::started?)
@@ -3697,6 +5334,8 @@ JSON-схемой. Преимущества спеки в том, что она 
   \end{clojure}
 \end{english}
 
+\fi
+
 Функция \verb|started?| вернёт флаг из метаданных текущей системы. Аналогично
 изменим \verb|stop!|, чтобы флаг становился ложью.
 
@@ -3704,6 +5343,23 @@ JSON-схемой. Преимущества спеки в том, что она 
 уже запущена. Если нет, фикстура работает как обычно: запуск, тест,
 остановка. Если система \emph{уже работает}, значит, кто-то сделал это
 вручную. В этом случае фикстура только выполнит тест, что гораздо быстрее.
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn fixture-system [t]
+  (let [started-manually?
+        (system/started?)]
+    (when-not started-manually?
+      (start!))
+    (t)
+    (when-not started-manually?
+      (stop!))))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -3716,6 +5372,8 @@ JSON-схемой. Преимущества спеки в том, что она 
       (stop!))))
   \end{clojure}
 \end{english}
+
+\fi
 
 Выполните в REPL \verb|(system/start!)|. Теперь вызывайте тест сколько угодно
 раз~--- система включена постоянно, и не придётся ждать её запуска.
@@ -3803,6 +5461,40 @@ Login. Браузер обновляет страницу, появляется 
 интерфейса, которые прежде были скрыты (ссылки My profile, Logout).
 
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(ns project.integration-tests
+  (:require [etaoin.api :as e]))
+
+(deftest test-ui-login-ok
+  (e/with-chrome {} driver
+    (e/go driver
+      "http://127.0.0.1:8080/login")
+    (e/wait-visible driver
+      {:fn/has-text "Login"})
+    (e/fill driver
+      {:tag :input :name :email}
+      "test@test.com")
+    (e/fill driver
+      {:tag :input :name :password}
+      "password")
+    (e/click driver
+      {:tag :button :fn/text "Login"})
+    (e/wait-visible driver
+      {:fn/has-text "Welcome"})
+    (is (e/visible? driver
+          {:tag :a
+           :fn/text "My profile"}))
+    (is (e/visible? driver
+          {:tag :button
+           :fn/text "Logout"}))))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (ns project.integration-tests
@@ -3820,6 +5512,8 @@ Login. Браузер обновляет страницу, появляется 
     (is (e/visible? driver {:tag :button :fn/text "Logout"}))))
   \end{clojure}
 \end{english}
+
+\fi
 
 Разберём отдельные выражения. Форма \verb|with-chrome|~--- это макрос, который
 запускает Chrome на время исполнения кода. Макрос нужен, чтобы выключить драйвер
@@ -3941,6 +5635,22 @@ Chrome, нужно выполнить в другом браузере, при �
 аргументом тип браузера. На каждом шаге фикстура связывает драйвер
 с~динамической переменной и выполняет тест.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn fix-multi-driver [t]
+  (doseq [driver-type [:chrome :firefox]]
+    (e/with-driver driver-type {} driver
+      (binding [*driver* driver]
+        (testing (format "Browser %s"
+                   (name driver-type))
+          (t))))))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn fix-multi-driver [t]
@@ -3951,6 +5661,8 @@ Chrome, нужно выполнить в другом браузере, при �
           (t))))))
   \end{clojure}
 \end{english}
+
+\fi
 
 Тесты сработают в обоих браузерах. Для ясности мы обернули тест сообщением о
 том, в каком браузере его вызывают. Чтобы добавить новый браузер, например
@@ -3975,6 +5687,27 @@ Safari, добавьте его ключ в вектор \verb|driver-type|.
 действий, напишем фикстуру \verb|fix-login-logout| и зарегистрируем с ключом
 \verb|:each|.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn fix-login-logout [t]
+  (doto *driver*
+    (e/go "http://127.0.0.1:8080/login")
+    (e/fill {:tag :input :name :email}
+      "test@test.com")
+    (e/click
+      {:tag :button :fn/text "Login"}))
+  (t)
+  (doto *driver*
+    (e/click {:tag :button
+              :fn/text "Logout"})
+    (e/wait-has-text "Login")))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn fix-login-logout [t]
@@ -3991,6 +5724,8 @@ Safari, добавьте его ключ в вектор \verb|driver-type|.
     (e/wait-has-text "Login")))
   \end{clojure}
 \end{english}
+
+\fi
 
 Выносите сложные действия в функции. Например, выбор даты в~виджете календаря
 может занять до десяти команд. Напишите условную функцию
@@ -4041,6 +5776,21 @@ Safari, добавьте его ключ в вектор \verb|driver-type|.
 аргументами. Ниже мы добавили проверки, что функцию вызвали один раз с
 параметрами cafe и 200m.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(let [{:keys [called?
+              call-count
+              call-args]} @mock]
+  (is called?)
+  (is (= 1 call-count))
+  (is (= '("cafe" "200m") call-args)))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (let [{:keys [called? call-count call-args]} @mock]
@@ -4049,6 +5799,8 @@ Safari, добавьте его ключ в вектор \verb|driver-type|.
   (is (= '("cafe" "200m") call-args)))
   \end{clojure}
 \end{english}
+
+\fi
 
 \index{библиотеки!Spy}
 
@@ -4116,6 +5868,18 @@ Spy полезен, когда функции передают в парамет
 набор проверок, сгруппированных по смыслу. Запишем факты о функции
 \verb|split|:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(facts "about split"
+ (str/split "a/b" #"/") => ["a" "b"]
+ (str/split "" #"irrelvant") => [""])
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (facts "about split"
@@ -4123,6 +5887,8 @@ Spy полезен, когда функции передают в парамет
  (str/split "" #"irrelvant") => [""])
   \end{clojure}
 \end{english}
+
+\fi
 
 \index{продвинутое равенство}
 \index{extended equality}
@@ -4143,12 +5909,26 @@ equality, продвинутое равенство. От обычного \verb
 консоли: ошибки выделены красным, стектрейсы спрятаны под выпадающие
 элементы. Добавьте плагин в Lein и задайте путь, куда писать файлы.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+:plugins [[test2junit "1.1.2"]]
+:test2junit-output-dir
+  "target/test2junit"
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 :plugins [[test2junit "1.1.2"]]
 :test2junit-output-dir "target/test2junit"
   \end{clojure}
 \end{english}
+
+\fi
 
 Чтобы использовать плагин, выполните \verb|lein test2junit|. Вы не увидите
 обычных сообщений в консоли, потому что теперь они направлены в файл. После
@@ -4161,6 +5941,18 @@ equality, продвинутое равенство. От обычного \verb
 именем. Чтобы сохранить отчёт о тестах, скопируйте его вручную после
 прогона. Другой способ~--- сразу нацелить плагин на нужный путь в настройках.
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+:test2junit-output-dir
+  (or (System/getenv "CI_ARTEFACTS")
+      "target/test2junit")
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 :test2junit-output-dir (or (System/getenv "CI_ARTEFACTS")
@@ -4168,14 +5960,29 @@ equality, продвинутое равенство. От обычного \verb
   \end{clojure}
 \end{english}
 
+\fi
+
 \noindent
 Убедитесь, что плагин подхватывает переменную:
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{bash}
+$ CI_ARTEFACTS=/some/custom/path \
+    lein test2junit
+  \end{bash}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{bash}
 $ CI_ARTEFACTS=/some/custom/path lein test2junit
   \end{bash}
 \end{english}
+
+\fi
 
 \subsection{Генерация данных}
 
@@ -4190,16 +5997,48 @@ $ CI_ARTEFACTS=/some/custom/path lein test2junit
 производит случайные данные по заданным правилам. Особенно полезна генерация
 записей. Объявим пользователя с тремя полями:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defrecord User
+  [user-name user-id active?])
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defrecord User [user-name user-id active?])
   \end{clojure}
 \end{english}
 
+\fi
+
 Чтобы получить случайную запись, нужно произвести три случайных величины и
 передать в конструктор \verb|->User|. Модуль предлагает всевозможные генераторы
 и их комбинации. Нас устроит кортеж из непустой строки, натурального числа и
 булева:
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(require
+ '[clojure.test.check.generators
+   :as gen])
+
+(def gen-fields
+  (gen/tuple
+    (gen/not-empty
+      gen/string-alphanumeric)
+    gen/nat
+    gen/boolean))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -4211,6 +6050,8 @@ $ CI_ARTEFACTS=/some/custom/path lein test2junit
              gen/boolean))
   \end{clojure}
 \end{english}
+
+\fi
 
 Когда генератор готов, из него получают данные:
 
@@ -4238,6 +6079,23 @@ Spec, которой мы посвятили главу \page{chapter-spec}, и�
 спекой. Раскрывается ещё одно свойство спек: кроме проверки, они подходят для
 тестовых данных. Предположим, мы задали пользователя с~тремя полями:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(s/def :user/id int?)
+(s/def :user/name string?)
+(s/def :user/active? boolean?)
+
+(s/def ::user
+  (s/keys :req-un [:user/id
+                   :user/name
+                   :user/active?]))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (s/def :user/id int?)
@@ -4250,8 +6108,23 @@ Spec, которой мы посвятили главу \page{chapter-spec}, и�
   \end{clojure}
 \end{english}
 
+\fi
+
 \noindent
 Функция \verb|s/gen| строит по спеке генератор. Пример его работы:
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(gen/generate (s/gen ::user))
+{:id 88546920
+ :name "Z4MO7GH80k3mRD"
+ :active? true}
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -4260,10 +6133,26 @@ Spec, которой мы посвятили главу \page{chapter-spec}, и�
   \end{clojure}
 \end{english}
 
+\fi
+
 Вместо случайных величин можно задать варианты (список имён, фамилий,
 городов). Сейчас имя пользователя~--- это машинная строка, что некрасиво. Поменяем
 спеку \verb|:user/name| на множество имён. Когда множество большое, его выносят
 в ресурс EDN и читают при загрузке модуля.
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(s/def :user/name
+  #{"Ivan" "Juan" "Huan" "Ioann"})
+
+{:id 274 :name "Juan" :active? true}
+{:id 557 :name "Huan" :active? true}
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -4273,6 +6162,8 @@ Spec, которой мы посвятили главу \page{chapter-spec}, и�
 {:id 557 :name "Huan" :active? true}
   \end{clojure}
 \end{english}
+
+\fi
 
 Возможности Spec обширны. С её помощью порождают связанные данные, например
 пользователей, которые ссылаются на профили, и~наоборот. Спеки могут быть любой
