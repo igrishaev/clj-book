@@ -725,8 +725,8 @@ HTTP-клиент:
     (reset! flag false)
     (while (not (realized? task))
       (log/info
-      "Waiting for
-               the task to complete")
+      "Waiting for the task
+                to complete")
       (Thread/sleep 300))))
   \end{clojure}
 \end{english}
@@ -827,24 +827,24 @@ IP. Пока что мы не знаем, как работает поиск, н
 \begin{english}
   \begin{clojure/lines}
 (defn task-fn []
-  (jdbc/with-db-transaction [tx db]
-    (when-let [request
-               (first (jdbc/query tx
-                        query))]
-      (let [{:keys [id ip]} request
-            info   (get-ip-info ip)
-            {zip :postal_code
-             country country_name
-             city :city lat :lat
-             lon :lng} info
-            fields {:is_processed true
-                    :zip zip
-                    :country country
-                    :city city
-                    :lat lat
-                    :lon lon}]
-        (jdbc/update! tx :requests
-          fields ["id = ?" id])))))
+ (jdbc/with-db-transaction [tx db]
+  (when-let [request
+             (first
+              (jdbc/query tx query))]
+    (let [{:keys [id ip]} request
+          info   (get-ip-info ip)
+          {zip :postal_code
+           country country_name
+           city :city lat :lat
+           lon :lng} info
+          fields {:is_processed true
+                  :zip zip
+                  :country country
+                  :city city
+                  :lat lat
+                  :lon lon}]
+      (jdbc/update! tx :requests
+        fields ["id = ?" id])))))
   \end{clojure/lines}
 \end{english}
 
@@ -1453,7 +1453,6 @@ Mount отреагирует на перезагрузку модуля?
 \begin{english}
   \begin{clojure}
 (:require
- [.....]
  [clj-http.conn-mgr :refer
    [make-reusable-conn-manager
     shutdown-manager]])
@@ -3077,8 +3076,7 @@ Clojure:
 \begin{english}
   \begin{clojure}
 (-> {...} make-worker meta)
-#:com.stuartsierra
-     .component{:dependencies {:db :db}}
+#:...component{:dependencies {:db :db}}
   \end{clojure}
 \end{english}
 
@@ -3108,8 +3106,7 @@ Clojure:
 (set! *print-meta* true)
 
 (make-worker {...})
-^#:com.stuartsierra
-      .component{:dependencies {:db :db}}
+^#:...component{:dependencies {:db :db}}
 #book.systems.comp.worker.Worker{...}
   \end{clojure}
 \end{english}
@@ -3606,8 +3603,7 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
       component/start))
 
 (component/start s-started)
-;; Execution error (BindException)
-;; Address already in use
+;; BindException: Address already in use
   \end{clojure}
 \end{english}
 
@@ -3880,12 +3876,8 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
     clojure.pprint/pprint)
 
 #:com.stuartsierra.component
- {start
-  #function[book.systems.comp
-                        .server/start]
-  stop
-  #function[book.systems.comp
-                        .server/stop]
+ {start #function[.../start]
+  stop  #function[.../stop]
   :dependencies
   {:compA :compA :compB :compB}}
   \end{clojure}
@@ -4028,8 +4020,8 @@ Integrant ожидает от ключа минимум два метода: з�
   \begin{clojure}
 (defmethod ig/init-key ::db
   [_ options]
-  {:datasource (cp/make-datasource
-                 options)})
+  {:datasource
+    (cp/make-datasource options)})
   \end{clojure}
 \end{english}
 
