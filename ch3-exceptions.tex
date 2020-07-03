@@ -62,7 +62,7 @@
 Отдельные платформы позволяют задать реакцию на непойманное
 исключение. Например, записать его в файл или завершить программу особым
 способом.
-
+%% TODO MOBILE IMAGE
 \begin{figure}[ht!]
   \chart{chart-ex-tree}
   \caption{Базовые классы исключений}
@@ -95,7 +95,7 @@ Clojure~--- это гостевой язык (англ.~hosted language). Он �
 оказалось на диске. Родословная класса выглядит так:
 
 \linegap
-
+%% TODO MOBILE
 \dirtree{%
  .1 java.lang.Object.
  .2 java.lang.Throwable.
@@ -1850,7 +1850,7 @@ middleware.
 \ifx\devicetype\mobile
 %% TODO code line ref
 \begin{english}
-  \begin{clojure/lines*}{firstnumber=15}
+  \begin{clojure/lines*}{firstnumber=17}
 (catch Exception e-sentry
   (log/errorf e-sentry
     "Sentry error: %s" DSN)

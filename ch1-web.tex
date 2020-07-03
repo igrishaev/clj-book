@@ -293,7 +293,7 @@ Clojure заменяют функцией. Это удобно, потому ч�
   \begin{clojure}
 (defn app [request]
  (let [{:keys [uri request-method]}
-      request]
+       request]
   {:status 200
    :headers {"Content-Type" "text/plain"}
    :body (format "You requested %s %s"
@@ -1227,16 +1227,12 @@ Compojure решает проблему вложенных путей. Расс�
   (let [{:keys [params route-params]} req
         {order-id :id} route-params
         params (select-keys params
-                            [:title
-                             :description
-                             :price])
+                 [:title :description
+                  :price])
         location (str "/content/order/"
-                      order-id
-                      "/view")]
-    (jdbc/update! *db*
-                  :orders
-                  params
-                  ["id = ?" order-id])
+                   order-id "/view")]
+    (jdbc/update! *db* :orders
+      params ["id = ?" order-id])
     {:status 302
      :headers {"Location" location}}))
   \end{clojure}
@@ -1628,7 +1624,7 @@ middleware зависят друг от друга, их можно <<схлоп
 \else
 
 \begin{english}
-
+%TODO MOBILE
 \noindent
 \begin{tabular}{ @{}p{3.2cm} @{}p{3.5cm} @{}p{3.5cm} }
 
@@ -1707,7 +1703,7 @@ Set-Cookie: visited=true;
 \index{модули!ring.middleware.cookies}
 
 \ifx\devicetype\mobile
-
+%% TODO code line ref
 \begin{english}
   \begin{clojure/lines}
 (require '[ring.middleware.cookies
@@ -1719,14 +1715,13 @@ Set-Cookie: visited=true;
         seen? (get-in cookies
                       seen-path)
         cookies* (assoc-in cookies
-                           seen-path
-                           true)]
+                   seen-path true)]
     {:status 200
      :cookies cookies*
      :body
      (if seen?
-       "Already seen."
-       "The first time you see it!")}))
+      "Already seen."
+      "The first time you see it!")}))
 
 (def app (-> page-seen
              wrap-cookies))
@@ -1901,8 +1896,7 @@ HTTP не предполагает связи между двумя запрос
 (defn page-counter [request]
   (let [{:keys [session]} request
         session* (update session
-                         :counter
-                         (fnil inc 0))
+                   :counter (fnil inc 0))
         counter (:counter session*)]
     {:status 200
      :session session*
@@ -2164,9 +2158,9 @@ Middleware не случайно выделяет поле \verb|:json-params|. 
 
 \begin{english}
   \begin{clojure}
-(require '[clojure.walk
-           :refer [keywordize-keys
-                   stringify-keys]])
+(require
+ '[clojure.walk :refer [keywordize-keys
+                        stringify-keys]])
 
 (defn wrap-headers-kw [handler]
   (fn [request]
@@ -2362,8 +2356,8 @@ Id хранят в заголовках, но дублируют в запрос
                       :session
                       :user-id)
           user (when user-id
-                 (-> user-id
-                     get-user-by-id))]
+                 (get-user-by-id
+                   user-id))]
       (-> request
           (assoc :user user)
           handler))))
@@ -2492,11 +2486,9 @@ middleware ниже по стеку не сработает.
     (try
       (handler request)
       (catch Throwable e
-        (log/errorf
-          e
+        (log/errorf e
           "Error, method %s, path %s"
-          request-method
-          uri)
+          request-method uri)
           {:status 500
            :headers
            {"content-type" "text/plain"}
@@ -2955,8 +2947,7 @@ HTTP. Потребитель считает его по мере загрузк�
       (select-keys [:status
                     :body :headers])
       (update :headers
-              select-keys
-              ["Content-Type"])))
+        select-keys ["Content-Type"])))
   \end{clojure}
 \end{english}
 
