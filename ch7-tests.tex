@@ -239,7 +239,7 @@ $c$. Особенность задачи в том, что её логика в�
 \end{english}
 \fi
 
-
+%% TODO calc coverage & lines
 В функции \verb|square-roots| семь строк. При запуске теста сработали пять из
 них. Покрытие составит 5/7, что приблизительно 71\%. Считается, что покрытия
 90\% достаточно, чтобы код работал надёжно. Значения ниже говорят о малом
@@ -822,8 +822,6 @@ $ lein test :only book.util-test/test-fahr
 \begin{english}
   \begin{clojure}
 $ lein test
-lein test
-:only book.util-test/test-fahr-nil
 
 ERROR in test-fahr-nil Numbers.java:3849
 expected: (nil? (->fahr nil))
@@ -1411,8 +1409,10 @@ IDE.
       (testing description
         (let [params
               (merge params-ok params*)
+
               response
               (api-create-user params)
+              
               {:keys [status]} response]
           (is (= 400 status)))))))
   \end{clojure}
@@ -1978,9 +1978,9 @@ expected: 200
 
 (deftest test-plot-chart-png
  (let [dataset [[...] [...] [...]]
-       filepath
-       (.getAbsolutePath *tmp-file*)]
-   (plot-chart dataset filepath)
+       filepath (.getAbsolutePath
+                          *tmp-file*)]
+   (plot-chart dataset filepath)))
   \end{clojure/lines*}
 \end{english}
 
@@ -1993,7 +1993,7 @@ expected: 200
 (deftest test-plot-chart-png
   (let [dataset [[...] [...] [...]]
         filepath (.getAbsolutePath *tmp-file*)]
-    (plot-chart dataset filepath)
+    (plot-chart dataset filepath)))
   \end{clojure/lines*}
 \end{english}
 
@@ -2049,9 +2049,9 @@ JDBC-драйвер. Фикстура \verb|fix-with-db| связывает \ver
 (defonce ^:dynamic *db* nil)
 
 (defn fix-with-db [t]
-  (let [cluster
-        (alia/cluster {:contact-points
-                       ["localhost"]})
+  (let [cluster (alia/cluster
+                  {:contact-points
+                   ["localhost"]})
         session (alia/connect cluster)]
     (binding [*db* session]
       (t))
@@ -2703,7 +2703,7 @@ $ lein test :integration
 Добавьте в файл \verb|deps.edn| запись:
 
 \ifx\devicetype\mobile
-%% TODO MOBILE url & sha
+
 \begin{english}
   \begin{clojure}
 :aliases
@@ -2714,9 +2714,7 @@ $ lein test :integration
    {:git/url
     "https://github.com/
          cognitect-labs/test-runner.git"
-    :sha
-"209b64504cb3bd3b99ecfec7937b358a879f55c1"
-  }}
+    :sha "209b64...."}}
   :main-opts
   ["-m" "cognitect.test-runner"]}}
   \end{clojure}
@@ -3103,7 +3101,6 @@ c~исключением. Следующий код:
 (constantly
   (throw (new Exception "error")))
 ;; Execution error at...
-;; error
   \end{clojure}
 \end{english}
 
@@ -3142,21 +3139,19 @@ c~исключением. Следующий код:
 \begin{english}
   \begin{clojure/lines}
 (deftest test-sites-ok-events-err
- (with-mock
-  book.views/get-sites-by-location
-  [...]
   (with-mock
-   book.views/get-events-by-location
-   (throw
-    (new java.net.UnknownHostException
-      "DNS error"))
-   (let [request {...}
-         response
-         (view-main-page request)
-         {:keys [status body]}
-         response]
-     (is (= 200 status))
-     (is (= {...} body))))))
+    book.views/get-sites-by-location
+    [...]
+    (with-mock
+     book.views/get-events-by-location
+     (throw
+      (new UnknownHostException
+        "DNS error"))
+     (let [req {...}
+           res (view-main-page req)
+           {:keys [status body]} res]
+       (is (= 200 status))
+       (is (= {...} body))))))
   \end{clojure/lines}
 \end{english}
 
@@ -3338,8 +3333,8 @@ JSON автоматически. Кроме того, пригодятся па�
   \begin{clojure}
 (defn fix-fake-sites-server [t]
   (let [opt {:port 8808 :join? false}
-        server
-        (run-jetty sites-handler opt)]
+        server (run-jetty
+                 sites-handler opt)]
     (t)
     (.stop server)))
 
@@ -3625,7 +3620,7 @@ JSON автоматически. Кроме того, пригодятся па�
   \begin{bash}
 $ mkdir -p env/test/resources/data
 $ mv resources/data/events.json \
-    env/test/resources/data/
+     env/test/resources/data/
   \end{bash}
 \end{english}
 
@@ -4781,7 +4776,8 @@ middleware. В боевых проектах он несёт важную лог
   \begin{clojure}
 {:request-method :get
  :uri
- "/users/?page=2&order=date&name=ivan"}
+ "/users/?page=2&order=
+                 date_added&name=ivan"}
   \end{clojure}
 \end{english}
 
@@ -4914,14 +4910,14 @@ middleware. В боевых проектах он несёт важную лог
 
 \begin{english}
   \begin{clojure}
-(let [request
-      (mock/request :get "/search/v1"
-                    {:lat 11 :lon 22})
+(let [request (mock/request
+                :get "/search/v1"
+                {:lat 11 :lon 22})
       response (sites-handler request)
-      body
-      (-> response
-          :body
-          (json/parse-string true))]
+      body (-> response
+               :body
+               (json/parse-string
+                 true))]
   (is (= {...} body)))
   \end{clojure}
 \end{english}
@@ -5041,12 +5037,12 @@ JSON-схемой. Преимущества спеки в том, что она 
 \begin{english}
   \begin{clojure}
 (let [response (...) ;; get the response
-      body
-      (-> response
-          :body
-          (json/parse-string true))]
-  (is
-    (s/valid? :api.search/result body)))
+      body (-> response
+               :body
+               (json/parse-string
+                 true))]
+  (is (s/valid? :api.search/result
+                body)))
   \end{clojure}
 \end{english}
 
@@ -5248,8 +5244,8 @@ JSON-схемой. Преимущества спеки в том, что она 
     (client/get
       "http://127.0.0.1:8080/api"
       {:query-params params
-       :headers
-       {:authentication auth-header}})
+       :headers {:authentication
+                 auth-header}})
     {:keys [status body]} response]
 (is (= 200 status))
 (is (= {:orders [...]} body))))
