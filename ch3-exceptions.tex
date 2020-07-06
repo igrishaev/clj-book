@@ -202,6 +202,8 @@ File С:/work/test.txt not found станет ясно, к~какому файл
 номеру. Снаружи это чёрный ящик: мы не знаем, откуда приходят
 данные. Предположим, функция обращается в~сеть. Выразим это на псевдокоде:
 
+\ifx\devicetype\mobile
+
 \index{языки!Python}
 \begin{english}
   \begin{python}
@@ -211,6 +213,19 @@ def get-user(id):
   return http.GET(url).body.json()
   \end{python}
 \end{english}
+
+\else
+
+\index{языки!Python}
+\begin{english}
+  \begin{python}
+def get-user(id):
+  url = "http://api.company.com/user/" + str(id)
+  return http.GET(url).body.json()
+  \end{python}
+\end{english}
+
+\fi
 
 Если вызвать функцию с номером, которого нет в системе, получим исключение
 \verb|HTTP Error: status 404|. Текст ничего не говорит о пользователе. Если
@@ -226,6 +241,8 @@ HTTP нет понятия пользователя. Известны лишь �
 дополним его контекстом и отправим наверх. Паттерн называется \verb|re-throw|,
 повторный выброс. Новый псевдокод:
 %% TODO MOBILE python js?
+\ifx\devicetype\mobile
+
 \begin{english}
   \begin{js}
 def get-user(id):
@@ -239,6 +256,22 @@ def get-user(id):
   }
   \end{js}
 \end{english}
+
+\else
+
+\begin{english}
+  \begin{js}
+def get-user(id):
+  try {
+    url = "http://api.company.com/user/" + str(id)
+    return http.GET(url).body.json()
+  } catch error {
+    throw Error("Cannot fetch user " + str(id), cause=error)
+  }
+  \end{js}
+\end{english}
+
+\fi
 
 \index{HTTP!ошибки}
 
