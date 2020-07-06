@@ -4,11 +4,28 @@
 \node (cfg) [entity] {Config};
 \node (srv) [entity, below left = of cfg, yshift=0.5cm, xshift=2cm] {Server};
 \node (dtb) [entity, below right = of cfg, yshift=0.5cm, xshift=-2cm] {Database};
+\ifx\devicetype\mobile
+
+\node (wrk) [entity, below right = of srv, yshift=0.5cm, xshift=-2cm] {Worker};
+
+\else
+
 \node (wrk) [entity, below right = of dtb, yshift=0.5cm, xshift=-2cm] {Worker};
 
-\draw [arrow] (srv) |- (cfg);
-\draw [arrow] (dtb) -| (cfg);
-\draw [arrow] (wrk) -| (dtb);
-\draw [arrow] (wrk) |- (cfg);
+\fi
 
+\draw [arrow] (srv) |- (cfg);
+\draw [arrow] (wrk) -| (dtb);
+
+\ifx\devicetype\mobile
+
+\draw [arrow] (wrk) -- (cfg);
+\draw [arrow] (dtb) |- (cfg);
+
+\else
+
+\draw [arrow] (wrk) |- (cfg);
+\draw [arrow] (dtb) -| (cfg);
+
+\fi
 \end{tikzpicture}
