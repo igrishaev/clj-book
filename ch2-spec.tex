@@ -1167,8 +1167,27 @@ API клиент передаёт архитектуру системы~--- 32 �
 
 \noindent
 
-%% TODO MOBILE
 Вывод числа:
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(def ->int
+  (with-conformer [val]
+    (Integer/parseInt val)))
+  \end{clojure}
+
+\splitter
+
+  \begin{clojure}
+(s/def ::->int
+  (s/and ::ne-string
+         ->int))
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
 
@@ -1192,6 +1211,8 @@ API клиент передаёт архитектуру системы~--- 32 �
 \end{tabular}
 
 \end{english}
+
+\fi
 
 \noindent
 и булева типа:
@@ -3521,7 +3542,40 @@ Clojure. Компилятор заменит вызов макроса на то
 \verb|defn|~--- определение функции. Кроме обязательных параметров он принимает
 дополнительные: строку документации, пре- и постпроверки. У функции может быть
 несколько тел:
-%% ------------ TODO MOBILE
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(defn my-inc
+  [x]
+  (+ x 1))
+  \end{clojure}
+
+\splitter
+
+  \begin{clojure}
+(defn my-inc
+  "Increase the number."
+  [x]
+  {:pre [(int? x)]
+   :post [(int? %)]}
+  (+ x 1))
+  \end{clojure}
+
+\splitter
+
+  \begin{clojure}
+(defn my-inc
+  ([x]
+   (my-inc x 1))
+  ([x delta]
+   (+ x delta)))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
 
 \noindent
@@ -3557,6 +3611,8 @@ Clojure. Компилятор заменит вызов макроса на то
 \end{tabular}
 
 \end{english}
+
+\fi
 
 Это одна и та же функция, записанная по-разному. Очевидно, разобрать все
 варианты вручную тяжело. До версии Clojure 1.10 каждый макрос парсил код как

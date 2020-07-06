@@ -153,6 +153,24 @@ def foo(bar=[]):
 Это привычка из императивного прошлого. Атом-аккумулятор лишний, достаточно
 \verb|map| или \verb|for|:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+(map (partial * 2)
+     [1 2 3 4 5])
+  \end{clojure}
+
+\splitter
+
+  \begin{clojure}
+(for [n [1 2 3 4 5]]
+  (* n 2))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
 
 \noindent
@@ -173,6 +191,8 @@ def foo(bar=[]):
 \end{tabular}
 
 \end{english}
+
+\fi
 
 Оба выражения короче и понятней. Не нужно создавать вектор и добавлять в него
 элементы~--- это делают функции. Если обход коллекции завязан на
@@ -1533,8 +1553,32 @@ Current: 1, timeout: 5000 ;; 2
 \verb|reduce| меняет её функциями \verb|conj!| и~аналогами. Сравним
 обычный \verb|reduce| и его мутабельную версию:
 
+\ifx\devicetype\mobile
+
 \begin{english}
-%% TODO MOBILE
+  \begin{clojure}
+(reduce
+ (fn [result n]
+   (conj result n))
+ []
+ nums)
+  \end{clojure}
+
+\splitter
+
+  \begin{clojure}
+(persistent!
+ (reduce
+  (fn [result* n]
+    (conj! result* n))
+  (transient [])
+  nums))
+  \end{clojure}
+\end{english}
+
+\else
+
+\begin{english}
 \noindent
 \begin{tabular}{ @{}p{5cm} @{}p{5cm} }
 
@@ -1562,6 +1606,8 @@ Current: 1, timeout: 5000 ;; 2
 \end{tabular}
 
 \end{english}
+
+\fi
 
 Второй \verb|reduce| пришлось обернуть в \verb|persistent!|. В случае с
 \verb|loop| мы втянули \verb|persistent!| внутрь и изолировали изменения. В
@@ -2243,8 +2289,27 @@ Clojure намеренно скрывает от нас стадию перем�
 \noindent
 Вывод с различными значениями \verb|*print-level*|:
 
+\ifx\devicetype\mobile
+
 \begin{english}
-%% TODO MOBILE
+  \begin{clojure}
+(set! *print-level* 4)
+(println data)
+;; {:foo {:bar #}}
+  \end{clojure}
+
+\splitter
+
+  \begin{clojure}
+(set! *print-level* 2)
+(println data)
+;; {:foo #}
+  \end{clojure}
+\end{english}
+
+\else
+
+\begin{english}
 \noindent
 \begin{tabular}{ @{}p{5cm} @{}p{5cm} }
 
@@ -2266,6 +2331,8 @@ Clojure намеренно скрывает от нас стадию перем�
 \end{tabular}
 
 \end{english}
+
+\fi
 
 \noindent
 При нулевом уровне увидим только \verb|#|.
@@ -2878,7 +2945,26 @@ Clojure предлагает несколько форм, чтобы выпол�
 \end{english}
 
 \index{middleware!wrap-locale}
-%% TODO MOBILE
+\ifx\devicetype\mobile
+
+%% \begin{english}
+  \begin{clojure}
+(with-locale :en
+  (tr :ui/add-to-cart))
+;; "Add to Cart"
+  \end{clojure}
+
+\splitter
+
+  \begin{clojure}
+(with-locale :ru
+  (tr :ui/add-to-cart))
+;; "Добавить в корзину"
+  \end{clojure}
+%% \end{english}
+
+\else
+
 %% \begin{english}
 
 \noindent
@@ -2901,6 +2987,8 @@ Clojure предлагает несколько форм, чтобы выпол�
 \end{tabular}
 
 %% \end{english}
+
+\fi
 
 Напишем middleware, чтобы определить локаль. Для простоты решим, что это
 параметр \verb|lang| из адресной строки. Если параметра нет, берём локаль по
