@@ -984,7 +984,29 @@ for (env, fn) in env_mapping.iteritems():
 
 \index{вложенность}
 \index{коллекции!вложенность}
-%% TODO MOBILE
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+;; so-so
+{:db-name "book"
+ :db-user "ivan"
+ :db-pass "****"}
+  \end{clojure}
+
+\splitter
+
+  \begin{clojure}
+;; better
+{:db {:name "book"
+      :user "ivan"
+      :pass "****"}}
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
 
 \noindent
@@ -1010,10 +1032,36 @@ for (env, fn) in env_mapping.iteritems():
 
 \end{english}
 
+\fi
+
 В разных системах вложенные переменные читают по-разному. Например, одинарное
 подчёркивание разделяет лексемы, но не меняет структуру. Двойное подчёркивание
 означает вложенность:
-%% TODO MOBILE
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{clojure}
+DB_NAME=book
+DB_PASS=pass
+
+{:db-name "book"
+ :db-pass "pass"}
+  \end{clojure}
+
+\splitter
+
+  \begin{clojure}
+DB__NAME=book
+DB__PASS=pass
+
+{:db {:name "book"
+      :pass "pass"}}
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
 
 \noindent
@@ -1040,6 +1088,8 @@ DB__PASS=pass
 \end{tabular}
 
 \end{english}
+
+\fi
 
 \index{коллекции!массив}
 
@@ -2040,10 +2090,46 @@ JSON выгодно отличается от многословного XML, к
 
 Сравните данные в JSON и YAML. Вторая запись короче и визуально спокойнее:
 
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{json}
+{
+    "server_port": 8080,
+    "db": {
+        "dbtype":   "mysql",
+        "dbname":   "book",
+        "user":     "ivan",
+        "password": "****"
+    },
+    "event": [
+        "2019-07-05T12:00:00",
+        "2019-07-12T23:59:59"
+    ]
+}
+  \end{json}
+
+\splitter
+
+  \begin{yaml}
+server_port: 8080
+db:
+  dbtype:   mysql
+  dbname:   book
+  user:     user
+  password: '****'
+event:
+  - 2019-07-05T12:00:00
+  - 2019-07-12T23:59:59
+  \end{yaml}
+\end{english}
+
+\else
+
 \begin{english}
 
 \noindent
-%% TODO MOBILE
+
 \begin{tabular}{ @{}p{6cm} @{}p{4cm} }
 
   \begin{json}
@@ -2081,6 +2167,8 @@ event:
 \end{tabular}
 
 \end{english}
+
+\fi
 
 \subsection{YAML}
 

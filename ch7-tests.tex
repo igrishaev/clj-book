@@ -1155,8 +1155,29 @@ IDE.
 убедиться, что вызов \verb|(->fahr nil)| бросит ошибку, а не вернёт
 \verb|nil|. Если проверки нет, код не защищён от подобных изменений:
 
+\ifx\devicetype\mobile
+
 \begin{english}
-%% TODO MOBILE
+  \begin{clojure}
+;; before
+(defn ->fahr [cel]
+  (+ (* cel 1.8) 32))
+  \end{clojure}
+
+\splitter
+
+  \begin{clojure}
+;; after
+(defn ->fahr [cel]
+  (when cel
+    (+ (* cel 1.8) 32)))
+  \end{clojure}
+\end{english}
+
+\else
+
+\begin{english}
+
 \noindent
 \begin{tabular}{ @{}p{5cm} @{}p{5cm} }
 
@@ -1179,6 +1200,8 @@ IDE.
 \end{tabular}
 
 \end{english}
+
+\fi
 
 \index{nil}
 
@@ -1517,8 +1540,26 @@ Emacs предлагает навигацию по коду командой \ve
 это скаляр, а действительное~--- выражение, поэтому хочется записать их как слева.
 Увы, придётся побороть себя и писать по образцу справа:
 
+\ifx\devicetype\mobile
+
 \begin{english}
-%% TODO MOBILE
+  \begin{clojure}
+;; wrong
+(= (int (->fahr 20)) 68)
+  \end{clojure}
+
+\splitter
+
+  \begin{clojure}
+;; correct
+(= 68 (int (->fahr 20)))
+  \end{clojure}
+\end{english}
+
+\else
+
+\begin{english}
+
 \noindent
 \begin{tabular}{ @{}p{5cm} @{}p{5cm} }
 
@@ -1538,6 +1579,8 @@ Emacs предлагает навигацию по коду командой \ve
 
 \end{english}
 
+\fi
+
 \index{библиотеки!JUnit}
 
 Правило уходит корнями в прошлое. Фреймворк JUnit утвердил именно такой порядок
@@ -1556,8 +1599,40 @@ Emacs предлагает навигацию по коду командой \ve
 путаницу. Согласно ему, нормальным считается статус 404 (expected), а не 200
 (actual). Вариант справа выводит статусы правильно.
 
+\ifx\devicetype\mobile
+
 \begin{english}
-%% TODO MOBILE
+  \begin{clojure}
+;; wrong
+(is (= (:status response)
+       200))
+
+Fail in test-...
+expected: 404
+  actual: 200
+    diff: - 404
+          + 200
+  \end{clojure}
+
+\splitter
+
+  \begin{clojure}
+;; correct
+(is (= 200
+       (:status response)))
+
+Fail in test-...
+expected: 200
+  actual: 404
+    diff: - 200
+          + 404
+  \end{clojure}
+\end{english}
+
+\else
+
+\begin{english}
+
 \noindent
 \begin{tabular}{ @{}p{5cm} @{}p{5cm} }
 
@@ -1590,6 +1665,8 @@ expected: 200
 \end{tabular}
 
 \end{english}
+
+\fi
 
 \section{Фикстуры}
 

@@ -632,8 +632,25 @@ Value error, a: 1, b: null
 словаря или вектора сообщит переменным \verb|nil|, если поля не совпали. Оба
 \verb|let| ниже произведут вектор из трёх \verb|nil|.
 
+\ifx\devicetype\mobile
+
 \begin{english}
-%% TODO MOBILE
+  \begin{clojure}
+(let [{:keys [a b c]} nil]
+  [a b c])
+  \end{clojure}
+
+\splitter
+
+  \begin{clojure}
+(let [[a b c] nil]
+  [a b c])
+  \end{clojure}
+\end{english}
+
+\else
+
+\begin{english}
 \noindent
 \begin{tabular}{ @{}p{5cm} @{}p{5cm} }
 
@@ -652,6 +669,8 @@ Value error, a: 1, b: null
 \end{tabular}
 
 \end{english}
+
+\fi
 
 \index{nil!punning}
 

@@ -1611,10 +1611,18 @@ middleware зависят друг от друга, их можно <<схлоп
 \begin{english}
   \begin{clojure}
 (comp foo bar)
+  \end{clojure}
 
+\splitter
+
+  \begin{clojure}
 (fn [x]
   (foo (bar x)))
+  \end{clojure}
 
+\splitter
+
+  \begin{clojure}
 (fn [x] (-> x
             bar
             foo))
@@ -1624,7 +1632,6 @@ middleware зависят друг от друга, их можно <<схлоп
 \else
 
 \begin{english}
-%TODO MOBILE
 \noindent
 \begin{tabular}{ @{}p{3.2cm} @{}p{3.5cm} @{}p{3.5cm} }
 
