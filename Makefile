@@ -56,6 +56,12 @@ warn:
 refs:
 	! grep -A 0 -B 0 -i 'LaTeX Warning: Reference' ${JOB}.log
 
+.PHONY: docker-build-prepare
+docker-build-prepare:
+	make pyg-print-install
+	./install-fonts.sh
+	cd ./makeindex && clojure -Stree
+
 IMAGE := clj-book
 
 .PHONY: docker-build
