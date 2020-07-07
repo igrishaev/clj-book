@@ -823,7 +823,7 @@ IP. Пока что мы не знаем, как работает поиск, н
 \index{транзакции}
 
 \ifx\devicetype\mobile
-%% TODO code line ref
+
 \begin{english}
   \begin{clojure/lines}
 (defn task-fn []
@@ -903,7 +903,7 @@ IP. Пока что мы не знаем, как работает поиск, н
 \verb|FOR UPDATE| работает только в транзакции, поэтому тело функции обёрнуто
 в~\verb|(jdbc/with-db-transaction)|. Это макрос, внутри которого доступно
 транзакционное соединение с базой. На него указывает символ~\verb|tx|. В~функции
-JDBC мы передаём \verb|tx|, а~не~\verb|db| (строки 3 и~12).
+JDBC мы передаём \verb|tx|, а~не~\verb|db| \ifx\devicetype\mobile(строки 5 и~18)\else(строки 3 и~12)\fi.
 
 \index{функции!get-ip-info}
 \index{сайты!iplocation.com}
@@ -2368,7 +2368,7 @@ COMMIT
 Запись хранит четыре слота: входные опции, флаг продолжения, футура с циклом
 (\verb|task|) и база данных. Последний слот~--- это зависимый компонент, экземпляр
 \verb|DB|, который мы только что написали. Реализуем \verb|Lifecycle|:
-%% TODO code line ref
+
 \ifx\devicetype\mobile
 
 \begin{english}

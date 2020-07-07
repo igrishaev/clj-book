@@ -99,9 +99,9 @@ def api_call(**params):
 \index{передача по ссылке}
 
 В теле \verb|api_call| грубая ошибка: переменная \verb|api_params| получает
-не копию глобальных параметров, а \emph{ссылку} на них \coderef{9}. Изменяя
+не копию глобальных параметров, а \emph{ссылку} на них \ifx\devicetype\mobile\coderef{10}\else\coderef{9}\fi. Изменяя
 \verb|api_params|, мы на самом деле меняем \verb|DEFAULT_PARAMS|
-\coderef{10}. На каждый вызов глобальные параметры меняются, что ведёт к
+\ifx\devicetype\mobile\coderef{11}\else\coderef{10}\fi. На каждый вызов глобальные параметры меняются, что ведёт к
 странному поведению программы. Код и состояние <<разъехались>>.
 
 На собеседованиях часто задают следующий вопрос. Представьте функцию с
@@ -2177,7 +2177,7 @@ Clojure намеренно скрывает от нас стадию перем�
 \index{функции!install-better-logging}
 
 \ifx\devicetype\mobile
-%% TODO code line ref
+
 \begin{english}
   \begin{clojure/lines}
 (defn install-better-logging []
@@ -2947,21 +2947,19 @@ Clojure предлагает несколько форм, чтобы выпол�
 \index{middleware!wrap-locale}
 \ifx\devicetype\mobile
 
-%% \begin{english}
-  \begin{clojure}
+\begin{clojure}
 (with-locale :en
   (tr :ui/add-to-cart))
 ;; "Add to Cart"
-  \end{clojure}
+\end{clojure}
 
 \splitter
 
-  \begin{clojure}
+\begin{clojure}
 (with-locale :ru
   (tr :ui/add-to-cart))
 ;; "Добавить в корзину"
-  \end{clojure}
-%% \end{english}
+\end{clojure}
 
 \else
 
