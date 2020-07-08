@@ -217,7 +217,14 @@
 
 % https://tex.stackexchange.com/questions/203720/
 \makeatletter\@openrightfalse\makeatother
+% printindex
+\ifx\devicetype\mobile
+\idxlayout{columns=1}
 \printindex
+\else
+\printindex
+\fi
+
 
 \ifx\mode\print
 \input{exit}
