@@ -95,13 +95,13 @@ Clojure~--- это гостевой язык (англ.~hosted language). Он �
 оказалось на диске. Родословная класса выглядит так:
 
 \linegap
-%% TODO MOBILE
+
 \dirtree{%
- .1 java.lang.Object.
- .2 java.lang.Throwable.
- .3 java.lang.Exception.
- .4 java.io.IOException.
- .5 java.io.FileNotFoundException.
+ .1 Object.
+ .2 Throwable.
+ .3 Exception.
+ .4 IOException.
+ .5 FileNotFoundException.
 }
 
 \linegap
@@ -200,7 +200,7 @@ File С:/work/test.txt not found станет ясно, к~какому файл
 руководство, чтобы развивать компанию. При спуске вниз начинается техническая
 часть. Представим, что функция \verb|get-user| находит пользователя по
 номеру. Снаружи это чёрный ящик: мы не знаем, откуда приходят
-данные. Предположим, функция обращается в~сеть. Выразим это на псевдокоде:
+данные. Предположим, функция обращается в~сеть. Выразим это на Python:
 
 \ifx\devicetype\mobile
 
@@ -239,35 +239,34 @@ HTTP нет понятия пользователя. Известны лишь �
 
 Расставим в коде \verb|try/catch|. Если исключение пришло из технических недр,
 дополним его контекстом и отправим наверх. Паттерн называется \verb|re-throw|,
-повторный выброс. Новый псевдокод:
-%% TODO MOBILE python js?
+повторный выброс. Новый код на Python:
+
 \ifx\devicetype\mobile
 
 \begin{english}
-  \begin{js}
+  \begin{python}
 def get-user(id):
-  try {
+  try:
     url = "http://api.company.com/" + \
           "user/" + str(id)
     return http.GET(url).body.json()
-  } catch error {
-    throw Error("Cannot fetch user " + \
-                str(id), cause=error)
-  }
-  \end{js}
+  except Exception as e:
+    raise Exception ("Cannot fetch " + \
+          "user " + str(id)) from e
+  \end{python}
 \end{english}
 
 \else
 
 \begin{english}
   \begin{js}
-def get-user(id):
-  try {
+def get_user(id):
+  try:
     url = "http://api.company.com/user/" + str(id)
     return http.GET(url).body.json()
-  } catch error {
-    throw Error("Cannot fetch user " + str(id), cause=error)
-  }
+  except Exception as e:
+    raise Exception("Cannot fetch user " + str(id)) from e
+
   \end{js}
 \end{english}
 
@@ -2001,7 +2000,26 @@ middleware.
 просто. Код на Python выглядел бы так:
 
 \index{языки!Python}
-%% TODO MOBILE
+
+\ifx\devicetype\mobile
+
+\begin{english}
+  \begin{python}
+class AccountHandler(RequestHandler):
+  def on_get(self, request):
+    if not self.check_params(request):
+      return BadRequest("Wrong input")
+    if not self.check_account(request):
+      return NotFound("No such an acc")
+    if not self.check_quotas(request):
+      return QuotasReached("Request " + \
+             "rate is limited")
+    return JSONResponse(self.get_data())
+  \end{python}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{python}
 class AccountHandler(RequestHandler):
@@ -2015,6 +2033,8 @@ class AccountHandler(RequestHandler):
     return JSONResponse(self.get_data_from_db())
   \end{python}
 \end{english}
+
+\fi
 
 В Clojure нет оператора \verb|return|. Результат нескольких форм~--- это результат
 последней. Мы не можем расположить несколько \verb|when| на одном уровне друг
