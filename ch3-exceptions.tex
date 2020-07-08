@@ -96,6 +96,8 @@ Clojure~--- это гостевой язык (англ.~hosted language). Он �
 
 \linegap
 
+\ifx\devicetype\mobile
+
 \dirtree{%
  .1 Object.
  .2 Throwable.
@@ -103,6 +105,18 @@ Clojure~--- это гостевой язык (англ.~hosted language). Он �
  .4 IOException.
  .5 FileNotFoundException.
 }
+
+\else
+
+\dirtree{%
+ .1 java.lang.Object.
+ .2 java.lang.Throwable.
+ .3 java.lang.Exception.
+ .4 java.io.IOException.
+ .5 java.io.FileNotFoundException.
+}
+
+\fi
 
 \linegap
 
