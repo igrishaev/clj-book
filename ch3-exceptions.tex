@@ -1856,7 +1856,7 @@ middleware.
 декораторы и middleware, вернитесь к~главе про веб-разработку \page{decorator}.
 
 \wavetop
-%% TODO code line ref
+
 \ifx\devicetype\mobile
 
 \begin{english}
@@ -1900,7 +1900,7 @@ middleware.
 \wavetop
 
 \ifx\devicetype\mobile
-%% TODO code line ref
+
 \begin{english}
   \begin{clojure/lines*}{firstnumber=17}
 (catch Exception e-sentry
@@ -1933,7 +1933,7 @@ middleware.
 \index{асинхронность}
 \index{синтаксис!@ (дереф)}
 
-Объясним оператор \verb|@| перед вызовом \verb|r/capture!| \coderef{14}. Функция
+Объясним оператор \verb|@| перед вызовом \verb|r/capture!| \ifx\devicetype\mobile\coderef{16}\else\coderef{14}\fi. Функция
 работает асинхронно за счёт библиотеки Manifold. Результат~--- это особый
 объект \verb|deferred|, похожий на футуру. Даже если в нём случилась ошибка, мы
 не узнаем этого, пока не <<дерефнем>> его. Оператор~\verb|@| ещё встретится нам

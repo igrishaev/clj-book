@@ -1710,7 +1710,7 @@ Set-Cookie: visited=true;
 \index{модули!ring.middleware.cookies}
 
 \ifx\devicetype\mobile
-%% TODO code line ref
+
 \begin{english}
   \begin{clojure/lines}
 (require '[ring.middleware.cookies
@@ -1761,7 +1761,7 @@ Set-Cookie: visited=true;
 \fi
 
 Замечание: переменная со звёздочкой на конце означает новую версию исходной
-переменной \coderef{8}. Например, такой же словарь, но с новым ключом. Вместо
+переменной \ifx\devicetype\mobile\coderef{9}\else\coderef{8}\fi. Например, такой же словарь, но с новым ключом. Вместо
 звёздочки иногда ставят штрих. Переменная \verb|cookies*| означает <<новые
 куки на базе старых>>.
 
