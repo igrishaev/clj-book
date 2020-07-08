@@ -103,6 +103,11 @@
   indentunit=0.25em,
   totoc
 ]{idxlayout}
+\ifx\devicetype\mobile
+\idxlayout{columns=1}
+\else
+\idxlayout{columns=2}
+\fi
 
 \usepackage{setspace}
 
@@ -217,7 +222,9 @@
 
 % https://tex.stackexchange.com/questions/203720/
 \makeatletter\@openrightfalse\makeatother
+
 \printindex
+
 
 \ifx\mode\print
 \input{exit}
