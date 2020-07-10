@@ -6,6 +6,8 @@
 
 \def\arr{$\to$\xspace}
 
+\newcommand{\mnoindent}{\ifx\devicetype\mobile\noindent\fi}
+
 \newcommand{\slurp}{\vspace{-1em}}
 
 \newcommand{\coderef}[1]{(строка~#1)\xspace}
@@ -35,8 +37,6 @@
 \def\splitter{{\noindent\centering\rule{3cm}{.4pt}\par}}
 
 \def\blank{\clearpage{\pagestyle{empty}\cleardoublepage}}
-
-\def\zspace{\hspace{0pt}}
 
 \ifx\mode\print
 \NewDocumentCommand{\footurl}{ m m O{} O{1mm} }{%
@@ -78,7 +78,7 @@
 \newminted[python/lines]{python}{linenos, xleftmargin=\codeindent}
 
 \newminted[json/lines]{json}{linenos, xleftmargin=\codeindent}
-
+%DELETE
 \newmintinline{clojure}{}
 
 \newminted[json]{json}{}
