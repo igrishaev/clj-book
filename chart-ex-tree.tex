@@ -18,14 +18,6 @@
 \draw [arrow] (obj) -- (thr);
 \draw [arrow] (thr) -| (err);
 \draw [arrow] (thr) -| (exc);
-\ifx\devicetype\mobile
-
-\draw [arrow] (exc) |- (rex);
-
-\else
-
 \draw [arrow] (exc) -| (rex);
-
-\fi
 
 \end{tikzpicture}
