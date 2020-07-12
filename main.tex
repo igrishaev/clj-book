@@ -21,12 +21,6 @@
 % linebreaks in verbatim for mobile
 \usepackage{spverbatim}
 
-% no indent for items in lists (in mobile)
-\ifx\devicetype\mobile
-\usepackage{enumitem}
-\setlist[itemize]{leftmargin=*}
-\fi
-
 
 %%
 %% Constants
@@ -121,8 +115,17 @@
 
 \usepackage{setspace}
 
+
+% href ursl for ebooks
 \ifx\mode\ebook
 \usepackage[hidelinks, hyperindex=false]{hyperref}
+\fi
+
+
+% no indent for items in lists (in mobile)
+\ifx\devicetype\mobile
+\usepackage{enumitem}
+\setlist[itemize]{leftmargin=*}
 \fi
 
 %% geometry presets
