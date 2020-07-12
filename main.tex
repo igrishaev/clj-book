@@ -21,6 +21,13 @@
 % linebreaks in verbatim for mobile
 \usepackage{spverbatim}
 
+% no indent for items in lists (in mobile)
+\ifx\devicetype\mobile
+\usepackage{enumitem}
+\setlist[itemize]{leftmargin=*}
+\fi
+
+
 %%
 %% Constants
 %%

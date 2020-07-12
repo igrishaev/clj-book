@@ -3337,10 +3337,9 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
   \end{clojure}
 \end{english}
 
-\mnoindent
 Расширим метод сервера \verb|start|. Если раньше мы передавали \verb|app|
 напрямую в \verb|run-jetty|, то теперь введём новый шаг. Функция
-\verb|make-handler| оборачивает \verb|app| таким образом, что каждый запрос
+\texttt{make\--hand\-ler} оборачивает \verb|app| таким образом, что каждый запрос
 в~\verb|app| дополнен базой.
 
 \ifx\devicetype\mobile
