@@ -28,7 +28,11 @@
 \newcommand{\lis}[1]{\hyperref[#1]{\uline{(листинг~\ref{#1})}}}
 \fi
 
+\ifx\devicetype\mobile
+\newcommand{\chart}[1]{\begin{center}\input{#1}\end{center}}
+\else
 \newcommand{\chart}[1]{\input{#1}}
+\fi
 
 \def\wavetop{{\noindent\centering\raisebox{-0em}[0em][0em]{\uwave{\hspace{3cm}}}\par}}
 
