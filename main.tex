@@ -98,6 +98,13 @@
 \setminted{breaklines=true}
 \fi
 
+% mobile headers
+\ifx\devicetype\mobile
+\usepackage{sectsty}
+\sectionfont{\raggedright}
+\subsectionfont{\raggedright}
+\fi
+
 % index
 \usepackage{index}
 \newindex{default}{idx}{ind}{Предметный указатель}
