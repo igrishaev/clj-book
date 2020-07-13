@@ -593,12 +593,17 @@ Clojure предлагает несколько способов менять д
   \verb|(get-in <current> [1005 :pids])|.
 
 \item
-  Добавим к нему новый процесс: \spverb|(conj <pids> 9999)|.\ifx\devicetype\mobile\else\\\fi
+  Добавим к нему новый процесс: \spverb|(conj <pids> 9999)|.\ifx\devicetype\mobile\ \else\\\fi
   Обозначим новое множество \verb|<pids*>|.
 
 \item
   Обновим \verb|<current>| этим множеством по пути 1005 \arr{} \verb|:pids|:\\
-  \spverb|(assoc-in <current> [1005 :pids] <pids*>)|.
+  \ifx\devicetype\mobile
+  \verb|(assoc-in <current>| \\
+  \verb|  [1005 :pids] <pids*>)|
+  \else
+  \verb|(assoc-in <current> [1005 :pids] <pids*>)|.
+  \fi
 
 \end{itemize}
 
@@ -1924,7 +1929,7 @@ Clojure намеренно скрывает от нас стадию перем�
   сторонние библиотеки;
 
 \item
-  стандартные модули Clojure, например \texttt{cloju\-re.co\-re}.
+  стандартные модули Clojure, например \texttt{clo\-ju\-re.co\-re}.
 
 \end{itemize}
 
