@@ -8,9 +8,15 @@ COMMIT_TS = $(shell git log -1 --format='%at')
 .PHONY: draft
 draft: pdf-build1
 
+.PHONY: pre-build
+pre-build: clear pdf-build1 index pdf-build2 pdf-build3 refs
+
 # release build
 .PHONY: build
-build: clear pdf-build1 index pdf-build2 pdf-build3 refs lines tag-job
+build:  pre-build lines tag-job
+
+.PHONY: mobile-build
+mobile-build: pre-build tag-job
 
 .PHONY: tag-job
 tag-job:
@@ -77,6 +83,7 @@ DOCKER_BUILD_PRE = \
 
 DOCKER_BUILD_POST = -v $(CURDIR)/:/book -w /book ${IMAGE}:build
 DOCKER_BUILD_POST_BUILD = ${DOCKER_BUILD_POST} make build
+DOCKER_BUILD_POST_MOBILE_BUILD = ${DOCKER_BUILD_POST} make mobile-build
 
 .PHONY: docker-build-draft
 docker-build-print-draft:
@@ -107,10 +114,10 @@ docker-build-tablet:
 docker-build-kindle:
 	${DOCKER_BUILD_PRE}	\
 	--env-file=ENV_KINDLE \
-	${DOCKER_BUILD_POST_BUILD}
+	${DOCKER_BUILD_POST_MOBILE_BUILD}
 
 .PHONY: docker-build-phone
 docker-build-phone:
 	${DOCKER_BUILD_PRE}	\
 	--env-file=ENV_PHONE \
-	${DOCKER_BUILD_POST_BUILD}
+	${DOCKER_BUILD_POST_MOBILE_BUILD}
