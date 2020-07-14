@@ -34,7 +34,7 @@ tag-job:
 
 .PHONY: index
 index:
-	cd makeindex && clojure -m makeindex.core ${PWD}/${JOB}.idx ${PWD}/${JOB}.ind
+	cd makeindex && bb --classpath src --main makeindex.core ${PWD}/${JOB}.idx ${PWD}/${JOB}.ind
 
 .PHONY: clear
 clear:
@@ -76,7 +76,6 @@ refs:
 docker-build-prepare:
 	make pyg-print-install
 	./install-fonts.sh
-	cd ./makeindex && clojure -Stree
 
 IMAGE := clj-book
 
