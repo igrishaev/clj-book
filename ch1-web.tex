@@ -288,7 +288,7 @@ Clojure заменяют функцией. Это удобно, потому ч�
 \label{first-handler}
 
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -327,7 +327,7 @@ Clojure заменяют функцией. Это удобно, потому ч�
 \verb|format|. Поскольку \verb|app|~--- это функция, вызовем её с разными
 запросами:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -385,7 +385,7 @@ Clojure заменяют функцией. Это удобно, потому ч�
 
 Запустим сервер:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -413,7 +413,7 @@ Clojure заменяют функцией. Это удобно, потому ч�
 остановить его, нужно поместить результат \verb|run-jetty| в~переменную
 и~позже вызвать метод \verb|.stop|:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -481,7 +481,7 @@ Clojure заменяют функцией. Это удобно, потому ч�
 
 Чтобы извлечь заголовки правильно, используйте \verb|:strs|:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -558,7 +558,7 @@ Clojure) регистр имеет значение. Ring приводит за�
 
 Легче всего прочитать тело в строку функцией \verb|slurp|:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -604,7 +604,7 @@ Clojure) регистр имеет значение. Ring приводит за�
 
 \index{заголовки!Location}
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -722,7 +722,7 @@ Clojure) регистр имеет значение. Ring приводит за�
 Так выглядит приложение на Compojure. Оно чище и короче того, что мы написали
 вначале.
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -791,7 +791,7 @@ Clojure) регистр имеет значение. Ring приводит за�
 
 \index{макросы!GET}
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -818,7 +818,7 @@ Clojure) регистр имеет значение. Ring приводит за�
 номеру из пути. Условная функция \verb|get-user-by-id| вернёт словарь
 пользователя по номеру. Находим в словаре имя и фамилию и возвращаем строку.
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -860,7 +860,7 @@ Compojure решает проблему вложенных путей. Расс�
 
 \index{макросы!context}
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -908,7 +908,7 @@ Compojure решает проблему вложенных путей. Расс�
 
 \index{макросы!ANY}
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -969,7 +969,7 @@ Compojure решает проблему вложенных путей. Расс�
 
 Перепишем на Bidi пример из начала главы. Добавьте зависимость:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -1025,7 +1025,7 @@ Compojure решает проблему вложенных путей. Расс�
 \verb|match-route*|. Это альтернативная версия \verb|match-route|, которая
 принимает словарь-накопитель. Его роль играет запрос.
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -1060,7 +1060,7 @@ Compojure решает проблему вложенных путей. Расс�
 поле \verb|:handler|. Обернём код в middleware. Получив запрос, новый
 обработчик добавит к нему поле \verb|handler| и вызовет исходный обработчик.
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -1142,7 +1142,7 @@ Compojure решает проблему вложенных путей. Расс�
 Это был простой роутинг на Bidi. Теперь рассмотрим товары, их
 просмотр и изменение. Новое дерево выглядит так:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -1181,7 +1181,7 @@ Compojure решает проблему вложенных путей. Расс�
 верстает его HTML-страницу. Если товара нет, вернём ответ 404 <<не
 найдено>>.
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -1224,7 +1224,7 @@ Compojure решает проблему вложенных путей. Расс�
 отличается шаблоном HTML. Обновление товара сложнее: нужно выбрать поля запроса
 и записать их в базу. Для краткости опустим валидацию:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -1415,7 +1415,7 @@ HTTP предусматривает данные в адресной строк�
 
 \index{middleware!wrap-params}
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -1450,7 +1450,7 @@ HTTP предусматривает данные в адресной строк�
 параметр \verb|who| задавал имя, кого приветствовать:
 \verb|/hello?who=John|. Добраться до него можно так:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -1593,7 +1593,7 @@ middleware зависят друг от друга, их можно <<схлоп
 \index{clojure.core!comp}
 \index{функции!композиция}
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -1616,7 +1616,7 @@ middleware зависят друг от друга, их можно <<схлоп
 их \verb|foo| и \verb|bar| и перепишем выражение несколько раз. В каждом
 столбике одинаковая функция, записанная по-разному.
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -1719,7 +1719,7 @@ Set-Cookie: visited=true;
 
 \index{модули!ring.middleware.cookies}
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure/lines}
@@ -1771,7 +1771,7 @@ Set-Cookie: visited=true;
 \fi
 
 Замечание: переменная со звёздочкой на конце означает новую версию исходной
-переменной \ifx\devicetype\mobile\coderef{9}\else\coderef{8}\fi. Например, такой же словарь, но с новым ключом. Вместо
+переменной \ifx\DEVICETYPE\MOBILE\coderef{9}\else\coderef{8}\fi. Например, такой же словарь, но с новым ключом. Вместо
 звёздочки иногда ставят штрих. Переменная \verb|cookies*| означает <<новые
 куки на базе старых>>.
 
@@ -1808,7 +1808,7 @@ document.cookie
 \noindent
 Измените переменную \verb|cookies*| так, чтобы у~\verb|seen| был атрибут:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -1903,7 +1903,7 @@ HTTP не предполагает связи между двумя запрос
 
 \index{модули!ring.middleware.session}
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -1990,7 +1990,7 @@ Middleware \verb|wrap-json-response| упрощает возврат JSON-дан
 Рассмотрим API для чтения пользователя. Если нашли его по номеру, вернём
 словарь полей. Если нет, в ответе структура ошибки.
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -2054,7 +2054,7 @@ malformed>>.
 внимание: middleware принимает дополнительные параметры. Флаг \verb|:keywords? true|
 означает, что ключи словаря станут кейвордами.
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -2172,7 +2172,7 @@ Middleware не случайно выделяет поле \verb|:json-params|. 
 
 \index{функции!stringify-keys}
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -2213,7 +2213,7 @@ Middleware не случайно выделяет поле \verb|:json-params|. 
 для строк. В заголовках ответа тоже кейворд. Убедитесь, что браузер покажет
 сообщение жирным шрифтом, потому что тип содержимого HTML.
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -2271,7 +2271,7 @@ id вернётся в ответе. Его пишут в лог, чтобы п�
 Напишем обёртку для id. Заголовки~--- это кейворды, потому что выше по стеку
 \verb|wrap-headers-kw|.
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -2328,7 +2328,7 @@ Id хранят в заголовках, но дублируют в запрос
 
 \index{логирование!HTTP}
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -2364,7 +2364,7 @@ Id хранят в заголовках, но дублируют в запрос
 
 \index{middleware!wrap-current-user}
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -2436,7 +2436,7 @@ middleware ниже по стеку не сработает.
 \index{middleware!wrap-auth-user-only}
 \index{HTTP!авторизация}
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -2494,7 +2494,7 @@ middleware ниже по стеку не сработает.
 
 \index{middleware!wrap-exception}
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -2593,7 +2593,7 @@ middleware под названием \verb|wrap-routes|. Оно принимае
 \noindent
 Смонтируем её на префикс \verb|/account| и обернём в проверку доступа.
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -2647,7 +2647,7 @@ Middleware, которое принимает middleware,~--- довольно �
 Наивное решение в том, чтобы прочитать файл функцией \verb|slurp| и~вернуть
 его содержимое:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -2696,7 +2696,7 @@ Ring допускает, чтобы телом ответа был файл, э�
 \verb|java.io.File|. Чтобы получить объект файла, путь к нему передают
 в~конструктор класса или функцию \verb|file| из модуля \verb|clojure.java.io|:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -2735,7 +2735,7 @@ Ring допускает, чтобы телом ответа был файл, э�
 
 Когда файлов несколько, плодить правило на каждый из них утомительно:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -2765,7 +2765,7 @@ Ring допускает, чтобы телом ответа был файл, э�
 этого служит middleware \verb|wrap-file|. Оно устроено так, что если запрос не
 подошёл основному приложению, middleware выполнит поиск файла в указанной папке.
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -2841,7 +2841,7 @@ Ring допускает, чтобы телом ответа был файл, э�
 бинарный поток. Чтобы определить тип по расширению файла, добавьте ещё одно
 middleware \verb|wrap-content-type|:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -2915,7 +2915,7 @@ HTTP. Потребитель считает его по мере загрузк�
 Яндекса переходят в наш ответ. Это касается и заголовков, но мы возвращаем их не
 все, а подмножество (в нашем случае \verb|Content-Type|).
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -2956,7 +2956,7 @@ HTTP. Потребитель считает его по мере загрузк�
 хотя адрес по-прежнему \verb|localhost|. Код \verb|app-proxy| можно выразить
 короче с помощью стрелочного оператора:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}

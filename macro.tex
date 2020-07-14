@@ -6,7 +6,7 @@
 
 \def\arr{$\to$\xspace}
 
-\newcommand{\mnoindent}{\ifx\devicetype\mobile\noindent\fi}
+\newcommand{\mnoindent}{\ifx\DEVICETYPE\MOBILE\noindent\fi}
 
 \newcommand{\slurp}{\vspace{-1em}}
 
@@ -16,19 +16,19 @@
 
 \newcommand{\eng}[1]{(англ.~#1)}
 
-\ifx\mode\print
+\ifx\MODE\PRINT
 \newcommand{\page}[1]{(с.~\pageref{#1})}
 \newcommand{\fig}[1]{(рис.~\ref{#1})}
 \newcommand{\lis}[1]{(листинг~\ref{#1})}
 \fi
 
-\ifx\mode\ebook
+\ifx\MODE\EBOOK
 \newcommand{\page}[1]{\hyperref[#1]{\uline{(с.~\pageref{#1})}}}
 \newcommand{\fig}[1]{\hyperref[#1]{\uline{(рис.~\ref{#1})}}}
 \newcommand{\lis}[1]{\hyperref[#1]{\uline{(листинг~\ref{#1})}}}
 \fi
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 \newcommand{\chart}[1]{\begin{center}\input{#1}\end{center}}
 \else
 \newcommand{\chart}[1]{\input{#1}}
@@ -42,38 +42,38 @@
 
 \def\blank{\clearpage{\pagestyle{empty}\cleardoublepage}}
 
-\ifx\mode\print
+\ifx\MODE\PRINT
 \NewDocumentCommand{\footurl}{ m m O{} O{1mm} }{%
   #1\footnote{\StrSubstitute{#2}{https://}{}}%
   \ifx\QR\NIL\else\marginnote{\setstretch{0.5}\qrcode[height=10mm]{#2}\\\vspace{1mm}{\tiny #3}}[#4]\fi}%
 \fi
 
-\ifx\mode\ebook
+\ifx\MODE\EBOOK
 \NewDocumentCommand{\footurl}{ m m O{} O{} }{\href{#2}{\uline{#1}}}
 \fi
 
 \newcommand{\smartlink}[2]{%
-\ifx\mode\print
+\ifx\MODE\PRINT
 \texttt{#1}%
 \fi
-\ifx\mode\ebook
+\ifx\MODE\EBOOK
 \href{#2}{\uline{#1}}%
 \fi
 }
 
-\def\emaillink{\smartlink{\email}{mailto:\email}}
+\def\EMAILLINK{\smartlink{\EMAIL}{mailto:\EMAIL}}
 
-\def\sitelink{\smartlink{\domain}{https://\domain}}
+\def\SITELINK{\smartlink{\DOMAIN}{https://\DOMAIN}}
 
 \newcommand{\tuple}[1]{\{#1\}}
 
 \newminted[clojure]{clojure}{}
 
-\ifx\mode\print
+\ifx\MODE\PRINT
 \def\codeindent{0mm}
 \fi
 
-\ifx\mode\ebook
+\ifx\MODE\EBOOK
 \def\codeindent{\parindent}
 \fi
 

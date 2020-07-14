@@ -160,7 +160,7 @@ Spec работают не с объектами спеки, а с ключам.
 него можно сослаться: функция \verb|s/get-spec| по~ключу спеки вернёт
 её объект. На практике он не нужен, потому что везде указывают ключи.
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -273,7 +273,7 @@ string>>. Спека встречается часто, поэтому логи�
 \index{clojure.core!re-matches}
 \index{регулярные выражения}
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -323,7 +323,7 @@ string>>. Спека встречается часто, поэтому логи�
 чтобы она не бросала исключения. В примере с \verb|::url| сначала убедимся,
 что это строка, и только потом проверим регулярным выражением.
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -394,7 +394,7 @@ string>>. Спека встречается часто, поэтому логи�
 \noindent
 Быстрая проверка:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -429,7 +429,7 @@ string>>. Спека встречается часто, поэтому логи�
 главы про веб-разработку \page{ring-params}. Его ключи~--- кейворды, а значения~---
 строки. На языке спеки это выглядит так:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -546,7 +546,7 @@ string>>. Спека встречается часто, поэтому логи�
 описание, пропавший ключ. Если каждый из словарей подставить в выражение
 \spverb|(s/valid? ::page <data>)|, результат будет ложью.
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -592,7 +592,7 @@ string>>. Спека встречается часто, поэтому логи�
 
 \index{spec!valid?}
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -641,7 +641,7 @@ string>>. Спека встречается часто, поэтому логи�
 
 Словари с правильным статусом и без него пройдут валидацию:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -680,7 +680,7 @@ string>>. Спека встречается часто, поэтому логи�
 \verb|int?|, что приведёт к ошибке. Это тот случай, когда пустое значение
 не равно его отсутствию.
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -805,7 +805,7 @@ JSON не поддерживает даты, поэтому их передаю�
 
 \index{даты}
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -859,7 +859,7 @@ JSON не поддерживает даты, поэтому их передаю�
 \noindent
 Дата и время:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -894,7 +894,7 @@ API клиент передаёт архитектуру системы~--- 32 �
 
 \index{clojure.core!case}
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -969,7 +969,7 @@ API клиент передаёт архитектуру системы~--- 32 �
 \noindent
 Код вывода:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -1040,7 +1040,7 @@ API клиент передаёт архитектуру системы~--- 32 �
 \verb|todo|, \verb|in_progress| и \verb|done|. Опишем спеку множеством
 этих значений:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -1076,7 +1076,7 @@ API клиент передаёт архитектуру системы~--- 32 �
 \noindent
 Это же выражение можно переписать на \verb|partial| от равенства:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -1171,7 +1171,7 @@ API клиент передаёт архитектуру системы~--- 32 �
 
 Вывод числа:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -1219,7 +1219,7 @@ API клиент передаёт архитектуру системы~--- 32 �
 \noindent
 и булева типа:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -1255,7 +1255,7 @@ API клиент передаёт архитектуру системы~--- 32 �
 \noindent
 Переменная \verb|->lower|~--- это обёртка для приведения регистра:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -1377,7 +1377,7 @@ API клиент передаёт архитектуру системы~--- 32 �
 \noindent
 Если передать пару со строкой, получим ошибку:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -1553,7 +1553,7 @@ API клиент передаёт архитектуру системы~--- 32 �
 \noindent
 На корректных данных функции не проявляют себя:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -1733,7 +1733,7 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 случае последний элемент \verb|:via|~--- это \verb|::ne-string|. Назначим ей
 сообщение <<Строка не должна быть пустой>> или что-то похожее.
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 %% \begin{english}
   \begin{clojure}
@@ -1760,7 +1760,7 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 
 \index{функции!get-message}
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 %% \begin{english}
   \begin{clojure}
@@ -1801,7 +1801,7 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 \index{регулярные выражения}
 \index{clojure.core!re-matches}
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -1847,7 +1847,7 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 будет \verb|::ne-string|. Для экономии места сократим вывод
 \verb|explain-data|:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -1882,7 +1882,7 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 строке. Попробуем почту, которая не совпала с шаблоном. Последним элементом
 \verb|:via| станет \verb|:sample/email|. Словарь ошибки выглядит так:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -1922,7 +1922,7 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 Чтобы \verb|get-message| вернул новое сообщение, добавим в словарь ключ
 \verb|::email|:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 %% \begin{english}
   \begin{clojure}
@@ -1972,7 +1972,7 @@ Python и JavaScript. Они скучны, не гибки и без конце�
   \end{clojure}
 %% \end{english}
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -2007,7 +2007,7 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 Для любой незнакомой спеки получим нейтральное сообщение. В~комментарии показан
 лог, который возникнет в консоли при вызове:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 %% \begin{english}
   \begin{clojure}
@@ -2037,7 +2037,7 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 рассмотрим его в целом. Для этого спровоцируем \verb|s/explain-data| с~пустой
 почтой. В поле \verb|:via| окажется цепочка:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -2091,7 +2091,7 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 однако из-за их низкого уровня сообщение будет непонятным. Для более ясного
 перевода удалим из-словаря \verb|::ne-string| и оставим \verb|::email|.
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 %% \begin{english}
   \begin{clojure}
@@ -2129,7 +2129,7 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 Чтобы объяснить, что такое сходимость и как ей управлять, объявим спеки книги и
 фильма с одним полем~--- описанием:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -2159,7 +2159,7 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 
 Если передать в описание пустую строку, в векторе \verb|:via| будет следующее:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -2198,7 +2198,7 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 Один из способов это сделать~--- заменить ссылку на предикат. Перепишите
 \verb|:book/description|, как в примере ниже:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -2225,7 +2225,7 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 \verb|ne-string| вернёт ложь, \verb|:book/description| станет последним
 элементом \verb|:via|:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -2250,7 +2250,7 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 \verb|ne-string|, и она появится в \verb|:via| при ошибке. Добавьте спекам
 отдельные переводы и выполните поиск, как мы делали выше.
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 %% \begin{english}
   \begin{clojure}
@@ -2284,7 +2284,7 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 Другой способ повлиять на сходимость~--- обернуть ключ спеки в~функцию
 \verb|s/spec|:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -2306,7 +2306,7 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 При такой записи спека \verb|:book/description| заменит \verb|::ne-string|
 в~векторе \verb|:via|:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -2344,7 +2344,7 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 конкретного \verb|:book/description| нужна особая фраза, добавим полную
 версию:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 %% \begin{english}
   \begin{clojure}
@@ -2370,7 +2370,7 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 
 Обновим поиск с учётом неполного ключа и фразы по умолчанию:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -2404,7 +2404,7 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 \noindent
 В действии:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 %% \begin{english}
   \begin{clojure}
@@ -2465,7 +2465,7 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 \noindent
 Пример его работы:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 %% \begin{english}
   \begin{clojure}
@@ -2511,7 +2511,7 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 
 \index{clojure.core!derive}
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 %% \begin{english}
   \begin{clojure}
@@ -2545,7 +2545,7 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 \noindent
 Если нужен особый перевод, расширим мультиметод:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 %% \begin{english}
   \begin{clojure}
@@ -2580,7 +2580,7 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 переменную. В особых случаях можно построить фразу в зависимости от полей
 ошибки. Например, добавить текущее значение:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 %% \begin{english}
   \begin{clojure}
@@ -2636,7 +2636,7 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 спека \verb|::post| для публикации в блоге. Кроме заголовка у записи могут
 быть теги, набор не пустых строк:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -2665,7 +2665,7 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 Предположим, один из тегов оказался пустым, что не имеет смысла. Привёдем
 сокращённый отчёт \verb|s/explain-data|:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -2709,7 +2709,7 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 \verb|:tags|. Значение, которое не прошло валидацию, находится в поле
 \verb|:val|. Этого достаточно, чтобы построить фразу:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -2748,7 +2748,7 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 Поле и значение заключим в кавычки, чтобы выделить из общего текста. Проверим,
 что вернёт функция:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -2922,7 +2922,7 @@ React-компонент. При изменении виджета он рису
 \noindent
 Положительный случай даёт на выходе словарь:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -2950,7 +2950,7 @@ React-компонент. При изменении виджета он рису
 Варианты с плохим номером, почтой или статусом не пройдут разбор. Примеры ниже
 вернут \verb|::s/invalid|:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -3027,7 +3027,7 @@ blocked;1;test@test.com;active
 словарь, как в начале. Если пользователь заблокирован, в~словаре будет поле
 \verb|:blocked|:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -3064,7 +3064,7 @@ blocked;1;test@test.com;active
 Представим, что на входе коллекция кортежей. Чтобы не утруждать себя итерацией,
 объявим спеку-коллекцию:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -3216,7 +3216,7 @@ port=8080
 Перейдём к недостающим элементам. Функция \verb|clear-ini-lines| убирает
 пустые строки и комментарии. В INI они начинаются с символа решётки.
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -3250,7 +3250,7 @@ port=8080
 секций>>. Под секцией понимают заголовок и прилегающие поля и значения. Запишем
 её в виде \verb|s/cat|:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -3289,7 +3289,7 @@ port=8080
 \noindent
 То же самое с регулярным выражением:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -3370,7 +3370,7 @@ port=8080
 неважно: мы вывели данные из текста, а привести словарь к нужному виду
 легко. Напишем функцию \verb|remap-ini-data|:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -3404,7 +3404,7 @@ port=8080
 \noindent
 Если передать в неё вектор из последнего шага, получим словарь:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -3430,7 +3430,7 @@ port=8080
 Напишем спеку для вывода типов и проверки. Номера портов приводим к числам, хост
 и пользователь~--- не пустые строки.
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -3552,7 +3552,7 @@ Clojure. Компилятор заменит вызов макроса на то
 дополнительные: строку документации, пре- и постпроверки. У функции может быть
 несколько тел:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -3668,7 +3668,7 @@ Clojure. Компилятор заменит вызов макроса на то
 \verb|:defn/body|~--- это \verb|regex|-спека, сгруппируем её с помощью
 \verb|s/spec|.
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -3742,7 +3742,7 @@ Clojure. Компилятор заменит вызов макроса на то
 \noindent
 Результат:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -3779,7 +3779,7 @@ Clojure. Компилятор заменит вызов макроса на то
 одного тела получим метку \verb|:single| и словарь. Для нескольких тел метка
 будет \verb|:multi|, а значение~--- вектор словарей:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -3867,7 +3867,7 @@ Spec работает в том числе как парсер граммати�
 от~аргументов даты и помещает в словарь с ключами \verb|:start| и
 \verb|:end|.
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -3901,7 +3901,7 @@ Spec работает в том числе как парсер граммати�
 используют функцию \verb|compare|, которая вернёт -1, 0 и 1 для случаев
 <<меньше>>, <<равно>> и <<больше>>. Быстрая проверка:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -3957,7 +3957,7 @@ Spec работает в том числе как парсер граммати�
 Напишем функцию и спеку к ней. Пусть функция считает разницу между датами в
 секундах. Если первая дата больше второй, результат отрицательный.
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -3994,7 +3994,7 @@ Spec работает в том числе как парсер граммати�
 \verb|date2|. Если тега нет, Clojure находит тип во время исполнения
 рефлексией, что медленней. Посчитаем разницу в сутках:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -4044,7 +4044,7 @@ Spec работает в том числе как парсер граммати�
 проверки, но не запускает их. Чтобы подменить функцию на её оснащенную версию,
 вызывают \verb|instrument|:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -4074,7 +4074,7 @@ Spec работает в том числе как парсер граммати�
 если передать в <<заряженную>> функцию не тот аргумент? Получим исключение
 \verb|ExceptionInfo|:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -4116,7 +4116,7 @@ Spec работает в том числе как парсер граммати�
 задали. Вот как выглядит справка для \verb|date-range-sec| после того, как
 объявили спеку:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -4170,7 +4170,7 @@ Spec
 
 \index{clojure.core!time}
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -4198,7 +4198,7 @@ Spec
 \noindent
 То же самое после оснащения:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -4267,7 +4267,7 @@ Spec
 из модулей JDBC несёт спеки подключения и основных функций. Используем их
 повторно:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -4293,7 +4293,7 @@ Spec
 \noindent
 Прочитаем конфигурацию из файла и проверим спекой:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
