@@ -23,10 +23,10 @@ RUN apt-get install -y \
     openjdk-8-jdk \
     pdftk-java
 
-RUN mkdir /clojure
-WORKDIR /clojure
-RUN curl -O https://download.clojure.org/install/linux-install-1.10.1.536.sh
-RUN chmod +x linux-install-1.10.1.536.sh
-RUN ./linux-install-1.10.1.536.sh
+RUN mkdir /bb
+WORKDIR /bb
+RUN curl -O https://raw.githubusercontent.com/borkdude/babashka/master/install
+RUN chmod +x install
+RUN ./install /usr/bin
 WORKDIR /
-RUN rm -rf /clojure
+RUN rm -rf /bb
