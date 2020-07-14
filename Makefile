@@ -12,9 +12,9 @@ draft: pdf-build1
 .PHONY: add-cover
 add-cover:
 ifdef COVER
-	cp ${JOB}.pdf ${JOB}-1.pdf
-	pdftk A=${JOB}-1.pdf B=${COVER} cat B A output ${JOB}.pdf
-	rm ${JOB}-1.pdf
+	mv ${JOB}.pdf ${JOB}.tmp.pdf
+	pdftk A=${JOB}.tmp.pdf B=${COVER} cat B A output ${JOB}.pdf
+	rm ${JOB}.tmp.pdf
 endif
 
 
