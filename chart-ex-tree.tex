@@ -6,7 +6,7 @@
 \node (err) [entity, below left = of thr, yshift=0.5cm, xshift=2cm] {Error};
 \node (exc) [entity, below right = of thr, yshift=0.5cm, xshift=-2cm] {Exception};
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 \node (rex) [entity, below = of thr, yshift=-0.5cm] {RuntimeException};
 \else
 \node (rex) [entity, below right = of exc, yshift=0.5cm, xshift=-2cm] {RuntimeException};

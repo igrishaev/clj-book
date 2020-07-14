@@ -25,13 +25,13 @@
 %%
 %% Constants
 %%
-\def\print{print}
-\def\ebook{ebook}
-\def\tablet{tablet}
-\def\kindle{kindle}
-\def\phone{phone}
-\def\mobile{mobile}
-\def\ridero{ridero}
+\def\PRINT{print}
+\def\EBOOK{ebook}
+\def\TABLET{tablet}
+\def\KINDLE{kindle}
+\def\PHONE{phone}
+\def\MOBILE{mobile}
+\def\RIDERO{ridero}
 \def\NIL{}
 
 %%
@@ -39,14 +39,14 @@
 %%
 
 \def\QR{$QR}
-\def\devicetype{$DEVICE_TYPE}
-\def\device{$DEVICE}
-\def\domain{$DOMAIN}
-\def\email{$EMAIL}
-\def\publisher{$PUBLISHER}
-\def\commithash{$COMMIT_HASH}
-\def\committs{$COMMIT_TS}
-\def\mode{$MODE}
+\def\DEVICETYPE{$DEVICE_TYPE}
+\def\DEVICE{$DEVICE}
+\def\DOMAIN{$DOMAIN}
+\def\EMAIL{$EMAIL}
+\def\PUBLISHER{$PUBLISHER}
+\def\COMMITHASH{$COMMIT_HASH}
+\def\COMMITTS{$COMMIT_TS}
+\def\MODE{$MODE}
 
 
 % http://www.khirevich.com/latex/microtype/
@@ -94,12 +94,12 @@
 \usemintedstyle{print}
 \SetupFloatingEnvironment{listing}{placement=H}
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 \setminted{breaklines=true}
 \fi
 
 % mobile headers
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 \usepackage{sectsty}
 \sectionfont{\raggedright}
 \subsectionfont{\raggedright}
@@ -115,7 +115,7 @@
   indentunit=0.25em,
   totoc
 ]{idxlayout}
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 \idxlayout{columns=1}
 \else
 \idxlayout{columns=2}
@@ -125,13 +125,13 @@
 
 
 % href ursl for ebooks
-\ifx\mode\ebook
+\ifx\MODE\EBOOK
 \usepackage[hidelinks, hyperindex=false]{hyperref}
 \fi
 
 
 % no indent for items in lists (in mobile)
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 \usepackage{enumitem}
 \setlist[itemize]{leftmargin=*}
 \fi
@@ -167,7 +167,7 @@
 %%
 %% Kindle or Phone
 %%
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 %% Remove labels for subchapters
 \usepackage{titlesec}
@@ -189,7 +189,7 @@
 
 
 %% for ebook, remove top margin for ToC
-\ifx\mode\ebook
+\ifx\MODE\EBOOK
 \setlength{\cftbeforetoctitleskip}{0pt}
 \setlength{\cftaftertoctitleskip}{2em}
 \fi
@@ -202,15 +202,15 @@
 
 \input{hyphenation}
 
-\ifx\mode\print
+\ifx\MODE\PRINT
 \input{title}
 \fi
 
-\ifx\mode\ebook
+\ifx\MODE\EBOOK
 \includepdf[pages={1}]{$COVER}
 \fi
 
-\ifx\publisher\ridero
+\ifx\PUBLISHER\RIDERO
 \includepdf[pages={1}]{media/ridero_opening.pdf}
 \else
 \input{abstract}
@@ -236,7 +236,7 @@
 \blank\include{ch7-tests}
 
 % works only in book class
-\ifx\mode\print
+\ifx\MODE\PRINT
 \backmatter
 \fi
 
@@ -247,11 +247,11 @@
 
 \printindex
 
-\ifx\mode\print
+\ifx\MODE\PRINT
 \input{exit}
 \fi
 
-\ifx\mode\ebook
+\ifx\MODE\EBOOK
 \input{author}
 \fi
 

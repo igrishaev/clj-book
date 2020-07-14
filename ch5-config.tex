@@ -219,7 +219,7 @@ Clojure и у DevOps уже написаны скрипты на Python для �
 
 \index{функции!exit}
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -273,7 +273,7 @@ Clojure и у DevOps уже написаны скрипты на Python для �
 
 \index{файлы}
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -314,7 +314,7 @@ Clojure и у DevOps уже написаны скрипты на Python для �
 \index{библиотеки!Cheshire}
 \index{модули!cheshire.core}
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -368,7 +368,7 @@ Clojure и у DevOps уже написаны скрипты на Python для �
 быстрая проверка на \emph{идентичность} кейворду \verb|::s/invalid|. В отличие
 от равенства, идентичность работает быстрее.
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -442,7 +442,7 @@ Clojure и у DevOps уже написаны скрипты на Python для �
 \noindent
 Опишем спеку сверху вниз. Это словарь с ключами:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -536,7 +536,7 @@ Clojure и у DevOps уже написаны скрипты на Python для �
 
 \index{функции!read-instant-date}
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -585,7 +585,7 @@ Clojure и у DevOps уже написаны скрипты на Python для �
 
 \index{clojure.core!alter-var-root}
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -619,7 +619,7 @@ Clojure и у DevOps уже написаны скрипты на Python для �
 
 \index{JDBC!query}
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -672,7 +672,7 @@ REPL. В~\verb|CONFIG| появится новая конфигурация.
 подмены \verb|exit|. Функция ниже не завершит JVM, а только бросит исключение
 с текстом, который передали в \verb|exit|:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -853,7 +853,7 @@ BAR=99
 \verb|PGUSER| и другие. У переменных среды выше приоритет, чем у параметров
 \verb|--host|, \verb|--user| и аналогов. Если в текущем шелле выполнить:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{bash}
@@ -987,7 +987,7 @@ for (env, fn) in env_mapping.iteritems():
 \index{вложенность}
 \index{коллекции!вложенность}
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -1040,7 +1040,7 @@ for (env, fn) in env_mapping.iteritems():
 подчёркивание разделяет лексемы, но не меняет структуру. Двойное подчёркивание
 означает вложенность:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -1247,7 +1247,7 @@ Clojure~--- это гостевая платформа, поэтому язык 
 Статический метод \verb|getenv| вернёт либо одну переменную по имени, либо
 весь словарь, если имя не указали.
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -1410,7 +1410,7 @@ Clojure~--- это гостевая платформа, поэтому язык 
 
 \index{spec!spec\arr{}keys}
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -1579,7 +1579,7 @@ $ lein repl
 
 Код ниже вернёт параметры по группам, как и задумано. Приведём их подмножество:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -1726,7 +1726,7 @@ $ cat config.tpl.json | envsubst
 \ref{fig:json-render}). Чтобы записать результат в~файл, добавьте в конец
 оператор вывода:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{bash}
@@ -1770,7 +1770,7 @@ $ cat config.tpl.json | envsubst > config.ready.json
 а имя переменной, например \verb|"DB_PASS"|. Напишем спеку, которая выводит
 значение переменной по имени:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -1842,7 +1842,7 @@ DB_PASS='*(&fd}A53z#$!' lein repl
 Добавим тег \verb|#env|, который вернёт значение переменной по имени. Имя
 может быть строкой или символом. Определим функцию:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -1881,7 +1881,7 @@ DB_PASS='*(&fd}A53z#$!' lein repl
 \noindent
 Прочитаем EDN-строку с новым тегом:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -1955,7 +1955,7 @@ db:
 
 Подключим библиотеку и прочитаем файл. На месте тегов получим значения среды:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -2040,7 +2040,7 @@ PostgreSQL или Nginx~--- больше половины файла заним�
 Разработчики придумали уловки, чтобы обойти ограничение. Например, поставить
 одноимённое поле перед тем, к которому относится комментарий:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{json}
@@ -2093,7 +2093,7 @@ JSON выгодно отличается от многословного XML, к
 
 Сравните данные в JSON и YAML. Вторая запись короче и визуально спокойнее:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{json}
@@ -2210,7 +2210,7 @@ YAML-файлов.
 
 \begin{listing}[ht!]
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{yaml}
@@ -2272,7 +2272,7 @@ phrases:
 Из-за двоеточия в последней строке парсер решит, что это вложенный
 словарь. Получим неверную структуру:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -2329,7 +2329,7 @@ EDN предлагает списки и~множества. Словари мо
 
 Пример с разными типами, коллекциями и тегами:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -2453,7 +2453,7 @@ property-файлу, и загружает его.
 \index{JVM!Jar}
 \index{JVM!properties}
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{bash}
@@ -2522,7 +2522,7 @@ property-файл и так далее. Легко построить такую
 Ключ \verb|:merge| объединяет конфигурацию с любым источником. В~нём
 следуют выражения, которые вернут словарь. Уберпример из документации:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -2585,7 +2585,7 @@ EDN. Библиотека предлагает теги, с которыми ф�
 
 Функция \verb|read-config| читает файл или ресурс EDN:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -2628,7 +2628,7 @@ EDN. Библиотека предлагает теги, с которыми ф�
 длинную строку, похожую на веб-адрес. Чтобы не повторяться, адрес вычисляют из
 исходных полей:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -2669,7 +2669,7 @@ EDN. Библиотека предлагает теги, с которыми ф�
 Пример ниже показывает, как найти имя базы по профилю. Без профиля получим
 \verb|"book"|, но для \verb|:test| имя станет \verb|"book_test"|:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -2726,7 +2726,7 @@ EDN. Библиотека предлагает теги, с которыми ф�
 \noindent
 При чтении файла ссылка разрешается в~значение:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -2786,7 +2786,7 @@ JSON на Aero, подумайте об обратной стороне меда
 Путь к файлу либо указывают в параметрах, либо библиотека ищет его по особым
 правилам. Вариант, когда путь задан явно:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -2853,7 +2853,7 @@ states:
 \noindent
 Результат:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -2876,7 +2876,7 @@ states:
 Тег \verb|!uuid| аналогичен \verb|#uuid| для EDN: он возвращает объект
 \verb|java.util.UUID| из строки:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{yaml}
@@ -2938,7 +2938,7 @@ Expound, чтобы улучшить текст об ошибке.
 мы не хотим обрывать REPL из-за ошибки в конфигурации. В интерактивном сеансе
 наша \verb|die-fn| только печатает текст и ошибку:
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -2972,7 +2972,7 @@ Expound, чтобы улучшить текст об ошибке.
 
 \index{логирование}
 
-\ifx\devicetype\mobile
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
