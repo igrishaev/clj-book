@@ -37,7 +37,6 @@
 %%
 %% Env variables
 %%
-
 \def\QR{$QR}
 \def\DEVICETYPE{$DEVICE_TYPE}
 \def\DEVICE{$DEVICE}
@@ -47,7 +46,7 @@
 \def\COMMITHASH{$COMMIT_HASH}
 \def\COMMITTS{$COMMIT_TS}
 \def\MODE{$MODE}
-
+\def\COVER{$COVER}
 
 % http://www.khirevich.com/latex/microtype/
 \usepackage[
@@ -202,12 +201,15 @@
 
 \input{hyphenation}
 
-\ifx\MODE\PRINT
-\input{title}
+% add cover when it's set
+\ifx\COVER\NIL
+\else
+\includepdf[pages={1}]{\COVER}
 \fi
 
-\ifx\MODE\EBOOK
-\includepdf[pages={1}]{$COVER}
+% for print version, add title
+\ifx\MODE\PRINT
+\input{title}
 \fi
 
 \ifx\PUBLISHER\RIDERO
