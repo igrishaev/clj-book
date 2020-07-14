@@ -6,3 +6,4 @@ COVER=
 PUBLISHER=
 GEOMETRY=geom-print
 JOB=clojure_print
+COVER=media/cover_print.pdf

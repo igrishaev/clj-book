@@ -8,8 +8,18 @@ COMMIT_TS = $(shell git log -1 --format='%at')
 .PHONY: draft
 draft: pdf-build1
 
+
+.PHONY: add-cover
+add-cover:
+ifdef COVER
+	cp ${JOB}.pdf ${JOB}-1.pdf
+	pdftk A=${JOB}-1.pdf B=${COVER} cat B A output ${JOB}.pdf
+	rm ${JOB}-1.pdf
+endif
+
+
 .PHONY: pre-build
-pre-build: clear pdf-build1 index pdf-build2 pdf-build3 refs
+pre-build: clear pdf-build1 index pdf-build2 pdf-build3 add-cover refs
 
 # release build
 .PHONY: build
