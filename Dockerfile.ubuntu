@@ -1,7 +1,7 @@
 # Base image which includes common settings
 # and software installation *only*.
 
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 
 ENV TZ=Europe/Moscow
 
@@ -20,7 +20,8 @@ RUN apt-get install -y \
     texlive-fonts-extra \
     git \
     cm-super \
-    openjdk-8-jdk
+    openjdk-8-jdk \
+    pdftk-java
 
 RUN mkdir /clojure
 WORKDIR /clojure
