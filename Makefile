@@ -91,17 +91,17 @@ docker-build-print-draft:
 	--env-file=ENV_PRINT \
 	${DOCKER_BUILD_POST} make draft
 
-.PHONY: docker-build-print
-docker-build-print:
-	${DOCKER_BUILD_PRE}	\
-	--env-file=ENV_PRINT \
-	${DOCKER_BUILD_POST_BUILD}
-
 .PHONY: docker-build-ridero
 docker-build-ridero:
 	${DOCKER_BUILD_PRE}	\
 	--env-file=ENV_PRINT \
 	--env-file=ENV_RIDERO \
+	${DOCKER_BUILD_POST_BUILD}
+
+.PHONY: docker-build-print
+docker-build-print:
+	${DOCKER_BUILD_PRE}	\
+	--env-file=ENV_PRINT \
 	${DOCKER_BUILD_POST_BUILD}
 
 .PHONY: docker-build-tablet
@@ -121,3 +121,6 @@ docker-build-phone:
 	${DOCKER_BUILD_PRE}	\
 	--env-file=ENV_PHONE \
 	${DOCKER_BUILD_POST_MOBILE_BUILD}
+
+.PHONY: docker-build-gumroad
+docker-build-gumroad: docker-build-print docker-build-tablet docker-build-phone docker-build-kindle
