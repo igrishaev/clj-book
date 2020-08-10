@@ -1345,7 +1345,7 @@ http://localhost:8080/
 
 Well, the \verb|:params| field is the general accumulator of parameters. Other wrappers~--- like \verb|wrap-params|~--- fill it as well. Some APIs are method-independent and take requests via both GET or POST. That is, the data is either in an address string or in a request body, respectively. We get the same \verb|:params| map, regardless of the approach.
 
-The the hybrid method works better because it applies GET for read requests~--- to enable HTTP caching.  Update requests~--- they are never cached~--- are executed 
+The hybrid method works better because it applies GET for read requests~--- to enable HTTP caching.  Update requests~--- they are never cached~--- are executed 
 via the POST method.
 
 In other APIs, parameters mustn't be mixed with or replaced by each other. Let's say our service works strictly according to the POST method. To read only JSON data, you should use the \verb|:json-params| or \verb|:body| fields. It depends on your case, which wrapper to prefer~--- \verb|wrap-json-body| or \verb|wrap-json-params|.
