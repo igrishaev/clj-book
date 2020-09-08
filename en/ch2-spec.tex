@@ -1,4 +1,3 @@
-
 \chapter{Clojure.spec}
 
 \label{chapter-spec}
@@ -63,7 +62,7 @@ Composition means that it is useful to have a few simple checks to compose sophi
 
 \index{functions}
 
-Both theses are in line with the concept of function.  The latter is used by one operation only — the call, and that makes things simpler. The function takes a value and returns "true" or "false". It answers the question of whether the value was proper or not. Clojure functions are first-class objects, so they are easy to combine. 
+Both theses are in line with the concept of function.  The latter is used by one operation only~--- the call, and that makes things simpler. The function takes a value and returns "true" or "false". It answers the question of whether the value was proper or not. Clojure functions are first-class objects, so they are easy to combine. 
 
 \section{Spec Basics} 
 
@@ -79,7 +78,7 @@ The \verb|s| synonym is needed to avoid name conflicts with \verb|Clojure.core|.
 
 \index{spec!def}
 
-The main operation in Spec is to create a new  \emph{spec}:
+The main operation in Spec is to create a new \emph{spec}:
 
 \begin{english}
   \begin{clojure}
@@ -89,13 +88,13 @@ The main operation in Spec is to create a new  \emph{spec}:
 
 \index{clojure.core!string?}
 
-The \verb|s/def| macro takes a key and a predicate. It should create a spec object from the \verb|string?| function and place it in the global registry with the  \verb|::string| key.
+The \verb|s/def| macro takes a key and a predicate. It should create a spec object from the \verb|string?| function and place it in the global registry with the \verb|::string| key.
 
 We need to understand that \verb|::string| is not a spec, but an alias. The spec library macros work with keys, not spec objects. They find specs by themselves in the registry. The keys are global, so this is convenient. You can refer to \verb|::string| anywhere without unnecessary imports.
 
 \index{spec!get-spec}
 
-The second argument is the \verb|string?|. A predicate is a function that returns true or false. A function is a building block for a spec. The spec wraps the function into a specific object. Technically, we can refer to it: the \verb|s/get-spec| function will return a spec object by the key. In practice, the object is not needed, because keys are specified everywhere.
+The second argument is the \verb|string?| predicate. A predicate is a function that returns true or false. A function is a building block for a spec. The spec wraps the function into a specific object. Technically, we can refer to it: the \verb|s/get-spec| function will return a spec object by the key. In practice, the object is not needed, because keys are specified everywhere.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -136,7 +135,7 @@ The most simplistic use of a spec is to check if a value conforms to it. The \ve
   \end{clojure}
 \end{english}
 
-An empty string will be validated, but in most cases, it doesn't make sense. An empty name or title means an error. Let's declare a spec that should additionally check if the string is empty. We can use a naive way to do it — let's complicate the predicate:
+An empty string will be validated, but in most cases, it doesn't make sense. An empty name or title means an error. Let's declare a spec that should additionally check if the string is empty. We can use a naive way to do it~--- let's complicate the predicate:
 
 \index{spec!::ne-string}
 
@@ -148,6 +147,7 @@ An empty string will be validated, but in most cases, it doesn't make sense. An 
          (not (empty? val)))))
   \end{clojure}
 \end{english}
+
 \noindent
 Quick check:
 
@@ -159,7 +159,7 @@ Quick check:
 \end{english}
 
 The \verb|::ne-string| key is short for "\textbf{n}on-\textbf{e}mpty
-String”. The spec is often used: so it is logical to shorten its name.
+string”. The spec is often used: so it is logical to shorten its name.
 
 A more elegant way to define this spec is to compose predicates using the \verb|every-pred| function. It takes a set of predicates and returns a super-predicate. It returns true only if all of its composing predicates are true.
 
@@ -192,7 +192,7 @@ We can build sophisticated specs in Clojure this way: declare primitives and bui
 During validation, Spec does not catch the exception, so the programmer must take care of this. Let's take a look at the URL validation spec. The easiest way to do this is to use a regular expression:
 
 \index{clojure.core!re-matches}
-\index{регулярные выражения}
+\index{regular expressions}
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -236,9 +236,9 @@ Anything but a string should throw an error:
 
 \index{NPE}
 
-Note: The  \verb|NullPointerException| class is a frequent visitor to the Java world. Its abbreviated name is  \verb|NPE|.
+Note: The  \verb|NullPointerException| class is a frequent visitor to the Java world. Its abbreviated name is \verb|NPE|.
 
-The reason is that \verb|nil| was plugged into the \verb|re-matches|. The function treats the argument as a string, resulting in \verb|NPE|. Rewrite the spec so that it won't throw exceptions. In the example with \verb|::url|, we should first make sure that it is a string, and only then check with a regular expression.
+The reason is that \verb|nil| was plugged into the \verb|re-matches| function. The function treats the argument as a string, resulting in \verb|NPE|. Rewrite the spec so that it won't throw exceptions. In the example with \verb|::url|, we should first make sure that it is a string, and only then check with a regular expression.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -269,7 +269,7 @@ The reason is that \verb|nil| was plugged into the \verb|re-matches|. The functi
 
 \index{spec!::ne-string}
 
-The  \verb|s/and| macro is designed so that the chain will break with the first failure. Anything after  \verb|::ne-string| will not work, and there will be no exception.
+The \verb|s/and| macro is designed so that the chain will break with the first failure. Anything after \verb|::ne-string| will not work, and there will be no exception.
 
 Let's check the user's age the same way. These predicates test the number of years and the range.
 
@@ -285,11 +285,11 @@ Let's check the user's age the same way. These predicates test the number of yea
 \end{english}
 
 \section{Specs for Collections}
-\index{collections}
 
+\index{collections}
 \index{scalars}
 
-Above, we were validating primitive types — \emph{scalars}. They are useful as examples, but rarely seen in practice. As a rule, we need to validate not scalars, but collections. The library offers macros to create specs for collections of primitives.
+Above, we were validating primitive types~--- \emph{scalars}. They are useful as examples, but rarely seen in practice. As a rule, we need to validate not scalars, but collections. The library offers macros to create specs for collections of primitives.
 
 \index{spec!coll-of}
 
@@ -335,7 +335,7 @@ Quick check:
 \index{spec!map-of}
 \index{HTTP!parameters}
 
-The  \verb|s/map-of| macro describes a map. Recall the \verb|:params| field from the chapter on web development \page{ring-params}.  The field keys are keywords, and the values ​​are strings. In the spec language, it looks like this:
+The \verb|s/map-of| macro describes a map. Recall the \verb|:params| field from the chapter on web development \page{ring-params}.  The field keys are keywords, and the values are strings. In the spec language, it looks like this:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -365,7 +365,7 @@ The  \verb|s/map-of| macro describes a map. Recall the \verb|:params| field from
 
 \fi
 
-The \verb|s/map-of| check is rather weak to cover all options. Knowing that values are strings is useless. We must make sure that the keys in the map meet our expectations. Besides, it rarely happens that the type of values ​​is the same. On the contrary, the map contains different information about the entity: a name, age, date.
+The \verb|s/map-of| check is rather weak to cover all options. Knowing that values are strings is useless. We must make sure that the keys in the map meet our expectations. Besides, it rarely happens that the type of values is the same. On the contrary, the map contains different information about the entity: a name, age, date.
 
 \index{spec!keys}
 
@@ -419,7 +419,7 @@ There are the following combinations of  \verb|req|, \verb|opt|, and \verb|un|:
 \index{spec!:opt}
 
 \item
-  \verb|:opt|~--- optional fully-qualified keys;,
+  \verb|:opt|~--- optional fully-qualified keys;
 
 \index{spec!:opt-un}
 
@@ -428,7 +428,7 @@ There are the following combinations of  \verb|req|, \verb|opt|, and \verb|un|:
 
 \end{itemize}
 
-The  \verb|::page| spec keys are required and unqualified (without a namespace). Below are examples of data \emph{with errors}. These may be an incorrect address, an empty description, or a missing key. If you put each map in the \spverb|(s/valid? ::page <data>)| expression, it should return false. 
+The \verb|::page| spec keys are required and unqualified (without a namespace). Below are examples of data \emph{with errors}. These may be an incorrect address, an empty description, or a missing key. If you put each map in the \spverb|(s/valid? ::page <data>)| expression, it should return false. 
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -588,7 +588,7 @@ Note that \verb|s/keys| distinguishes between \verb|nil| and the presence of a k
 
 \index{conform!values}
 
-Until now, we have validated data with \verb|s/valid?|. The function must return true or false, which means whether the data is proper or not. But the validation alone is not enough — sometimes values ​​are correct, but you need to coerce them to a required type.
+Until now, we have validated data with \verb|s/valid?|. The function must return true or false, which means whether the data is proper or not. But the validation alone is not enough — sometimes values are correct, but you need to coerce them to a required type.
 
 So, the input received a number as a string. We made sure that the string consists of digits and does not exceed the allowed length. After validation, the value is still a string and must be parsed manually. It would be nice if some algorithm coerces proper types for us.
 
@@ -603,7 +603,7 @@ Spec offers such features. These are the \verb|s/conformer| and и~\verb|s/confo
  
 \index{spec!::invalid}
 
-First, write the type coercion function. It takes the original value and returns either a new one or the \verb|::s/invalid| key indicating an error. The function will be wrapped in  \verb|s/conformer| to obtain a spec.  \verb|S/conform| takes a spec-conformer and data. If the types were coerced without errors, we get a conformed value, otherwise — the \verb|::s/invalid| key.
+First, write the type coercion function. It takes the original value and returns either a new one or the \verb|::s/invalid| key indicating an error. The function will be wrapped in \verb|s/conformer| to obtain a spec.  \verb|S/conform| takes a spec-conformer and data. If the types were coerced without errors, we get a conformed value, otherwise — the \verb|::s/invalid| key.
 
 Next, we'll look at converting a string to an integer. To tell a conformer from a validator, we need to add an arrow to the name, which means type coercion.
 
@@ -620,7 +620,6 @@ Next, we'll look at converting a string to an integer. To tell a conformer from 
 \end{english}
 
 \noindent
-
 This spec is passed to \verb|s/conform| with the data:
 
 \begin{english}
@@ -701,7 +700,7 @@ Now, we will wrap the function in a spec:
   \end{clojure}
 \end{english}
 
-Before parsing, we'll do minimal checks. We should make sure it's not an empty string — to cut off \verb|nil| and other garbage. Date conforming: 
+Before parsing, we'll do minimal checks. We should make sure it's not an empty string ~--- to cut off \verb|nil| and other garbage. Date conforming: 
 
 \begin{english}
   \begin{clojure}
@@ -738,7 +737,7 @@ Date and time:
 
 \index{spec!enumerations}
 
-Sometimes it is known in advance what values a field takes. Suppose a client transmits the system architecture~— 32 or 64 bits~— when calling the API. For the sake of two values, it makes no sense to parse a number: we can use  \verb|case| or a map.
+Sometimes it is known in advance what values a field takes. Suppose a client transmits the system architecture~--- 32 or 64 bits~--- when calling the API. For the sake of two values, it makes no sense to parse a number: we can use \verb|case| or a map.
 
 Let's look at the \verb|case| macro option. If nothing is found, signal an error with the \verb|::s/invalid| key. Note that \verb|case| does not do a linear search. It builds the branch indexes and goes straight to the required one.
 
@@ -794,7 +793,7 @@ Below we will see the option with a map to transform the value. Conveniently, th
   \end{clojure}
 \end{english}
 
-Similarly, we can read boolean values from strings. There is no single agreement on how to write true and false in text. Possible spellings are \verb|True|, \verb|TRUE|, \verb|1|,  \verb|yes| (for true) and \verb|FALSE|, \verb|no|, etc. (for opposite meaning). When parsing values, they must be converted to a single case. In Clojure, \verb|FALSE| and \verb|false| are different strings, even if the sender means the same. A scenario looks like this:
+Similarly, we can read boolean values from strings. There is no single agreement on how to write true and false in text. Possible spellings are \verb|True|, \verb|TRUE|, \verb|1|, \verb|yes| (for true) and \verb|FALSE|, \verb|no|, etc. (for opposite meaning). When parsing values, they must be converted to a single case. In Clojure, \verb|FALSE| and \verb|false| are different strings, even if the sender means the same. A scenario looks like this:
 
 \begin{itemize}
 
@@ -872,12 +871,11 @@ Conforming in progress:
 
 We've written enough code to notice the same areas in it~--- patterns. In this section, we will put them into functions and macros that will speed up your work.
 
-
 \subsection{Sets}
 
 \index{sets}
 
-A set is suitable as a spec when the values ​​are known. It works like a function: if the argument is found in the set, we'll get it. Otherwise, we'll get \verb|nil|. Let's imagine that the status of a task may be the \verb|todo|, \verb|in_progress|, and \verb|done| strings. We can describe the spec with a set of these values:
+A set is suitable as a spec when the values are known. It works like a function: if the argument is found in the set, we'll get it. Otherwise, we'll get \verb|nil|. Let's imagine that the status of a task may be the \verb|todo|, \verb|in_progress|, and \verb|done| strings. We can describe the spec with a set of these values:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -972,9 +970,9 @@ The inner function is closed on the \verb|arg-set| variable. We got this set fro
 \index{exceptions!try}
 \index{exceptions!catch}
 
-Conformers require special attention. They are prone to mistakes — not catching an exception or not wrapping a function in an auxiliary  \verb|s/conformer|. To reduce the risk of errors, let's move the routine into the \verb|with-conformer| macro.
+Conformers require special attention. They are prone to mistakes — not catching an exception or not wrapping a function in an auxiliary \verb|s/conformer|. To reduce the risk of errors, let's move the routine into the \verb|with-conformer| macro.
 
-The macro takes a variable symbol and an arbitrary body. It creates a function with one argument. The function will execute the body in the \verb|try/catch| block. If there is no exception, we'll get the last body expression. Otherwise,  \verb|::s/invalid| will be returned. We've deliberately enclose the symbol in square brackets to make the syntax look like a function (\verb|defn|).
+The macro takes a variable symbol and an arbitrary body. It creates a function with one argument. The function will execute the body in the \verb|try/catch| block. If there is no exception, we'll get the last body expression. Otherwise, \verb|::s/invalid| will be returned. We've deliberately enclose the symbol in square brackets to make the syntax look like a function (\verb|defn|).
 
 \begin{english}
   \begin{clojure}
@@ -1102,7 +1100,7 @@ The \verb|->lower| variable is a wrapper for case conversion:
 \fi
 
 \mnoindent
-The  \verb|::s/invalid| key is not necessary at the end of the \verb|case macro. If the default option is not specified and \verb|case| did not find a branch, it will throw an exception. \verb|With-conformer| will catch it and return \verb|::s/invalid|.
+The  \verb|::s/invalid| key is not necessary at the end of the \verb|case| macro. If the default option is not specified and \verb|case| did not find a branch, it will throw an exception. \verb|With-conformer| will catch it and return \verb|::s/invalid|.
 
 \section{Logical Paths}
 
@@ -1145,7 +1143,7 @@ Now \verb|s/conform| will return not just a value, but a pair with a tag:
 \index{scalars}
 \index{spec!forks}
 
-If there is a fork in the spec  (\verb|s/or|, \verb|s/alt|), then the structure of the \verb|s/conform| will differ from the input data: a vector will appear instead of a scalar. Here we will show it on the nested data. Let the port be one of the database connection fields:
+If there is a fork in the spec (\verb|s/or|, \verb|s/alt|), then the structure of the \verb|s/conform| will differ from the input data: a vector will appear instead of a scalar. Here we will show it on the nested data. Let the port be one of the database connection fields:
 
 \begin{english}
   \begin{clojure}
@@ -1198,11 +1196,11 @@ If we pass a pair with a string, we'll get an error:
 
 \fi
 
-Actually, we attached the predicate to the \verb|:num| tag. This predicate doesn't infer anything, so \verb|unform| drops the tag for the predicate and returns a value. The \verb|:string| tag points to the  \verb|conformer| type spec, that \emph{conforms} the value. To execute \verb|unform|, we need to tell it how to do it.
+Actually, we attached the predicate to the \verb|:num| tag. This predicate doesn't infer anything, so \verb|unform| drops the tag for the predicate and returns a value. The \verb|:string| tag points to the \verb|conformer| type spec, that \emph{conforms} the value. To execute \verb|unform|, we need to tell it how to do it.
 
 \index{spec!conformer}
 
-The first argument of \verb|s/conformer| is the function of type coercion. The \verb|s/conform| refers to it when called. The second~--- optional~--- argument is a function with the opposite effect: it returns the previous value by the result of  \verb|conform|. This function will fire at the moment when \verb|s/unform| is executed.
+The first argument of \verb|s/conformer| is the function of type coercion. The \verb|s/conform| refers to it when called. The second~--- optional~--- argument is a function with the opposite effect: it returns the previous value by the result of \verb|conform|. This function will fire at the moment when \verb|s/unform| is executed.
 
 Convert \verb|::->int| to support \verb|unform|:
 
@@ -1297,8 +1295,8 @@ The \verb|s/explain| family functions take spec and data. If the check fails, we
 \index{spec!explain}
 \index{spec!explain-str}
 \index{spec!explain-data}
-\index{spec!отчёт}
-\index{отчёт!spec}
+\index{spec! report }
+\index{ report!spec}
 
 \item
   \verb|s/explain| displays it to standard stream (to the screen);
@@ -1366,7 +1364,7 @@ Let's try an integer instead of a name:
   \end{clojure}
 \end{english}
 
-The output reads like this: the \verb|42| value failed to pass the \verb|string?| predicate check. The path to the value is inside the \verb|[:username]| map. The key of the spec with error is  \verb|::string|.
+The output reads like this: the \verb|42| value failed to pass the \verb|string?| predicate check. The path to the value is inside the \verb|[:username]| map. The key of the spec with error is \verb|::string|.
 
 The report shows the most nested specs and predicates. I think you remember that \verb|::ne-string| is a combination of \verb|::string| and \verb|not-empty|. The error happened at the \verb|::string| stage, and it was said about it.
 
@@ -1389,7 +1387,7 @@ For an empty string, the output will be different. This time, the error will be 
 
 \label{spec-messages}
 
-When validating data, it's not just the fact of error that matters. It is more important to explain to a client exactly where they went wrong. Regardless of whether a client is a human or a program,  we should add a clear text in a response. After all, it will get into the logs that employees read.
+When validating data, it's not just the fact of error that matters. It is more important to explain to a client exactly where they went wrong. Regardless of whether a client is a human or a program, we should add a clear text in a response. After all, it will get into the logs that employees read.
 
 We often see messages like “Error: DATAERROR” without any details, or a red “check data” text above a two-screen form. If programmers can translate machine language into human one, such nonsense can be avoided.
 
@@ -1416,12 +1414,12 @@ To compose the message, let's go back to the \verb|s/explain-data| function. As 
   \end{clojure}
 \end{english}
 
-\index{языки!Python}
-\index{языки!JavaScript}
+\index{languages!Python}
+\index{languages!JavaScript}
 
 At first glance, it is not clear what to do with it. Some programmers give up and say the library error reporting is not good. But this is not so: the report contains all the necessary data — you just need to process it correctly. 
 
-Newbies ask: why not make clear messages at the library level? For example, assign a field to a spec that says — “Please enter the correct address.” Why not take a Python or JavaScript library as a sample?
+Newbies ask: why not make clear messages at the library level? For example, assign a field to a spec that says~--- “Enter the correct address.” Why not take a Python or JavaScript library as a sample?
 
 \index{fundamentality}
 
@@ -1450,7 +1448,7 @@ The \verb|explain-data| map contains the keys \verb|:spec|, \verb|:value|, and \
   \verb|:via| is a vector of specs, along which the value has passed from an upper level to a lower;
 
 \item
-  \verb|:in| is the physical path to the value. It is a vector of keys and indexes that are passed to the \verb|get-in|function. If we execute \verb|(get-in <data> <:in>)|, we'll get the value that caused the error.
+  \verb|:in| is the physical path to the value. It is a vector of keys and indexes that is passed to the \verb|get-in| function. If we execute \verb|(get-in <data> <:in>)|, we'll get the value that caused the error.
 
 \end{itemize}
 
@@ -1515,7 +1513,7 @@ Now we'll write a function that takes an error map (one of the elements of \verb
 
 \fi
 
-The \verb|peek| function is similar to the  \verb|last| one (get the last element). The difference between the two is that \verb|last| runs from the beginning of the collection, which is inefficient. \verb|Peek| is the vector version of \verb|last| that jumps to the end immediately.
+The \verb|peek| function is similar to the \verb|last| one (get the last element). The difference between the two is that \verb|last| runs from the beginning of the collection, which is inefficient. \verb|Peek| is the vector version of \verb|last| that jumps to the end immediately.
 
 We will now test the method for other fields. Add the email address to the \verb|::sample| spec:
 
@@ -1595,7 +1593,7 @@ If we pass an empty string to \verb|email|, the last element of the \verb|via| w
 
 \fi
 
-A call of   \verb|get-message| with this error will return an empty string message. This time, let's try an email that doesn't match the pattern. The final element of \verb|:via| will be \verb|:sample/email|. The error map looks like this:
+A call of \verb|get-message| with this error will return an empty string message. This time, let's try an email that doesn't match the pattern. The final element of \verb|:via| will be \verb|:sample/email|. The error map looks like this:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1634,7 +1632,7 @@ A call of   \verb|get-message| with this error will return an empty string messa
 
 \fi
 
-For \verb|get-message| o return a new message, add the \verb|::email| key to the map:
+For \verb|get-message| to return a new message, add the \verb|::email| key to the map:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1644,7 +1642,7 @@ For \verb|get-message| o return a new message, add the \verb|::email| key to the
   {::ne-string
    "The string must not be empty"
    ::email
-   "Please enter the correct email address"})
+   "Enter the correct email address"})
   \end{clojure}
 %% \end{english}
 
@@ -1654,7 +1652,7 @@ For \verb|get-message| o return a new message, add the \verb|::email| key to the
   \begin{clojure}
 (def spec-errors
   {::ne-string "The string must not be empty"
-   ::email "Please enter the correct email address"})
+   ::email "Enter the correct email address"})
   \end{clojure}
 %% \end{english}
 
@@ -1763,7 +1761,7 @@ By now, we've worked with the last element of the \verb|:via| vector. Let's take
 
 \fi
 
-We should read it like this: error in the sample due to email \arr{} error in the email due to an empty string. You can see: the specs are in descending order of priority, the global object comes first, the local issue comes last. It is beneficial to start your search from a local problem and move towards a global one. First, check \verb|::ne-string|, then  \verb|::email|, and, if you have found no error~--- \verb|::sample|.  Let's call this method a bottom-up search.
+We should read it like this: error in the sample due to email \arr{} error in the email due to an empty string. You can see: the specs are in descending order of priority, the global object comes first, the local issue comes last. It is beneficial to start your search from a local problem and move towards a global one. First, check \verb|::ne-string|, then \verb|::email|, and, if you have found no error~--- \verb|::sample|.  Let's call this method a bottom-up search.
 
 \index{clojure.core!keep}
 
@@ -1781,7 +1779,7 @@ Unlike previous solutions, we look for the translation for each element in rever
   \end{clojure}
 \end{english}
 
-This method advantage is that it preserves the required level of details in messages. For example,  \verb|::email| may consist of several small specs, but due to their low level, the message will be incomprehensible. For a more obvious translation, we'll remove \verb|::ne-string| from the map and leave \verb|::email|.
+This method advantage is that it preserves the required level of details in messages. For example, \verb|::email| may consist of several small specs, but due to their low level, the message will be incomprehensible. For a more obvious translation, we'll remove \verb|::ne-string| from the map and leave \verb|::email|.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1789,14 +1787,13 @@ This method advantage is that it preserves the required level of details in mess
   \begin{clojure}
 (def spec-errors
   {::email
-   "Enter the correct email addressс"})
+   "Enter the correct email address"})
 
 (get-message
   {:via [::sample ::email ::ne-string]})
-"Enter the correct email addressс"
+"Enter the correct email address"
   \end{clojure}
 %% \end{english}
-
 
 \else
 
@@ -1869,13 +1866,13 @@ If we pass an empty string to the description, the \verb|:via| vector will conta
 
 \fi
 
-Please note that there is no   \texttt{:book/de\-scription} spec in the vector. Therefore, we cannot compose a message specifically for this field, for example~--- incorrect book description. The \verb|::movie| behaves similarly: if we pass in an empty string, at the end of the via vector there will be the \verb|::ne-string| spec.
+Please note that there is no \texttt{:book/de\-scription} spec in the vector. Therefore, we cannot compose a message specifically for this field, for example~--- incorrect book description. The \verb|::movie| behaves similarly: if we pass in an empty string, at the end of the via vector there will be the \verb|::ne-string| spec.
 
 \mnoindent
-The \texttt{(s/def :book/description ::ne\--string)} expression is a link. When one spec refers to another, Spec shortens the chain to reach \verb|::ne-string| immediately. In such a situation, they say that the \verb|:book/description| and \verb|:movie/description|  \emph{converge} в \verb|::ne-string|. Sometimes convergence has an advantage: you can specify a translation for \verb|::ne-string| and refer to it in all text fields. When the \verb|:via| path is vital, the spec is reorganized.
+The \texttt{(s/def :book/description ::ne\--string)} expression is a link. When one spec refers to another, Spec shortens the chain to reach \verb|::ne-string| immediately. In such a situation, they say that the \verb|:book/description| and \verb|:movie/description| specs \emph{converge} into \verb|::ne-string|. Sometimes convergence has an advantage: you can specify a translation for \verb|::ne-string| and refer to it in all text fields. When the \verb|:via| path is vital, the spec is reorganized.
 
 \mnoindent
-One way to do this is to replace the link with a predicate. Rewrite \verb|:book/description| s in the example below:
+One way to do this is to replace the link with a predicate. Rewrite \verb|:book/description| as in the example below:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1899,7 +1896,7 @@ One way to do this is to replace the link with a predicate. Rewrite \verb|:book/
 \fi
 
 \mnoindent
-The description now refers not to \verb|::ne-string|, but a predicate with the same name. Below \verb|:book/description| , there will be no specs. If \verb|ne-string| returns false, \verb|:book/description| will become the last element of the \verb|:via|
+The description now refers not to \verb|::ne-string|, but a predicate with the same name. Below \verb|:book/description|, there will be no specs. If \verb|ne-string| returns false, \verb|:book/description| will become the last element of the \verb|:via|:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2103,7 +2100,7 @@ The disadvantage of a map is that it is difficult to expand it from the outside.
 
 To do this, replace the map with a multimethod. Its dispatcher takes an error map and finds the faulty specification. Next, we will expand the multimethod with specs. Next, we will expand the multimethod with specs. With this approach, everyone can add their translations or replace somebody else's ones if they did not fit.
 
-Let's declare a multimethod with the  \texttt{::ne\--string} translation:
+Let's declare a multimethod with the \texttt{::ne\--string} translation:
 
 \index{multimethods!problem\arr{}text}
 
@@ -2206,7 +2203,6 @@ If we need an individual translation, let's expand the multimethod:
 (problem->text
   {:val "" :via [:book/description]})
 "Enter book description"
-
   \end{clojure}
 %% \end{english}
 
@@ -2235,12 +2231,12 @@ Note that each method takes an error map. We have shaded it with the \verb|_| ch
 (defmethod problem->text
   :book/description
   [{:keys [val]}]
-  (format "Ошибка в описании книги: %s"
+  (format  " Error in book description: %s"
     val))
 
 (problem->text
   {:val "abc" :via [:book/description]})
-"Ошибка в описании книги: abc"
+" Error in book description: abc"
   \end{clojure}
 %% \end{english}
 
@@ -2250,10 +2246,10 @@ Note that each method takes an error map. We have shaded it with the \verb|_| ch
   \begin{clojure}
 (defmethod problem->text :book/description
   [{:keys [val]}]
-  (format "Ошибка в описании книги: %s" val))
+  (format  " Error in book description: %s" val))
 
 (problem->text {:val "abc" :via [:book/description]})
-"Ошибка в описании книги: abc"
+" Error in book description: abc"
   \end{clojure}
 %% \end{english}
 
@@ -2267,9 +2263,9 @@ Note that each method takes an error map. We have shaded it with the \verb|_| ch
 
 If the options above seemed tricky to you, try a message template. In this case, the message is made up of the field name and value (e.g., "the email field has the test invalid value"). We can simply get the message using the \verb|format| function. The method is fast and cheap, though there is an echo of machine language in messages.
 
-We should get the field name as the last keyword of the \verb|:in| field. Let's try to take the last element. Let me remind you that \verb|:in| is the physical path to the data, which is passed to the \verb|get-in|, \verb|assoc-in| , and other functions. Its elements are not only keywords for nested maps, but also vector indexes.
+We should get the field name as the last keyword of the \verb|:in| field. Let's try to take the last element. Let me remind you that \verb|:in| is the physical path to the data, which is passed to the \verb|get-in|, \verb|assoc-in|, and other functions. Its elements are not only keywords for nested maps, but also vector indexes.
 
-Here's an example where  \verb|:in| ends with a number. Let's say the \verb|::post| spec is for a blog post. In addition to the title, a post can have tags, a set of non-empty strings:
+Here's an example where \verb|:in| ends with a number. Let's say the \verb|::post| spec is for a blog post. In addition to the title, a post can have tags, a set of non-empty strings:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2411,7 +2407,7 @@ What should we do if localization is required, i.e., text in one of several lang
 \index{locale }
 \index{translation}
 
-By locale, we will get a translation map, then we translate the message, as we did above. With the locale code, we can make search easy. For individual phrases, we will set more precise locales, for example, American and British English with codes \verb|en_US| and \verb|en_GB|. Let's change the search order. First, the search goes to the lower locale  (\verb|en_US|), and then to the higher one (\verb|en|). If there is no American English version, we'll get that in International English. That is how message translation works in a broad sense, not just for errors.
+By locale, we will get a translation map, then we translate the message, as we did above. With the locale code, we can make search easy. For individual phrases, we will set more precise locales, for example, American and British English with codes \verb|en_US| and \verb|en_GB|. Let's change the search order. First, the search goes to the lower locale (\verb|en_US|), and then to the higher one (\verb|en|). If there is no American English version, we'll get that in International English. That is how message translation works in a broad sense, not just for errors.
 
 It's up to you where to read locale from.  You can save it to a session, request parameters, database~--- as it is convenient in your project. We will return to the topic of translation later in the chapter on mutability \page{translate}.
 
@@ -2419,10 +2415,11 @@ The second question is how to link errors to UI. The model is separate from the 
 
 Let's imagine the form as a tree. Keys are fields, and values are widgets. A widget contains a field type, current value, and error. Each widget has a subscribed React component. It draws the input field with the current value when the widget changes. If the error is not \verb|nil|, a red message appears above the field.
 
-Validation takes the form and builds a tree of values. It has the same topology, but instead of widgets, there are input field values. We use specs to validate values ​​and infer types from strings. In case of an error, we will get an report from \verb|explain|. For each element from the \verb|problems| field, we'll find the path, spec, and error message. We should add this message to the widget  \verb|:error| field. The component that is subscribed to the widget will re-render it with an error above the field.
+Validation takes the form and builds a tree of values. It has the same topology, but instead of widgets, there are input field values. We use specs to validate values and infer types from strings. In case of an error, we will get a report from \verb|explain|. For each element from the \verb|problems| field, we'll find the path, spec, and error message. We should add this message to the widget \verb|:error| field. The component that is subscribed to the widget will re-render it with an error above the field.
 
 \index{interface}
 \index{frameworks!React}
+
 We mentioned forms, React, and UI issues. Together they are called the \emph{front-end}. We will not go deep into this topic, because there will be enough talk about it for a whole book.
 
 \section{Parsing}
@@ -2462,7 +2459,7 @@ Suppose we need to parse an array of users. Each of them is a tuple of the form 
   make sure that there are precisely three elements in the tuple;
 
 \item
-  convert a number to a number;
+  convert a number to an integer;
 
 \item
   check the email for minimum criteria;
@@ -2475,14 +2472,13 @@ Suppose we need to parse an array of users. Each of them is a tuple of the form 
 
 \end{itemize}
 
-We are already familiar with \verb|s/conformer|. It is possible to write a function that will take a tuple and do the above. However, the former will be rigid with a too big  \emph{scope}. There is another way.
+We are already familiar with \verb|s/conformer|. It is possible to write a function that will take a tuple and do the above. However, the former will be rigid with a too big \emph{scope}. There is another way.
 
 \index{spec!cat}
 
-The \verb|s/cat| spec parses collections. It takes a set of tags and other specs. The \verb|s/cat| matches the elements of the input collection to specifications. If they match, we get a map. Map keys are tags, and values ​​are a call to a child spec with an element.
+The \verb|s/cat| spec parses collections. It takes a set of tags and other specs. The \verb|s/cat| matches the elements of the input collection to specifications. If they match, we get a map. Map keys are tags, and values are a call to a child spec with an element.
 
-Let's compose a spec for parsing a tuple. We'll start with the status. The spec below conforms the \verb|active| and \verb|pending| strings to specific keywords. Other values ​​will trigger an error.
-
+Let's compose a spec for parsing a tuple. We'll start with the status. The spec below conforms the \verb|active| and \verb|pending| strings to specific keywords. Other values will trigger an error.
  
 \begin{english}
   \begin{clojure}
@@ -2568,7 +2564,7 @@ blocked;1;test@test.com;active
 It complicates our task because now the tuple consists of three 
 \emph{or} four elements. The semantics of the fields have shifted: the first element is not only a number but also a blocking flag. Legacy data, and especially financial one, sometimes has weird conditions.
 
-In imperative languages, they generate an  \verb|if/else| cascade. Clojure solves the problem declaratively. We will now declare the block spec that conforms the string to a flag:
+In imperative languages, they generate an \verb|if/else| cascade. Clojure solves the problem declaratively. We will now declare the block spec that conforms the string to a flag:
 
 \begin{english}
   \begin{clojure}
@@ -2581,7 +2577,7 @@ In imperative languages, they generate an  \verb|if/else| cascade. Clojure solve
 
 \index{spec!?}
 
-We should add this spec into the final  \verb|s/cat|, but indicate that it occurs never or only once. To do this,  \verb|::blocked| is wrapped in the  \verb|s/?| spec. In regexes, the question mark does the same for a pattern.
+We should add this spec into the final \verb|s/cat|, but indicate that it occurs never or only once. To do this, \verb|::blocked| is wrapped in the \verb|s/?| spec. In regexes, the question mark does the same for a pattern.
 
 We have already written specs for displaying numbers and email. It remains to collect them into a composition:
 
@@ -2595,7 +2591,7 @@ We have already written specs for displaying numbers and email. It remains to co
   \end{clojure}
 \end{english}
 
-Both tuples now match the  \verb|::user| spec. If there is no label, we'll get a map as in the beginning. If a user is blocked, there will be the  \verb|:blocked| field in the map: 
+Both tuples now match the \verb|::user| spec. If there is no label, we'll get a map as in the beginning. If a user is blocked, there will be the  \verb|:blocked| field in the map: 
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2676,7 +2672,7 @@ Imagine a situation where the input is a collection of tuples. To avoid iteratio
 \index{clojure.core!filter}
 \index{clojure.core!complement}
 
-We should filter out blocked users using the \verb|filter and predicate  \spverb|(complement :blocked)|.
+We should filter out blocked users using \verb|filter and the \spverb|(complement :blocked)| predicate.
 
 \subsection{Practice}
 
@@ -2684,8 +2680,7 @@ We should filter out blocked users using the \verb|filter and predicate  \spverb
 \index{parsing}
 
 Using Spec, we can parse not only data but also text. Let's discuss how to parse an INI file into a data map.
-\footurl{INI}{https://en.wikipedia.org/wiki/INI\_file}[INI][-3mm]~---
-is an old configuration format. It consists of titles and pairs of fields and values. Here's an example of a conditional  \verb|config.ini|:
+\footurl{INI}{https://en.wikipedia.org/wiki/INI\_file}[INI][-3mm] is an old configuration format. It consists of titles and pairs of fields and values. Here's an example of a conditional  \verb|config.ini|:
 
 \begin{english}
   \begin{ini}
@@ -2717,7 +2712,7 @@ If we discard blank lines and comments, the format boils down to the grammar \ve
 \index{clojure.core!doall}
 \index{clojure.core!with-open}
 
-First, let's read lines from the file. Specs should not have side effects, so reading is taken out in a separate step. The  \verb|line-seq| function is lazy: it returns a line collection that fills up as it walks. The \verb|doall| form forces walking over it to count all the elements. Without \verb|doall| we will exit the \verb|with-open|  macro with an unfilled collection, but the file will already be closed.
+First, let's read lines from the file. Specs should not have side effects, so reading is taken out in a separate step. The \verb|line-seq| function is lazy: it returns a line collection that fills up as it walks. The \verb|doall| form forces walking over it to count all the elements. Without \verb|doall| we will exit the \verb|with-open| macro with an unfilled collection, but the file will already be closed.
 
 \index{iteration!doall}
 
@@ -3024,7 +3019,7 @@ It's time to write a spec for type coercion and checking. We conform port number
 \index{modules!clojure.walk}
 \index{functions!keywordize-keys}
 
-The final touch is to correct the type of keys in the map. At the moment, they are strings, but the \verb|::ini-config| spec expects keywords. In this case, the \verb|clojure.walk| module offers the  \verb|keywordize-keys| function. It walks through a map of any nesting and changes keys. The final spec:
+The final touch is to correct the type of keys in the map. At the moment, they are strings, but the \verb|::ini-config| spec expects keywords. In this case, the \verb|clojure.walk| module offers the \verb|keywordize-keys| function. It walks through a map of any nesting and changes keys. The final spec:
 
 \begin{english}
   \begin{clojure}
@@ -3213,13 +3208,7 @@ We'll prepare the data for the spec. It is a list that repeats the \verb|defn| e
   \end{clojure}
 \end{english}
 
-
-
-
-
-
-
-If we execute \verb|defn-expr| in the REPL, we'll see the code as it would appear in an editor. However, the frequent use of  \verb|list| and apostrophes makes our code noisy and prone to mistakes. For the sake of brevity, let's freeze not individual symbols, but the entire \verb|defn| expression. That will keep the original syntax:
+If we execute \verb|defn-expr| in the REPL, we'll see the code as it would appear in an editor. However, the frequent use of \verb|list| and apostrophes makes our code noisy and prone to mistakes. For the sake of brevity, let's freeze not individual symbols, but the entire \verb|defn| expression. That will keep the original syntax:
 
 \begin{english}
   \begin{clojure}
@@ -3345,8 +3334,7 @@ Spec also works as a grammar parser: you can parse data and build a tree. You ar
 
 The problem with validation also applies to functions. They get data from intermediaries, and there is always the likeliness of data error. Let's remember our function with a date range. If its first date is bigger than the second one, interval validations should return false. That is where the spec comes in.
 
-Now, we will describe parameters of a function. It is \verb|s/cat| , which takes a bite out of date arguments and places it in a dictionary with the \verb|:start| and
-\verb|:end| keys.
+Now, we will describe parameters of a function. It is \verb|s/cat| , which takes a bite out of date arguments and places it in a dictionary with the \verb|:start| and \verb|:end| keys.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -3378,7 +3366,7 @@ Now, we will describe parameters of a function. It is \verb|s/cat| , which takes
 
 \index{clojure.core!compare}
 
-The second function in \verb|s/and| takes a map and compares the dates. For dates, use the \verb|compare| function that will return -1, 0, and 1 (for values: ​​less than, equal to, and bigger than, respectively). Quick check:
+The second function in \verb|s/and| takes a map and compares the dates. For dates, use the \verb|compare| function that will return -1, 0, and 1 (for values: less than, equal to, and bigger than, respectively). Quick check:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -3419,7 +3407,7 @@ The spec library includes a decorator, so we don't have to write a custom one. I
 
 \index{monkey patch}
 
-\verb|Instrument| takes a symbol of the instrumented function. They set with the same symbol a spec for a function. \verb|Instrument| replaces the function with the same one, but with checks. When one module changes another, it is a kind of a  \footurl{monkey patch}{https://en.wikipedia.org/wiki/Monkey\_patch}[Monkey patch][-3mm]. A functional spec is declared as the \verb|s/fdef| macro. It takes a function symbol and specs of input parameters, of the result, and their composition.
+\verb|Instrument| takes a symbol of the instrumented function. They set with the same symbol a spec for a function. \verb|Instrument| replaces the function with the same one, but with checks. When one module changes another, it is a kind of a \footurl{monkey patch}{https://en.wikipedia.org/wiki/Monkey\_patch}[Monkey patch][-3mm]. A functional spec is declared as the \verb|s/fdef| macro. It takes a function symbol and specs of input parameters, of the result, and their composition.
 
 \index{dates}
 \index{classes!Date}
@@ -3485,9 +3473,9 @@ The \verb|^Date| tags are required for the compiler to know the type of \verb|da
 \noindent
 If we swap the dates, we'll get the same number with a minus.
 
-Then, we'll describe the functional spec with the  \verb|date-range-sec| symbol. The \verb|:args| key is indicated the spec of the incoming parameters. It's a list, so \verb|s/cat comes in handy for it. This spec splits a list as a map so that the specs below work with keys.
+Then, we'll describe the functional spec with the \verb|date-range-sec| symbol. The \verb|:args| key is indicated the spec of the incoming parameters. It's a list, so \verb|s/cat comes in handy for it. This spec splits a list as a map so that the specs below work with keys.
 
-The \verb|:ret| key stands for a result spec. Most often, it is a check for an integer (\verb|int?|), or a string  (\verb|string?|), or their  \verb|nilable| versions that allow \verb|nil|: \verb|(s/nilable int?)|, and so on.
+The \verb|:ret| key stands for a result spec. Most often, it is a check for an integer (\verb|int?|), or a string (\verb|string?|), or their \verb|nilable| versions that allow \verb|nil|: \verb|(s/nilable int?)|, and so on.
 
 \index{spec!fdef}
 
@@ -3501,7 +3489,7 @@ The \verb|:ret| key stands for a result spec. Most often, it is a check for an i
 
 You may pass ready-made specs to the \verb|:args| and \verb|:ret| keys; it is useful for reuse. You can have multiple specs for a date range.
 
-When created, a functional spec does not change the function. It only declares checks but does not run them. To replace a function with its instrumented version, call  \verb|instrument|:
+When created, a functional spec does not change the function. It only declares checks but does not run them. To replace a function with its instrumented version, call \verb|instrument|:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -3556,14 +3544,14 @@ Now \verb|date-range-sec| should check the arguments and the result. What happen
 \index{spec!explain}
 \index{report!explain}
 
-The message and the body are familiar to us. The \verb|message| field contains the text from the \verb|s/explain-str| function. The report from \verb|s/explain-data| is in the \verb|data|  field. To get to it, we must pass the exception to the \verb|(ex-data e)| function.
+The message and the body are familiar to us. The \verb|message| field contains the text from the \verb|s/explain-str| function. The report from \verb|s/explain-data| is in the \verb|data| field. To get to it, we must pass the exception to the \verb|(ex-data e)| function.
 
 \subsection{Documentation}
 
 \index{documentation}
 \index{modules!clojure.repl}
 
-Functional spec improves documentation. The  \verb|doc| function from the \verb|clojure.repl module outputs documentation about the requested one. With the advent of Spec, this function began to behave differently. In addition to documentation, it returns the spec, if any. The documentation for \verb|date-range-sec| looks like this after declaring the spec:
+Functional spec improves documentation. The \verb|doc| function from the \verb|clojure.repl module outputs documentation about the requested one. With the advent of Spec, this function began to behave differently. In addition to documentation, it returns the spec, if any. The documentation for \verb|date-range-sec| looks like this after declaring the spec:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -3604,7 +3592,7 @@ IDE and editors depend on the \verb|doc| function to show tips on arguments. \fo
 
 \index{performance}
 
-\verb|Instrument| helps with testing. During testing, functions are instrumented to identify errors. This is done using a module that runs the  \verb|(instrument ...)| series on load. The project is designed so that the module is loaded only for the duration of the tests. If the function receives the invalid arguments, it will become noticeable.
+\verb|Instrument| helps with testing. During testing, functions are instrumented to identify errors. This is done using a module that runs the \verb|(instrument ...)| series on load. The project is designed so that the module is loaded only for the duration of the tests. If the function receives the invalid arguments, it will become noticeable.
 
 \index{benchmark}
 
@@ -3676,11 +3664,11 @@ Time has increased a hundredfold! Validation slows down the application \emph{si
 
 The libraries in Clojure are usually supplied with specs to help other developers. If the library often works with some data structure, describe it with a spec. \footurl{JDBC}{https://github.com/clojure/java.jdbc}[JDBC][-7mm], a wrapper for relational databases, is a good example.
 
-The database connection is defined with a map with the keys \verb|:host|, \verb|:port|, \verb|:user|, and others. Usually, one reads a map from the configuration. Before connecting, you need to check it so as not to get  \verb|NPE| and other oddities.
+The database connection is defined with a map with the keys \verb|:host|, \verb|:port|, \verb|:user|, and others. Usually, one reads a map from the configuration. Before connecting, you need to check it so as not to get \verb|NPE| and other oddities.
 
 \index{NPE}
 
-Suppose the configuration is described in the EDN resource. The  \verb|:db| field sets the connection to the database.
+Suppose the configuration is described in the EDN resource. The \verb|:db| field sets the connection to the database.
 
 \index{formats!EDN}
 
@@ -3747,7 +3735,7 @@ Let's read the configuration from the file and check with the spec:
 
 \index{spec!or}
 
-Be careful with the \verb|::jdbc/db-spec| spec~--- it is a tricky one with the \verb|s/or| macros that create forks. If we pass it to \verb|s/conform| , we'll get the fields with tags (lines 3, 4, 6):
+Be careful with the \verb|::jdbc/db-spec| spec~--- it is a tricky one with the \verb|s/or| macros that create forks. If we pass it to \verb|s/conform|, we'll get the fields with tags (lines 3, 4, 6):
 
 \begin{english}
   \begin{clojure/lines}
@@ -3814,7 +3802,7 @@ Separate development teams are writing wrappers over Spec to expand its capabili
 \index{people!Rich Hickey}
 \index{video!Maybe Not}
 
-In his  \footurl{Maybe Not}{https://youtube.com/watch?v=YR5WdGrpoug}[Maybe\\*Not] talk, Rich Hickey announced the second version of the spec library. They should simplify the work with maps (using the \verb|select| spec), and with multiple types (when the value is a string or a number). It is an open-source development, but it's too early to talk about the results. We'll talk about the second version beyond the scope of this chapter.
+In his \footurl{Maybe Not}{https://youtube.com/watch?v=YR5WdGrpoug}[Maybe\\*Not] talk,Rich Hickey announced the second version of the spec library. They should simplify the work with maps (using the \verb|select| spec), and with multiple types (when the value is a string or a number). It is an open-source development, but it's too early to talk about the results. We'll talk about the second version beyond the scope of this chapter.
 
 \section{Summary}
 
@@ -3829,7 +3817,3 @@ The library converts (conforms) old data to new ones. The \verb|s/conform| funct
 The Spec offers regex specs similar to regular expressions. They differ from ordinary specs in that they capture part of a collection. They write data parsers on regex specs, including those for Clojure. Basic macros validate a body using Spec.
 
 The library is useful when running tests. The \verb|instrument| function modifies another function so that a spec can check its arguments. That makes the tests more reliable, although it slows down the call. The functional spec becomes part of the documentation.
-
-Spec does not offer solutions for error messages. It depends on the project: how to build them and show them a client. One approach is based on a map, where keys are specs, and values are an error text or translation tag. Replacing a map with a multimethod makes it easier for consumers to expand it. 
-
-We have reviewed the main features of the library. Alas, we had to leave generators, multi-specs, and other exciting things outside the scope of this discussion. You can find that all in the official documentation. We do not say goodbye to specs~--- we will return to them in the next chapters.
