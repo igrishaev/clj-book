@@ -19,7 +19,7 @@ The Clojure distribution has included Spec since version 1.9. The full name of t
 \index{validation}
 \index{parsing}
 
-Spec has become a milestone in the development of Clojure. The key property of spec is its being fundamental. Data validation is a small part of its capabilities. Spec not only validates data but also transforms it. It is easy to write parsers in Spec. 
+Spec has become a milestone in the development of Clojure. The key property of spec is its being fundamental. Data validation is a small part of its capabilities. Spec not only validates data but also transforms it. It is easy to write parsers in Spec.
 
 Formally, clojure.spec is a regular library. But its abstractions are so powerful that Clojure reuses them. Since version 1.10, the Clojure compiler parses main macros using Spec. So the projects complement each other.
 
@@ -39,10 +39,10 @@ It is believed that statically typed code is safer than dynamically typed one. T
 Let's see how to express the network port in the code. In the operating system, this is a number from 0 to $2^{16}-1$. Integer types we usually describe in powers of two, so there is a conditional \verb|unsigned int| that covers this exact range. Port Zero has its semantics and is not used in application programs. The likelihood that the language provides a type from~1 to~$2^{16}-1$ is extremely small.
 
 The problem is more noticeable on the date range. A single date can be as reasonable as you want, but the range imposes a limitation: the beginning should be strictly less than the end. Business can impose additional restrictions: the difference is no more than a week, both dates are within the current month.
- 
+
 \index{validation}
 
-OOP solves this problem using the \verb|UnixPort| and \verb|DateRange| classes. Conditional \verb|UnixPort| is a class with a constructor. It takes an integer and performs a range check. If the integer is out of range from 1 to \dots~$2^{16}-1$, the constructor will throw an exception. The programmer might believe he/she has created a new type. But classes and types are not the same. 
+OOP solves this problem using the \verb|UnixPort| and \verb|DateRange| classes. Conditional \verb|UnixPort| is a class with a constructor. It takes an integer and performs a range check. If the integer is out of range from 1 to \dots~$2^{16}-1$, the constructor will throw an exception. The programmer might believe he/she has created a new type. But classes and types are not the same.
 
 A constructor is a regular validator. When we write \spverb|new UnixPort(8080)| , it will work implicitly. Implicitness gives the illusion that we have created a type. In fact, this is validation and syntactic sugar.
 
@@ -58,13 +58,13 @@ Independence and composition are hallmarks of convenient validation. Independenc
 
 \index{functions!composition}
 
-Composition means that it is useful to have a few simple checks to compose sophisticated ones. Suppose the checks “A” and “B” are specified. Now, we need their combinations~--- “A  \emph{&}~B” and “A \emph{or}~B”. Ideally, a composition is a couple of code lines and is trivial.
+Composition means that it is useful to have a few simple checks to compose sophisticated ones. Suppose the checks "A" and "B" are specified. Now, we need their combinations~--- "A  \emph{\&}~B" and "A \emph{or}~B". Ideally, a composition is a couple of code lines and is trivial.
 
 \index{functions}
 
-Both theses are in line with the concept of function.  The latter is used by one operation only~--- the call, and that makes things simpler. The function takes a value and returns "true" or "false". It answers the question of whether the value was proper or not. Clojure functions are first-class objects, so they are easy to combine. 
+Both theses are in line with the concept of function.  The latter is used by one operation only~--- the call, and that makes things simpler. The function takes a value and returns "true" or "false". It answers the question of whether the value was proper or not. Clojure functions are first-class objects, so they are easy to combine.
 
-\section{Spec Basics} 
+\section{Spec Basics}
 
 With this in mind, we come to Spec. Now we should include the module in the current namespace:
 
@@ -118,7 +118,7 @@ The second argument is the \verb|string?| predicate. A predicate is a function t
 
 \index{spec!registry }
 
-Specs are stored in the global registry under their keys. When the \verb|s/def| macro puts a spec into the registry, it does not check if there is already the same one in it. Therefore, we will lose the previous version if it is there. 
+Specs are stored in the global registry under their keys. When the \verb|s/def| macro puts a spec into the registry, it does not check if there is already the same one in it. Therefore, we will lose the previous version if it is there.
 
 \index{key conflicts}
 
@@ -159,7 +159,7 @@ Quick check:
 \end{english}
 
 The \verb|::ne-string| key is short for "\textbf{n}on-\textbf{e}mpty
-string”. The spec is often used: so it is logical to shorten its name.
+string". The spec is often used: so it is logical to shorten its name.
 
 A more elegant way to define this spec is to compose predicates using the \verb|every-pred| function. It takes a set of predicates and returns a super-predicate. It returns true only if all of its composing predicates are true.
 
@@ -183,7 +183,7 @@ We are assembling a new entity from the base ones: this way is short and functio
   \end{clojure}
 \end{english}
 
-We can build sophisticated specs in Clojure this way: declare primitives and build up their combinations. 
+We can build sophisticated specs in Clojure this way: declare primitives and build up their combinations.
 
 \section{Exceptions}
 
@@ -398,13 +398,13 @@ Let's create the spec for a page:
 
 The \verb|:req-un| parameter specifies the vector of specs. For each of them, our spec looks for a key of the same name in the map and validates the value. Let's see what \verb|:req-un| means and what other parameters \verb|s/keys| takes.
 
-The \verb|:req-un| name consists of the parts “req” and “un”. The former is a sign of the presence of a key, and the latter — of the type. Req (required) means that the keys must be in the map. The opposite in meaning parameter is called opt (optional). It specifies keys that may not be present. They will only be validated if they are in the map.
+The \verb|:req-un| name consists of the parts "req" and "un". The former is a sign of the presence of a key, and the latter — of the type. Req (required) means that the keys must be in the map. The opposite in meaning parameter is called opt (optional). It specifies keys that may not be present. They will only be validated if they are in the map.
 
  \index{spec!:un}
 
-The “un-” part stands for an unqualified key. When checking un-keys, the spec discards their space. For example, if you specify \verb|:page/address| in the \verb|:req-un| list, then the \verb|:address| key will be searched for in the map, not the \verb|:page/address| one.
+The "un-" part stands for an unqualified key. When checking un-keys, the spec discards their space. For example, if you specify \verb|:page/address| in the \verb|:req-un| list, then the \verb|:address| key will be searched for in the map, not the \verb|:page/address| one.
 
-We meet unqualified keys frequently. The data comes from different APIs and databases that know nothing about the namespaces. There are exceptions when the entire company stack is built in Clojure. In this case, a client and server send data with fully-qualified keys. 
+We meet unqualified keys frequently. The data comes from different APIs and databases that know nothing about the namespaces. There are exceptions when the entire company stack is built in Clojure. In this case, a client and server send data with fully-qualified keys.
 
 There are the following combinations of  \verb|req|, \verb|opt|, and \verb|un|:
 
@@ -428,7 +428,7 @@ There are the following combinations of  \verb|req|, \verb|opt|, and \verb|un|:
 
 \end{itemize}
 
-The \verb|::page| spec keys are required and unqualified (without a namespace). Below are examples of data \emph{with errors}. These may be an incorrect address, an empty description, or a missing key. If you put each map in the \spverb|(s/valid? ::page <data>)| expression, it should return false. 
+The \verb|::page| spec keys are required and unqualified (without a namespace). Below are examples of data \emph{with errors}. These may be an incorrect address, an empty description, or a missing key. If you put each map in the \spverb|(s/valid? ::page <data>)| expression, it should return false.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -554,7 +554,7 @@ Maps with the proper status and without it will be validated:
 
 \index{nil}
 
-Note that \verb|s/keys| distinguishes between \verb|nil| and the presence of a key. If the status is \verb|nil|, it \emph{is} in the map. Checking \verb|nil| for \verb|int?| should work, which will lead to an error. In this case, the empty value is not the same as no value. 
+Note that \verb|s/keys| distinguishes between \verb|nil| and the presence of a key. If the status is \verb|nil|, it \emph{is} in the map. Checking \verb|nil| for \verb|int?| should work, which will lead to an error. In this case, the empty value is not the same as no value.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -600,7 +600,7 @@ Spec offers such features. These are the \verb|s/conformer| and и~\verb|s/confo
 \label{spec-invalid}
 
 \index{spec!conformer}
- 
+
 \index{spec!::invalid}
 
 First, write the type coercion function. It takes the original value and returns either a new one or the \verb|::s/invalid| key indicating an error. The function will be wrapped in \verb|s/conformer| to obtain a spec.  \verb|S/conform| takes a spec-conformer and data. If the types were coerced without errors, we get a conformed value, otherwise — the \verb|::s/invalid| key.
@@ -700,7 +700,7 @@ Now, we will wrap the function in a spec:
   \end{clojure}
 \end{english}
 
-Before parsing, we'll do minimal checks. We should make sure it's not an empty string ~--- to cut off \verb|nil| and other garbage. Date conforming: 
+Before parsing, we'll do minimal checks. We should make sure it's not an empty string ~--- to cut off \verb|nil| and other garbage. Date conforming:
 
 \begin{english}
   \begin{clojure}
@@ -1389,7 +1389,7 @@ For an empty string, the output will be different. This time, the error will be 
 
 When validating data, it's not just the fact of error that matters. It is more important to explain to a client exactly where they went wrong. Regardless of whether a client is a human or a program, we should add a clear text in a response. After all, it will get into the logs that employees read.
 
-We often see messages like “Error: DATAERROR” without any details, or a red “check data” text above a two-screen form. If programmers can translate machine language into human one, such nonsense can be avoided.
+We often see messages like "Error: DATAERROR" without any details, or a red "check data" text above a two-screen form. If programmers can translate machine language into human one, such nonsense can be avoided.
 
 \index{interface}
 \index{user}
@@ -1417,9 +1417,9 @@ To compose the message, let's go back to the \verb|s/explain-data| function. As 
 \index{languages!Python}
 \index{languages!JavaScript}
 
-At first glance, it is not clear what to do with it. Some programmers give up and say the library error reporting is not good. But this is not so: the report contains all the necessary data — you just need to process it correctly. 
+At first glance, it is not clear what to do with it. Some programmers give up and say the library error reporting is not good. But this is not so: the report contains all the necessary data — you just need to process it correctly.
 
-Newbies ask: why not make clear messages at the library level? For example, assign a field to a spec that says~--- “Enter the correct address.” Why not take a Python or JavaScript library as a sample?
+Newbies ask: why not make clear messages at the library level? For example, assign a field to a spec that says~--- "Enter the correct address." Why not take a Python or JavaScript library as a sample?
 
 \index{fundamentality}
 
@@ -1429,7 +1429,7 @@ It is difficult to create a system of errors that is fine for everyone. Each pro
 
 If the Spec developers focused on error messages, they would be distracted from the main objective. So instead of Spec , we would get validators kind of those that dozens write for Python and JavaScript. They are boring, rigid, and lack a concept.
 
-The \verb|explain-data| map contains the keys \verb|:spec|, \verb|:value|, and \verb|:problems| with the \verb|clojure.spec.alpha| namespace. The first two are a spec and a value that were used for checking. Now we are interested in \verb|:problems|. It is a list of maps, each describing a validation error. Let's list their fields and semantics: 
+The \verb|explain-data| map contains the keys \verb|:spec|, \verb|:value|, and \verb|:problems| with the \verb|clojure.spec.alpha| namespace. The first two are a spec and a value that were used for checking. Now we are interested in \verb|:problems|. It is a list of maps, each describing a validation error. Let's list their fields and semantics:
 
 \index{spec!forks}
 
@@ -2479,7 +2479,7 @@ We are already familiar with \verb|s/conformer|. It is possible to write a funct
 The \verb|s/cat| spec parses collections. It takes a set of tags and other specs. The \verb|s/cat| matches the elements of the input collection to specifications. If they match, we get a map. Map keys are tags, and values are a call to a child spec with an element.
 
 Let's compose a spec for parsing a tuple. We'll start with the status. The spec below conforms the \verb|active| and \verb|pending| strings to specific keywords. Other values will trigger an error.
- 
+
 \begin{english}
   \begin{clojure}
 (s/def :user/status
@@ -2524,7 +2524,7 @@ In the positive case, the output will be a map:
 
 \fi
 
-Variants with an invalid number, mail, or status will not be parsed. The specs from the examples below return \verb|::s/invalid|: 
+Variants with an invalid number, mail, or status will not be parsed. The specs from the examples below return \verb|::s/invalid|:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2561,7 +2561,7 @@ blocked;1;test@test.com;active
   \end{text}
 \end{english}
 
-It complicates our task because now the tuple consists of three 
+It complicates our task because now the tuple consists of three
 \emph{or} four elements. The semantics of the fields have shifted: the first element is not only a number but also a blocking flag. Legacy data, and especially financial one, sometimes has weird conditions.
 
 In imperative languages, they generate an \verb|if/else| cascade. Clojure solves the problem declaratively. We will now declare the block spec that conforms the string to a flag:
@@ -2591,7 +2591,7 @@ We have already written specs for displaying numbers and email. It remains to co
   \end{clojure}
 \end{english}
 
-Both tuples now match the \verb|::user| spec. If there is no label, we'll get a map as in the beginning. If a user is blocked, there will be the  \verb|:blocked| field in the map: 
+Both tuples now match the \verb|::user| spec. If there is no label, we'll get a map as in the beginning. If a user is blocked, there will be the  \verb|:blocked| field in the map:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -3059,9 +3059,9 @@ Now we might eliminate minor flaws in the code. Let the pair \verb|"foo="| will 
 \index{parsing}
 \index{macros}
 
-At the end of the topic, let's talk about how to parse code. We have already seen that Spec is suitable for parsing collections. Clojure code consists of lists. That leads to an unexpected solution: we can check the code with a spec and return an error before its running. 
+At the end of the topic, let's talk about how to parse code. We have already seen that Spec is suitable for parsing collections. Clojure code consists of lists. That leads to an unexpected solution: we can check the code with a spec and return an error before its running.
 
-It is convenient to do checking in macros. They are special functions that work at compile time. The macro takes code as a list of symbols. There may be errors in the code, but the macro treats them just as symbols. 
+It is convenient to do checking in macros. They are special functions that work at compile time. The macro takes code as a list of symbols. There may be errors in the code, but the macro treats them just as symbols.
 
 The task of a macro is to rebuild such a list into a Clojure-understandable one. The compiler will replace the call to the macro with what it returned and run the code. Macros are a separate milestone in learning Clojure. For now, let's look at how to check a macro with a spec.
 
@@ -3267,7 +3267,7 @@ Result:
 \fi
 
 Please pay attention to the \verb|:body| field. It is a vector with a label and a result. For a single body, we get the \verb|:single| label and a map. For several bodies, the label will be \verb|:multi|, and the value will be a vector of maps:
- 
+
 \ifx\DEVICETYPE\MOBILE
 
 \begin{english}
@@ -3473,7 +3473,7 @@ The \verb|^Date| tags are required for the compiler to know the type of \verb|da
 \noindent
 If we swap the dates, we'll get the same number with a minus.
 
-Then, we'll describe the functional spec with the \verb|date-range-sec| symbol. The \verb|:args| key is indicated the spec of the incoming parameters. It's a list, so \verb|s/cat comes in handy for it. This spec splits a list as a map so that the specs below work with keys.
+Then, we'll describe the functional spec with the \verb|date-range-sec| symbol. The \verb|:args| key is indicated the spec of the incoming parameters. It's a list, so \verb|s/cat| comes in handy for it. This spec splits a list as a map so that the specs below work with keys.
 
 The \verb|:ret| key stands for a result spec. Most often, it is a check for an integer (\verb|int?|), or a string (\verb|string?|), or their \verb|nilable| versions that allow \verb|nil|: \verb|(s/nilable int?)|, and so on.
 
@@ -3799,12 +3799,18 @@ To date, the Spec package still hasn't gotten rid of the alpha part in the name.
 
 Separate development teams are writing wrappers over Spec to expand its capabilities. For example, Spec.tools, which we have talked about, binds specs with JSON schema and tools like Swagger.
 
-\indexff
+\index{people!Rich Hickey}
+\index{video!Maybe Not}
+
+In his \footurl{Maybe Not}{https://youtube.com/watch?v=YR5WdGrpoug}[Maybe\\*Not] talk,Rich Hickey announced the second version of the spec library. They should simplify the work with maps (using the \verb|select| spec), and with multiple types (when the value is a string or a number). It is an open-source development, but it's too early to talk about the results. We'll talk about the second version beyond the scope of this chapter.
+
+\section{Summary}
+
 Spec is a Clojure library that comes with the language. Spec offers a set of functions and macros. They are used to describe the rules that the data must follow. The rules are predicates, i.e., functions that return true or false.
 
 They are more flexible and powerful than types. If the value is of a proper type, this does not guarantee correctness. Classes like \verb|UnixPort| are not types~--- they are runtime validation. It binds to calling the class using syntax.
 
-Predicates combine with each other, unlike classes. It is easy to compose a predicate with “each of” or “any of” logic, and others. 
+Predicates combine with each other, unlike classes. It is easy to compose a predicate with "each of" or "any of" logic, and others.
 
 The library converts (conforms) old data to new ones. The \verb|s/conform| function wraps another function to return a conformed value. For what is this? We use this to coercion strings to numbers and dates.
 
