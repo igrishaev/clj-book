@@ -25,7 +25,7 @@ Developers of frameworks and browsers check with it to make the code work on dif
 HTTP is textual, so it’s convenient. You don't need to parse bytes to understand what is happening. The main parts of the protocol are textual, although it also works with binary data.  There are requests and responses in HTTP. Both of them consist of three parts:
 the first line, headers, and a body.
 
-The first (start) line carries the most important information. Request and response lines are different in form. In case of requests, it contains a method, a path, and a version. A response line includes a status, a message, and a version. 
+The first (start) line carries the most important information. Request and response lines are different in form. In case of requests, it contains a method, a path, and a version. A response line includes a status, a message, and a version.
 
 \index{HTTP!headers}
 
@@ -94,12 +94,12 @@ To reduce the number of actions with the resource, we use other, rarer methods. 
 
 \index{web development!REST}
 
-The method & resource approach has grown into what is called today \footurl{REST}{https://restapitutorial.com}[REST]. REST proponents distinguish entities and CRUD operations on them (\textbf{C}reate, \textbf{R}ead, \textbf{U}pdate, \textbf{D}elete). The approach is considered proper when the entity is specified via the path, for example, \verb|/users/1|, and the operation~---  by the method. If it's a change request, the data is read from the body with JSON. We will not dwell on REST any longer, 
+The method \& resource approach has grown into what is called today \footurl{REST}{https://restapitutorial.com}[REST]. REST proponents distinguish entities and CRUD operations on them (\textbf{C}reate, \textbf{R}ead, \textbf{U}pdate, \textbf{D}elete). The approach is considered proper when the entity is specified via the path, for example, \verb|/users/1|, and the operation~---  by the method. If it's a change request, the data is read from the body with JSON. We will not dwell on REST any longer,
 because this is just a set of guidelines, not the perfect and not the only one.
 
 \index{web development!CRUD}
 
-The protocol does not impose REST and other rules. You can work with HTTP in any way that suits your project. An ideal architecture does not ensure success, and vice versa, 
+The protocol does not impose REST and other rules. You can work with HTTP in any way that suits your project. An ideal architecture does not ensure success, and vice versa,
 success does not mean that everything is perfect under the hood.
 
 \subsection{Framework}
@@ -123,12 +123,12 @@ Clojure projects rely on frameworks. The above principles are also valid for thi
 
 Developer \footurl{James Reeves}{https://www.booleanknot.com}[James\\*Reeves] is known for contributing to the Clojure ecosystem.  All projects use his libraries.  At the advent of Clojure, James created the web development standard for the language. The standard is based on a few simple ideas.
 
-Applications can be extremely complex: they rely on third-party services, machine learning, take into account hundreds of facts about clients. But even the most complex application takes a request and returns a response, and therefore it is a function. Skeptics will say the idea isn't new. In Django, a handler is also sometimes not a class, 
+Applications can be extremely complex: they rely on third-party services, machine learning, take into account hundreds of facts about clients. But even the most complex application takes a request and returns a response, and therefore it is a function. Skeptics will say the idea isn't new. In Django, a handler is also sometimes not a class,
 but a function. The difference is that the handler is not an application yet. It doesn't have a router, middleware, and other abstractions. A handler function is a local option in other programming languages.
 
 \label{http-all-function}
 
-In Clojure, an application remains a function at all levels. A route is a function that accepts a request, looks for a handler, and transfers control to it. Middleware 
+In Clojure, an application remains a function at all levels. A route is a function that accepts a request, looks for a handler, and transfers control to it. Middleware
 is also a function that adds logic to the application. Every heavy abstraction (\verb|Application|, \verb|Router|, \verb|Handler| classes) is replaced with a function in Clojure. Functions, unlike classes, comply with each other, so it's convenient.
 
 Another idea is to keep the request and response structure fixed. There should be documents (in addition to code) that describe the fields and their semantics. This is similar to the HTTP protocol: the specification simplifies the code and makes it transferable. It is convenient when different Clojure projects work with the same structures. If the framework adheres to the standard, the community will be more interested in it. It is in a developer's interest to follow the standard.
@@ -331,7 +331,7 @@ We must pay attention to request fields \verb|:headers| and \verb|:body|. Header
 
 \index{syntax!:strs (splitting)}
 
-To extract the headers properly, we'll use \verb|:strs|: 
+To extract the headers properly, we'll use \verb|:strs|:
 
 \ifx\devicetype\mobile
 
@@ -427,7 +427,7 @@ Ring request is a map with the \verb|:status|, \verb|:headers|, and \verb|:body|
 
 \begin{itemize}
 
-\item 
+\item
 \verb|:status| is an integer, a sign of success or failure. We discussed the semantics of statuses at the beginning of the chapter;
 
 \item
@@ -513,7 +513,7 @@ Let's do the simplest thing that comes to mind. We will write a handler that fin
 
 The function's response depends on the \verb|:uri| request field. Now we can run the application in a browser and check for different addresses. This approach is naive, but it works.
 
-The function has its flaws. We ignored the request methods: \verb|GET/users| and \verb|POST/users| ones differ in meaning. We compared the paths without considering parameters. With correct routing, paths \verb|/users/1| and \verb|/users/99| come to one handler with a different \verb|id| parameter. The code turned out to be noisy. Rules must declaratively specify routes. 
+The function has its flaws. We ignored the request methods: \verb|GET/users| and \verb|POST/users| ones differ in meaning. We compared the paths without considering parameters. With correct routing, paths \verb|/users/1| and \verb|/users/99| come to one handler with a different \verb|id| parameter. The code turned out to be noisy. Rules must declaratively specify routes.
 
 Libraries solve these and other problems. We'll look at Compojure and Bidi. Both of them build routes, but their approaches are orthogonal.
 
@@ -565,7 +565,7 @@ page-404)
 
 \fi
 
-Let's figure out what we got at the output. The \verb|app| variable is the function that accepts the request. We have defined it not through \verb|def| or \verb|defn| but with 
+Let's figure out what we got at the output. The \verb|app| variable is the function that accepts the request. We have defined it not through \verb|def| or \verb|defn| but with
 the \verb|defroutes| macro. It builds the router function and binds it to the \verb|app| variable. Using macros reduces the amount of code.
 
 The name of the variable is followed by the rules. The syntax of a rule is \tuple{method, path, request, expression}.
@@ -597,7 +597,7 @@ We have identified the problem: the rules \verb|GET /users/1| and \verb|GET /use
 \end{english}
 
 Let's pay attention to the colon before \verb|id| and square brackets in the middle.
-The part of the path with a colon indicates a parameter. At the time of the request, Compojure will place it in the \verb|params map.
+The part of the path with a colon indicates a parameter. At the time of the request, Compojure will place it in the \verb|params| map.
 
 Suppose a \verb|page-user| page will show the first and last name of the user by the number from the path. The \verb|get-user-by-id| conditional function will return the user's map by number. Now let's look up the first and last name in the map and return a string.
 
@@ -1050,7 +1050,9 @@ The order of middleware components is sometimes critical. Some of them use data 
 
 \index{middleware!order}
 
-Now let's look at the \clojureinline{(def app ...)} form above. An \textbf{error} has crept into it. The request goes from bottom to top — therefore, \verb|wrap-keyword-params| will be executed first \coderef{4}. It will try to find \verb|:params| in the request, yet with no success. Then \verb|wrap-params| should work \coderef{3}. It will fill out the field with a map from the address string. As a result, the keys of \verb|:params| will become strings. We need to swap \verb|wrap-params| with \verb|wrap-keyword-params|.
+% TODO \clojureinline
+
+Now let's look at the line \verb|(def app ...)| form above. An \textbf{error} has crept into it. The request goes from bottom to top — therefore, \verb|wrap-keyword-params| will be executed first \coderef{4}. It will try to find \verb|:params| in the request, yet with no success. Then \verb|wrap-params| should work \coderef{3}. It will fill out the field with a map from the address string. As a result, the keys of \verb|:params| will become strings. We need to swap \verb|wrap-params| with \verb|wrap-keyword-params|.
 
 Wrong middleware order costs hours of debugging. But there is a trick: if two or more middleware components are dependent on each other, we can join them. The \verb|comp| function takes functions and returns a super function that applies them to an argument. So we will write a smart parameter wrapper:
 
@@ -1114,7 +1116,7 @@ foo))
 
 If \verb|x| in the third column is an application, and \verb|foo| and \verb|bar| are middleware elements, then everything becomes clear. During request, they work in reverse order, so \verb|foo| will run before \verb|bar|. Thus, in place of \verb|foo| must be \verb|wrap-params|, and instead of \verb|bar| — \verb|wrap-keyword-params|. If we put them in the first column, we will get what we have written down at the beginning.
 
-A plus at the end of name means it is an improved version of \verb|wrap-params|. In the stack, let's replace \verb|wrap-params| and \verb|wrap-keyword-params| with their 
+A plus at the end of name means it is an improved version of \verb|wrap-params|. In the stack, let's replace \verb|wrap-params| and \verb|wrap-keyword-params| with their
 plus versions. The chain has become shorter, and the parameter logic has been defined separately.
 
 Next, we'll talk about other useful middleware components: cookie, sessions, and JSON.
@@ -1123,7 +1125,7 @@ Next, we'll talk about other useful middleware components: cookie, sessions, and
 
 \index{HTTP!cookie}
 
-HTTP cookies are small pieces of information. There should be an convention between a server and a browser on how to store and transfer them. If the server sets cookies, 
+HTTP cookies are small pieces of information. There should be an convention between a server and a browser on how to store and transfer them. If the server sets cookies,
 the browser will remember them for this website. Next time the browser will send them to the server automatically. This will continue until they expire or are deleted. Both a server using the header and a user in browser settings can delete cookies.
 
 The simplest case of using cookies is determining if the user has already visited the website. The application first looks for cookies named \verb|visited| in the request. If they are not found, the server will add a header:
@@ -1345,14 +1347,14 @@ http://localhost:8080/
 
 Well, the \verb|:params| field is the general accumulator of parameters. Other wrappers~--- like \verb|wrap-params|~--- fill it as well. Some APIs are method-independent and take requests via both GET or POST. That is, the data is either in an address string or in a request body, respectively. We get the same \verb|:params| map, regardless of the approach.
 
-The hybrid method works better because it applies GET for read requests~--- to enable HTTP caching.  Update requests~--- they are never cached~--- are executed 
+The hybrid method works better because it applies GET for read requests~--- to enable HTTP caching.  Update requests~--- they are never cached~--- are executed
 via the POST method.
 
 In other APIs, parameters mustn't be mixed with or replaced by each other. Let's say our service works strictly according to the POST method. To read only JSON data, you should use the \verb|:json-params| or \verb|:body| fields. It depends on your case, which wrapper to prefer~--- \verb|wrap-json-body| or \verb|wrap-json-params|.
 
 \index{middleware!wrap-json-params}
 
-It must be noted that the \verb|:params| field is a map with string-keys. To merge properly, the \verb|wrap-json-params| middleware also leaves the keys as strings. You have to cast keys with \verb|wrap-keyword-params| after the merger. 
+It must be noted that the \verb|:params| field is a map with string-keys. To merge properly, the \verb|wrap-json-params| middleware also leaves the keys as strings. You have to cast keys with \verb|wrap-keyword-params| after the merger.
 
 The \verb|:json-params| field is intended for cases when JSON is not a map, but an array that cannot be merged with \verb|:params|. For this reason, such data is stored in a separate field.
 
@@ -1596,7 +1598,7 @@ A middleware that takes another middleware is a pretty cool abstraction. If you 
 
 \label{http-files}
 
-Until now, we have returned strings or collections in the response. Now we'll have a look at the case when the data is in a file. Suppose a mobile app requests ATMs and branches addresses. The bank stores this data on the internal network, and the web application does not have access to it. Besides, new branches and ATMs rarely appear, so it is wasteful to access the database for every request. Once a week, the script uploads data to a file and copies it to the server where 
+Until now, we have returned strings or collections in the response. Now we'll have a look at the case when the data is in a file. Suppose a mobile app requests ATMs and branches addresses. The bank stores this data on the internal network, and the web application does not have access to it. Besides, new branches and ATMs rarely appear, so it is wasteful to access the database for every request. Once a week, the script uploads data to a file and copies it to the server where
 the web application is running.
 
 \index{files!upload}
