@@ -1,98 +1,57 @@
-\chapter{Исключения}
+\chapter{Exceptions}
 
-\index{исключения}
+\index{exceptions }
 
 \begin{teaser}
-В этой главе мы рассмотрим исключения в Clojure: как они устроены и чем
-отличаются от аналогов Java. Когда лучше бросать, а~когда перехватывать
-исключения. Что и как писать в лог, чтобы расследовать инцидент было легко.
+This chapter considers exceptions in Clojure. How do they work and how do they differ from their Java counterparts? When is it better to throw and when to catch exceptions? What do you write in a log and how do you write it to make an incident investigation easy?
 \end{teaser}
 
-Возможно, читателю покажется странным, что исключениям отдана целая глава. Тему
-считают простой: исключения можно кинуть, поймать и записать в лог. В теории
-этого хватит, чтобы работать в~проекте.
+Somebody might find it strange to devote an entire chapter to exceptions. The topic, after all, is simple: exceptions can only be thrown, caught, and logged. Theoretically, this is enough to work on a project.
 
-Исключения просты с технической стороны, но несут обширную
-\emph{семантику}. Когда именно кидать исключения, а когда перехватывать?  Какую
-полезную информацию они несут? Куда записывать исключения? Можно ли ловить их
-предикатами? На практике мы тонем во множестве частных случаев.
+Exceptions are technically simple, but they have rich \emph{semantics}. When exactly should you throw and catch exceptions? What useful information do they carry? Where to write exceptions? Can we catch them with predicates? In practice, we are overwhelmed with countless specific cases.
 
-Новички следуют только положительному пути, поэтому в их коде тяжело
-расследовать ошибки. Почему сервер ответил с кодом 500? Возможны сотни причин,
-по которым запрос не удался. Но запись в~логе слишком скудна, чтобы понять, что
-произошло.
+Newbies tend to follow the positive path (as if they are on ideal conditions), so it is hard to troubleshoot errors in their code. Why did the server respond with code 500? There are innumerable possible reasons why the request failed. However, the log entry provides too little information to understand what has happened.
 
-Хороший программист внимателен к ошибкам. С опытом становится ясно: экономия на
-исключениях не даёт выигрыша. Да, мы быстрее закроем задачу, и кода
-получится меньше. Однако позже возникнут задачи на устранение ошибок и их
-детализацию.
+A good programmer pays close attention to errors. With experience, it becomes clear~--- refusing exceptions does not pay off. Without them, we will complete the task faster, and there will be less code~--- that is right. But later, you will have problems with detailing and fixing said errors.
 
-Исключения в коде столь же равноправны, как и нормальное поведение. Избегайте
-мысли, что это недоразумение, которое не случится с~вами. Если в проекте много
-задач на непойманные ошибки, это значит, что пора изучить тему.
+Exceptions in code are just as important as normal behavior. If you think this kind of problem will not happen to you, think again. If your project encounters trouble due to uncaught errors, then it is time to study the topic.
 
-\section{Основы исключений}
+\section{Basics of Exceptions}
 
-\index{классы!Exception}
+\index{classes!Exception}
 
-Прежде чем углубляться в детали, вспомним, что такое исключения и~как они себя
-ведут.
+Before going into detail, let us remember what exceptions are and how they behave.
 
-Исключение~--- это объект, чаще всего экземпляр класса \verb|Exception|. От других
-классов он отличается тем, что его можно \emph{бросить}. В разных языках для
-этого служат операторы \verb|throw|, \verb|raise| и другие.
+An exception is an object, most often an instance of the \verb|Exception| class. It differs from other classes in that we can \emph{throw} it. In different languages, there are operators which serve this purpose. Among those are \verb|throw|, \verb|raise|, and others.
 
-Брошенный объект прерывает исполнение и всплывает по стеку вызовов. Возможны два
-исхода: либо его поймали оператором \verb|catch| на одном из уровней, либо
-перехват не состоялся.
+The thrown object interrupts execution and floats up the call stack. There are two possible outcomes: either the \verb|catch| statement catches it at one of the levels or not~--- knowingly or by mistake.
 
-В первом случае мы получим \emph{объект} исключения. К нему обращаются как
-обычно: читают поля, вызывают методы, передают в~функции. Дальнейшее поведение
-зависит от логики программы. Иногда исключение пишут в лог и завершают
-программу, в других случаях продолжают работу.
+In the first case, we will get an exception \emph{object}. We access it as usual: get fields, call methods, pass them to functions. Further behavior depends on program logic. Sometimes an exception is logged, and the program is terminated; otherwise, the program continues running.
 
-Когда исключение не поймали, программа завершится с кодом, отличным от
-нуля. Если не предусмотрено иное, перед выходом программа запишет исключение в
-\verb|stderr| (канал ошибок). Мы увидим его класс, текст и то, что называют
-<<стектрейс>>. Это цепочка вызовов, которые прошло исключение.
+If we do not catch the exception, the program will exit with nonzero code. Unless otherwise specified, the program will write the exception to \verb|stderr| (error channel) before exiting. We will see its class, text, and stack trace there. The last is the chain of calls that an exception passed through.
 
-\index{исключения!стектрейс}
-\index{каналы!stderr}
+\index{exceptions!stacktrace}
+\index{ channels!stderr}
 
-Отдельные платформы позволяют задать реакцию на непойманное
-исключение. Например, записать его в файл или завершить программу особым
-способом.
+Some platforms allow you to specify a reaction to an uncaught exception. For example, to write it to a file or terminate the program in a special way.
 
 \begin{figure}[ht!]
   \chart{chart-ex-tree}
-  \caption{Базовые классы исключений}
+  \caption{Base Exception Classes}
   \label{fig:exceptions}
 \end{figure}
 
-Clojure~--- это гостевой язык (англ.~hosted language). Он опирается на возможности,
-которые предлагает домашняя платформа, \emph{хост}. Исключения~--- одна из
-областей, в которую Clojure не вмешивается. По умолчанию Clojure использует
-формы \verb|try| и \verb|catch|, аналогичные Java.
+Clojure is a hosted language: it relies on the capabilities that the \emph{host} offers. Exceptions are an area where Clojure leverages Java best practices. By default, Clojure uses the \verb|try| and \verb|catch| forms similar to Java's.
 
-\index{классы!Throwable}
+\index{classes!Throwable}
 
-Рассмотрим исключения в Java \fig{fig:exceptions}. Платформа содержит
-базовый класс \texttt{Throwable}~--- предок всех исключений. Другие классы наследуют
-его и расширяют семантику. Наследники первого уровня~--- это классы \verb|Error| и
-\verb|Exception|. Класс \verb|RuntimeException| унаследован от \verb|Exception|
-и так далее.
+Let's take a look at Java's exceptions \fig{fig:exceptions}. The platform contains the \texttt{Throwable} base class, the ancestor of all exceptions. Other classes inherit from it and extend its semantics. The \verb|Error| and \verb|Exception| classes are first-level heirs. The \verb|RuntimeException| class inherits from from the \verb|Exception| one and so on.
 
-\index{классы!IOException}
+\index{classes!IOException}
 
-Пакеты Java несут дополнительные исключения, унаследованные от описанных
-выше. Например, \verb|java.io.IOException| для ошибок ввода-вывода,
-\verb|java.net.ConnectException| для сетевых проблем~--- другие. Бросать
-\verb|Throwable| считается дурным тоном. Этот класс несёт слишком мало
-информации о том, что случилось.
+Java packages contain additional exceptions inherited from those described above. For example, \verb|java.io.IOException| is for I/O errors, \verb|java.net.ConnectException|~--- for network problems. Throwing \verb|Throwable| is considered bad manner because this class carries too little information about what happened.
 
-В дереве исключений каждый класс дополняет семантику предка. Рассмотрим
-исключение \verb|FileNotFoundException|. Оно возникает, когда файла не
-оказалось на диске. Родословная класса выглядит так:
+In the exception tree, each class complements the semantics of the ancestor. Consider the \verb|FileNotFoundException| exception. It arises when a file is not on disk. The class pedigree looks like this:
 
 \linegap
 
@@ -121,105 +80,61 @@ Clojure~--- это гостевой язык (англ.~hosted language). Он �
 \linegap
 
 \mnoindent
-Схему читают <<объект \arr выбрасываемое \arr исключение \arr ошибка
-ввода-вывода \arr файл не найден>>. По имени \verb|FileNotFoundException|
-легко догадаться, с чем связана проблема. Если же разработчик бросил
-\verb|Throwable|, это усложнит поиск причины.
+The diagram is read like this “object \arr throwable \arr exception \arr I/O error \arr file not found". It's easy to guess by the name \verb|FileNotFoundException| what the problem is. If a developer threw a \verb|Throwable|, it would make it harder to find the cause of the error.
 
-Различают \emph{checked}- и \emph{unchecked}-исключения, проверяемые и
-нет. Разница между ними в семантике. Разработчик должен предвидеть checked-исключения и обработать их в коде. При чтении файла справедливо ожидать, что его
-не окажется на диске, поэтому класс \verb|FileNotFoundException| относится к
-категории checked.
+There are \emph{checked} and \emph{unchecked} exceptions.
+They differ in semantics. The developer must anticipate checked exceptions and handle them in code. When we read a file, which is not on disk, the \verb|FileNotFoundException| class is a checked exception.
 
-\index{классы!FileNotFoundException}
+\index{classes!FileNotFoundException}
 
 \label{exc-hierarchy}
 
-Предсказать нехватку памяти трудно, поэтому \verb|OutOfMemoryError|
-непроверяемое исключение (unchecked). Когда ресурсы ограничены, любое действие
-может исчерпать память. Перехватывать это исключение нет смысла, поскольку при
-нехватке памяти система нестабильна.
+However, it is difficult to predict a memory shortage, so \verb|OutOfMemoryError| is an unchecked exception. When resources are limited, any action can run out of memory. There is no point in catching this exception since the system is unstable when there is insufficient memory.
 
-\index{исключения!checked}
-\index{исключения!unchecked}
+\index{exceptions!checked}
+\index{ exceptions!unchecked}
 
-Классы, унаследованные от \verb|Error| и \texttt{Runtime\-Exception},~--- это
-непроверяемые исключения (unchecked). Унаследованные от \verb|Exception|~---
-проверяемые (checked).
+The classes inherited from \verb|Error| and \texttt{Runtime\-Exception} are unchecked exceptions. Those inherited from \verb|Exception| are checked exceptions.
 
-\index{исключения!throw}
-\index{исключения!catch}
+\index{ exceptions!throw}
+\index{ exceptions!catch}
 
-Чтобы бросить исключение, его экземпляр передают в оператор
-\verb|throw|. Оператор \verb|catch| перехватывает исключения. В Java и
-других языках он устроен на иерархии классов. Если искомый тип
-\verb|IOException|, мы поймаем все исключения, унаследованные от этого класса.
+To throw an exception, we pass its instance to the \verb|throw| statement. The \verb|catch| statement catches exceptions. In Java and other languages, it relies on a class hierarchy. If the type we are looking for is \verb|IOException|, we will catch all exceptions inherited from this class.
 
-Чем выше класс в дереве наследования, тем больше исключений охватит
-\verb|catch|. В Java считается плохим тоном ловить ошибки классами
-\verb|Throwable| или \verb|Exception|. Современные IDE выдают предупреждение
-too wide catch expression, слишком широкий охват. Класс \verb|Exception|
-заменяют на несколько более точных исключений. Например, отдельно ошибки
-ввода-вывода, сети и другие.
+The higher the class in the inheritance tree, the more exceptions the \verb|catch| statement will cover. In Java, it is bad manner to catch errors with the \verb|Throwable| or \verb|Exception| classes. Today's IDEs generate the "too broad catch expression" warning. It is better to replace the \verb|Exception| class with some more precise ones: for example, I/O errors, network errors, and others separately.
 
-Одного класса недостаточно, чтобы понять причину
-исключения. У~\verb|FileNotFoundException| нет поля \verb|file|, чтобы
-отследить, какой именно файл не удалось найти. Большинство исключений принимают
-строку с сообщением об ошибке. Сообщение должно быть понятно человеку. Из строки
-File С:/work/test.txt not found станет ясно, к~какому файлу мы обращались.
+One class is not enough to understand an exception cause.
+\verb|FileNotFoundException| does not have the \verb|file| field to track down which particular file does not exist. Most exceptions take an error message string. The message must be understandable to a person.
+If we see the message "File C:/work/test.txt not found", it becomes clear which file we were trying to access.
 
-\index{сообщения}
+\index{messages}
 
-Иногда текста не хватает, чтобы объяснить причину ошибки. Предположим, данные не
-прошли валидацию и нам хотелось бы исследовать их позже. Если записать данные в
-сообщение, текст получится слишком большим. Это небезопасно: в данных могут быть
-личные данные или ключи доступа. Такое сообщение нельзя писать в лог или
-показывать пользователю. Даже путь к файлу может выдать важную информацию.
+Sometimes a text is not enough to explain the reason for the error. Let us say data validation failed, and we would like to investigate it later. If you write the data to the message, the text will be too large. Additionally, this is not secure: the data may contain personal information or access keys. Such a message must not be logged or shown to a user. Even the file path can reveal valuable information to outsiders.
 
-Если нужно сохранить данные для расследования, создают новый класс исключения. У
-него отдельное поле для данных, из-за которых произошла ошибка. Поле заполняют в
-конструкторе исключения. Сообщение формируют так, чтобы оно не выдало приватную
-информацию.
+If you need to store data for investigation, create a new exception class with a separate field for the data that caused the error. The field is populated in the exception constructor. Create your message so that it does not reveal private information.
 
-\section{Цепочки и контекст}
+\section{Chains and Context}
 
-\index{исключения!цепочки}
+\index{exceptions!chains}
 
-Исключения строятся в цепочку. Каждый экземпляр принимает необязательный
-аргумент \verb|cause| (англ.~<<причина>>). Он хранит либо \verb|Null|, либо
-ссылку на другое исключение.
+Exceptions are chained. Each instance takes an optional \verb|cause| argument. It stores either \verb|Null| or a link to another exception.
 
-\index{null!в Java}
+\index{null!in Java}
 
-\index{контекст}
+\index{context}
 
-Цепочки образуются, когда код перехватил исключение, но не знает, как с ним
-поступить.  Это нормально, потому что на низком уровне код не видит полной
-картины. Предположим, метод пишет данные в файл. У него нет полномочий решить,
-что делать, если файла нет, поэтому метод бросит исключение. Его перехватит
-метод, который тоже не принимает решений. Остаётся бросить новое исключение
-со ссылкой на первое. Это и есть цепочка.
+Chains are formed when the code catches an exception but does not know what to do with it. Since the code does not see the full picture at a low level, this is normal. Suppose the method writes data to a file. It has no authority to decide what to do if the file does not exist so an exception will be thrown. Another method that also does not make decisions will catch this exception. You only need to create a new exception with a link to the first one. This is the chain.
 
-В конце управление перейдёт к методу, который знает, что делать. Логика зависит
-от типа исключения и бизнес-правил. Если файла нет, программа создаст его или
-выполнит поиск в другом месте. Если в~HTTP-запросе произошёл сбой, выждать
-секунду и повторить его, а~после третьей попытки завершить программу.
+Eventually, control will pass to the method that knows what to do.
+The logic depends on an exception type and business rules. If a file does not exist, the program will create it or search elsewhere. If an HTTP request fails, it the method waits for a second and repeat it, and after the third attempt, terminate the program.
 
-В системе должен быть последний рубеж, где перехватывают все исключения. Если
-ошибка дошла до этого уровня, значит, её не поймали правила ниже. Это говорит о
-нештатном поведении системы. Клиенту вернут текст о том, что запрос не
-прошёл. Чтобы расследовать причину, исключение пишут в лог и передают сборщику
-ошибок.
+The system should have the last frontier where all exceptions are caught. If the error has reached this level, then the rules below did not catch it. This indicates abnormal system behavior. A client will receive a text stating that the request has not passed. For investigating the cause, the exception is logged and passed to the error collector.
 
-На верхнем уровне кода лежит бизнес-логика. Это шаги, которые диктует
-руководство, чтобы развивать компанию. При спуске вниз начинается техническая
-часть. Представим, что функция \verb|get-user| находит пользователя по
-номеру. Снаружи это чёрный ящик: мы не знаем, откуда приходят
-данные. Предположим, функция обращается в~сеть. Выразим это на Python:
+Conditions imposed by company management to help develop their business are known collectively as business logic. Business logic lies at the top level of code, and the more technical parts come into play at lower levels. Let us say the \verb|get-user| function finds a user by their number. From the outside, it's a black box: we do not know where the data comes from. Suppose the function is communicating with a network. Let us write this in Python:
 
 \ifx\DEVICETYPE\MOBILE
 
-\index{языки!Python}
+\index{languages!Python}
 \begin{english}
   \begin{python}
 def get-user(id):
@@ -231,7 +146,7 @@ def get-user(id):
 
 \else
 
-\index{языки!Python}
+\index{languages!Python}
 \begin{english}
   \begin{python}
 def get-user(id):
@@ -242,19 +157,12 @@ def get-user(id):
 
 \fi
 
-Если вызвать функцию с номером, которого нет в системе, получим исключение
-\verb|HTTP Error: status 404|. Текст ничего не говорит о пользователе. Если
-встретить эту запись в журнале, мы даже не поймём, к~какому сервису обращались.
+If we call a function with a number that does not exist in the system, we will get the \verb|HTTP Error: status 404| exception. This text does not say anything about the user. We will not understand from such an entry in the log which service we accessed.
 
-Чем больше мы углубляемся в технические детали, тем меньше знаем о бизнесе. В
-HTTP нет понятия пользователя. Известны лишь метод, адрес и другие поля
-запроса. Разделим ошибку на две половины. Верхняя часть называет бизнес-причину:
-не найден пользователь с номером~42. Почему? Из-за технического сбоя: запрос GET
-к адресу \verb|http://api.company.com/user/42| вернул статус 404.
+The more we go into technical details, the less we know about the business. In HTTP, there is no such thing as a user. Only the method, address, and other fields of the request are known. Let us divide the error into two halves.
+The top half indicates the business reason: User 42 was not found. Why? The GET request to the \verb|http://api.company.com/user/42| address returned status 404 due to technical glitch.
 
-Расставим в коде \verb|try/catch|. Если исключение пришло из технических недр,
-дополним его контекстом и отправим наверх. Паттерн называется \verb|re-throw|,
-повторный выброс. Новый код на Python:
+Let us place \verb|try/catch| in our code. If the exception came from technical levels, let us add context and send it up. The pattern is called \verb|re-throw|. Here is the new Python code:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -287,29 +195,19 @@ def get_user(id):
 
 \fi
 
-\index{HTTP!ошибки}
+\index{HTTP!errors}
 
-Новое исключение описывает бизнес-проб\-ле\-му и при этом ссылается на
-техническую. У ошибки HTTP тоже может быть причина: устаревший сертификат,
-проблемы соединения. Образуется цепочка исключений. В проектах они достигают
-пяти и более звеньев.
+The new exception describes a business problem while referring to a technical one. An HTTP error might also have the following causes: an expired certificate or connection problems. A chain of exceptions is formed. There are up to five or more links in projects.
 
-Спуск по цепочке напоминает допрос. На каждое <<почему>> мы получаем новую пищу
-для размышлений, пока не доберёмся до сути. Это не значит, что самое нижнее
-исключение важнее других: одно лишь \verb|HTTPError| не отвечает на все
-вопросы. Важно то, как к нему пришли.
+Descending a chain is like an interrogation. In response to each why question, we receive new information until we get to the heart of the matter. This is not to say that the innermost exception is more important than the others: the \verb|HTTPError| exception cannot answer all questions alone. The important thing is how you came to it.
 
-Так работают исключения в промышленных языках: Java, Python и других. У каждой
-платформы особенности, но в целом картина не меняется. Теперь рассмотрим, что
-предлагает Clojure.
+That is how exceptions work in languages like Java, Python, and others. Each platform has its features, but the overall picture does not change. Now let us take a look at what Clojure has to offer.
 
-\section{Переходим к Clojure}
+\section{Moving on to Clojure}
 
-Чтобы познакомиться с исключением, спровоцируем его. Подойдёт старый
-приём~--- поделить число на ноль. Включите REPL и выполните
-\verb|(/ 1 0)|. Появится текст:
+To get acquainted with the exception, let's provoke it. A surefire trick is to divide a number by zero. Turn on REPL and do \verb|(/ 1 0)|. The following text will appear: 
 
-\index{деление на ноль}
+\index{divide by zero}
 
 \begin{english}
   \begin{text}
@@ -318,24 +216,17 @@ Divide by zero
   \end{text}
 \end{english}
 
-Это отчёт об ошибке. В зависимости от редактора и настроек оно выглядит
-по-разному. Emacs с модулем CIDER откроет буфер \texttt{*cider\--error*}
-с подробной информацией.
+This is the bug report. It looks different depending on the editor and settings. Emacs with the CIDER module will open the \texttt{*cider\--error*} buffer with detailed information.
 
 \index{Emacs!*cider-error*}
 \index{REPL}
-\index{исключения!в REPL}
+\index{exeptions!in REPL}
 
-Заметим, что исключение в REPL не завершает его: от нас по-прежнему ждут
-команды. REPL перехватывает ошибки и только выводит их на экран. В боевом
-запуске программы на Clojure ведут себя как обычно. Если в главном потоке не
-поймано исключение, программа остановится.
+Note that an exception in the REPL does not stop it: a command is still expected from us. The REPL catches errors and only displays them on a screen. Clojure programs work as usual in a production run. If no exception is caught on the main thread, the program will stop.
 
-Чтобы поймать исключение, код помещают в форму \verb|try|. За ним следует одна
-и более \verb|catch|. В них указывают, какие классы перехватывать и что делать
-с исключением. Вот как безопасно разделить число:
+To catch the exception, place the code in the \verb|try| form. It is followed by one or more \verb|catch| forms. They indicate which classes to catch and what to do with an exception. Here's how to safely divide a number: 
 
-\index{арифметика}
+\index{arithmetic}
 
 \begin{english}
   \begin{clojure}
@@ -346,16 +237,12 @@ Divide by zero
   \end{clojure}
 \end{english}
 
-Форма \verb|catch| принимает класс и произвольный символ. С ним будет связано
-исключение, если управление перейдёт в эту ветку. Далее идёт произвольный код. В
-нём исключение доступно как локальная переменная \verb|e|.
+The \verb|catch| form takes a class and an arbitrary symbol. An exception will be bound with it if control is taken to that branch. Next goes the arbitrary code. There, the exception is available as the local variable \verb|e|.
 
-\index{исключения!ex-message}
+\index{exceptions!ex-message}
 
-Мы вывели на экран текст, что вычисления прошли неудачно. Это слишком
-поверхностное объяснение. Метод \verb|.getMessage| вернёт сообщение, которое
-назначили исключению при создании. С версии 1.10 Clojure предлагает функцию
-\verb|ex-message|, которая делает то же самое:
+We display the text about the failure of calculations.
+This explanation is of little use. The \verb|.getMessage| method will return the message assigned to the exception when it was created. Since version 1.10, Clojure offers the \verb|ex-message| function that does the same:
 
 \begin{english}
   \begin{clojure}
@@ -367,9 +254,8 @@ Divide by zero
   \end{clojure}
 \end{english}
 
-Класс \verb|ArithmeticException| ловит не все ошибки вычислений. Что случится,
-если сложить 1 и \verb|nil|? Даже если поместить расчёты в~\verb|try/catch|,
-мы не поймаем исключение:
+The \verb|ArithmeticException| class fails to catch some computation errors.
+What will happen if you add 1 to \verb|nil|? Even if we put the calculations in \verb|try/catch|, we won't catch the exception: 
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -400,15 +286,11 @@ Divide by zero
 \index{NPE}
 
 \noindent
-Дело в том, что классы \verb|ArithmeticException| и
-\verb|NullPointerException| не пересекаются. У них разные пути в дереве
-наследования, поэтому перехват одного не влияет на другое. Это правильно, потому
-что у~классов разная семантика. Ошибка в арифметике~--- это не то же самое, что
-\verb|Null| вместо значения.
+That is because the \verb|ArithmeticException| and \verb|NullPointerException| classes do not overlap. They have different paths in the inheritance tree, so catching one does not affect the other. And rightly so, because the classes have different semantics. An arithmetic error is not the same as \verb|Null| instead of a value.
 
-\index{исключения!ветки}
+\index{exceptions!brances}
 
-Форма \verb|try| принимает несколько \verb|catch|. Перехватим оба случая:
+The \verb|try| form takes several \verb|catch| ones. Let's catch both cases :
 
 \begin{english}
   \begin{clojure}
@@ -421,17 +303,11 @@ Divide by zero
   \end{clojure}
 \end{english}
 
-Макрос перебирает классы из каждого \verb|catch| и остановится на первом
-подходящем варианте. Результатом \verb|try| станет последнее выражение из
-блока \verb|catch|, который подошёл. В примере выше результат будет
-\verb|nil|, потому что его вернёт \verb|println|. Если ни одна ветка не
-подошла, исключение продолжит путь вверх по стеку вызовов.
+The macro iterates over the classes from each \verb|catch| and stops at the first one that matches. The \verb|try| will result in the last expression from the \verb|catch| block that matched. In the example above, the result will be \verb|nil| because \verb|println| will return it. If no branches match, the exception will continue to go up the call stack.
 
-\index{наследование}
+\index{inheritance}
 
-Чем выше класс исключения в дереве, тем больше случаев он покрывает. Если
-заменить \verb|ArithmeticException| на \verb|Throwable|, ветка захватит
-любое исключение, будь то деление на ноль или \verb|NPE|:
+The higher the exception class in the tree, the more cases it covers. If you replace \verb|ArithmeticException| with \verb|Throwable|, the branch will catch any exception, whether it's division by zero or \verb|NPE|:
 
 \begin{english}
   \begin{clojure}
@@ -443,27 +319,15 @@ Divide by zero
   \end{clojure}
 \end{english}
 
-В отличие от Java, в Clojure нет строгих правил о том, какие исключения
-перехватывать. Это остаётся на ваше усмотрение. Здравый смысл подсказывает, что
-перехват \verb|Throwable| опасен: возникает ложное ощущение, что код работает
-без ошибок.
+Unlike Java, Clojure doesn't have strict rules about which exceptions to catch. That's up to you. Common sense dictates that intercepting with \verb|Throwable| should not be used: there will be a false impression that the code works without errors.
 
-В случае с \verb|ArithmeticException| проблема в расчётах, но для \verb|NPE|
-это не так. \verb|Nil| вместо числа говорит о том, что проблема в источнике,
-который сообщил \verb|nil|, а не в арифметике. Вот почему перехват
-\verb|NPE| вреден. Мы подробно изучим эту проблему в главе про
-тесты \page{illegal-arg}.
+In the case of \verb|ArithmeticException|, the problem is in the calculations, but for \verb|NPE|~--- it is not. \verb|Nil| instead of a number tells us that the problem is in the source, which passed \verb|nil|, and not in arithmetic. That is why catching \verb|NPE| is wrong. We'll explore this issue in detail in the chapter on tests \page{illegal-arg}.
 
-Форму \verb|try/catch| с широким охватом ставят на верхний уровень кода. Это
-нужно, чтобы программа не остановилась никогда. Так работают веб-серверы,
-очереди сообщений, сетевое ПО.
+The \verb|try/catch| form with a broad scope is placed at the top level of the code. That is needed so that the program never stops. That is how web servers, message queues, and networking software work.
 
-\index{исключения!выброс}
+\index{exceptions!throw}
 
-Иногда исключение бросают намеренно, чтобы сообщить о~нештатной
-ситуации. Оператор \verb|new| создаёт новый Java-объект. Ему передают класс и
-параметры конструктора. Форма \verb|throw| принимает исключение и запускает
-механизм выброса.
+Sometimes an exception is thrown deliberately to report an abnormal situation. The \verb|new| operator creates a new Java object. Classes and constructor parameters are passed to it. The throw form takes an exception and runs the throw mechanism.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -486,10 +350,7 @@ Divide by zero
 
 \fi
 
-Сообщение выше неинформативно. Даже если мы указали, что проблема в арифметике
-или базе данных, хотелось бы знать, какие именно значения вызвали ошибку. Для
-этого сообщение строят функцией \verb|format|. Она принимает шаблон и
-параметры подстановки:
+The message above is not informative. But even if we indicated that the problem is in arithmetic or the database, we would like to know which values exactly caused the error. For this, build the message using the \verb|format| function. It takes the template and substitution parameters: 
 
 \index{clojure.core!format}
 
@@ -523,7 +384,7 @@ Divide by zero
 \fi
 
 \noindent
-Если вызвать \verb|add| с \verb|nil|, сообщение станет понятнее:
+Calling \verb|add| with \verb|nil| makes the message clearer:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -545,9 +406,7 @@ Value error, a: 1, b: null
 
 \fi
 
-Функция \verb|format| полезна тем, что отображает \verb|nil| как
-\verb|null|. Это преимущество перед \verb|str|, которая приводит
-\verb|nil| к пустой строке. Вариант со \verb|str| выглядит так:
+The \verb|format| function is useful in that it displays \verb|nil| as \verb|null|. That is its advantage over \verb|str|, which converts \verb|nil| to an empty string. The \verb|str| variant looks like this:
 
 \begin{english}
   \begin{clojure}
@@ -557,26 +416,18 @@ Value error, a: 1, b: null
 \end{english}
 
 \noindent
-Текст вводит в заблуждение: \verb|b|~--- это \verb|nil| или пустая строка? В~случае
-с~\verb|format| ошибки быть не может.
+The text is misleading: is \verb|b| an empty string or \verb|nil|? In the case of \verb|format|, you won't get confused.
 
-\section{Подробнее о контексте}
+\section{More about Context}
 
-\index{контекст!в исключениях}
-\index{классы!ExceptionInfo}
+\index{context!in exceptions}
+\index{classes!ExceptionInfo}
 
-Данные в тексте приводят к риску. Сообщение может оказаться слишком большим или
-выдать лишние сведения. Проблему решает класс \verb|ExceptionInfo|~---
-исключение из поставки Clojure. Оно устроено так, чтобы хранить данные. Clojure
-предлагает ряд функций для работы с~ним.
+The data in a text leads to risk. A message may be too large or disclose unnecessary information. The \verb|ExceptionInfo| class, a Clojure exception, solves this problem. It is designed to store data. Clojure offers some functions for working with it.
 
-Ключевая функция \verb|ex-info| создаёт экземпляр \verb|ExceptionInfo|. Она
-принимает сообщение и словарь данных. Это контекст, в котором возникло
-исключение. Например, если HTTP-запрос не удался, в словарь помещают метод,
-адрес и код ответа.
+The key \verb|ex-info| function creates an instance of \verb|ExceptionInfo|. The former takes a message and a data map. That is the context in which the exception arose. For example, if an HTTP request fails, the map will contain the method, address, and response code.
 
-\verb|Ex-info| только создаёт исключение, но не бросает его. Результат
-передают в \verb|throw|:
+\verb|Ex-info| only creates an exception; it doesn't throw it. The result is passed to \verb|throw|:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -607,25 +458,16 @@ Value error, a: 1, b: null
 
 \fi
 
-Мы разделили сообщение и данные. Текст не выдаёт номер пользователя и адрес
-сервиса. Его запишут в лог или отправят пользователю, а контекст обработают
-отдельно.
+We have separated the message and data. The text does not reveal a user number and service address. It will be logged or sent to a user, and the context will be processed separately.
 
-При работе с контекстом помните несколько правил. Словарь не может быть
-\verb|nil|. Это редкий случай, когда Clojure отличает \verb|nil| от
-коллекции. Не храните в словаре значения, которые нельзя записать в файл,
-например поток или сетевое подключение. В идеале контекст передают по сети в
-формате JSON. Позже мы рассмотрим, что делать с контекстом.
+Remember a few rules when working with context. A map must not be \verb|nil|. That is the rare case where Clojure distinguishes \verb|nil| from a collection. Do not store values that cannot be written to a file, such as a stream or a network connection, in a map. Ideally, the context is transmitted over the network in JSON format. We'll look at what to do with context later.
 
-Функция \verb|ex-data| вернёт данные исключения. Если это <<родное>>
-\verb|ExceptionInfo|, получим словарь. Для других классов результат функции
-будет \verb|nil|.
+The \verb|ex-data| function will return the exception data. If this is a native \verb|ExceptionInfo|, we'll get a map. For other classes, the function will return \verb|nil|.
 
-\index{исключения!ex-data}
+\index{exceptions!ex-data}
 
-Поймаем исключение: в форме \verb|catch| укажем класс
-\verb|ExceptionInfo|. Функция \verb|ex-data| извлекает словарь, который передали
-в \verb|ex-info|. Разделим его на поля и построим сообщение.
+Let's catch the exception: in the \verb|catch| form, we'll specify the \verb|ExceptionInfo| class. The \verb|ex-data| function retrieves the map that was passed to \verb|ex-info|.
+Let's split it into fields and build a message.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -657,13 +499,11 @@ Value error, a: 1, b: null
 
 \fi
 
-\section{Когда бросать исключения}
+\section{When to Throw Exceptions}
 
-До сих пор не ясно, когда бросать исключения, а когда ограничиться
-проверкой. Рассмотрим типичные ситуации и решения.
+It is still unclear when to throw exceptions and when to check only. Let's look at typical situations and solutions.
 
-При обходе коллекций нет смысла бросать исключения. \verb|Nil| ведёт себя как
-пустая коллекция того типа, который имеет в виду функция. Выражения
+There is no point in throwing exceptions when walking through collections. \verb|Nil| behaves like an empty collection of the type that the function accepts.
 
 \begin{english}
   \begin{clojure}
@@ -675,9 +515,7 @@ Value error, a: 1, b: null
 \end{english}
 
 \noindent
-вернут списки и словари. Ключ от \verb|nil| вернёт \verb|nil|. Разбор
-словаря или вектора сообщит переменным \verb|nil|, если поля не совпали. Оба
-\verb|let| ниже произведут вектор из трёх \verb|nil|.
+The expressions above should return lists and maps. The key for \verb|nil| will return \verb|nil|. Parsing a map or vector will set the variables to \verb|nil| if the fields don't match. Both of the \verb|let| directives below will create a vector of three \verb|nil| references.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -721,19 +559,12 @@ Value error, a: 1, b: null
 
 \index{nil!punning}
 
-Термин nil punning означает лояльность к \verb|nil|. С таким подходом
-пустые значения не вызывают ошибок. Нельзя утверждать, что Clojure полностью
-nil punning. \verb|Nil| дружит с коллекциями, но не работает с~арифметикой
-и регулярными выражениями.
+What does nil punning mean? It means \verb|nil| can be treated as different things in different contexts. With this approach, empty values do not cause errors. Of course, Clojure doesn't make full use of nil punning. In Clojure, \verb|nil| works with collections, but not arithmetic and regular expressions.
 
 \index{spec!valid?}
 \index{spec!conform}
 
-Если вы сомневаетесь в коллекции, используйте спеку. Функции \verb|s/valid?| и
-\verb|s/conform| из прошлой главы \page{spec-conform} помогут убедиться, что
-коллекция верна. Этим вы отделите проверку от работы с данными. Если валидация
-не прошла, бросайте исключение. Передайте в контекст данные \verb|explain|,
-чтобы разобрать их позже.
+When in doubt about a collection, use a spec. The \verb|s/valid?| and \verb|s/conform| functions from the last chapter \page{spec-conform} will help you make sure the collection is correct. That will separate validation from data manipulation. If validation fails — throw an exception. Pass the \verb|explain| data into the context so you can parse it later.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -771,11 +602,7 @@ nil punning. \verb|Nil| дружит с коллекциями, но не раб
 \index{spec}
 \index{spec!assert}
 
-Для краткости используйте макрос \verb|assert| из поставки Spec. Он делает то
-же самое: проверяет данные и либо возвращает их, либо бросает исключение с
-данными \verb|explain|. Поведение макроса определяет глобальный флаг
-\verb|check-asserts|. Если его выключить, эффект \verb|assert| пропадает и
-исключений не будет.
+For the sake of shortness, use the assert \verb|assert| from Spec. It does the same: validates the data and either returns it or throws an exception with \verb|explain| data. The \verb|check-asserts| global flag defines the macro behavior. If it is off, the effect of \verb|assert| disappears, and there will be no exception.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -820,22 +647,16 @@ nil punning. \verb|Nil| дружит с коллекциями, но не раб
 
 \fi
 
-Другой случай, когда прибегают к исключению,~--- отказ ресурса. Если не удалось
-прочитать файл, недостаточно просто сказать об этом. Возможны десятки причин:
-файла нет, он занят другим процессом, кончилось место на диске, ошибка в
-кодировке. От ошибки зависит, кто ей займётся и как не допустить её
-снова.
+Another case of resorting to an exception is resource failure. If the file could not be read, simply reporting this fact is not enough.
+That might have happened for various reasons: the file does not exist or is occupied by another process; there is insufficient disk space or an encoding error, etc. The error category determines what to do with it and how to prevent it from recurring.
 
 \index{HTTP!404}
 
-В индустрии нет единого мнения о том, бросать ли исключение на негативный
-HTTP-ответ. Согласно протоколу, ответ со статусом 404 такой же верный, как и
-200. Продвинутые библиотеки предлагают флаг, чтобы управлять этим поведением.
+There is no industry consensus on whether to throw an exception on a negative HTTP response. According to the protocol, a 404 response is as correct as 200. Advanced libraries offer the flag to choose whether to throw an exception at 4xx statuses or not.
 
-Предположим, наш HTTP-клиент не бросает исключение. Сделаем это вручную:
-проверим статус и запустим \verb|ex-info| с подробностями:
+Let's say our HTTP client doesn't throw an exception. Let's do it manually~--- check the status and run \verb|ex-info| with details: 
 
-\index{HTTP!авторизация}
+\index{HTTP!authentication}
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -875,23 +696,15 @@ HTTP-ответ. Согласно протоколу, ответ со стату
 
 \fi
 
-Исключения полезны в библиотеках. Код условно делится на два типа: исполнение и
-координация. Библиотеки относятся к исполнительному коду. На уровне библиотеки
-мы не знаем, в какой семантике работает код. Если бросить исключение,
-бизнес-логика перехватит его и продолжит работу. Но если молча подавлять ошибки,
-потребители будут недовольны. Это касается и паттерна <<вернуть \verb|nil| и
-записать в~лог>>, что значит проигнорировать проблему.
+Exceptions are useful in libraries. Code is conventionally divided into two types: execution and coordination. Libraries are the executive code. At the library level, we don't know what semantics the code is running in. If an exception is thrown, business logic will catch it and continue running. But if you suppress errors without explanation, consumers will be dissatisfied. That also applies to the "return \verb|nil| and write to the log" pattern, that is, ignore the problem.
 
-\section{Подробнее о цепочках}
+\section{More about Сhains}
 
-\index{исключения!цепочки}
+\index{exceptions!chains}
 
-Рассмотрим цепочки исключений на практике. Функция \verb|ex-info|
-принимает третий необязательный параметр \verb|cause|. Это либо \verb|nil|,
-либо другое исключение, которое станет частью нового. Ниже функция
-\verb|divide| ловит ошибку арифметики и бросает новое исключение с контекстом.
+Now let's see how to work with exception chains exactly. The \verb|ex-info| function takes a third optional \verb|cause| parameter. It might be \verb|nil or another exception that will become part of the new one. Below, the \verb|divide| function catches an arithmetic error and throws a new exception with context.
 
-\index{исключения!cause}
+\index{exceptions!cause}
 
 \label{re-throw-example}
 
@@ -908,8 +721,7 @@ HTTP-ответ. Согласно протоколу, ответ со стату
   \end{clojure}
 \end{english}
 
-Функция \verb|ex-cause| возвращает причину исключения. Если её не было,
-получим \verb|nil|.
+The \verb|ex-cause| function returns a cause of an exception. If there is no cause, we'll get \verb|nil|.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -939,7 +751,7 @@ HTTP-ответ. Согласно протоколу, ответ со стату
 \fi
 
 \noindent
-Код выведет:
+The code will output:
 
 \begin{english}
   \begin{text}
@@ -948,13 +760,11 @@ Divide by zero
   \end{text}
 \end{english}
 
-Напишем функцию, которая вернёт список исключений по убыванию
-старшинства. На первом месте исходное исключение, на втором~--- его причина, затем
-причина причины и так далее. Проще всего это сделать формой \verb|loop|:
+Let's write a function that returns an exception list in descending order of precedence. The original exception comes first, the cause of the exception comes second, then~--- the cause of the cause, and so on. Using the \verb|loop| shape is the simplest means of doing this: 
 
-\index{итерация}
+\index{iteration}
 \index{clojure.core!loop}
-\index{функции!ex-chain}
+\index{functions!ex-chain}
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -985,10 +795,7 @@ Divide by zero
 
 \fi
 
-Для экспериментов объявим переменную \verb|e|. Это цепь исключений из трёх
-звеньев. На первом уровне ошибка бизнес-логики: не удалось извлечь
-пользователя. На втором уровне проблема с авторизацией: не хватило прав
-доступа. На третьем~--- ошибка транспорта: HTTP-запрос вернул статус 403.
+To experiment, let's declare the variable \verb|e|. That is a three-link chain of exceptions. At the first level, there is a business logic error: Failed to retrieve user. At the second level — a problem with authorization: Not enough access rights. There is the transport error at the third one: The HTTP request returned status 403.
 
 \label{e-sample}
 
@@ -1028,11 +835,9 @@ Divide by zero
 
 \fi
 
-\index{коллекции!обход}
+\index{collections!traversal}
 
-Получилось дерево исключений, но не всегда удобно работать с~деревом. Плоская
-структура лучше поддаётся обходу. Пригодится функция \verb|ex-chain|, которую
-мы написали. Вот как получить сообщения всех исключений:
+We got an exception tree as a result, but it is not always convenient to work with the tree. Walking through a flat structure is better. The ex-\verb|ex-chain| function we wrote will be useful for us. Here's how to get messages of all exceptions:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1056,9 +861,9 @@ Divide by zero
 \fi
 
 \noindent
-А так~--- напечатать построчно (получим столбик тех же строк):
+And so~--- print line by line (we'll get a column of the same lines): 
 
-\index{печать!исключений}
+\index{printing!exceptions}
 
 \begin{english}
   \begin{clojure}
@@ -1067,9 +872,7 @@ Divide by zero
   \end{clojure}
 \end{english}
 
-Выразим \verb|ex-chain| короче через \verb|iterate|. Это функция, которая
-шаг за шагом применяет другую функцию к аргументу. Ограничение
-\verb|take-while| нужно, чтобы остановиться на первом пустом элементе.
+Let's express \verb|ex-chain| in short through the \verb|iterate| function. This function applies another one to the argument step by step. We need the \verb|take-while| constraint to stop at the first empty element.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1092,23 +895,17 @@ Divide by zero
 
 \fi
 
-\section{Печать исключений}
+\section{Printing of Exceptions}
 
-Что-то пошло не так, и мы оказались в ветке \verb|catch|. На исключение
-указывает локальная переменная. Как с ней поступить?
+Something went wrong, and we found ourselves in the \verb|catch| thread. The local variable indicates the exception. What can we do about it?
 
-Самое простое, что можно сделать с исключением,~--- напечатать в~консоль. Функция
-\verb|println| достаточно умна: перед выводом она переводит исключение в
-словарь. Это удобно для редакторов и IDE, потому что словарь легко разобрать на
-части. Например, показать только ту часть стек-трейса, что касается Clojure.
+The simplest thing is to print the exception to the console. The \verb|println| function is smart enough: it converts the exception to a map before printing. The map is easy to divide into parts, so it is convenient for editors and IDE. For example, to show only that part of the stack trace that concerns Clojure.
 
-Последнее исключение в цепочке называют корнем, \emph{root}. Для удобства
-\verb|println| дублирует корень в начале, чтобы сразу было видно
-первопричину. Вот что выведет \verb|(println e)|:
+The last exception in the chain is called the \emph{root}. For convenience, \verb|println| duplicates it to the beginning, so that we can see the root cause immediately. This is what \verb|(println e)| will output:
 
-\index{печать!исключений}
+\index{printing!exceptions}
 
-\ifx\DEVICETYPE\MOBILE
+ \ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -1162,23 +959,17 @@ Divide by zero
 
 \fi
 
-\index{языки!Java}
-\index{стектрейс}
+\index{languages!Java}
+\index{stacktrace}
 
-Вектор \verb|:trace| называют стек-трейсом. Это методы Java, по которым прошло
-исключение с момента выброса до перехвата. Элемент трейса~--- это вектор с именем
-класса, метода, файла и номера строки.
+The \verb|:trace| vector is called a stack trace. It is a list of Java methods that the exception passed through, from being thrown to being caught. A trace element is a vector with a class, method, and file names as well as a line number.
 
-Мы сократили трейс, чтобы не тратить на него бумагу. В реальности трейсы
-занимают несколько экранов. Они показывают Java-код, который получился из
-Clojure, и это сбивает с толку. Шумные трейсы~--- справедливый упрёк в адрес
-Clojure. С другой стороны, ими страдают многие JVM-языки.
+We have shortened the trace, but tracks usually take up several screens. They show the resulting Java code instead of the initial Clojure one ~--- it's confusing. Noisy traces are a fair reproach to Clojure. On the other hand, this is a common flaw of many JVM languages.
 
-\index{модули!clojure.stacktrace}
+\index{modules!clojure.stacktrace}
 
 \mnoindent
-В пакете \verb|clojure.stacktrace| несколько функций для печати
-исключений. \verb|Print-throwable| выводит сообщение и контекст:
+The \verb|clojure.stacktrace| package has several functions for printing exceptions. \verb|Print-throwable| prints message and context:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1203,8 +994,7 @@ clojure.lang.ExceptionInfo: Get user info error
 
 \fi
 
-Макрос \verb|with-out-str| перехватывает вывод в консоль. Код ниже ничего не
-печатает, но вернёт строку:
+The \verb|with-out-str| macro intercepts the output to the console. The code below does not print anything, but it will return the string:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1227,40 +1017,25 @@ clojure.lang.ExceptionInfo: Get user info error
 
 \fi
 
-Функции \verb|print-stack-trace| и \texttt|print-cause\--trace| печатают трейс с
-небольшими отличиями. Они принимают параметр \verb|n|, чтобы задать глубину
-трейса.
+The \verb|print-stack-trace| and \texttt|print-cause\--trace| functions print a trace with slight differences. They take the \verb|n| parameter to specify the depth of the trace.
 
-\section{Логирование}
+\section{Logging}
 
-\index{логирование}
+\index{logging}
 
-Вывод в консоль помогает в отладке, не не подходит для боевого
-запуска. Перечислим, чего ожидают от кода, который ловит исключения.
+Console output helps in debugging, but, in a production run, it is not good. Here's what you can expect from code that catches exceptions.
 
-Для любого сообщения важны его вспомогательные данные: время, модуль, номер
-процесса. Сообщения различают по уровню важности: информационное,
-предупреждение, тревога и другие. Печать не несёт этих сведений, а их ручной
-сбор увеличит код.
+The auxiliary data (time, module, process number) of any message is important to us. Messages differ in importance: informational, warning, alarm, and others. This information is not printed, and if you collect it manually, the code grows.
 
-Если программа работает на многих серверах, сбор сообщений
-централизован. Представьте, что сотрудник переключается между сотней машин,
-чтобы читать логи,~--- это никуда не годится. Если сообщение пришло по сети,
-нужно запомнить адрес источника.
+When the program runs on multiple servers, message collection is centralized. Imagine an employee switching between hundreds of machines to read logs - that is no good. If the message came over the network, you need to remember the source address.
 
-Не все сообщения одинаково важны. Иногда библиотеки порождают сотни отладочных
-сообщений в минуту. Нужен механизм, чтобы отбрасывать их по некоторым признакам.
+Not all messages are of equal importance. Sometimes libraries generate hundreds of debug messages per minute. We need an algorithm to drop them for specific reasons.
 
-Наконец, консоль и файл~--- не единственные каналы данных. Особо важные
-сообщения пишут в журнал операционной системы, шлют на почту, ботам в чате или в
-СМС ответственным лицам.
+Plus, the console and file aren't the only data feeds. Especially important messages need to be written to the operating system log, sent to email and chatbots, or people in charge as text messages.
 
-Указанные проблемы решает логирование. Это система, которая принимает сообщения
-и пересылает в нужные каналы. Библиотека \verb|clojure.tools.logging|
-предлагает функции и макросы, чтобы логировать сообщения. Это сторонний проект,
-поэтому добавьте зависимость:
+Logging solves the above problems. This system gets messages and sends them to the required channels. The \verb|clojure.tools.logging| library offers functions and macros to log messages. That is a third-party project, so add the dependency:
 
-\index{библиотеки!clojure.tools.logging}
+\index{libraries!clojure.tools.logging}
 
 \begin{english}
   \begin{clojure}
@@ -1269,7 +1044,7 @@ clojure.lang.ExceptionInfo: Get user info error
 \end{english}
 
 \noindent
-Запишем простое сообщение:
+Let's write a simple message:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1293,8 +1068,7 @@ clojure.lang.ExceptionInfo: Get user info error
 \fi
 
 \noindent
-В REPL появится строка. По умолчанию лог добавляет уровень важности. В нашем
-случае это информационное сообщение, \verb|INFO|.
+A line will appear in REPL. By default, the log adds a severity level. In our case, this is an informational message, \verb|INFO|.
 
 \begin{english}
   \begin{text}
@@ -1302,31 +1076,19 @@ INFO: A message from my module
   \end{text}
 \end{english}
 
-В Clojure логирование устроено из двух уровней. Первый~--- это входная точка,
-макросы \verb|log/info|, \verb|log/error| и другие. Второй уровень называют
-бэкендом. Под ним понимают Java-библиотеку, которая выполняет основную работу:
-пишет сообщения в файлы, отправляет их по сети и так далее.
+Clojure logging has two levels. The first one is the entry point, the \verb|log/info|, \verb|log/error|, and other macros. The second level is called the backend. It is a Java library that does the bulk of the work: writes messages to files, sends them over the network, and so on.
 
-Такое устройство несёт преимущества. Исторически сложилось так, что для Java
-написано много библиотек логирования. Каждая из них предлагает свои классы и
-методы. Если проект использует конкретный Java-бэкенд, не получится сменить его
-без правок в коде.
+Such a structure has advantages. Historically, many logging libraries have written for Java. Each of them offers its classes and methods. If the project uses a particular Java backend, you won't be able to change it without code editing.
 
-\index{логирование!бекэнды}
-\index{библиотеки!Logback}
-\index{библиотеки!Log4j}
+\index{logging!backends}
+\index{libraries!Logback}
+\index{libraries!Log4j}
 
-В Clojure эту проблему решили дизайном. При старте модуль \verb|logging| ищет
-библиотеки \verb|Logback|, \verb|Log4j| и другие. Если ничего не найдено, он
-использует стандартный пакет \verb|java.util.logging|. Вызов \verb|log/info|
-сводится к вызову класса из найденной библиотеки.
+In Clojure, this problem was solved by design. At startup, the \verb|logging| module looks for the \verb|Logback|, \verb|Log4j|, and other libraries. If not, it uses the standard \verb|java.util.logging|. The \verb|log/info|call boils down to calling a class from the found library.
 
-Чтобы нужный бэкенд <<подхватился>>, добавьте его в зависимости. Особенно
-популярен проект \verb|Logback|. От аналогов его отличает большой выбор
-\emph{аппендеров} (англ.~appenders). Так называют пункт назначения, куда писать
-сообщения. Это может быть файл, удалённый syslog, почтовый сервер.
+To pick up the required backend, add it to the dependencies. The \verb|Logback| project is especially popular. It has a large selection of \emph{appenders}, unlike its analogs. An appender determines the destination where to write messages. It may be a file, a remote syslog, or a mail server.
 
-Добавьте Logback к проекту:
+Add Logback to your project:
 
 \begin{english}
   \begin{clojure}
@@ -1334,11 +1096,9 @@ INFO: A message from my module
   \end{clojure}
 \end{english}
 
-\index{форматы!XML}
+\index{formats!XML}
 
-Библиотеки логирования ищут настройки в стандартных местах. Если в папку
-\verb|resources| положить XML-файл для бэкенда, он прочтёт его на
-старте. Запишите туда следующий файл \verb|logback.xml|:
+Logging libraries look for settings in standard locations. If you put an XML file in the \verb|resources| folder, the backend will read it at the start. Write the following \verb|logback.xml| file there:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1383,13 +1143,9 @@ INFO: A message from my module
 
 \fi
 
-\index{даты!в логах}
+\index{dates!in logs}
 
-Мы задали appender для вывода в консоль. В теге \verb|pattern| указан шаблон
-сообщения. Параметры шаблона начинаются со знака процента. Подстановка
-\verb|\%msg| означает сообщение, \verb|\%date|~--- текущую дату. Её
-формат задают в фигурных скобках, например \verb|%date{ISO8601}|. Залогируйте
-что-нибудь с новыми настройками. Вывод изменится:
+So, we have set the appender to output to the console. The \verb|pattern| tag contains a message template. Template parameters start with a percent sign. Substitution \verb|\%msg| stands for a message, \verb|\%date| ~--- for the current date. Its format is specified in curly braces, for example, \verb|%date{ISO8601}|. Log something with new settings. The output will change:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1414,9 +1170,7 @@ INFO: A message from my module
 
 \label{log-ex-param}
 
-Макросы \verb|log/info|, \verb|log/error| и другие допускают, что первым
-аргументом может быть не текст, а исключение. Выше мы объявили переменную
-\verb|e| для экспериментов. Запишем её в лог:
+The \verb|log/info|, \verb|log/error|, and other macros first argument might be not a text, but an exception. Above, we have declared the variable \verb|e| for experimentation. Let's write it to the log:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1452,35 +1206,20 @@ Caused by: clojure.lang.ExceptionInfo: HTTP error
 
 \fi
 
-Для экономии мы удалили часть трейса. Из примера видно, что цепочка состоит из
-трёх звеньев~--- как и задали \verb|e|. Проблема в том, что у каждого звена
-пропали данные. Logback не подозревает о том, что поле \verb|data| класса
-\verb|ExceptionInfo| так важно для нас.
+To save space, we have removed part of the trace. From the example, you can see the chain consists of three links, which we specified as \verb|e|. But each link has lost data! The problem is that Logback is unaware that the \verb|data| field of the \verb|ExceptionInfo| class is so important to us.
 
-\index{логирование!исключений}
+\index{logging!exception}
 
-Библиотека предлагает несколько шаблонов для исключения: \verb|%xEx|,
-\verb|%xException| и другие. Они влияют на длину и детализацию трейса, но
-игнорируют данные. Похоже ведут себя Log4j и другие проекты.
+The library offers several templates for exceptions (\verb|%xEx|, \verb|%xException|, and others). They affect the length and detail of the trace but ignore data. Log4j and other projects behave similarly.
 
-В Java проблему решают новым классом. Как правило, бэкенд логирования предлагает
-класс, который переводит исключение в строку. Его наследуют и заменяют нужный
-метод. В настройках логирования указывают путь к новому классу.
+In Java, the problem is solved with a new class. Typically, the logging backend offers a class that converts the exception into a string. Create a descendant class and modify the request method there. Set the new class path in logging settings.
 
-Способ работает и в Clojure, но с неудобствами. Чтобы наследовать класс в
-Clojure, нужен отдельный модуль с директивой \verb|:gen-class|. Придётся
-читать документацию к библиотеке, исследовать классы и~интерфейсы. Решение будет
-завязано на конкретный бэкенд. Если проект переедет на Log4j, мы вынуждены
-наследовать другой класс. Это не тот способ, которому следуют в Clojure.
+The method works in Clojure as well, but with some problems. Clojure requires a separate module with the \verb|:gen-class| directive to inherit a class. You will have to read the library documentation, and explore the classes and interfaces. The decision will depend on the specific backend. Switching to Log4 will force us to inherit from another class. There is another way you can follow in Clojure.
 
-Напишем функцию для логирования ошибок. Это обёртка над \verb|log/error| с
-небольшой разницей: перед записью в лог исключение переходит в текст, как удобно
-нам. Чтобы собрать данные об ошибке, построим цепочку исключений с помощью
-\verb|ex-chain|. Функция \verb|ex-print| пробегает по ней и печатает данные в
-консоль.
+Let's write a function for logging errors. This wrapper over \verb|log/error| changes something: it converts the exception to text before writing to the log, which is convenient for us. To collect error data, let's build an exception chain using \verb|ex-chain|. The \verb|ex-print| function runs over it and prints the data to the console.
 
-\index{печать!исключений}
-\index{функции!ex-print}
+\index{printing!exceptions}
+\index{functions!ex-print}
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1520,8 +1259,7 @@ Clojure, нужен отдельный модуль с директивой \ver
 
 \fi
 
-Результат выглядит приятнее, чем пирамида трейсов. Чётко видны данные,
-которые привели к ошибке:
+The result looks more attractive than the trace pyramid. The data that led to the error is more visible:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1558,11 +1296,10 @@ clojure.lang.ExceptionInfo
 
 \fi
 
-\index{печать!перехват}
+\index{printing!interception}
 \index{clojure.core!with-out-str}
 
-Чтобы перехватить печать на экран, вызов \verb|ex-print| оборачивают в
-\verb|with-out-str|:
+To intercept printing to the screen, we wrap the call of \verb|ex-print| in \verb|with-out-str|:
 
 \begin{english}
   \begin{clojure}
@@ -1575,9 +1312,7 @@ clojure.lang.ExceptionInfo
   \end{clojure}
 \end{english}
 
-Вторым аргументом в \verb|log-error| передают сообщение. Если его нет, запишем
-нейтральное Error. Чтобы сообщение и тело не слиплись, используем
-\verb|println| для переноса строки. Примеры:
+We pass a message to \verb|log-error| as the second argument. If it does not exist, write a neutral Error. To prevent the message and body from sticking together, we use \verb|println| to break a line. Here are some examples:
 
 \begin{english}
   \begin{clojure}
@@ -1586,7 +1321,7 @@ clojure.lang.ExceptionInfo
   \end{clojure}
 \end{english}
 
-Второй вызов запишет в лог следующее:
+The second call will log the following:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1613,8 +1348,7 @@ clojure.lang.ExceptionInfo
 
 \fi
 
-Доработайте \verb|log-error| так, чтобы сообщение было шаблоном, а~функция
-принимала параметры подстановки:
+Modify the \verb|log-error| so that the message will be a template, and the function will take substitution parameters:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1636,69 +1370,36 @@ clojure.lang.ExceptionInfo
 
 \fi
 
-Сообщения об ошибках отделяют от прочих записей. Для этого заводят минимум два
-аппендера: консоль и файл. В консоль выводят все сообщения, чтобы программист
-был в курсе событий. Ошибки требуют реакции, поэтому их пишут в файл или
-пересылают по сети. Позже их анализируют вручную или специальными программами.
+Error messages are separate from other entries. There are at least two appenders for this: ConsoleAppender and FileAppender. All messages are output to the console to keep the programmer informed. Errors require a response so they are written to a file or sent over the network. Later we analyze them manually or with special programs.
 
-В главе про изменяемость мы расскажем, как сделать так, чтобы макрос
-\verb|log/error| сводился к вызову \verb|log-error| \page{install-logger}.
-Так мы избавимся от импорта \verb|log-error| в каждый модуль, где логируют ошибку.
-Однако сейчас об этом говорить преждевременно.
+In the chapter on mutability, we'll show you how to boil down the \verb|log/error| macro to calling \verb|log-error| \page{install-logger}. This way, we get rid of importing \verb|log-error| into each module where an error is logged. However, it is too early to talk about it now.
 
-\section{Сбор исключений}
+\section{Collecting Exceptions}
 
-\index{исключения!сбор}
+\index{exceptions!collecting}
 
-Мы придумали, как выразить исключение текстом. Теперь можно записать его в файл,
-отправить письмом или даже распечатать. Недостаток в том, что у текста нет
-структуры. С точки зрения кода это поток символов, и неясно, где что. При сборе
-ошибок важно выделить ключевые данные: тип, подсистему, модуль. Это нужно по
-следующим причинам.
+We've figured out how to express an exception as text. Now you can write it to a file, send it by email or even print it. A disadvantage to text is that it is not structured. From a code point of view, this is a stream of characters, and it is not clear where things are. When collecting errors, it is crucial to distinguish data type, subsystem, and module. They are necessary for the following reasons.
 
-\textbf{Предотвратить дублирование.} Во время наплыва клиентов может вскрыться
-ошибка, которую не заметили ранее. Если каждый раз писать её в файл, получим
-тысячи одинаковых сообщений. Это расточительно в плане ресурсов и затрудняет
-поиск.
+\textbf{Prevent duplication.} During an influx of customers, we might find an error that did not notice before. If we write it to a file every time, we get a ton of identical messages. That is resource-intensive and makes it difficult to find errors.
 
-Сборщик определяет схожесть ошибок по особым правилам. Сообщения user~1 not
-found и~user~2 not found отличаются, но сборщик свернёт их в одну
-запись и по запросу покажет остальные.
+A collector determines the error similarity according to special rules. The "user1 not found" and "user2 not found" messages are slightly different, but the collector will combine them into one entry and show the rest when requested.
 
-\textbf{Поиск.} Нельзя построить эффективный поиск без структуры. Когда ошибки в
-виде текста, можно искать только по вхождению слова или регулярному
-выражению. Такой поиск нерелевантен, то есть не учитывает, насколько точно
-элемент подходит запросу. Ещё он не отсекает дубли: не хотелось бы видеть тысячу
-одинаковых сообщений в выдаче.
+\textbf{Search.} You cannot build an efficient search without a structure.
+When errors are in the form of text, you can search only by the occurrence of a word or regular expression. This search is not relevant; it ignores how closely the item matches the request. It also does not cut out duplicates: we run the risk of being overwhelmed by identical messages in the search results.
 
-\textbf{Статистика.} Когда ошибки разобрали на части, можно строить по ним
-отчёты. Например, сколько ошибок случилось за прошлый месяц или
-год. Группировать данные по проектам или командам. Выявить проекты, где ошибки
-случаются чаще всего.
+\textbf{Statistics.} When we have identified error parts, we can build reports on them. For example, we can find out how many errors happened in the last month or year, or group data by projects or teams, or identify projects where mistakes happen most often.
 
-\textbf{База знаний.} В системе сбора каждая ошибка становится артефактом. К ней
-пишут комментарии, прикрепляют скриншоты и записи с экрана. На ошибку можно
-сослаться в задаче или ревью. Если исключения хранят в логах, это невозможно.
+\textbf{Knowledge base.} In a collection system, every error becomes an artifact. They write comments to it, attach screenshots and screen recordings. You can refer to an error in a task or review. If exceptions are logged, these options are not available.
 
-\index{базы данных!Sentry}
+\index{databases!Sentry}
 
-Среди прочих систем достойно выглядит \footurl{Sentry}{https://sentry.io}[Sentry][-0mm],
-веб-приложение на Django. В нём заводят проекты, которые накапливают ошибки
-от клиентов. Чтобы отправить ошибку в Sentry, к нему обращаются по~HTTP методом
-POST. В теле передают JSON с различными полями. Sentry предлагает десятки полей,
-чтобы описать ошибку. Сюда входят параметры машины, операционной системы, детали
-HTTP-запроса, стек-трейс и другие.
+\footurl{Sentry}{https://sentry.io}[Sentry][-0mm], a web application based on Django, looks decent compared to other systems. One uses it to create projects that accumulate customer errors. To send an error to Sentry, use the HTTP POST method. Its body contains JSON with various fields. Sentry offers dozens of fields to describe an error with. They are for parameters of a machine, an operating system, HTTP request details, a stack trace, and others.
 
-\index{библиотеки!Sentry-clj}
+\index{libraries!Sentry-clj}
 
-Как правило, приложение не собирает эти данные вручную, а~пользуется
-библиотеками. Часто они называются Raven или похожим образом. Семантика в том,
-что \emph{сторожевой ворон} (англ.~raven) несёт вести \emph{дозорному}
-(англ.~sentry).
+An application does not collect these data on its own but rather uses libraries. They are often called Raven or similar. It's like a pun~--- а \emph{raven} carries news to a \emph{ sentry }.
 
-Для Clojure написаны библиотеки \footurl{Sentry-clj}{https://github.com/getsentry/sentry-clj}[Sentry-clj][-22mm] и
-\footurl{Exoscale Raven}{https://github.com/exoscale/raven}[Exoscale Raven]. Первая опирается на
-официальную Java-библиотеку. Добавьте её в~проект:
+\footurl{Sentry-clj}{https://github.com/getsentry/sentry-clj}[Sentry-clj][-22mm] and \footurl{Exoscale Raven}{https://github.com/exoscale/raven}[Exoscale Raven] libraries are written for Clojure. The former relies on the official Java library. Add it to your project:
 
 \begin{english}
   \begin{clojure}
@@ -1708,10 +1409,7 @@ HTTP-запроса, стек-трейс и другие.
 
 \index{DSN}
 
-Задайте библиотеке нужный DSN. Под DSN понимают адрес проекта в Sentry. Проект
-объединяет сообщения по глобальному признаку: ошибки бэкенда в одном проекте,
-фронтенда~--- во втором, мобильного приложения~--- в третьем. DSN находится в
-настройках проекта в~разделе <<интеграция>>.
+Set the required DSN to the library. DSN is a project address in Sentry. The project combines messages according to the main feature: backend errors will be in one project, front-end errors~--- in the second one, mobile appl's~--- in the third. DSN is in the project settings of the Integration section.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1738,9 +1436,7 @@ HTTP-запроса, стек-трейс и другие.
 
 \fi
 
-Когда библиотека знает DSN, отправим сообщение с помощью функции
-\verb|send-event|. Среди прочих параметров нас интересует \verb|:throwable|, в
-который передают исключение.
+Once the library knows the DSN, send the message using the \verb|send-event| function. We're especially interested in the \verb|:throwable| parameter that gets an exception.
 
 \begin{english}
   \begin{clojure}
@@ -1748,23 +1444,14 @@ HTTP-запроса, стек-трейс и другие.
   \end{clojure}
 \end{english}
 
-В ответ получим номер события, а в проекте появится новая запись. Предположим,
-мы передали экземпляр \verb|e|, цепочку из трёх исключений, которую задали
-выше \page{e-sample}. В интерфейсе Sentry мы увидим информацию о каждом звене. В
-поле \verb|:extra| окажутся данные верхнего исключения, словарь
-\verb|{:user-id 42}|.
+In response, we will receive the event number, and a new entry will appear in the project.
+Suppose we passed in an instance of \verb|e|~--- the chain of three exceptions~--- that we've defined above \page{e-sample}. In the Sentry interface, we will see information about each link. The \verb|:extra| field will contain the data of the top-level exception~--- the map \verb|{:user-id 42}|.
 
-Недостаток \verb|sentry-clj| в том, что она передаёт не весь
-контекст. Хотелось бы видеть данные всех уровней, а не только верхнего. Иначе мы
-не узнаем, какой был токен, по какому адресу мы обратились в сеть и другие
-детали. Можно собрать данные вручную и передать в ключ \verb|:extra|, но это
-увеличит код.
+\verb|Sentry-clj| does not transmit the entire context; this is its drawback. We would like to see data from all levels, not just the top one. Otherwise, we will not know what the token was, at what address we tried to access the network, and other details. It is possible to collect data manually and pass it to the \verb|:extra| key, but this will increase the code.
 
-\index{библиотеки!Raven}
+\index{libraries!Raven}
 
-Библиотека Exoscale Raven написана на Clojure и потому учитывает тонкости
-языка. С недавней версии она передаёт полные данные об
-исключении. Подключите её в проект и отправьте исключение \verb|e|:
+The Exoscale Raven library is written in Clojure and therefore takes the language nuances into account. Starting with the recently released version, it transmits the complete exception data. Include it in the project and send an exception \verb|e|:
 
 \begin{english}
   \begin{clojure}
@@ -1825,31 +1512,22 @@ HTTP-запроса, стек-трейс и другие.
 
 \fi
 
-  \caption{Пример JSON-данных исключения}
+  \caption{ Sample of exception JSON-data}
   \label{fig:ex-json-data}
 \end{listing}
 
-Откройте событие в Sentry и промотайте вниз. В секции \verb|extra| появится ключ
-\verb|:via| с детальной информацией. Привёдем её фрагмент \lis{fig:ex-json-data}.
-Каждый словарь состоит из класса исключения, сообщения и данных. В поле \verb|:at|
-вектор четырёх элементов: класс, метод, имя файла и строка, на которой возникло
-исключение. С таким отчётом найти причину будет проще.
+Open the event in Sentry and scroll down. In the \verb|extra| section, the \verb|:via| key with detailed information will appear. Below is a snippet of it \lis{fig:ex-json-data}. Each map consists of an exception class, message, and data. In the \verb|:at| field is a vector of four elements: a class, a method, a filename, and the line where an exception was thrown. Such a report makes it easier to find the cause.
 
 \index{clojure.core!Throwable\arr{}map}
 
-Структуру выше получили функцией \texttt{Throw\-able->map}. Она принимает
-исключение и отдаёт словарь с ключами \verb|:via|, \verb|:cause| и
-другими. Элементы словарей~--- это строки и символы, поэтому результат легко
-записать в JSON или EDN.
+We obtained the structure above with the \texttt{Throw\-able->map} function. It takes an exception and returns a map with the \verb|:via|, \verb|:cause|, and other keys.
+Map items are strings and characters, so the result can be easily written in JSON or EDN formats.
 
-\section{Sentry и Ring}
+\section{Sentry and Ring}
 
 \index{Ring!Sentry}
 
-Теперь, когда вы знакомы с Sentry, напишем защитный декоратор для
-Ring-приложения. Он ловит ошибки, отправляет их в Sentry и~возвращает
-нейтральный ответ о том, что запрос не удался. Декоратор ставят на вершину стека
-middleware.
+Now that you are familiar with Sentry, let's write a protective decorator for a Ring application. It catches errors, sends them to Sentry, and returns a neutral response that the request failed. The decorator should be at the top of the middleware stack.
 
 \begin{english}
   \begin{clojure/lines*}{firstnumber=1}
@@ -1865,10 +1543,8 @@ middleware.
 
 \wavebottom
 
-Обратите внимание, что запрос к Sentry тоже обёрнут в \verb|try/catch|. Sentry~---
-это отдельный сервис, который может быть недоступен. В этом случае в лог пишут
-оба исключения: и первичное, и связанное с Sentry. Если вы забыли, как работают
-декораторы и middleware, вернитесь к~главе про веб-разработку \page{decorator}.
+Please note that the request to Sentry is also wrapped in \verb|try/catch|. Since Sentry is a third-party service, it may be unavailable at times. In this case, both exceptions are logged: the primary one and the one related to Sentry.
+If you need to brush up on how middleware and decorators work, go back to the chapter on web development \page{decorator}.
 
 \wavetop
 
@@ -1906,11 +1582,7 @@ middleware.
 
 \wavebottom
 
-Для полной картины мы передаём в Sentry не просто исключение, а событие
-\coderef{9}. Мы наращиваем его исключением, запросом Ring и произвольными
-данными. Функции \verb|(r/add-<something>)| дополняют событие различными
-полями. Raven предлагает функции, чтобы добавить теги, пользователя и другие
-сущности.
+For the sake of completeness, we are passing to Sentry not just an exception, but an event \coderef{9}. We add an exception, a Ring request, and arbitrary data to it. The \verb|(r/add-<something>)| functions supplement the event with various fields. Raven offers functions to add tags, users and other entities.
 
 \wavetop
 
@@ -1944,32 +1616,21 @@ middleware.
 
 \fi
 
-\index{библиотеки!Manifold}
-\index{асинхронность}
-\index{синтаксис!@ (дереф)}
+\index{libraries!Manifold}
+\index{asynchrony}
+\index{ syntax!@ (deref)}
 
 \mnoindent
-Объясним оператор \verb|@| перед вызовом \verb|r/capture!| \ifx\DEVICETYPE\MOBILE\coderef{16}\else\coderef{14}\fi. Функция
-работает асинхронно за счёт библиотеки Manifold. Результат~--- это особый
-объект \verb|deferred|, похожий на футуру. Даже если в нём случилась ошибка, мы
-не узнаем этого, пока не <<дерефнем>> его. Оператор~\verb|@| ещё встретится нам
-в будущих главах.
+Let me explain the \verb|@| operator before calling \verb|r/capture!| \ifx\DEVICETYPE\MOBILE\coderef{16}\else\coderef{14}\fi. The function works asynchronously due to the Manifold library. The result is a special \verb|deferred| object which acts as the Java Future object. We won't know about an error until we dereference the former. We'll encounter the \verb|@| operator in following chapters.
 
-В боевых системах объекты \verb|deferred| обычно не дерефят, а оборачивают в
-макросы \verb|d/catch| и \verb|d/chain|, асинхронные аналоги \verb|catch|
-и~стрелочного оператора \arr{}. Программирование на Manifold~--- это
-отдельная тема, которой мы не касаемся в этой книге.
+In production systems, one doesn't usually do the dereference of \verb|deferred| objects but wraps them in \verb|d/catch| and \verb|d/chain| macros~--- asynchronous analogs of \verb|catch| and the arrow operator \arr{}. Programming in Manifold is a separate topic; we won't touch on it in this book.
 
-\section{Переходы по коду}
+\section{Jumping Code}
 
-\index{исключения!переходы}
+\index{exceptions!jumps}
 \index{GOTO}
 
-До сих пор мы рассматривали исключение как сигнал об ошибке. Вспомним ключевое
-свойство: исключение прерывает программу и всплывает, пока его не
-поймают. Иногда этим пользуются, чтобы перейти вверх по стеку. Если бросить
-условное \verb|MyGOTOException|, а сверху поставить \verb|catch| с этим
-классом, получим оператор \verb|GOTO|:
+Until now, we have regarded an exception as an error signal. Recall the fundamental property of an exception~--- it interrupts the program flow and floats up until it is caught. Sometimes you can use that to move up the stack. If we throw the conditional \verb|MyGOTOException| and, at the top, put \verb|catch| with this class, we'll get the \verb|GOTO| operator: 
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2004,19 +1665,14 @@ middleware.
 
 \fi
 
-Если \verb|(condition)| вернёт истину, мы пропустим третий шаг. В~литературе
-трюк называют <<исключение как способ управления исполнением>>. Это
-противоречивая практика; применяйте её осторожно. Код становится неочевидным и
-трудным в поддержке.
+If \verb|(condition)|returns true, we'll skip the third step. This is known as the "exception as a control flow mechanism" technique. The method is controversial; use it carefully. Code becomes obscure and difficult to maintain.
 
-\index{императивный стиль}
+\index{imperative style}
 
-Всё же бывают моменты, когда нужно прервать исполнение. Например, мы
-выяснили, что у пользователя нет прав к ресурсу. Усложним задачу: пусть проверок
-несколько, и на каждой нужно пресечь запрос. В императивных языках это решается
-просто. Код на Python выглядел бы так:
+Still, there are times when you need to interrupt execution. For example, we have found that a user does not have access rights to the resource. Let's complicate the task: let there be several checks, and you need to cancel each request.
+Writing in imperative languages, this is easy to solve. Python code might look like this:
 
-\index{языки!Python}
+\index{languages!Python}
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2053,17 +1709,11 @@ class AccountHandler(RequestHandler):
 
 \fi
 
-В Clojure нет оператора \verb|return|. Результат нескольких форм~--- это результат
-последней. Мы не можем расположить несколько \verb|when| на одном уровне друг
-под другом. Даже если одна из них вернёт ложь, исполнение перейдёт к следующей
-форме.
+There is no \verb|return| statement in Clojure. The result of multiple forms is the result of the last one. We cannot place multiple \verb|when| on the same level, one below the other. Even if only one of them returns false, execution will go to the next form.
 
 \index{Pyramid of Doom}
 
-Вариант с каскадом \verb|if/else| работает, но выглядит громоздко. По-другому
-его называют Pyramid of Doom. Чем ниже вложенность, тем больше проблем у
-разработчика. Ради интереса добавьте условие в~середину кода на Clojure
-\lis{fig:clj-pyramid}.
+The \verb|if/else| cascade works, but looks unwieldy. It is not called the pyramid of doom for nothing. The deeper the nesting, the more problems the developer has. For fun, add a conditional to the middle of the Clojure code \lis{fig:clj-pyramid}
 
 \begin{listing}[ht!]
 
@@ -2102,18 +1752,15 @@ class AccountHandler(RequestHandler):
 
 \fi
 
-\caption{Пример пирамиды на Clojure}
+\caption{ Clojure Pyramid Example }
 \label{fig:clj-pyramid}
 
 \end{listing}
 
-\index{библиотеки!Ring HTTP Response}
-\index{организации!Metosin}
+\index{libraries!Ring HTTP Response}
+\index{organisations!Metosin}
 
-Пирамиду решают разными способами, в том числе исключениями. Библиотека Ring
-HTTP Response предлагает функции, чтобы кидать исключения с HTTP-ответом. В
-middleware добавляют декоратор, который ловит такие исключения и возвращает из
-них ответ. Добавьте библиотеку в проект:
+You can solve the pyramid problem in different ways, including exceptions. The Ring HTTP Response library offers functions to throw HTTP response exceptions. A decorator is added to the middleware to catch such exceptions and return a response composed of them. Add the library to your project:
 
 \begin{english}
   \begin{clojure}
@@ -2123,7 +1770,7 @@ middleware добавляют декоратор, который ловит та
 
 Напишем \verb|account-handler| по-другому:
 
-\index{модули!ring.util.http-response}
+\index{modules!ring.util.http-response}
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2170,20 +1817,13 @@ middleware добавляют декоратор, который ловит та
 
 \fi
 
-Новый код похож на императивный. Некоторых уязвляет факт, что в Clojure
-пользуются императивным подходом. Всё в порядке: наша задача сделать так, чтобы
-код был удобным в поддержке. Вопрос парадигмы при этом не важен.
+Our new code is similar to the imperative one. Some people are unhappy that Clojure uses an imperative approach. Never mind. Our job is to make the code maintainable. Loyalty to the paradigm doesn't matter here.
 
-Функции из модуля \texttt{ring.util.http\--res\-ponse} бывают с восклицательным
-знаком и без него. Это сигнал о том, что функция бросает исключение. Например,
-\verb|not-found!| породит \verb|ex-info|, в теле которого HTTP-ответ со
-статусом 404.
+Functions of the texttt{ring.util.http\--res\-ponse} module are available with and without an exclamation mark. It signals that a function throws an exception. For example, \verb|not-found!| will return the \verb|ex-info| which body contains an HTTP response with a 404 status.
 
 \index{HTTP!404}
 
-Чтобы схема работала, добавим декоратор \verb|wrap-http-response|. Он ловит
-ошибки от функций с восклицательным знаком, достаёт из них ответ и
-возвращает клиенту.
+To make the scheme work, let's add the \verb|wrap-http-response| decorator. It catches errors from functions with an exclamation mark, extracts an answer from them, and returns it to a client.
 
 \begin{english}
   \begin{clojure}
@@ -2199,34 +1839,20 @@ middleware добавляют декоратор, который ловит та
   \end{clojure}
 \end{english}
 
-Избегайте исключений для прыжков по коду. Убедитесь, что это крайняя мера. Вы
-должны что-то выиграть: сократить код или оперативно решить проблему. Если
-пришлось идти на этот шаг, возьмите библиотеку, чтобы сослаться на примеры и
-документацию.
+Try to use code jumping only as a last resort: if you win something with it~--- shorten the code or quickly solve the problem. If you have to take this step, use the library to refer to examples and documentation.
 
 \index{finally}
-\index{контекстный менеджер}
+\index{context manager}
 
-\section{Finally и контекстный менеджер}
+\section{Finally Form and Context Manager}
 
-Иногда код выполняют в рамках ресурса. Это может быть файл, сокет или транзакция
-базы данных. В начале работы ресурс <<открывают>>, а в конце
-<<закрывают>>. Открытый ресурс считается занятым. Когда ресурс занят, другие
-клиенты не могут пользоваться им в полной мере. Открытый кем-то файл можно
-читать, но не менять.
+Sometimes the code is executed within a resource. It might be a file, socket, or a database transaction. At the beginning of work, one "opens" the resource and~--- at the end~--- "closes" it. An open resource is considered busy. When a resource is busy, other clients cannot make full use of it. You can read someone's open file, but can't change it.
 
-Закрывайте ресурс сразу же, как только в нём отпала нужда. Этому может
-помешать ошибка. Если код, который работает с ресурсом, не поймал исключение,
-файл или порт останутся открытыми до конца работы. Чтобы закрыть ресурс даже в
-случае ошибки, прибегают к~форме \verb|finally|.
+Close the resource as soon as you no longer need it. An error can prevent this. If the code working with the resource does not catch the exception, the file or port will remain open until the end of the work. To close the resource even in the error event, resort to the \verb|finally| form.
 
-Форму ставят последней в \verb|try|. Если ошибки не было, \verb|finally|
-выполняется после основного кода из \verb|try|. Когда возникло исключение,
-\verb|finally| сработает в промежутке между его появлением и выбросом.
+It is placed last in the \verb|try| block. If there is no error, the \verb|finally| form is executed after the main code of \verb|try|. If an exception arises, \verb|finally| will perform between its occurrence and throwing.
 
-Рассмотрим ручной доступ к файлу: запишем в него несколько
-байт. \verb|Finally| гарантирует, что файл закроется, даже если в процессе
-возникло исключение \lis{fig:write-file}.
+Let's take a look at manual access to a file: write a few bytes to it. \verb|Finally| ensures that the file will close even though an exception is thrown in the process \lis{fig:write-file}.
 
 \begin{listing}[ht!]
 
@@ -2265,25 +1891,20 @@ middleware добавляют декоратор, который ловит та
 
 \fi
 
-\caption{Ручная работа с файлом}
+\caption{Manual file handling}
 \label{fig:write-file}
 
 \end{listing}
 
-Чтобы вы не забыли закрыть файл, современные языки предлагают контекстные
-менеджеры. Это может быть класс, оператор или макрос. Менеджер исполняет блок
-кода с дополнительными эффектами. Перед блоком сработает логика входа, а после
-него~--- логика выхода. Последний получит управление, даже если блок бросил
-исключение. Платформа удержит его, выполнит код выхода и снова бросит.
+Today's languages offer context managers, so you don't forget to close the file. A manager can be a class, operator, or macro.
+The manager executes a block of code with additional effects. The entry logic is triggered before the block, and the exit logic~--- after it. The exit logic will take control even if the block has thrown an exception.
+The platform will hold it, execute the exit code, and throw it again.
 
-\index{языки!Python}
+\index{languages!Python}
 
-Особо изящно менеджер устроен в Python. Это оператор \verb|with|, который
-ожидает объект. У объекта должны быть методы \verb|__enter__|
-и~\verb|__exit__|, которые сработают при входе и выходе. \verb|With|
-применяют для файлов, транзакций базы данных, фикстур в тестах. Пример с~файлом:
+The Python manager is remarkably elegant. It is the \verb|with| statement that expects an object. The object must have the \verb|__enter__| and~\verb|__exit__| methods that will work when entering and exiting. You can use the \verb|with| statement for files, database transactions, and test fixtures. Here's an example with a file:
 
-\index{файлы}
+\index{files}
 
 \begin{english}
   \begin{python}
@@ -2292,11 +1913,9 @@ with open("/path/to/file.txt", "w") as f:
   \end{python}
 \end{english}
 
-Напишем похожий менеджер для Clojure. Это макрос, который принимает символ и
-путь к файлу. Внутри макроса файл связан с~символом. \verb|Finally|
-гарантирует, что файл закроется при выходе из блока.
+Let's write a similar manager for Clojure. It is a macro that takes a symbol and a file path. Within a macro, a file is bound with a symbol. \verb|Finally| ensures the file will close when exiting the block.
 
-\index{классы!FileWriter}
+\index{classes!FileWriter}
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2329,7 +1948,7 @@ with open("/path/to/file.txt", "w") as f:
 
 \fi
 
-Выполните код и проверьте файл \verb|test.txt|:
+Execute the code and check the \verb|test.txt| file:
 
 \begin{english}
   \begin{clojure}
@@ -2339,54 +1958,36 @@ with open("/path/to/file.txt", "w") as f:
   \end{clojure}
 \end{english}
 
-Контекстные менеджеры именуют с префиксом \verb|with-|. Так делают акцент на
-том, что код работает в рамках ресурса.
+Context managers' name begins with the prefix \verb|with-|. So they emphasize that the code works within the resource.
 
 \index{clojure.core!with-open}
 
-В Clojure предусмотрен макрос \verb|with-open|. Это улучшенная версия кода,
-что мы написали. В отличие от нашего примера, \verb|with-open| работает с
-более абстрактным источником, в том числе и файлом. Выход из макроса, даже с
-ошибкой, закрывает источник.
+Clojure provides the \verb|with-open| macro. It is an improved version of the code we have written. Unlike our example, \verb|with-open| works with a more abstract source, including a file. Exiting the macro, even with an error, closes the resource.
 
-В \verb|finally| нет смысла при работе с коллекциями или чистыми
-функциями. Пользуйтесь им только если ресурс занят и должен быть освобожден.
+There is no point in using \verb|finally| when working with collections or pure functions. Use it only when you need to free a busy resource.
 
-\section{Исключения на предикатах}
+\section{Exceptions and Predicates}
 
-\index{исключения!на предикатах}
-\index{предикаты!в исключениях}
+\index{exceptions!predicates}
+\index{predicates!in exceptions}
 
-Система \verb|try/catch| работает на классах и наследовании. Если нужно
-поймать особый случай, пишут класс и бросают его экземпляр. Типичный проект на
-Java или Python несёт на борту модуль с исключениями. Среди них базовый класс
-\verb|ProjectException| и унаследованные от него \verb|UserNotFound|,
-\verb|AccessDenied| и другие. Это однообразный код, написанный вручную.
+The \verb|try/catch| system works based on classes and inheritance. If you need to catch a particular exception, write a class and throw an instance of it. A typical Java or Python project carries a module with exceptions.
+The base class \verb|ProjectException| and inherited from it \verb|UserNotFound|, \verb|AccessDenied|, and others are among them. It is a manually written homogeneous code.
 
-\index{библиотеки!Slingshot}
+\index{libraries!Slingshot}
 
-В главе про Spec мы говорили, что предикаты мощнее типов
-\page{type-and-pred}. Это верно и для исключений: если можно поймать их
-функцией, не понадобится класс. Подход с предикатами предлагает библиотека
-\footurl{Slingshot}{https://github.com/scgilardi/slingshot}[Slingshot][-6mm] (англ.~<<рогатка>>).
-В ней находятся улучшенные версии \verb|try|, \verb|catch| и~\verb|throw|.
+In the chapter on Spec, we've said that predicates were more powerful than types \page{type-and-pred}. The same is true for exceptions: if you can catch them with a function, you don't need a class. The \footurl{Slingshot}{https://github.com/scgilardi/slingshot}[Slingshot][-6mm] library offers a predicate approach. There are improved versions of \verb|try|, \verb|catch| and \verb|throw|in Slingshot.
 
-\index{фундаментальность}
+\index{ \fundamentality}
 
-Это удивит тех, кто не знаком с Clojure: с помощью макросов в~ней меняют даже
-такие фундаментальные вещи, как перехват исключений. В других языках подобных
-изменений ждут годами, а в Clojure подключают библиотеку.
+Those who are not familiar with Clojure will be surprised: you can change even such fundamental things as catching exceptions with the help of macros in it. In other languages, such changes have been waiting for years. In Clojure, you just need to use a library.
 
-\index{макросы!try\Plus}
-\index{макросы!throw\Plus}
+\index{macros!try\Plus}
+\index{macros!throw\Plus}
 
-Slingshot содержит макросы \verb|throw+| и \verb|try+|. Они совместимы
-с~обычными \verb|throw| и \verb|try|: если заменить старые формы на версии с
-плюсом, ничего не изменится. Однако новые формы несут преимущества.
+Slingshot contains the \verb|throw+| and \verb|try+| macros. They are compatible with regular \verb|throw| and \verb|try|; if you replace the usual forms with the plus versions, nothing changes. However, these new forms bring benefits.
 
-Макрос \verb|throw+| принимает не только исключение, но и любой объект. Лучше
-всего на эту роль подходит словарь: он объединяет несколько значений в
-ключах. Пример ниже бросит \verb|ex-info| с заданным словарём:
+The \verb|throw+| macro accepts any object, not just an exception. A map works best: it combines multiple values in keys. The code below will throw \verb|ex-info| with the given dictionary:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2412,9 +2013,7 @@ Slingshot содержит макросы \verb|throw+| и \verb|try+|. Они �
 
 \fi
 
-Кроме объекта, \verb|throw+| принимает исключе\-ние-причину, шаблон сообщения и
-параметры подстановки. Обратите внимание, что порядок аргументов отличается от
-\verb|ex-info|.
+\verb|Throw+| takes an object, a cause exception, a message template, and substitution parameters. Note: the order of the arguments is different from \verb|ex-info|.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2443,13 +2042,9 @@ Slingshot содержит макросы \verb|throw+| и \verb|try+|. Они �
 
 \fi
 
-\index{предикаты!в исключениях}
+\index{predicates!in exceptions}
 
-Форма \verb|catch| внутри \verb|try+| ловит исключения не только
-классами. Slingshot предлагает для этого селекторы и предикаты. Под селектором
-понимают вектор, где нечётный элемент~--- это ключ словаря, а чётный~---
-значение. Селектор проверяет, что ключи и значения входят в контекст. Если да,
-управление переходит в ветку с этим селектором.
+The \verb|catch| form inside \verb|try+| catches exceptions not only with classes. Slingshot offers selectors and predicates for that. Here, a selector is a vector: its odd element is a map key, and even one is a value. The selector checks if keys and values are included in the context. If so, control passes to the branch with that selector.
 
 \begin{english}
   \begin{clojure/lines}
@@ -2463,33 +2058,19 @@ Slingshot содержит макросы \verb|throw+| и \verb|try+|. Они �
   \end{clojure/lines}
 \end{english}
 
-Когда бросают словарь, добавляют поле \verb|:type| \coderef{2}. В~нём указывают
-ключ с текущим пространством, в нашем случае \verb|::user-error|. При отлове
-исключений в другом модуле селектор принимает вид
-\spverb|[:type :book.exceptions/user-error]|. Пространство обещает, что мы не
-перехватим другой \texttt{:user\--error} из чужой библиотеки.
+When the map is thrown, add the \verb|:type| field \coderef{2}. It specifies a key with the current space, in our case~--- \verb|::user-error|.
+When catching exceptions in another module, the selector looks like this: \spverb|[:type :book.exceptions/user-error]|. The namespace guarantees that we will not intercept \texttt{:user\--error} of someone else's library.
 
-Пример выше напечатает брошенный словарь. Внутри \verb|catch| переменная
-\verb|e| ссылается не на исключение, а на данные, которые передали
-в~\verb|throw+|.
+The example above should print a thrown map. The variable \verb|e|, which is inside \verb|catch|, does not link to the exception, but the data we passed to \verb|throw+|.
 
-Вместо селектора может быть предикат, функция одного аргумента. Если класс
-ошибки \verb|ExceptionInfo|, предикат получит словарь данных, а иначе~--- объект
-исключения. Функция должна учесть, что тип аргумента может быть разным. Когда
-предикат вернул истину, управление переходит в его ветку \verb|catch|.
+Instead of a selector, we can use a predicate, a function of one argument. If the error class is \verb|ExceptionInfo|, the predicate will get a data map; otherwise, an exception object. The function should take into account an argument type. When the predicate returns true, control will pass to its \verb|catch| branch.
 
-\index{сервисы!Amazon S3}
+\index{services!Amazon S3}
 
-Предикатами пользуются, когда нужно тонкое условие перехвата. Рассмотрим
-загрузку файла в Amazon S3. В особых случаях Java SDK бросает исключение уже
-после того, как файл загружен. Это случается из-за разницы в контрольных
-суммах. Загрузка считается неудачной, и мы должны удалить файл, чтобы он не
-занимал место.
+Use predicates when you need fine tuned interception conditions. Let's see how to upload a file to Amazon S3. In special situations, Java SDK throws an exception after the file is loaded (if the checksums do not match). We have to delete the unsuccessfully uploaded file so as not to waste space.
 
 \mnoindent
-К сожалению, в SDK нет класса \verb|ChecksumError| или аналога. Вместо него
-приходит обычный \verb|AmazonS3Exception| с длинным текстом. Чтобы выделить
-наш случай, сравним сообщение с шаблоном. Вынесем проверку в функцию:
+Unfortunately, there is neither the \verb|ChecksumError| class nor an equivalent in SDK. Instead, we'll receive a regular \verb|AmazonS3Exception| with a long text. To highlight our case, let's compare the message with the template. Let's take the check into the function:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2522,7 +2103,7 @@ Slingshot содержит макросы \verb|throw+| и \verb|try+|. Они �
 \fi
 
 \noindent
-Поместим её в \verb|try+|, чтобы поймать случай с контрольной суммой:
+We should put it in \verb|try+| to catch the checksum case:
 
 \begin{english}
   \begin{clojure}
@@ -2533,11 +2114,7 @@ Slingshot содержит макросы \verb|throw+| и \verb|try+|. Они �
   \end{clojure}
 \end{english}
 
-Slingshot используют в \footurl{Clj-http}{https://github.com/dakrone/clj-http}[Clj-http]~---
-популярном HTTP-клиенте для Clojure. В случае ошибки он бросает ответ через
-\verb|throw+|. Если обернуть запрос в \verb|try+|, получим более тонкий
-разбор ошибок. Например, отдельные ветки для статуса 500 и негативного ответа в
-целом.
+\footurl{Clj-http}{https://github.com/dakrone/clj-http}[Clj-http], a popular HTTP client for Clojure, uses Slingshot. In case of an error, it throws a response with \verb|throw+|. If we wrap the request in \verb|try+|, we'll get a more detailed analysis of errors. For example, we can get separate branches for status 500 and for the general negative response.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2572,40 +2149,27 @@ Slingshot используют в \footurl{Clj-http}{https://github.com/dakrone/
 
 \fi
 
-Slingshot делает ставку на данные, а не классы, что поощряется
-в~Clojure. Начинающим не всегда очевидны плюсы этого подхода. Советуем читателю
-сперва разобраться с обычными \verb|try/catch|. Подключайте Slingshot только
-если чувствуете потребность.
+Slingshot relies on data, not classes, as Clojure encourages. Benefits of this approach are not always apparent to newbies. It is helpful to understand the usual \verb|try/catch| method first. Include Slingshot only if it makes sense to do so.
 
-\index{библиотеки!Ex}
-\index{организации!Exoscale}
+\index{libraries!Ex}
+\index{organisations!Exoscale}
 
-Slingshot не единственный пример <<кложурных>> исключений. Обратите внимание на
-\footurl{Ex}{https://github.com/exoscale/ex}[Ex][-3mm]~--- аналог, которым пользуются в
-Exoscale. Библиотека учитывает семантику ключей (\verb|:fault|,
-\verb|:conflict|), их наследование, поддерживает Manifold и многое
-другое.
+Slingshot is not the only example of exceptions for Clojure. Pay attention to \footurl{Ex}{https://github.com/exoscale/ex}[Ex][-3mm]~--- the analog we use at Exoscale.
+That library allows for the semantics of the keys (\verb|:fault|, \verb|:conflict|), and their inheritance, supports Manifold, and much more.
 
-\section{Приёмы и функции}
+\section{ Techniques and Functions }
 
-Рассмотрим несколько техник для исключений. Они просты и потому не стоят того,
-чтобы выносить их в отдельную библиотеку. Чаще всего их копируют из проекта в
-проект с небольшими изменениями.
+Let's look at several techniques for exceptions. They are simple, so you shouldn't put them in a separate library. They are usually copied from a project to a project with some changes.
 
-\index{языки!Lua}
+\index{languages!Lua}
 
 \label{pcall}
 
-\textbf{Безопасный вызов функции.} В языке Lua нет операторов \verb|try| и
-\verb|catch|. Чтобы обезопасить вызов от ошибки, используют
-\footurl{\texttt{pcall}}{https://www.lua.org/pil/8.4.html}[Lua pcall][-3mm]. Это сокращение от
-protected call, <<защищённый вызов>>. Иногда приём полезен и в Clojure.
+\textbf{ Safe function call.} Lua language has no \verb|try| and \verb|catch| statements. To make the call safe from error, use the \footurl{\texttt{pcall}}{https://www.lua.org/pil/8.4.html}[Lua pcall][-3mm] operator. It is short for a protected call. Sometimes this technique is useful in Clojure, too.
 
-\verb|Pcall| принимает функцию, аргументы и возвращает пару значений. Первое
-означает успех выполнения. Если это истина, на втором месте результат
-вычислений, а иначе~--- экземпляр ошибки. Версия на Clojure:
+\verb|Pcall| takes a function and arguments and returns a pair of values. The first of them signifies a successful execution. If it is true, the second value will be the result of the computation, otherwise~--- an error instance. Clojure version:
 
-\index{функции!pcall}
+\index{functions!pcall}
 
 \begin{english}
   \begin{clojure}
@@ -2616,7 +2180,7 @@ protected call, <<защищённый вызов>>. Иногда приём п�
   \end{clojure}
 \end{english}
 
-Для краткости разбейте результат в \verb|let|:
+To make the result more concise, process it with \verb|let|:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2644,11 +2208,9 @@ protected call, <<защищённый вызов>>. Иногда приём п�
 
 \fi
 
-\index{языки!JavaScript}
+\index{languages!JavaScript}
 
-В JavaScript популярна другая семантика: функции-колбэки принимают аргументы
-\verb|error| и \verb|result|. Функция \verb|pcall-js|~--- это изменённый
-вариант \verb|pcall|, который вернёт пару \tuple{ошибка, результат}.
+A different semantics is popular in JavaScript: callback functions take the \verb|error| and \verb|result| arguments. The \verb|pcall-js| function is a modified version of \verb|pcall| that returns an \tuple {error, result} pair.
 
 \begin{english}
   \begin{clojure}
@@ -2660,7 +2222,7 @@ protected call, <<защищённый вызов>>. Иногда приём п�
 \end{english}
 
 \noindent
-Разбиение выглядит по-другому:
+The split looks different:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2687,18 +2249,13 @@ protected call, <<защищённый вызов>>. Иногда приём п�
 
 \fi
 
-\index{функции!с повтором}
+\index{functions!with repeat}
 
-\textbf{Попытки с задержкой.} Иногда сторонний сервис нестабилен, и~к~нему
-обращаются несколько раз. Чтобы не копировать код, обернём повтор в
-функцию. \verb|Pcall-retry| пытается выполнить целевую функцию за несколько
-подходов. Первый удачный вызов станет результатом. Если была ошибка, но попытки
-ещё не кончились, функция ждёт и повторяет вызов. Когда попытки
-исчерпаны, функция бросит исключение. Внутри используется \verb|pcall|,
-который мы задали выше.
+\textbf{ Retries with delay.} Sometimes a third party service is unstable, and you have to access it multiple times. Let's wrap the retrying in a function so as not to copy the code. \verb|Pcall-retry| tries to call the target function in multiple passes. The result will be the first successful calling. If an error occurs but abut attempts haven't completed, the function waits and retries the call. When the number of attempts is over, the function will throw an exception.
+Internally, the \verb|pcall| we defined above is used.
 
-\index{функции!pcall-retry}
-\index{итерация!loop}
+\index{functions!pcall-retry}
+\index{iteration!loop}
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2739,12 +2296,9 @@ protected call, <<защищённый вызов>>. Иногда приём п�
 
 \fi
 
-Это наивная версия, и в реальности её улучшают: меняют стратегию ожидания,
-добавляют логи. Однако принцип остаётся прежним.
+That is a naive version; you can improve it by changing the waiting strategy and adding logs. However, the principle remains the same.
 
-Любопытно, что функции стыкуются между собой. Построим комбинацию из
-\verb|pcall| и \verb|pcall-retry|. Даже если сервис недоступен и мы
-стучались в него много раз, получим пару \verb|[ok? result]|.
+By the way, these functions are compatible with each other. Let's build a combination of \verb|pcall| and \verb|pcall-retry|. Even if the service is not available and we have knocked on it many times, we will get a pair \verb|[ok? result]|.
 
 \begin{english}
   \begin{clojure}
@@ -2752,11 +2306,9 @@ protected call, <<защищённый вызов>>. Иногда приём п�
   \end{clojure}
 \end{english}
 
-\textbf{Исключения в Loop.} Форма \verb|loop| устроена особо: её часть
-\verb|recur| не может быть внутри \verb|try|. Предположим, мы хотим написать
-функцию повтора без \verb|pcall|. Фрагмент кода:
+\textbf{ Exceptions in a loop.} The \verb|loop| form is designed in a special way: its \verb|recur| part cannot be inside \verb|try|. Let's say we want to write a recur function without \verb|pcall|. Here is a snippet of code:
 
-\index{итерация}
+\index{iteration}
 \index{clojure.core!loop}
 
 \begin{english}
@@ -2771,16 +2323,11 @@ protected call, <<защищённый вызов>>. Иногда приём п�
   \end{clojure}
 \end{english}
 
-Компилятор не примет код с сообщением Can only recur from tail
-position. Чтобы исправить ошибку, нужно вынести \verb|recur| из
-\verb|try|. Проще всего это сделать с помощью \verb|pcall|, как в примере с
-\verb|pcall-retry|.
+The compiler will not accept the code with the message: Can only recur from tail position. To fix the error, you need to take out \verb|recur| from \verb|try|. The easiest way to do this is with \verb|pcall|, as in the example with \verb|pcall-retry|.
 
-\textbf{Throw in place.} До сих пор мы кидали исключения с помощью
-\verb|ex-info| и \verb|throw|. Первая строит исключение, а вторая
-бросает. Совместим их в функцию \verb|error!| и упростим аргументы:
+\textbf{Throw in place.} By now, we have thrown exceptions using \verb|ex-info| and \verb|throw|. The former builds an exception, the latter throws it. Let's combine them in the \verb|error!| function and simplify the arguments:
 
-\index{функции!error"!}
+\index{functions!error"!}
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2804,7 +2351,7 @@ position. Чтобы исправить ошибку, нужно вынести 
 \fi
 
 \noindent
-Чтобы вызвать исключение, нужна только строка, а остальное по желанию:
+The function needs only one parameter~--- a string~--- to throw an exception, and the others are optional:
 
 \begin{english}
   \begin{clojure}
@@ -2814,13 +2361,10 @@ position. Чтобы исправить ошибку, нужно вынести 
   \end{clojure}
 \end{english}
 
-\textbf{Сообщение с параметрами.} Иногда ошибке достаточно подробной строки. В
-этом случае \verb|ex-info| избыточен, потому что требует словаря. Напишем
-функцию, которая бросает \verb|Exception| с форматированным сообщением. В
-неё передают шаблон и значения подстановки. Частичка \verb|f| на конце
-имени означает форматирование.
+\textbf{ Messages with parameters.} Sometimes a detailed string is enough for an error. In this case, \verb|ex-info| is redundant because it requires a map as an argument. Now, we'll write a function that throws \verb|Exception| with a formatted message. It takes a template and substitution values.
+The \verb|f| added to the function name means formatting.
 
-\index{функции!errorf"!}
+\index{functions!errorf"!}
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2851,11 +2395,9 @@ position. Чтобы исправить ошибку, нужно вынести 
 
 \fi
 
-\textbf{Безопасный макрос.} Перехват исключений работает и в макросах. Код с
-макросами обычно короче и выразительней, чем обычная функция. Следующий пример
-показывает, как выполнить код в безопасном режиме, игнорируя ошибку:
+\textbf{Safe macro.} Catching of exceptions works in macros as well. Code with macros is usually shorter and more expressive than a regular function. The following example shows how to execute code in safe mode, ignoring an error:
 
-\index{макросы!with-safe}
+\index{macros!with-safe}
 
 \begin{english}
   \begin{clojure}
@@ -2867,8 +2409,7 @@ position. Чтобы исправить ошибку, нужно вынести 
 \end{english}
 
 \noindent
-Пустая форма \verb|catch| вернёт \verb|nil|. Мы получим его, если случится
-ошибка:
+An empty \verb|catch| form will return \verb|nil|. We'll get it if an error occurs:
 
 \begin{english}
   \begin{clojure}
@@ -2877,45 +2418,24 @@ nil
   \end{clojure}
 \end{english}
 
-На практике \verb|nil| не всегда означает ошибку, поэтому возвращают ключи
-\verb|:error| или \verb|:invalid|. Так работает Spec, которую мы разобрали в
-прошлой главе \page{spec-invalid}. Иногда в \verb|catch| добавляют запись в
-лог или обращение к Sentry. Подавляйте ошибку только если результат
-действительно неважен.
+In practice, \verb|nil| does not always mean an error, so the \verb|:error| or \verb|:invalid| keys are returned. That is how the Spec library works, which we discussed in the last chapter \page{spec-invalid}. Sometimes, we add logging or a Sentry call in the \verb|catch| block. Only suppress the error if the result is unimportant at all.
 
-\section{Заключение}
+\section{Summary}
 
-Исключения в Clojure устроены как в Java. Формы \verb|try| и \verb|catch| похожи
-на одноимённые операторы. Перехват работает на классах и~наследовании. Чем выше
-класс в иерархии, тем больше ошибок он охватывает.
+Exceptions in Clojure are similar to Java's. The \verb|try| and \verb|catch| forms are similar to Java statements of the same name. Interception works on classes and inheritance. The higher the class in the hierarchy, the more errors it covers.
 
-Класс \verb|ExceptionInfo| создан специально для Clojure. Его поле
-\verb|data| принимает любой словарь. Тип исключения определяют по полю
-\verb|:type| словаря. Функция \verb|ex-info|~--- это конструктор исключения.
+The \verb|ExceptionInfo| class is specifically designed for Clojure. Its \verb|data| field takes any map. The exception type is determined by the \verb|:type| field of the map. The \verb|ex-info| function is an exception constructor.
 
-У ошибки может быть причина, \verb|cause|. Если вы поймали исключение, но не
-знаете, что с ним делать, бросьте новое с контекстом и~ссылкой на исходное. Так
-собираются цепочки исключений. Чтобы выяснить причину, пригодятся данные со всей
-цепочки, а не только с верхнего звена.
+An error may have a \verb|cause|. If you catch an exception but don't know what to do with it, throw a new one with context and a link to the initial. That is how exception chains are built. To find out the cause, data from the entire chain will come in, not just from the top link.
 
-Код на вершине приложения решает, что делать с исключением. Лучше всего
-отправить его в систему сбора ошибок. На эту роль подходят Sentry и
-аналоги. Убедитесь, что клиент для Sentry передаёт всю информацию об ошибке, а не
-только стек-трейс.
+The code at the application top-level decides what to do with the exception.
+That is best to pass it to the error collection system. Sentry or its analogs can be such a system. Make sure the Sentry client passes all error information, not just the stack trace.
 
 \mnoindent
-В ветке \verb|finally| обычно закрывают ресурс, чтобы он не остался занятым
-при ошибке. Доступ к ресурсу упрощает контекстный менеджер. Это макрос вида
-\verb|with-<something>|, который оборачивает блок кода
-в~\verb|try/finally|. Для файлов Clojure предлагает макрос \verb|with-open|.
+If an error occurs, we usually close the resource in the \verb|finally| branch~--- to prevent it from staying busy. A context manager makes it easy to access the resource. The context manager is a \verb|with-<something>| macro wrapping a block of code in \verb|try/finally|. Clojure offers a \verb|with-open| macro working with files.
 
-Иногда исключением пользуются, чтобы перейти в другое место в~коде. Это
-противоречивый подход, и на него должны быть причины. Если переходов не
-избежать, подключите специальную библиотеку.
+Sometimes we can use an exception to jump to a particular place in the code. That is a controversial approach, and you must have good reasons for using it. If jumping code is vital, include a special library.
 
-Slingshot предлагает улучшенные макросы \verb|try+| и \verb|throw+|. С ними
-ошибки ловят не классами, а селекторами и предикатами. Вместо исключений
-используют словари.
+Slingshot offers the improved macros \verb|try+| and \verb|throw+|. With them, you catch errors with selectors and predicates, not classes. Maps are used instead of exceptions.
 
-Ряд функций упрощает контроль за исключениями. Возьмите их на заметку, чтобы
-сократить код.
+Some functions simplify the exception control. Please take note of them to shorten your code.
