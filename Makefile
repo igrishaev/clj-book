@@ -79,7 +79,7 @@ docker-build-prepare:
 
 IMAGE := clj-book
 
-.PHONY: docker-build
+.PHONY: docker-build-images
 docker-build-images:
 	docker build -t ${IMAGE}:ubuntu -f Dockerfile.ubuntu .
 	docker build -t ${IMAGE}:build .
