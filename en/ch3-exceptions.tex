@@ -31,7 +31,7 @@ In the first case, we will get an exception \emph{object}. We access it as usual
 If we do not catch the exception, the program will exit with nonzero code. Unless otherwise specified, the program will write the exception to \verb|stderr| (error channel) before exiting. We will see its class, text, and stack trace there. The last is the chain of calls that an exception passed through.
 
 \index{exceptions!stacktrace}
-\index{ channels!stderr}
+\index{channels!stderr}
 
 Some platforms allow you to specify a reaction to an uncaught exception. For example, to write it to a file or terminate the program in a special way.
 
@@ -92,12 +92,12 @@ They differ in semantics. The developer must anticipate checked exceptions and h
 However, it is difficult to predict a memory shortage, so \verb|OutOfMemoryError| is an unchecked exception. When resources are limited, any action can run out of memory. There is no point in catching this exception since the system is unstable when there is insufficient memory.
 
 \index{exceptions!checked}
-\index{ exceptions!unchecked}
+\index{exceptions!unchecked}
 
 The classes inherited from \verb|Error| and \texttt{Runtime\-Exception} are unchecked exceptions. Those inherited from \verb|Exception| are checked exceptions.
 
-\index{ exceptions!throw}
-\index{ exceptions!catch}
+\index{exceptions!throw}
+\index{exceptions!catch}
 
 To throw an exception, we pass its instance to the \verb|throw| statement. The \verb|catch| statement catches exceptions. In Java and other languages, it relies on a class hierarchy. If the type we are looking for is \verb|IOException|, we will catch all exceptions inherited from this class.
 
@@ -702,7 +702,7 @@ Exceptions are useful in libraries. Code is conventionally divided into two type
 
 \index{exceptions!chains}
 
-Now let's see how to work with exception chains exactly. The \verb|ex-info| function takes a third optional \verb|cause| parameter. It might be \verb|nil or another exception that will become part of the new one. Below, the \verb|divide| function catches an arithmetic error and throws a new exception with context.
+Now let's see how to work with exception chains exactly. The \verb|ex-info| function takes a third optional \verb|cause| parameter. It might be \verb|nil| or another exception that will become part of the new one. Below, the \verb|divide| function catches an arithmetic error and throws a new exception with context.
 
 \index{exceptions!cause}
 
@@ -1512,7 +1512,7 @@ The Exoscale Raven library is written in Clojure and therefore takes the languag
 
 \fi
 
-  \caption{ Sample of exception JSON-data}
+  \caption{Sample of exception JSON-data}
   \label{fig:ex-json-data}
 \end{listing}
 
@@ -1618,7 +1618,7 @@ For the sake of completeness, we are passing to Sentry not just an exception, bu
 
 \index{libraries!Manifold}
 \index{asynchrony}
-\index{ syntax!@ (deref)}
+\index{syntax!@ (deref)}
 
 \mnoindent
 Let me explain the \verb|@| operator before calling \verb|r/capture!| \ifx\DEVICETYPE\MOBILE\coderef{16}\else\coderef{14}\fi. The function works asynchronously due to the Manifold library. The result is a special \verb|deferred| object which acts as the Java Future object. We won't know about an error until we dereference the former. We'll encounter the \verb|@| operator in following chapters.
@@ -1752,7 +1752,7 @@ The \verb|if/else| cascade works, but looks unwieldy. It is not called the pyram
 
 \fi
 
-\caption{ Clojure Pyramid Example }
+\caption{Clojure Pyramid Example}
 \label{fig:clj-pyramid}
 
 \end{listing}
@@ -1978,7 +1978,7 @@ The base class \verb|ProjectException| and inherited from it \verb|UserNotFound|
 
 In the chapter on Spec, we've said that predicates were more powerful than types \page{type-and-pred}. The same is true for exceptions: if you can catch them with a function, you don't need a class. The \footurl{Slingshot}{https://github.com/scgilardi/slingshot}[Slingshot][-6mm] library offers a predicate approach. There are improved versions of \verb|try|, \verb|catch| and \verb|throw|in Slingshot.
 
-\index{ \fundamentality}
+\index{fundamentality}
 
 Those who are not familiar with Clojure will be surprised: you can change even such fundamental things as catching exceptions with the help of macros in it. In other languages, such changes have been waiting for years. In Clojure, you just need to use a library.
 
@@ -2165,7 +2165,7 @@ Let's look at several techniques for exceptions. They are simple, so you shouldn
 
 \label{pcall}
 
-\textbf{ Safe function call.} Lua language has no \verb|try| and \verb|catch| statements. To make the call safe from error, use the \footurl{\texttt{pcall}}{https://www.lua.org/pil/8.4.html}[Lua pcall][-3mm] operator. It is short for a protected call. Sometimes this technique is useful in Clojure, too.
+\textbf{Safe function call.} Lua language has no \verb|try| and \verb|catch| statements. To make the call safe from error, use the \footurl{\texttt{pcall}}{https://www.lua.org/pil/8.4.html}[Lua pcall][-3mm] operator. It is short for a protected call. Sometimes this technique is useful in Clojure, too.
 
 \verb|Pcall| takes a function and arguments and returns a pair of values. The first of them signifies a successful execution. If it is true, the second value will be the result of the computation, otherwise~--- an error instance. Clojure version:
 
