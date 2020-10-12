@@ -72,6 +72,10 @@ warn:
 refs:
 	! grep -A 0 -B 0 -i 'LaTeX Warning: Reference' ${JOB}.log
 
+.PHONY: check-urls
+check-urls:
+	./check-urls.sh
+
 .PHONY: docker-build-prepare
 docker-build-prepare:
 	make pyg-print-install
