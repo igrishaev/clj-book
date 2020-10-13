@@ -7,7 +7,7 @@ Chapter 1 looks at writing Clojure applications. We will talk about data transfe
 \index{organisations!Cognitect}
 \index{organisations!StackOverflow}
 
-Every year Cognitect \footurl{surveys}{https://blog.cognitect.com/blog/2017/1/31/clojure-2018-results}[Cognitect 2018] Clojure developers. One of their questions is "What field do you work in?" In 2010, half of the surveyed built web applications. By~2018, this number has grown to 80 percent, which is four-fifths of those people. We can find out similar dynamics in \footurl{StackOverflow surveys}{https://insights.stackoverflow.com/survey/2018}[Stack\-Overflow 2018][10mm].
+Every year Cognitect \footurl{surveys}{https://blog.cognitect.com/blog/2017/1/31/clojure-2018-results}[Cognitect 2018] Clojure developers. One of their questions is ``What field do you work in?'' In 2010, half of the surveyed built web applications. By~2018, this number has grown to 80 percent, which is four-fifths of those people. We can find out similar dynamics in \footurl{StackOverflow surveys}{https://insights.stackoverflow.com/survey/2018}[Stack\-Overflow 2018][10mm].
 According to them, more and more engineers are moving toward web development from related fields.
 
 If you get a job related to Clojure, most likely you will work with web applications. We specifically do not say ``a site'' because the term is becoming a thing of the past. Nowadays, a web application is not only a text with pictures. Broadly speaking, this is a complex data exchange over HTTP.
@@ -83,7 +83,7 @@ Reading and parsing content is time-consuming. Modern frameworks do not do this 
 
 The main parts of a request are \emph{method} and \emph{path}. A path points to a specific resource on a server. Sometimes it means a file relative to a given folder. For example, \verb|/images/map.jpg| will return the file of the same name from \verb|/var/www/static|. File sharing is just one form of the path, among many others. A path may contain the entity number: \verb|/users/9677/profile|. You can configure the server so that requests with the prefix \verb|/internal| and \verb|/public| go to different machines.
 
-A request method means an action that we intend to perform on a resource. The main methods are \verb|GET|, \verb|POST|, \verb|PUT| and \verb|DELETE|, which read, create, update and delete a resource. A \verb|POST /users/| request  means "create a user", and a \verb|GET /users/| one~--- "get a list of users".
+A request method means an action that we intend to perform on a resource. The main methods are \verb|GET|, \verb|POST|, \verb|PUT| and \verb|DELETE|, which read, create, update and delete a resource. A \verb|POST /users/| request  means ``create a user'', and a \verb|GET /users/| one~--- ``get a list of users''.
 
 The main response parameter is the status, which is a positive integer. Statuses are grouped by high-order digit. Values from 200 to 299 are considered positive. Such statuses mean that a server has processed a request without errors. For short, this range is denoted as \verb|2хх|.
 
@@ -313,7 +313,7 @@ Here's what happened. We have added the \verb|run-jetty| function to the current
 
 \fi
 
-If the flag is "true"{}~--- as it was in the first case~--- the main thread will be running unless we'll stop the server. To do this, you need to press \verb|Ctrl+C|. While the server is running, let's open a browser at \verb|http://localhost:8080|. Now we can see the text "You requested GET /".  Let's change the path to \verb|/hello| or
+If the flag is ``true''{}~--- as it was in the first case~--- the main thread will be running unless we'll stop the server. To do this, you need to press \verb|Ctrl+C|. While the server is running, let's open a browser at \verb|http://localhost:8080|. Now we can see the text ``You requested GET /''.  Let's change the path to \verb|/hello| or
 \verb|/path/to/file.txt| then the message will be different.
 
 \section{Requests and Responses}
@@ -2068,7 +2068,7 @@ It suppresses technical problems in the preliminary stages. Its task is to retur
 
 An interesting scenario is when middleware affects requests along a specific path. What's the drawback of \verb|wrap-auth-user-only|? If we add it to the stack, an anonymous user won't see anything: each request will return code 403. Home page, contact information, login form~--- everything will be unavailable. Who needs such an application?
 
-We should check only a part of the requests. For example, those that start with the word "account": \verb|/account/cart|, \verb|/account/orders|, and so on. We should put the wrapper down — at the route level, not on the general stack.
+We should check only a part of the requests. For example, those that start with the word ``account'': \verb|/account/cart|, \verb|/account/orders|, and so on. We should put the wrapper down — at the route level, not on the general stack.
 
 The implementation depends on how we build the routes. Compojure offers a middleware called \verb|wrap-routes|. This middleware takes a rule and \emph{another} middleware. The latter will be called if the rule matches the request. This complicated logic ensures that the middleware is not called until the request matches the rule.
 
