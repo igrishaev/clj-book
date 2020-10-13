@@ -80,7 +80,7 @@ In the exception tree, each class complements the semantics of the ancestor. Con
 \linegap
 
 \mnoindent
-The diagram is read like this “object \arr throwable \arr exception \arr I/O error \arr file not found". It's easy to guess by the name \verb|FileNotFoundException| what the problem is. If a developer threw a \verb|Throwable|, it would make it harder to find the cause of the error.
+The diagram is read like this ``object \arr throwable \arr exception \arr I/O error \arr file not found''. It's easy to guess by the name \verb|FileNotFoundException| what the problem is. If a developer threw a \verb|Throwable|, it would make it harder to find the cause of the error.
 
 There are \emph{checked} and \emph{unchecked} exceptions.
 They differ in semantics. The developer must anticipate checked exceptions and handle them in code. When we read a file, which is not on disk, the \verb|FileNotFoundException| class is a checked exception.
@@ -101,11 +101,11 @@ The classes inherited from \verb|Error| and \texttt{Runtime\-Exception} are unch
 
 To throw an exception, we pass its instance to the \verb|throw| statement. The \verb|catch| statement catches exceptions. In Java and other languages, it relies on a class hierarchy. If the type we are looking for is \verb|IOException|, we will catch all exceptions inherited from this class.
 
-The higher the class in the inheritance tree, the more exceptions the \verb|catch| statement will cover. In Java, it is bad manner to catch errors with the \verb|Throwable| or \verb|Exception| classes. Today's IDEs generate the "too broad catch expression" warning. It is better to replace the \verb|Exception| class with some more precise ones: for example, I/O errors, network errors, and others separately.
+The higher the class in the inheritance tree, the more exceptions the \verb|catch| statement will cover. In Java, it is bad manner to catch errors with the \verb|Throwable| or \verb|Exception| classes. Today's IDEs generate the ``too broad catch expression'' warning. It is better to replace the \verb|Exception| class with some more precise ones: for example, I/O errors, network errors, and others separately.
 
 One class is not enough to understand an exception cause.
 \verb|FileNotFoundException| does not have the \verb|file| field to track down which particular file does not exist. Most exceptions take an error message string. The message must be understandable to a person.
-If we see the message "File C:/work/test.txt not found", it becomes clear which file we were trying to access.
+If we see the message ``File C:/work/test.txt not found'', it becomes clear which file we were trying to access.
 
 \index{messages}
 
@@ -696,7 +696,7 @@ Let's say our HTTP client doesn't throw an exception. Let's do it manually~--- c
 
 \fi
 
-Exceptions are useful in libraries. Code is conventionally divided into two types: execution and coordination. Libraries are the executive code. At the library level, we don't know what semantics the code is running in. If an exception is thrown, business logic will catch it and continue running. But if you suppress errors without explanation, consumers will be dissatisfied. That also applies to the "return \verb|nil| and write to the log" pattern, that is, ignore the problem.
+Exceptions are useful in libraries. Code is conventionally divided into two types: execution and coordination. Libraries are the executive code. At the library level, we don't know what semantics the code is running in. If an exception is thrown, business logic will catch it and continue running. But if you suppress errors without explanation, consumers will be dissatisfied. That also applies to the ``return \verb|nil| and write to the log'' pattern, that is, ignore the problem.
 
 \section{More about Сhains}
 
@@ -1382,7 +1382,7 @@ We've figured out how to express an exception as text. Now you can write it to a
 
 \textbf{Prevent duplication.} During an influx of customers, we might find an error that did not notice before. If we write it to a file every time, we get a ton of identical messages. That is resource-intensive and makes it difficult to find errors.
 
-A collector determines the error similarity according to special rules. The "user1 not found" and "user2 not found" messages are slightly different, but the collector will combine them into one entry and show the rest when requested.
+A collector determines the error similarity according to special rules. The ``user1 not found'' and ``user2 not found'' messages are slightly different, but the collector will combine them into one entry and show the rest when requested.
 
 \textbf{Search.} You cannot build an efficient search without a structure.
 When errors are in the form of text, you can search only by the occurrence of a word or regular expression. This search is not relevant; it ignores how closely the item matches the request. It also does not cut out duplicates: we run the risk of being overwhelmed by identical messages in the search results.
@@ -1665,7 +1665,7 @@ Until now, we have regarded an exception as an error signal. Recall the fundamen
 
 \fi
 
-If \verb|(condition)|returns true, we'll skip the third step. This is known as the "exception as a control flow mechanism" technique. The method is controversial; use it carefully. Code becomes obscure and difficult to maintain.
+If \verb|(condition)|returns true, we'll skip the third step. This is known as the ``exception as a control flow mechanism'' technique. The method is controversial; use it carefully. Code becomes obscure and difficult to maintain.
 
 \index{imperative style}
 
@@ -1846,7 +1846,7 @@ Try to use code jumping only as a last resort: if you win something with it~--- 
 
 \section{Finally Form and Context Manager}
 
-Sometimes the code is executed within a resource. It might be a file, socket, or a database transaction. At the beginning of work, one "opens" the resource and~--- at the end~--- "closes" it. An open resource is considered busy. When a resource is busy, other clients cannot make full use of it. You can read someone's open file, but can't change it.
+Sometimes the code is executed within a resource. It might be a file, socket, or a database transaction. At the beginning of work, one ``opens'' the resource and~--- at the end~--- ``closes'' it. An open resource is considered busy. When a resource is busy, other clients cannot make full use of it. You can read someone's open file, but can't change it.
 
 Close the resource as soon as you no longer need it. An error can prevent this. If the code working with the resource does not catch the exception, the file or port will remain open until the end of the work. To close the resource even in the error event, resort to the \verb|finally| form.
 

@@ -101,7 +101,6 @@ To reduce the number of actions with the resource, we use other, rarer methods. 
 
 \index{web development!REST}
 
-% TODO lost quotation marks 'The method & resource'
 The method \& resource approach has grown into what is called today \footurl{REST}{https://restapitutorial.com}[REST]. REST proponents distinguish entities and CRUD operations on them (\textbf{C}reate, \textbf{R}ead, \textbf{U}pdate, \textbf{D}elete). The approach is considered proper when the entity is specified via the path, for example, \verb|/users/1|, and the operation~---  by the method. If it's a change request, the data is read from the body with JSON. We will not dwell on REST any longer,
 because this is just a set of guidelines, not the perfect and not the only one.
 
@@ -2339,7 +2338,6 @@ Streaming means the return of the stream. The stream can be huge, even endless. 
 
 Streams are even better suited for proxying. This word means data transfer through an intermediary. Suppose the company internal server gives important information upon request. We have to provide them to clients. However, we must not give them direct access to the internal resource. So we write middleware that checks access rights. If everything is ok, we send an HTTP request to the internal service and receive a stream. It becomes the body of our response to the client. We do not change the content, but only connect the stream to the required consumer.
 
-% TODO lost quotation marks 'not to read'
 Let's write a proxy application that will return the Yandex home page. In the request, we refer to it using GET. In the options, we pass the \verb|stream?| flag, which means not to read the response. In this case, the body will be a stream, not an HTML string. The Yandex response fields — \verb|status| and \verb|body| — go into our response. The above also applies to headers, but we will return not all of them, but their subset only (in our case, \verb|Content-Type|).
 
 \ifx\DEVICETYPE\MOBILE
