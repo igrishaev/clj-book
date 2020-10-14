@@ -8,13 +8,13 @@
 In this chapter, we will cover clojure.spec. It is a library for data validation in Clojure. It is a unique library: you can write validators and parsers in it, and generate data for tests. Spec is fundamental, so we should pay close attention to it.
 \end{teaser}
 
-The name spec is short for a specification. The library is a set of functions and macros for a schematic description of data. For example, what keys the map consists of and what the types of its values are. Such a record is called a data specification or spec. In what follows, we will use the "spec" word.
+The name spec is short for a specification. The library is a set of functions and macros for a schematic description of data. For example, what keys the map consists of and what the types of its values are. Such a record is called a data specification or spec. In what follows, we will use the ``spec'' word.
 
 Special functions check if the data conforms to a spec. If not, we will get a report of where the error occurred and why.
 
 \index{modules!clojure.spec.alpha}
 
-The Clojure distribution has included Spec since version 1.9. The full name of the module is \verb|clojure.spec.alpha|. The part "alpha" at the end of the name does not matter: it remained for historical reasons.
+The Clojure distribution has included Spec since version 1.9. The full name of the module is \verb|clojure.spec.alpha|. The part ``alpha'' at the end of the name does not matter: it remained for historical reasons.
 
 \index{validation}
 \index{parsing}
@@ -58,11 +58,11 @@ Independence and composition are hallmarks of convenient validation. Independenc
 
 \index{functions!composition}
 
-Composition means that it is useful to have a few simple checks to compose sophisticated ones. Suppose the checks "A" and "B" are specified. Now, we need their combinations~--- "A  \emph{\&}~B" and "A \emph{or}~B". Ideally, a composition is a couple of code lines and is trivial.
+Composition means that it is useful to have a few simple checks to compose sophisticated ones. Suppose the checks ``A'' and ``B'' are specified. Now, we need their combinations~--- ``A  \emph{\&}~B'' and ``A \emph{or}~B''. Ideally, a composition is a couple of code lines and is trivial.
 
 \index{functions}
 
-Both theses are in line with the concept of function.  The latter is used by one operation only~--- the call, and that makes things simpler. The function takes a value and returns "true" or "false". It answers the question of whether the value was proper or not. Clojure functions are first-class objects, so they are easy to combine.
+Both theses are in line with the concept of function.  The latter is used by one operation only~--- the call, and that makes things simpler. The function takes a value and returns ``true'' or ``false''. It answers the question of whether the value was proper or not. Clojure functions are first-class objects, so they are easy to combine.
 
 \section{Spec Basics}
 
@@ -158,8 +158,8 @@ Quick check:
   \end{clojure}
 \end{english}
 
-The \verb|::ne-string| key is short for "\textbf{n}on-\textbf{e}mpty
-string". The spec is often used: so it is logical to shorten its name.
+The \verb|::ne-string| key is short for ``\textbf{n}on-\textbf{e}mpty
+string''. The spec is often used: so it is logical to shorten its name.
 
 A more elegant way to define this spec is to compose predicates using the \verb|every-pred| function. It takes a set of predicates and returns a super-predicate. It returns true only if all of its composing predicates are true.
 
@@ -398,11 +398,11 @@ Let's create the spec for a page:
 
 The \verb|:req-un| parameter specifies the vector of specs. For each of them, our spec looks for a key of the same name in the map and validates the value. Let's see what \verb|:req-un| means and what other parameters \verb|s/keys| takes.
 
-The \verb|:req-un| name consists of the parts "req" and "un". The former is a sign of the presence of a key, and the latter — of the type. Req (required) means that the keys must be in the map. The opposite in meaning parameter is called opt (optional). It specifies keys that may not be present. They will only be validated if they are in the map.
+The \verb|:req-un| name consists of the parts ``req'' and ``un''. The former is a sign of the presence of a key, and the latter — of the type. Req (required) means that the keys must be in the map. The opposite in meaning parameter is called opt (optional). It specifies keys that may not be present. They will only be validated if they are in the map.
 
  \index{spec!:un}
 
-The "un-" part stands for an unqualified key. When checking un-keys, the spec discards their space. For example, if you specify \verb|:page/address| in the \verb|:req-un| list, then the \verb|:address| key will be searched for in the map, not the \verb|:page/address| one.
+The ``un-'' part stands for an unqualified key. When checking un-keys, the spec discards their space. For example, if you specify \verb|:page/address| in the \verb|:req-un| list, then the \verb|:address| key will be searched for in the map, not the \verb|:page/address| one.
 
 We meet unqualified keys frequently. The data comes from different APIs and databases that know nothing about the namespaces. There are exceptions when the entire company stack is built in Clojure. In this case, a client and server send data with fully-qualified keys.
 
@@ -595,7 +595,7 @@ So, the input received a number as a string. We made sure that the string consis
 \index{spec!conform}
 
 \mnoindent
-Spec offers such features. These are the \verb|s/conformer| and и~\verb|s/conform| functions. If they return a converted value, it is called a "conformed" value in terms of Spec.
+Spec offers such features. These are the \verb|s/conformer| and и~\verb|s/conform| functions. If they return a converted value, it is called a ``conformed'' value in terms of Spec.
 
 \label{spec-invalid}
 
@@ -1389,7 +1389,7 @@ For an empty string, the output will be different. This time, the error will be 
 
 When validating data, it's not just the fact of error that matters. It is more important to explain to a client exactly where they went wrong. Regardless of whether a client is a human or a program, we should add a clear text in a response. After all, it will get into the logs that employees read.
 
-We often see messages like "Error: DATAERROR" without any details, or a red "check data" text above a two-screen form. If programmers can translate machine language into human one, such nonsense can be avoided.
+We often see messages like ``Error: DATAERROR'' without any details, or a red ``check data'' text above a two-screen form. If programmers can translate machine language into human one, such nonsense can be avoided.
 
 \index{interface}
 \index{user}
@@ -1419,7 +1419,7 @@ To compose the message, let's go back to the \verb|s/explain-data| function. As 
 
 At first glance, it is not clear what to do with it. Some programmers give up and say the library error reporting is not good. But this is not so: the report contains all the necessary data — you just need to process it correctly.
 
-Newbies ask: why not make clear messages at the library level? For example, assign a field to a spec that says~--- "Enter the correct address." Why not take a Python or JavaScript library as a sample?
+Newbies ask: why not make clear messages at the library level? For example, assign a field to a spec that says~--- ``Enter the correct address.'' Why not take a Python or JavaScript library as a sample?
 
 \index{fundamentality}
 
@@ -1454,7 +1454,7 @@ The \verb|explain-data| map contains the keys \verb|:spec|, \verb|:value|, and \
 
 The report contains everything we need. Let's take the problem value from \verb|:val|. The last element of the \verb|:via| vector is the spec where the validation stopped.
 
-Let's compose a map, where a key is a spec, and a value is a clear text or template. Knowing which spec caused the error, we get the text from the map. In our case, the last element of \verb|:via| is \verb|::ne-string|. Let's assign the message "The string must not be empty" (or something similar) to it.
+Let's compose a map, where a key is a spec, and a value is a clear text or template. Knowing which spec caused the error, we get the text from the map. In our case, the last element of \verb|:via| is \verb|::ne-string|. Let's assign the message ``The string must not be empty'' (or something similar) to it.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1809,7 +1809,7 @@ This method advantage is that it preserves the required level of details in mess
 
 \fi
 
-If a field that lacks translation appears in \verb|::sample|, the search will be resolved in \verb|::sample|. A general translation for it might be a kind of "the sample is filled in incorrectly" to localize the problem. That useful if \verb|::sample| will become an element of another spec, it in turn becomes part of a third spec, and so on.
+If a field that lacks translation appears in \verb|::sample|, the search will be resolved in \verb|::sample|. A general translation for it might be a kind of ``the sample is filled in incorrectly'' to localize the problem. That useful if \verb|::sample| will become an element of another spec, it in turn becomes part of a third spec, and so on.
 
 \subsubsection{Convergence}
 
@@ -2000,7 +2000,7 @@ The advantage of \verb|s/spec| is that you only wrap the links, while the predic
 
 \subsubsection{Flexible Search}
 
-Let's flip the problem. Suppose there are many entities with descriptions in a project: books, films, games, and so on. It would be great if all descriptions (\verb|:movie/description|, \texttt{:book/descrip\-tion}, etc) converge to the "incorrect description" message. How can we do this without adding each spec to the translation?
+Let's flip the problem. Suppose there are many entities with descriptions in a project: books, films, games, and so on. It would be great if all descriptions (\verb|:movie/description|, \texttt{:book/descrip\-tion}, etc) converge to the ``incorrect description'' message. How can we do this without adding each spec to the translation?
 
 To avoid overloading of a map, let's resort to a ploy. Let our function look for a translation by the full key, and if there is none, then by name. Then the \verb|:description| key will be enough for all the specs to converge to this translation. If you need a specific phrase for a particular \verb|:book/description|, add the full version:
 
@@ -2261,7 +2261,7 @@ Note that each method takes an error map. We have shaded it with the \verb|_| ch
 
 \index{templates}
 
-If the options above seemed tricky to you, try a message template. In this case, the message is made up of the field name and value (e.g., "the email field has the test invalid value"). We can simply get the message using the \verb|format| function. The method is fast and cheap, though there is an echo of machine language in messages.
+If the options above seemed tricky to you, try a message template. In this case, the message is made up of the field name and value (e.g., ``the email field has the test invalid value''). We can simply get the message using the \verb|format| function. The method is fast and cheap, though there is an echo of machine language in messages.
 
 We should get the field name as the last keyword of the \verb|:in| field. Let's try to take the last element. Let me remind you that \verb|:in| is the physical path to the data, which is passed to the \verb|get-in|, \verb|assoc-in|, and other functions. Its elements are not only keywords for nested maps, but also vector indexes.
 
@@ -2553,7 +2553,7 @@ Variants with an invalid number, mail, or status will not be parsed. The specs f
 
 \subsection{Conditional Parsing}
 
-Let's say we are working with the legacy data format. It is conditional: if there is the "blocked" label in front of the number, the user is blocked. For instance:
+Let's say we are working with the legacy data format. It is conditional: if there is the ``blocked'' label in front of the number, the user is blocked. For instance:
 
 \begin{english}
   \begin{text}
@@ -2796,7 +2796,7 @@ Now we should move on to the missing elements. The \verb|clear-ini-lines| functi
 
 \index{spec!*}
 
-The \verb|some-fn| function combines multiple predicates with the "for any of" logic. The \spverb|(s/* :ini/section)| spec we should read as~--- zero or more sections. Here, a section is a title and the adjacent fields and values. Let's write it as \verb|s/cat|:
+The \verb|some-fn| function combines multiple predicates with the ``for any of'' logic. The \spverb|(s/* :ini/section)| spec we should read as~--- zero or more sections. Here, a section is a title and the adjacent fields and values. Let's write it as \verb|s/cat|:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -3403,7 +3403,7 @@ This situation suggests a decorator that takes a function and a spec. Before run
 \index{modules!clojure.spec.test.alpha}
 \index{functions!instrument}
 
-The spec library includes a decorator, so we don't have to write a custom one. It is the \verb|instrument| function from the \verb|clojure.spec.test.alpha|. Pay attention to the namespace: the word "test" has crept into it. That is, the instrumentation of functions was taken out in a separate module.
+The spec library includes a decorator, so we don't have to write a custom one. It is the \verb|instrument| function from the \verb|clojure.spec.test.alpha|. Pay attention to the namespace: the word ``test'' has crept into it. That is, the instrumentation of functions was taken out in a separate module.
 
 \index{monkey patch}
 
@@ -3810,7 +3810,7 @@ Spec is a Clojure library that comes with the language. Spec offers a set of fun
 
 They are more flexible and powerful than types. If the value is of a proper type, this does not guarantee correctness. Classes like \verb|UnixPort| are not types~--- they are runtime validation. It binds to calling the class using syntax.
 
-Predicates combine with each other, unlike classes. It is easy to compose a predicate with "each of" or "any of" logic, and others.
+Predicates combine with each other, unlike classes. It is easy to compose a predicate with ``each of'' or ``any of'' logic, and others.
 
 The library converts (conforms) old data to new ones. The \verb|s/conform| function wraps another function to return a conformed value. For what is this? We use this to coercion strings to numbers and dates.
 
