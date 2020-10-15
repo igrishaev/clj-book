@@ -79,7 +79,6 @@ In the exception tree, each class complements the semantics of the ancestor. Con
 
 \linegap
 
-\mnoindent
 The diagram is read like this ``object \arr throwable \arr exception \arr I/O error \arr file not found''. It's easy to guess by the name \verb|FileNotFoundException| what the problem is. If a developer threw a \verb|Throwable|, it would make it harder to find the cause of the error.
 
 There are \emph{checked} and \emph{unchecked} exceptions.
@@ -968,7 +967,6 @@ We have shortened the trace, but tracks usually take up several screens. They sh
 
 \index{modules!clojure.stacktrace}
 
-\mnoindent
 The \verb|clojure.stacktrace| package has several functions for printing exceptions. \verb|Print-throwable| prints message and context:
 
 \ifx\DEVICETYPE\MOBILE
@@ -1620,7 +1618,6 @@ For the sake of completeness, we are passing to Sentry not just an exception, bu
 \index{asynchrony}
 \index{syntax!@ (deref)}
 
-\mnoindent
 Let me explain the \verb|@| operator before calling \verb|r/capture!| \ifx\DEVICETYPE\MOBILE\coderef{16}\else\coderef{14}\fi. The function works asynchronously due to the Manifold library. The result is a special \verb|deferred| object which acts as the Java Future object. We won't know about an error until we dereference the former. We'll encounter the \verb|@| operator in following chapters.
 
 In production systems, one doesn't usually do the dereference of \verb|deferred| objects but wraps them in \verb|d/catch| and \verb|d/chain| macros~--- asynchronous analogs of \verb|catch| and the arrow operator \arr{}. Programming in Manifold is a separate topic; we won't touch on it in this book.
@@ -2069,7 +2066,6 @@ Instead of a selector, we can use a predicate, a function of one argument. If th
 
 Use predicates when you need fine tuned interception conditions. Let's see how to upload a file to Amazon S3. In special situations, Java SDK throws an exception after the file is loaded (if the checksums do not match). We have to delete the unsuccessfully uploaded file so as not to waste space.
 
-\mnoindent
 Unfortunately, there is neither the \verb|ChecksumError| class nor an equivalent in SDK. Instead, we'll receive a regular \verb|AmazonS3Exception| with a long text. To highlight our case, let's compare the message with the template. Let's take the check into the function:
 
 \ifx\DEVICETYPE\MOBILE
@@ -2431,7 +2427,6 @@ An error may have a \verb|cause|. If you catch an exception but don't know what 
 The code at the application top-level decides what to do with the exception.
 That is best to pass it to the error collection system. Sentry or its analogs can be such a system. Make sure the Sentry client passes all error information, not just the stack trace.
 
-\mnoindent
 If an error occurs, we usually close the resource in the \verb|finally| branch~--- to prevent it from staying busy. A context manager makes it easy to access the resource. The context manager is a \verb|with-<something>| macro wrapping a block of code in \verb|try/finally|. Clojure offers a \verb|with-open| macro working with files.
 
 Sometimes we can use an exception to jump to a particular place in the code. That is a controversial approach, and you must have good reasons for using it. If jumping code is vital, include a special library.

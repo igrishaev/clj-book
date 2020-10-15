@@ -594,7 +594,6 @@ So, the input received a number as a string. We made sure that the string consis
 
 \index{spec!conform}
 
-\mnoindent
 Spec offers such features. These are the \verb|s/conformer| and и~\verb|s/conform| functions. If they return a converted value, it is called a ``conformed'' value in terms of Spec.
 
 \label{spec-invalid}
@@ -654,7 +653,6 @@ Let's see how to recover the date from the string. That is an old good web devel
 \index{modules!clojure.instant}
 \index{functions!read-instant-date}
 
-\mnoindent
 We will need a string parser and a small wrapper to bind it with the spec. The \verb|read-instant-date| function from the \verb|clojure.instant| module reads a date from a string. The function is tolerant to the format and takes into account different combinations. For example, the date can only be a year.
 
 \index{даты}
@@ -1099,7 +1097,6 @@ The \verb|->lower| variable is a wrapper for case conversion:
 
 \fi
 
-\mnoindent
 The  \verb|::s/invalid| key is not necessary at the end of the \verb|case| macro. If the default option is not specified and \verb|case| did not find a branch, it will throw an exception. \verb|With-conformer| will catch it and return \verb|::s/invalid|.
 
 \section{Logical Paths}
@@ -1477,7 +1474,6 @@ Let's compose a map, where a key is a spec, and a value is a clear text or templ
 
 \fi
 
-\mnoindent
 Now we'll write a function that takes an error map (one of the elements of \verb|::s/problems|) and returns a message:
 
 \index{functions!get-message}
@@ -1559,7 +1555,6 @@ We will now test the method for other fields. Add the email address to the \verb
 
 The \verb|::email| spec checks that the string is not empty and matches the address pattern. The pattern requires the string to have an \verb|@| and a period, with arbitrary characters between them.
 
-\mnoindent
 If we pass an empty string to \verb|email|, the last element of the \verb|via| will be \verb|::ne-string|. To save space, let's shorten the output of \verb|explain-data|:
 
 \ifx\DEVICETYPE\MOBILE
@@ -1868,10 +1863,8 @@ If we pass an empty string to the description, the \verb|:via| vector will conta
 
 Please note that there is no \texttt{:book/de\-scription} spec in the vector. Therefore, we cannot compose a message specifically for this field, for example~--- incorrect book description. The \verb|::movie| behaves similarly: if we pass in an empty string, at the end of the via vector there will be the \verb|::ne-string| spec.
 
-\mnoindent
 The \texttt{(s/def :book/description ::ne\--string)} expression is a link. When one spec refers to another, Spec shortens the chain to reach \verb|::ne-string| immediately. In such a situation, they say that the \verb|:book/description| and \verb|:movie/description| specs \emph{converge} into \verb|::ne-string|. Sometimes convergence has an advantage: you can specify a translation for \verb|::ne-string| and refer to it in all text fields. When the \verb|:via| path is vital, the spec is reorganized.
 
-\mnoindent
 One way to do this is to replace the link with a predicate. Rewrite \verb|:book/description| as in the example below:
 
 \ifx\DEVICETYPE\MOBILE
@@ -1895,7 +1888,6 @@ One way to do this is to replace the link with a predicate. Rewrite \verb|:book/
 
 \fi
 
-\mnoindent
 The description now refers not to \verb|::ne-string|, but a predicate with the same name. Below \verb|:book/description|, there will be no specs. If \verb|ne-string| returns false, \verb|:book/description| will become the last element of the \verb|:via|:
 
 \ifx\DEVICETYPE\MOBILE
@@ -2152,7 +2144,6 @@ The \verb|:default| key is responsible for the default action. If no translation
 
 Let's remember the message for the description. We want both specs~--- \verb|:book/description| and \verb|:movie/description|~--- to converge to the common translation \verb|::description|. But at the same time, we want to be able to specify an individual translation for them. The hierarchy of keys provides this possibility. If the multimethod does not have a key, but the key inherits from the parent, the multimethod will search for the parent.
 
-\mnoindent
 To do this, we will inherit the \verb|:book/description| key from
 \verb|::description|. If an error occurs in the \verb|:book/description| spec, we'll get a common translation for any description.
 
