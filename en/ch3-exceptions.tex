@@ -204,7 +204,7 @@ That is how exceptions work in languages like Java, Python, and others. Each pla
 
 \section{Moving on to Clojure}
 
-To get acquainted with the exception, let's provoke it. A surefire trick is to divide a number by zero. Turn on REPL and do \verb|(/ 1 0)|. The following text will appear: 
+To get acquainted with the exception, let's provoke it. A surefire trick is to divide a number by zero. Turn on REPL and do \verb|(/ 1 0)|. The following text will appear:
 
 \index{divide by zero}
 
@@ -223,7 +223,7 @@ This is the bug report. It looks different depending on the editor and settings.
 
 Note that an exception in the REPL does not stop it: a command is still expected from us. The REPL catches errors and only displays them on a screen. Clojure programs work as usual in a production run. If no exception is caught on the main thread, the program will stop.
 
-To catch the exception, place the code in the \verb|try| form. It is followed by one or more \verb|catch| forms. They indicate which classes to catch and what to do with an exception. Here's how to safely divide a number: 
+To catch the exception, place the code in the \verb|try| form. It is followed by one or more \verb|catch| forms. They indicate which classes to catch and what to do with an exception. Here's how to safely divide a number:
 
 \index{arithmetic}
 
@@ -254,7 +254,7 @@ This explanation is of little use. The \verb|.getMessage| method will return the
 \end{english}
 
 The \verb|ArithmeticException| class fails to catch some computation errors.
-What will happen if you add 1 to \verb|nil|? Even if we put the calculations in \verb|try/catch|, we won't catch the exception: 
+What will happen if you add 1 to \verb|nil|? Even if we put the calculations in \verb|try/catch|, we won't catch the exception:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -349,7 +349,7 @@ Sometimes an exception is thrown deliberately to report an abnormal situation. T
 
 \fi
 
-The message above is not informative. But even if we indicated that the problem is in arithmetic or the database, we would like to know which values exactly caused the error. For this, build the message using the \verb|format| function. It takes the template and substitution parameters: 
+The message above is not informative. But even if we indicated that the problem is in arithmetic or the database, we would like to know which values exactly caused the error. For this, build the message using the \verb|format| function. It takes the template and substitution parameters:
 
 \index{clojure.core!format}
 
@@ -653,7 +653,7 @@ That might have happened for various reasons: the file does not exist or is occu
 
 There is no industry consensus on whether to throw an exception on a negative HTTP response. According to the protocol, a 404 response is as correct as 200. Advanced libraries offer the flag to choose whether to throw an exception at 4xx statuses or not.
 
-Let's say our HTTP client doesn't throw an exception. Let's do it manually~--- check the status and run \verb|ex-info| with details: 
+Let's say our HTTP client doesn't throw an exception. Let's do it manually~--- check the status and run \verb|ex-info| with details:
 
 \index{HTTP!authentication}
 
@@ -759,7 +759,7 @@ Divide by zero
   \end{text}
 \end{english}
 
-Let's write a function that returns an exception list in descending order of precedence. The original exception comes first, the cause of the exception comes second, then~--- the cause of the cause, and so on. Using the \verb|loop| shape is the simplest means of doing this: 
+Let's write a function that returns an exception list in descending order of precedence. The original exception comes first, the cause of the exception comes second, then~--- the cause of the cause, and so on. Using the \verb|loop| shape is the simplest means of doing this:
 
 \index{iteration}
 \index{clojure.core!loop}
@@ -860,7 +860,7 @@ We got an exception tree as a result, but it is not always convenient to work wi
 \fi
 
 \noindent
-And so~--- print line by line (we'll get a column of the same lines): 
+And so~--- print line by line (we'll get a column of the same lines):
 
 \index{printing!exceptions}
 
@@ -1627,42 +1627,45 @@ In production systems, one doesn't usually do the dereference of \verb|deferred|
 \index{exceptions!jumps}
 \index{GOTO}
 
-Until now, we have regarded an exception as an error signal. Recall the fundamental property of an exception~--- it interrupts the program flow and floats up until it is caught. Sometimes you can use that to move up the stack. If we throw the conditional \verb|MyGOTOException| and, at the top, put \verb|catch| with this class, we'll get the \verb|GOTO| operator: 
+Until now, we have regarded an exception as an error signal. Recall the fundamental property of an exception~--- it interrupts the program flow and floats up until it is caught. Sometimes you can use that to move up the stack. If we throw the conditional \verb|MyGOTOException| and, at the top, put \verb|catch| with this class, we'll get the \verb|GOTO| operator:
 
 \ifx\DEVICETYPE\MOBILE
 
 \begin{english}
-  \begin{clojure}
+  \begin{clojure/lines}
 (try
-  (do-first-step)
-  (do-second-step)
+  (do-step-1)
+  (do-step-2)
   (when (condition)
     (throw (new MyGOTOException)))
-  (do-third-step)
+  (do-step-3)
   (catch MyGOTOException e
     (println "The third step
                   has been skipped")))
-  \end{clojure}
+  \end{clojure/lines}
 \end{english}
 
 \else
 
 \begin{english}
-  \begin{clojure}
+  \begin{clojure/lines}
 (try
-  (do-first-step)
-  (do-second-step)
+  (do-step-1)
+  (do-step-2)
   (when (condition)
     (throw (new MyGOTOException)))
-  (do-third-step)
+  (do-step-3)
   (catch MyGOTOException e
     (println "The third step has been skipped")))
-  \end{clojure}
+  \end{clojure/lines}
 \end{english}
 
 \fi
 
-If \verb|(condition)|returns true, we'll skip the third step. This is known as the ``exception as a control flow mechanism'' technique. The method is controversial; use it carefully. Code becomes obscure and difficult to maintain.
+If \verb|(condition)| in the fourth line returns true, we'll skip the third
+step. This is known as the ``exception as a control flow mechanism''
+technique. The method is controversial; use it carefully. Code becomes obscure
+and difficult to maintain.
 
 \index{imperative style}
 
