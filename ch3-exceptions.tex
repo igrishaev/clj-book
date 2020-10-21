@@ -1974,40 +1974,40 @@ middleware.
 \ifx\DEVICETYPE\MOBILE
 
 \begin{english}
-  \begin{clojure}
+  \begin{clojure/lines}
 (try
-  (do-first-step)
-  (do-second-step)
+  (do-step-1)
+  (do-step-2)
   (when (condition)
     (throw (new MyGOTOException)))
-  (do-third-step)
+  (do-step-3)
   (catch MyGOTOException e
     (println "The third step
                   has been skipped")))
-  \end{clojure}
+  \end{clojure/lines}
 \end{english}
 
 \else
 
 \begin{english}
-  \begin{clojure}
+  \begin{clojure/lines}
 (try
-  (do-first-step)
-  (do-second-step)
+  (do-step-1)
+  (do-step-2)
   (when (condition)
     (throw (new MyGOTOException)))
-  (do-third-step)
+  (do-step-3)
   (catch MyGOTOException e
     (println "The third step has been skipped")))
-  \end{clojure}
+  \end{clojure/lines}
 \end{english}
 
 \fi
 
-Если \verb|(condition)| вернёт истину, мы пропустим третий шаг. В~литературе
-трюк называют <<исключение как способ управления исполнением>>. Это
-противоречивая практика; применяйте её осторожно. Код становится неочевидным и
-трудным в поддержке.
+Если \verb|(condition)| в четвёртой строке вернёт истину, мы пропустим третий
+шаг. В~литературе трюк называют <<исключение как способ управления
+исполнением>>. Это противоречивая практика; применяйте её осторожно. Код
+становится неочевидным и трудным в поддержке.
 
 \index{императивный стиль}
 
