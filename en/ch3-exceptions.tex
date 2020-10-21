@@ -2324,7 +2324,7 @@ By the way, these functions are compatible with each other. Let's build a combin
   \end{clojure}
 \end{english}
 
-The compiler will not accept the code with the message: Can only recur from tail position. To fix the error, you need to take out \verb|recur| from \verb|try|. The easiest way to do this is with \verb|pcall|, as in the example with \verb|pcall-retry|.
+The compiler will not accept the code with the message: ``Can only recur from tail position''. To fix the error, you need to take out \verb|recur| from \verb|try|. The easiest way to do this is with \verb|pcall|, as in the example with \verb|pcall-retry|.
 
 \textbf{Throw in place.} By now, we have thrown exceptions using \verb|ex-info| and \verb|throw|. The former builds an exception, the latter throws it. Let's combine them in the \verb|error!| function and simplify the arguments:
 
