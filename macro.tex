@@ -65,7 +65,9 @@
 
 \def\SITELINK{\smartlink{\DOMAIN}{https://\DOMAIN}}
 
-\newcommand{\tuple}[1]{\{#1\}}
+%% small non-breaking space
+%% https://tex.stackexchange.com/questions/76132/
+\newcommand{\tuple}[1]{\textlangle\,#1\,\textrangle}
 
 \newminted[clojure]{clojure}{}
 
