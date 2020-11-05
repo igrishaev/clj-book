@@ -1,57 +1,43 @@
+\chapter{Mutability}
 
-\chapter{Изменяемость}
-
-\index{изменяемость}
+\index{mutability}
 
 \begin{teaser}
-В классических языках данные меняются, а стандартная библиотека предлагает
-ограничения: локи, атомарные действия, постоянные коллекции. В Clojure,
-наоборот, данные не меняются, а мутабельные типы задвинуты на второй план. Это
-сделано специально, потому что неизменяемость~--- центральная идея языка.
+In classical languages, data is mutable, and a standard library offers restrictions: locks, atomic actions, and persistent collections. In contrast, Clojure data are persistent and mutable types are pushed into the background. It is by design since immutability is the basic idea of the language.
 \end{teaser}
 
-Руководства по Clojure учат постоянными коллекциям. Это правильный подход, но
-когда появляется состояние, новички испытывают трудности. В этой главе мы займём
-другую позицию: рассмотрим, как управлять состоянием в программах.
+Clojure tutorials teach us persistent collections.
+The approach is correct, but when a state appears, beginners might experience some difficulties.
+So in this chapter, I want to walk you through a different way: we'll look at how to manage state in programs.
 
-\section{Общие проблемы}
+\section{Common Problems}
 
-На Clojure трудно писать в императивном стиле, когда акцент сделан на изменении
-данных. Скажем, чтобы получить список удвоенных чисел, выполняют шаги:
+In Clojure, writing in an imperative style (which emphasizes data changing) is difficult. For example, to get a list of doubled numbers, follow the steps:
 
-\index{итерация}
+\index{iteration}
 
 \begin{itemize}
 \item
-  создать пустой список~--- будущий результат;
+  create an empty list as a future result;
 \item
-  пройти по элементам исходного списка;
+  go through the initial list's elements;
 \item
-  на каждом шаге вычислить новый элемент;
+  calculate a new one on each step;
 \item
-  добавить его к результату.
+  add the former to the result.
 \end{itemize}
 
-Базовые типы Clojure не меняются, и к ним нельзя применить алгоритм выше. Те,
-кто пришёл из императивных языков, поначалу не могут писать код с
-постоянными коллекциями. Привычка менять данные так сильно укрепилась в них, что
-иммутабельность кажется физическим ограничением.
+Since the base types of Clojure are immutable, we cannot apply the above algorithm to them. Those programmers who have come to Clojure from imperative languages cannot write code with persistent collections at first. They are so used to changing data that immutability seems like a physical limitation.
 
-Создатель Clojure полагает, что изменяемость~--- основная проблема в разработке
-ПО. Когда мы пишем код, то видим его начальное состояние, в котором он будет
-первый такт машинного времени. Затем программа инициирует классы, заполнит поля,
-и объекты изменятся.
+The Clojure creator believes mutability is the major problem in software development.
+When we write the code, we see its initial state, in which it is in the first tick of machine time.
+Then the program initiates the classes, fills in the fields, and the objects change.
 
-Некоторые ошибки трудно расследовать, потому что код и состояние
-расходятся. Чтобы исправить ошибку, её повторяют в локальном окружении. Однако
-привести код в конкретное состояние не так просто. Неизменяемые данные отсекают
-целый пласт ошибок, от которых страдают императивные языки.
+Investigating some errors is difficult because the code and state diverge. To fix the error, we will have to repeat it in the local environment. However, getting the code into a concrete state is not easy. Immutable data cuts off a whole layer of errors that imperative languages are prone to.
 
-\index{языки!Python}
+\index{ languages!Python}
 
-Рассмотрим примеры на Python. В модуле заданы параметры запроса по
-умолчанию. Функция \verb|api_call| принимает дополнительные параметры,
-объединяет со стандартными и передаёт в HTTP-клиент:
+Let’s take a look at the following examples in Python. The module holds default request parameters. The \verb|api_call| function gets additional parameters, combines them with the standard ones, and sends them to an HTTP client:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -96,16 +82,13 @@ def api_call(**params):
 
 \fi
 
-\index{передача по ссылке}
+\index{pass by reference}
 
-В теле \verb|api_call| грубая ошибка: переменная \verb|api_params| получает
-не копию глобальных параметров, а \emph{ссылку} на них \ifx\DEVICETYPE\MOBILE\coderef{10}\else\coderef{9}\fi. Изменяя
-\verb|api_params|, мы на самом деле меняем \verb|DEFAULT_PARAMS|
-\ifx\DEVICETYPE\MOBILE\coderef{11}\else\coderef{10}\fi. На каждый вызов глобальные параметры меняются, что ведёт к
-странному поведению программы. Код и состояние <<разъехались>>.
+There is a crude error in the \verb|api_call| body: the \verb|api_params| variable gets not a copy of the global parameters but a \emph{reference} to them \ifx\DEVICETYPE\MOBILE\coderef{10}\else\coderef{9}\fi. When trying to change \verb|api_params|, instead, we are changing \verb|DEFAULT_PARAMS|
+\ifx\DEVICETYPE\MOBILE\coderef{11}\else\coderef{10}\fi. For each call, the global parameters change, which leads to erratic program behavior.
+The state of the program and the code in our minds are out of sync.
 
-На собеседованиях часто задают следующий вопрос. Представьте функцию с
-сигнатурой ниже. Объясните, что в ней не так, и приведите пример ошибки.
+In a job interview, you may often hear a question like the one below. Imagine a function with the following signature. Please, explain what is wrong with it and give an example of the error.
 
 \begin{english}
   \begin{python}
@@ -113,10 +96,7 @@ def foo(bar=[]):
   \end{python}
 \end{english}
 
-Ответ: параметры функции по умолчанию создаются однажды. В~данном случае
-\verb|bar| равен пустому списку. В Python список изменяется. Если в
-\verb|bar| ничего не передали, получим исходный список. Добавим в~него
-элемент, и в следующий раз \verb|bar| будет уже не пустой:
+Answer: The default function parameters are created once. In this case, \verb|bar| is equal to an empty list. In Python, the list is mutable. If nothing was passed to \verb|bar|, we get the original list. Let's add an element to it, and next time \verb|bar| will be not empty:
 
 \begin{english}
   \begin{python}
@@ -126,15 +106,12 @@ def foo(bar=[]):
   \end{python}
 \end{english}
 
-Вызов \verb|foo| вернёт списки \verb|[1]|, \verb|[1, 1]| и так
-далее. Ещё хуже: если результат \verb|foo| сохранить в переменную и позже
-добавить к нему элемент, на самом деле изменится злосчастный \verb|bar|.
+Calling \verb|foo| will return lists \verb|[1]|, \verb|[1, 1]|, and so on. Even worse: if you save the result of \verb|foo| to a variable and later add an element to it, in fact, the same ill-fated \verb|bar| will change.
 
-Современные IDE проверяют код на неявные ошибки. Про список в~сигнатуре знают
-все анализаторы и линтеры. Но мы не можем целиком положиться на утилиты: если
-данные меняются постоянно, трудно понять, где ошибка, а где умысел.
+Modern IDEs checks code for implicit errors.
+All analyzers and linters know about a list in a signature. But we cannot entirely rely on utilities: if the data changes constantly, it is difficult to understand where a bug and where "it's a feature" is.
 
-Начинающих кложуристов выдаёт код:
+Clojure beginners often write code like this:
 
 \begin{english}
   \begin{clojure}
@@ -147,11 +124,10 @@ def foo(bar=[]):
   \end{clojure}
 \end{english}
 
-\index{императивный стиль}
+\index{imperative style}
 
 \noindent
-Это привычка из императивного прошлого. Атом-аккумулятор лишний, достаточно
-\verb|map| или \verb|for|:
+There is a noticeable habit of imperative languages in it. The atom accumulator is unnecessary: a \verb|map| or \verb|for| is enough:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -194,78 +170,66 @@ def foo(bar=[]):
 
 \fi
 
-Оба выражения короче и понятней. Не нужно создавать вектор и добавлять в него
-элементы~--- это делают функции. Если обход коллекции завязан на
-атоме, скорее всего это слабое решение.
+Both expressions are shorter and more understandable. You don't need to create a vector and add elements to it~--- functions do this. If collection traversing uses atomicity, most likely, it's a weak solution.
 
-Авторы Clojure сделали всё, чтобы выделить состояние на общем фоне. К
-состоянию прибегают только в крайних случаях. Если вы написали код на атомах без
-уважительной причины, вам сделают замечание или не примут работу.
+The Clojure authors have done everything to make state stand out from the general background.
+State is resorted to only when it is necessary.
+If you write code using atoms for no good reason, you will receive a comment, or they won't accept your work.
 
-\index{состояние}
+\index{state}
 
-\subsection{В защиту состояния}
+\subsection{In Defense of State}
 
-Мы говорили, что состояние несёт потенциальные ошибки. Это слишком линейное
-заявление: без состояния работают только небольшие программы. Например, скрипты,
-которые запускают раз в день. Писать промышленный код без состояния невозможно.
+We said that state is fraught with potential errors. That is not entirely true because only small programs run without using state: for example, scripts that run once a day. It is impossible to write enterprise applications without state.
 
-\index{ресурсы}
+\index{resources}
 
-Постоянные данные избавляют нас от ошибок с перезаписью полей. Это значимый
-выигрыш, но кроме данных приложение полагается на \emph{ресурсы}. Для них
-действует правило: дешевле работать с открытым ресурсом, чем постоянно открывать
-и закрывать его. Состояние повышает скорость программы.
+Persistent data saves us from field rewriting errors. That is a significant gain, but beyond the data, the application relies on \emph{resources}.
+The rule applies: working with an open resource is cheaper than when you need to open and close it time and again.
+State speeds up a program.
 
-\index{веб-разработка}
-\index{протоколы!CGI}
+\index{web development}
+\index{ protocols!CGI}
 
-Много лет назад веб-серверы работали по протоколу CGI,
-\footurl{Common Gateway Interface}{https://en.wikipedia.org/wiki/Common\_Gateway\_Interface}[CGI].
-На каждый запрос сервер запускал скрипт или бинарный файл. Скрипт получал данные
-запроса из переменных среды. Программа писала ответ в стандартный поток. Сервер
-перехватывал его и выводил пользователю.
+Years ago, web servers used the \footurl{Common Gateway Interface}{https://en.wikipedia.org/wiki/Common\_Gateway\_Interface}[CGI] (CGI).
+For each request, the server ran a script or a binary file.
+The script received request data from environment variables. The program wrote the response to standard thread. The server intercepted it and displayed it to a user.
 
-Схема была простой и удобной. Приложение могло быть скриптом на Perl или
-программой на C\Plus\Plus. У сервера не было состояния. В любой момент
-разработчик обновлял файл, и изменения вступали в силу немедленно.
+The pattern was simple and convenient. The application might be a Perl script or a C\Plus\Plus program. A server was stateless. At any time, the developer updated the file and the changes took effect immediately.
 
-За преимущества платили низкой скоростью. Каждый запрос к~серверу порождал новый
-процесс. Даже если программа написана на Си, запуск процесса занимает
-время. Индустрия пришла к тому, что приложение должно работать постоянно, а не
-по запросу.
+Low speed was the price to pay for those benefits. Each request to the server caused a new process.
+Even if the program was written in C, starting the process took time.
+The industry has concluded that the application should run continuously, not on a request.
 
-\index{протоколы!FastCGI}
+\index{protocols!FastCGI}
 
-Приложение на FastCGI устроено как самостоятельный сервер. Его
-производительность на два порядка выше, чем у CGI. В нём появилось
-состояние~--- открытый порт и цикл ввода-вывода. Цикл читает запрос и~делегирует
-отдельному потоку. Это усложнило разработку, что привело к новым парадигмам
-и фреймворкам.
+The FastCGI application is designed as an independent server. Its performance is two orders of magnitude higher than that of CGI.
+The FastCGI application now has a state: an open port and a Request-Response loop.
+The loop reads the request and delegates to a separate thread.
+It has complicated development, leading to new paradigms and frameworks.
 
-Похоже устроены соединения с базой данных. Представим, что на каждый запрос мы
-открываем соединение, работаем с ним и закрываем. В машинном мире открыть
-TCP-соединение~--- это долгая операция. Так появились пулы соединений.
+Database connections are similar.
+Imagine that for each request, we open a connection, work with it, and then close it.
+In the machine world, opening a TCP connection is a long process.
+Therefore, connection pools appeared.
 
-\index{пул соединений}
+\index{connection pool}
 
-Пул~--- это объект, который держит несколько открытых соединений. Пул знает, какое
-из них занято или свободно. Чтобы работать с~базой, мы занимаем одно из
-свободных соединений, работаем с ним и возвращаем. Для потребителя пул~--- это
-примитивный объект, который выдаёт и забирает соединения.
+A pool is an object that holds multiple open connections.
+It is aware of which one is busy or free.
+To access a database, we take one of the free pool connections and work with it, then return it.
+For the consumer, a pool is a primitive object that gives and takes connections.
 
-Логика пула довольно сложна. Если соединений не хватает, он увеличивает свою
-ёмкость, а при избытке сокращает. Для каждого соединения пул считает время
-работы и прочие метрики. Он же решает, когда закрыть соединение и заменить его
-новым. Пул работает в~отдельном потоке, чтобы не блокировать основную программу.
+But the pool logic is pretty complicated.
+It increases its capacity if there are not enough connections; otherwise, it reduces. A pool counts operating time and other metrics for each connection. It also decides when to close the connection and replace it with a new one.
+The pool runs in a separate thread so as not to block the main program.
 
-Столь сложное устройство компенсирует скорость доступа. Каждый запрос протекает
-по заранее открытому соединению, что намного быстрее, чем открывать его каждый
-раз.
+The increased access speed compensates for the design complexity.
+Each request flows through a pre-opened connection, which is much faster than opening it every time.
 
-Сама архитектура машин поощряет изменять данные. В школе нам объясняют память
-компьютера как массив ячеек. Запись в ячейку по~адресу дёшева. И в C\Plus\Plus,
-и в Python одинаково легко обновить элемент массива:
+Machine architecture itself encourages data changing. At school, we are taught the memory of a computer as an array of cells.
+Writing to a cell at the address is cheap.
+In both C\Plus\Plus and Python, it is equally simple to update an array element:
 
 \begin{english}
   \begin{python}
@@ -273,24 +237,23 @@ items[i] = 5;
   \end{python}
 \end{english}
 
-Постоянные структуры хуже ложатся на эту модель памяти. Поэтому они сложнее:
-неизменяемый список~--- это не цепочка, а дерево узлов с указателем. Постоянные
-коллекции умны и копируют данные не полностью, а частично. Всё же на больших
-объёмах выгоднее работать с~изменяемыми структурами.
+Persistent structures fit this memory model worse.
+Therefore, they are more complex — an immutable list is not a chain but a tree of nodes with a pointer.
+Persistent collections are smart and do not copy data entirely but partially.
+Still, at large volumes, it is more profitable to work with mutable structures.
 
-Мы не призываем всюду внедрять состояние. Древовидность и замедление~--- это цена,
-которую платят за меньший риск ошибки. Инженер должен знать, на что идёт,
-когда добавляет состояние или избавляется от него. По ходу главы мы изучим
-императивные возможности Clojure~--- как ими пользоваться и когда это
-действительно нужно.
+We do not call for the introduction of state everywhere.
+Tree-like and slowing down is the price to pay for less risk of error.
+An engineer must know where adding state or getting rid of it leads.
+As the chapter progresses, we'll explore when and how to use Clojure's imperative features.
 
-\section{Атомы}
+\section{Atoms}
 
-\index{атом}
+\index{atom}
 
-Clojure предлагает несколько способов менять данные. Самый простой из них~---
-атом~--- объект, который прячет в себе другой объект. Атом получают
-одноимённой функцией с начальным значением:
+Clojure offers several ways to modify data.
+An atom is the simplest of them all. It is an object that hides another one within itself.
+Atoms are created using the function of the same name with an initial value:
 
 \begin{english}
   \begin{clojure}
@@ -298,7 +261,7 @@ Clojure предлагает несколько способов менять д
   \end{clojure}
 \end{english}
 
-Если напечатать атом, увидим следующее:
+If we print the atom, we see the following:
 
 \begin{english}
   \begin{clojure}
@@ -306,16 +269,15 @@ Clojure предлагает несколько способов менять д
   \end{clojure}
 \end{english}
 
-Чтобы извлечь значение, применяют оператор \verb|@|. Запись \verb|@store|~---
-это укороченный вариант \verb|(deref store)|. Функция \verb|deref| принимает
-атом и возвращает содержимое. Семантически это то же самое, что получить
-значение по указателю. В русской литературе операцию называют
-<<разыменование>>. В разговорном языке про оператор \verb|@| говорят
-<<дереф>>, <<дерефнуть>>.
+To extract a value, use the \verb|@| operator.
+The \verb|@| is a shorthand for \verb|(deref store)|.
+The \verb|deref| function takes an atom and returns the content.
+Semantically, this is the same as getting a value 
+by pointer.
 
-\index{дереф}
-\index{разыменование}
-\index{синтаксис!@ (дереф)}
+\index{deref}
+\index{dereference}
+\index{syntax!@ (deref)}
 \index{clojure.core!deref}
 
 \begin{english}
@@ -324,16 +286,13 @@ Clojure предлагает несколько способов менять д
   \end{clojure}
 \end{english}
 
-В отличие от коллекций, атом меняет содержимое и остаётся тем самым
-объектом. Это важно: если добавить к словарю ключ, получим новый словарь, при
-этом старый не изменится. Если изменить содержимое атома, это будет всё тот
-же атом с номером \verb|10ed2e87|.
+Unlike collections, this one changes its content but remains the same object.
+That is important: if you add a key to a map, we get a new map, while the old one will not change.
+If we change the content of the atom from our example, it will still be the same atom with the number \verb|10ed2e87|.
 
 \index{clojure.core!reset"!}
 
-Наивный способ изменить атом~--- вызвать \verb|reset!|. Функция принимает атом
-и новое значение. Оно может быть любого типа, в том числе \verb|nil|,
-коллекцией, исключением:
+The simplified way to change an atom is to call \verb|reset!|. The function gets the atom and a new value. It can be of any type, including nil, a collection, and an exception:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -357,26 +316,21 @@ Clojure предлагает несколько способов менять д
 \end{english}
 \fi
 
+If we execute \verb|@store| after each expression, we get what was passed to \verb|reset!|.
+The last instance will not throw an exception because there is no \verb|throw| statement.
 
-Если выполнить \verb|@store| после каждого выражения, получим то, что передали
-в \verb|reset!|. Последний случай не бросит исключение, потому что нет
-оператора \verb|throw|.
+\subsection{Atom Increment}
 
-\subsection{Приращение атома}
+\index{counters}
+\index{atom!increment}
 
-\index{счётчики}
-\index{атом!приращение}
+We said that the way with the \verb|reset!| function was simplified because it does not regard what value the atom currently contains. In practice, an atom is modified based on the content.
+If it's a counter, it doesn't matter what value is in it now. The atom receives an instruction to add 1.
+For a vector, the message looks like "add an element"; for a map — "remove a key", and so on.
 
-Мы назвали \verb|reset!| наивным, потому что функция не учитывает текущего
-значения атома. На практике атом изменяют, отталкиваясь от содержимого. Если это
-счётчик, неважно, какое значение в нём сейчас. Атому посылают команду <<прибавь
-единицу>>. Для вектора сообщение выглядит как <<добавь элемент>>, для
-словаря~--- <<удали ключ>> и так далее.
-
-Значение атома уходит на второй план; нас интересует \emph{действие}. Чтобы
-обновить атом с учётом состояния, ему посылают функцию. Она принимает текущее
-значение и возвращает новое, которое заменит содержимое. В функцию
-\verb|swap!| передают атом и функцию для расчёта нового значения:
+The atom value fades into the background; we are interested \emph{in action}.
+To update an atom with its state, a function is sent to it. It takes the current value and returns a new one that will replace the content.
+An atom and a function are passed to the \verb|swap!| function to calculate a new value:
 
 \index{clojure.core!swap"!}
 
@@ -388,14 +342,11 @@ Clojure предлагает несколько способов менять д
 \end{english}
 
 \noindent
-Если повторять вызов \verb|swap!|, значение \verb|counter| каждый раз
-будет увеличиваться на единицу.
+The counter value will increment by one each time with the calling of \verb|swap!|.
 
-\verb|Swap!| принимает дополнительные параметры для расчёта. Предположим, мы
-хотим увеличить счётчик сразу на три позиции или отмотать назад. Вместо
-\verb|inc| возьмём сложение и вычитание, функции \verb|+| и \verb|-|. Их
-первым аргументом станет текущее значение атома, а второй аргумент передают в
-\verb|swap!|:
+\verb|Swap!| takes additional parameters for calculation.
+Suppose we want to increase the counter by three positions at once or rewind. Instead of \verb|inc|, we will apply addition and subtraction, the functions \verb|+| and \verb|-|.
+Their first argument is the current value of atom and the second one is passed to \verb|swap!|:
 
 \begin{english}
   \begin{clojure}
@@ -404,7 +355,7 @@ Clojure предлагает несколько способов менять д
   \end{clojure}
 \end{english}
 
-Атом вычислит новое значение по правилу:
+The atom will calculate a new value according to the rule:
 
 \begin{english}
   \begin{clojure}
@@ -414,10 +365,9 @@ Clojure предлагает несколько способов менять д
 \end{english}
 
 \noindent
-где \verb|<current>|~--- текущее значение.
+where <current> is the current value.
 
-Это был частный случай \verb|swap!| с одним аргументом. В общем случае функция
-принимает их произвольное количество:
+The example above is a specific case of \verb|swap!| with one argument. In general, the function accepts an arbitrary number of these:
 
 \begin{english}
   \begin{clojure}
@@ -426,7 +376,7 @@ Clojure предлагает несколько способов менять д
 \end{english}
 
 \noindent
-Новое значение находят формой:
+We find a new value using the following form:
 
 \begin{english}
   \begin{clojure}
@@ -434,13 +384,13 @@ Clojure предлагает несколько способов менять д
   \end{clojure}
 \end{english}
 
-До сих пор мы хранили в атомах счётчики. На практике редко считают одну
-сущность. Гораздо чаще счётчики ведут в разрезе чего-то. Например, просмотры
-страниц по адресам, число сообщений у~пользователя и так далее.
+Until now, we have stored counters in atoms.
+But in practice, one entity is rarely counted.
+More often, counters act in a context of something (e.g., page views by addresses, the number of user's messages, and so on).
 
-Чтобы не создавать по атому на каждую сущность, их объединяют в
-словарь. Рассмотрим подсчёт системных ресурсов. Ключи словаря означают тип
-ресурса, значения~--- степень потребления в байтах или процентах.
+In order not to create one atom for each entity, the former are combined into a map.
+Let’s take a look at counting system resources.
+Map keys stand for a resource type, and values — for consumption in bytes or percent.
 
 \begin{english}
   \begin{clojure}
@@ -451,8 +401,8 @@ Clojure предлагает несколько способов менять д
   \end{clojure}
 \end{english}
 
-Отдельная функция вычисляет потребление диска. Чтобы записать новое значение в
-атом по ключу \verb|:store|, вызовем \verb|swap!| следующим образом:
+A separate function calculates disk consumption.
+To write a new value to an atom using the \verb|:store| key, call \verb|swap!| as follow:
 
 \begin{english}
   \begin{clojure}
@@ -464,16 +414,13 @@ Clojure предлагает несколько способов менять д
   \end{clojure}
 \end{english}
 
-Эта форма перепишет значение в поле \verb|:store| на новое. Возможен и~другой
-подход, когда мы не считаем всё занятое место на диске, а~фиксируем разницу на
-каждое изменение. Скажем, если пользователь создал или удалил файл, мы читаем
-событие и обновляем \verb|:store| с~приращением.
+This form will overwrite the value in the field of \verb|:store| with a new one. Another approach is also possible: we record the difference for each change and do not count all the occupied disk space.
+For instance, if a user has created or deleted a file, we read the event and update \verb|:store| incrementally.
 
-Функция \verb|get-file-event| каким-то образом вернёт событие файловой
-системы. Это словарь с ключами \verb|:action| и \verb|:size|. В зависимости
-от \verb|:action| мы наращиваем или уменьшаем потребление диска. Наша версия
-\texttt{get-file\--event}~--- это заглушка, которая случайно вернёт одно из двух
-событий:
+The \verb|get-file-event| function will somehow return a file system event.
+It is a map with the \verb|:action| and \verb|:size| keys.
+We increase or decrease disk consumption depending on \verb|:action|.
+Our version of \texttt{get-file\--event} is a stub that will randomly return one of two events:
 
 \begin{english}
   \begin{clojure}
@@ -489,7 +436,7 @@ Clojure предлагает несколько способов менять д
 \end{english}
 
 \noindent
-Пересчёт потребления диска изменится:
+The recalculation of disk consumption will change:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -520,20 +467,18 @@ Clojure предлагает несколько способов менять д
 
 \fi
 
-\index{файлы}
+\index{files}
 
-Так считают ресурсы в облачных платформах. Обращение к диску~--- это дорогая
-операция: нельзя пробежаться по дереву папок и найти объём. Иногда файлы
-одного клиента лежат на разных дисках и~серверах. Поэтому ресурсы считают
-итеративно и раз в интервал сверяют цифры.
+This way, resources are counted in cloud platforms.
+Accessing a disk is an expensive operation: you cannot go through a tree of folders and find the volume.
+Sometimes one client's files are located on different disks and servers. Therefore, we count resources iteratively and check the numbers every interval.
 
 \index{PID}
-\index{процессы}
+\index{processes}
 
-Усложним пример с ресурсами: теперь их считают в разрезе пользователей. Ключи
-верхнего уровня означают номер пользователя, а~значения~--- словари
-ресурсов. Для каждого пользователя ведём список его процессов, множество
-идентификаторов \footurl{\texttt{PID}}{https://en.wikipedia.org/wiki/Process\_identifier}[PID][-9mm]
+Let's complicate the example with resources: now we'll count them in the context of users.
+The top-level keys represent a user number, and the values stand for resource maps.
+For each user, we keep a list of their processes, i.e., a set of \footurl{\texttt{PID}}{https://en.wikipedia.org/wiki/Process\_identifier}[PIDs][-9mm]
 \coderef{5}.
 
 \ifx\DEVICETYPE\MOBILE
@@ -561,8 +506,7 @@ Clojure предлагает несколько способов менять д
 \end{english}
 \fi
 
-
-Чтобы добавить процесс пользователю 1005, выполним \verb|swap!|:
+To add a process to user 1005, execute the \verb|swap!| function:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -583,21 +527,20 @@ Clojure предлагает несколько способов менять д
 
 \fi
 
-Это сложная комбинация: в \verb|swap!| передали функцию, которая принимает
-функцию. Разберём по шагам, что произошло.
+It's a tricky combination: we passed a function to \verb|swap!|, which function in turn takes another one. Let's figure out what happened step by step.
 
 \begin{itemize}
 
 \item
-  Получим множество старых процессов \verb|<pids>|:\\
-  \verb|(get-in <current> [1005 :pids])|.
+  Get a lot of old \verb|<pids>| processes:\\
+  \verb|(get-in <current> [1005 :pids])|
 
 \item
-  Добавим к нему новый процесс: \spverb|(conj <pids> 9999)|.\ifx\DEVICETYPE\MOBILE\ \else\\\fi
-  Обозначим новое множество \verb|<pids*>|.
+  Add a new process to it: \spverb|(conj <pids> 9999)|.\ifx\DEVICETYPE\MOBILE\ \else\\\fi.
+  Denote the new set \verb|<pids*>|
 
 \item
-  Обновим \verb|<current>| этим множеством по пути 1005 \arr{} \verb|:pids|:\\
+  Update \verb|<current>| with this set along path 1005 \arr{} \verb|:pids|:\\
   \ifx\DEVICETYPE\MOBILE
   \verb|(assoc-in <current>| \\
   \verb|  [1005 :pids] <pids*>)|
@@ -608,8 +551,7 @@ Clojure предлагает несколько способов менять д
 \end{itemize}
 
 \noindent
-Чтобы удалить процесс, замените \verb|conj| на \verb|disj|. Это обратная
-функция, которая удаляет элемент из множества.
+Replace \verb|conj| with \verb|disj|, to remove a process. The latter is the inverse function that removes an item from the set.
 
 \index{clojure.core!get-in}
 \index{clojure.core!update-in}
@@ -633,48 +575,43 @@ Clojure предлагает несколько способов менять д
 
 \fi
 
-Функция \verb|reset!| нужна, чтобы сбросить атом в исходное состояние. В
-других случаях важно знать текущее значение, чтобы вычислить новое. Поэтому
-\verb|swap!| мощнее и гибче \verb|reset!|.
+The \verb|reset!| function resets the atom to its original state. In other cases, you need to know the current value to calculate a new one.
+Therefore \verb|swap!| is more powerful and flexible than \verb|reset!|.
 
-\subsection{Совместный доступ}
+\subsection{Shared Access}
 
-\index{чистые функции}
-\index{атом!перезапуск}
+\index{pure functions}
+\index{atom!restart}
 
-Функция, которую передают в \verb|swap!|, должна быть без побочных эффектов. В
-терминах функционального программирования её бы назвали \emph{чистой функцией}.
-Она не должна обращаться к базе данных, файлам, выводу на экран. Технически
-это возможно, но вы столкнётесь со странным поведением атома. Дело в том,
-что иногда функция срабатывает \emph{несколько} раз за один \verb|swap!|.
-Причина кроется в способе, которым атом обновляет содержимое.
+A function passed to \verb|swap!| must be free of side effects. In functional programming terms, it is \emph{a pure function}.
+It shouldn't access the database, files, and screen output.
+Technically it is possible, but you will run into the strange atom behavior.
+The point is that sometimes the function runs \emph{multiple} times in one \verb|swap!|.
+The reason lies in the way the atom updates the content.
 
-Предположим, ресурсы считают в нескольких потоках: один слушает события файловой
-системы, второй следит за памятью. Возникает проблема совместного
-доступа. Возможна ситуация, когда два потока обновляют одни и те же
-данные. Первый поток справился быстрее и~записал в атом свою версию
-данных. Второй поток рассчитал другой вариант. Если он изменит атом, эффект
-первого аннулируется.
+Assuming resources are counted in several threads: one of them listens for file system events, the other one monitors memory.
+There is a sharing access problem.
+A situation may arise when two threads update the same data.
+For example, the first thread ran faster and wrote its data version to an atom.
+Then the second thread calculated another version.
+If it changes the atom content, the first thread effect will be canceled.
 
-\index{терминал}
+\index{terminal}
 
-Это классическая задача про терминал и семейную пару. Муж и~жена вносят наличные
-на общий пустой счёт. Жена вносит 100 рублей, терминал прибавляет эту сумму к
-нулю и записывает в базу. Муж вносит 50 рублей, терминал делает то же
-самое. Итого на счёте 50 рублей, а 100 пропали.
+The classic problem about the terminal and a couple illustrates this situation. Husband and his wife deposit cash into an empty joint account. The wife deposits $ 100. The terminal adds this amount to zero and writes it to the database. Then the husband deposits $ 50, and the terminal repeats its actions. As a result, there are fifty dollars on the account, and a hundred dollars is lost.
 
-Атом не допустит такого поведения. Он запоминает начальное значение в~момент
-вычисления нового. Перед тем как обновить содержимое, атом проверяет, что
-текущее значение совпадает с начальным. Если они не равны, атом обновили из
-другого потока.
+An atom will not allow this.
+It remembers the initial value at the moment of calculating a new one.
+The atom checks that the current value matches the initial value before updating the content.
+If they are not equal, then the atom has been updated from another thread.
 
-В этом случае атом повторяет цикл. Текущее становится начальным, и от него
-вычисляют новое значение. Атом ещё раз сравнивает текущее и начальное
-значения. Цикл повторяется до тех пор, пока они не будут равны. Это значит, что за время
-вычислений атом не обновили. Атом меняет текущее значение на новое и выходит из
-цикла.
+In this case, the atom repeats the cycle. The current value becomes the initial value, and a new one is calculated from it. The atom compares the current and initial values again. 
+The cycle is repeated until they are equal.
+This means that the atom was not updated during the computation. 
+The atom changes the current value to a new one and exits the loop.
 
-Покажем сказанное на примере. Возьмем атом со словарём:
+We will show the above with an example.
+Let's take an atom with a map:
 
 \begin{english}
   \begin{clojure}
@@ -682,8 +619,9 @@ Clojure предлагает несколько способов менять д
   \end{clojure}
 \end{english}
 
-Понадобится функция \emph{медленного} сложения. Она принимает текущее значение,
-приращение и время простоя. Для ясности добавим вывод в консоль.
+We'll need the "\emph{slow} addition" function.
+It takes the current value, increment, and timeout.
+Let's add the output to the console for clarity.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -714,10 +652,9 @@ Clojure предлагает несколько способов менять д
 \fi
 
 \index{clojure.core!future}
-\index{футуры}
+\index{futures}
 
-Обновим атом одновременно из двух потоков. Для этого вызовем \verb|swap!| в
-футуре. В первой ждём две секунды, во второй~--- пять:
+Let's update the atom simultaneously from two threads. To do this, we call \verb|swap!| in a future block. In the first case, we wait two seconds and five in the second case:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -742,7 +679,7 @@ Clojure предлагает несколько способов менять д
 \fi
 
 \noindent
-Проверим атом:
+Check the atom:
 
 \begin{english}
   \begin{clojure}
@@ -751,7 +688,8 @@ Clojure предлагает несколько способов менять д
 \end{english}
 
 \noindent
-Это правильное значение: $0 + 1 + 2 = 3$. Вывод консоли:
+The following value is correct: $0 + 1 + 2 = 3$
+Console output:
 
 \begin{english}
   \begin{text}
@@ -761,30 +699,27 @@ Current: 1, timeout: 5000 ;; 2
   \end{text}
 \end{english}
 
-Вторая функция сработала два раза, что и следует из алгоритма. Второй
-\verb|swap!| начал расчёты с начальным значением \verb|{:number 0}|, а
-к~завершению оно стало \verb|{:number 1}|~--- его записал первый
-\verb|swap!|. Чтобы избежать ошибки, атом запустил второй \verb|swap!| ещё раз
-относительно \verb|{:number 1}|.
+The second function worked twice, which follows from the algorithm.
+The second \verb|swap!| started calculation with the initial value \verb|{:number 0}|, and by the end, it became \verb|{:number 1}|, the first \verb|swap!| wrote it.
+The atom started the second \verb|swap!| once again regarding \verb|{:number 1}| to avoid the error.
 
-Когда атом меняют из нескольких потоков, перезапуск может случиться больше двух
-раз. Это недопустимо для функций, которые зависят от окружения.
+When an atom is changed from multiple threads, the restart might occur more than two times.
+That is unallowable for environment dependent functions.
 
-\subsection{Валидаторы и вотчеры}
+\subsection{Validators and Watchers}
 
-\index{атом!валидация}
-\index{валидация!в атоме}
+\index{atom!validation}
+\index{ validation!in atom}
 
-Поведение атомов расширяют валидаторы и вотчеры (англ.~watcher~--- <<наблюдатель>>).
-Валидаторы означают функции проверки. Они принимают новое значение
-\emph{до того}, как оно записано в текущее. Если валидатор вернул ложь, вызов
-\verb|swap!| обернётся ошибкой.
+Validators and watchers extend atom behavior.
+Validators are validation functions that take on a new value \emph{before} it replaces the current one.
+If the validator returns false, calling \verb|swap!| will result in an error.
 
 \index{clojure.core!set-validator"!}
 
-Функция \verb|set-validator!| добавляет валидатор к атому. Для счётчика
-предположим, что он не может быть отрицательным. Попытка понизить его при нуле
-вызовет исключение:
+The \verb|set-validator!| function adds a validator to the atom.
+Let's say that our counter cannot be negative.
+Attempting to decrease its value when it is zero will throw an exception:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -814,33 +749,33 @@ Current: 1, timeout: 5000 ;; 2
 
 \fi
 
-Вотчеры~--- это побочные эффекты атома. Они срабатывают \emph{после того}, как атом
-перешёл в новое состояние. Вотчер задают уникальным ключом и функцией. Она
-принимает четыре аргумента: ключ, атом, старое и новое значения. Одному атому
-можно назначить несколько вотчеров.
+Watchers are side effects of an atom.
+The functions fire \emph{after} the atom swaps to a new state. The watcher is set with a unique key and a function.
+That takes four arguments: a key, an atom, old and new values.
+We can assign several watchers to one atom.
 
-Разберёмся, когда полезны вотчеры. Вспомним подсчёт ресурсов: система получает
-события и обновляет атом. Если потребление диска превысило лимит, мы не можем
-бросить исключение. В этом нет смысла, потому что события поступают из внешней
-системы. Исключение на нашей стороне не остановит поток событий.
+Now we will discuss when watchers are useful.
+Remember resource counting: the system receives events and updates the atom.
+If the disk consumption has exceeded the limit, we shouldn't throw an exception.
+It doesn't make sense because the events come from an external system.
+An exception on our side will not stop the flow of events.
 
-\index{атом!вотчер}
+\index{atom!watcher}
 
-Правильно задать \emph{реакцию} на превышение лимита. Например, уведомить
-пользователя письмом, что ресурс исчерпан. Или отправить запрос в подсистему,
-которая отвечает за доступ. Для этого и нужен вотчер: он связывает изменение
-атома и реакцию на него.
+It will be correct to set a \emph{reaction} to exceeding the limit: for example, notify the user with a letter that the resource has been exhausted or send a request to the subsystem that is responsible for access.
+For this, a watcher is useful: it links an atom change and a reaction to this.
 
-\index{логирование!в атоме}
+\index{logging!in atom}
 
-Если потребление вышло за лимит, запишем в лог сообщение. Объявим функцию
-вотчера \verb|store-watcher|. Заметим, что из четырёх параметров нам нужен
-только последний~--- \verb|value|. Это новое значение атома. В боевом коде мы бы
-назначили первым трём символ подчёркивания. Оно затеняет лишние переменные и
-поэтому работает быстрее. Однако мы оставили понятные имена, чтобы передать
-семантику.
+Let's log a message if the consumption has gone beyond the limit.
+Now declare the \verb|store-watcher| function.
+Note that we only need the last of the four parameters, namely \verb|value|.
+It is a new atom value.
+In production code, we would assign an underscore character to the first three parameters.
+It shadows unused variables and, so everything works faster.
+However, we have kept readable names in the example to convey semantics.
 
-\index{синтаксис!\textbf{\_} (затенение)}
+\index{syntax!\textbf{\_} (shadowing)}
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -878,7 +813,7 @@ Current: 1, timeout: 5000 ;; 2
 \fi
 
 \mnoindent
-Добавим атому вотчер с ключом \verb|:watch-store|:
+Let's add a watch function with the \verb|:watch-store| key to our atom:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -910,7 +845,7 @@ Current: 1, timeout: 5000 ;; 2
 \fi
 
 \noindent
-Если потребление диска превысит лимит, увидим запись в лог:
+If disk consumption exceeds the limit, we will see a log entry:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -933,23 +868,21 @@ Current: 1, timeout: 5000 ;; 2
 
 \fi
 
-Валидацию и вотчеры рассматривают как пре- и постэффекты. Разница в том, что
-первые могут прервать исполнение, а вторые нет. У них разные задачи:
-предварительные эффекты проверяют то, что \emph{может случиться}, а
-постэффекты~--- то, что \emph{уже случилось}. Поэтому на них реагируют
-по-разному.
+We might consider validation and watchers as pre- and post-effects.
+The difference is that the former can interrupt the execution, while the latter cannot.
+They have different jobs: pre-effects check what \emph{might happen}, and post-effects what has \emph {already happened}.
+Therefore, they cause different reactions.
 
-\subsection{Другие примеры}
+\subsection{Other Examples}
 
-\index{мемоизация}
+\index{memoization}
 \index{clojure.core!memoize}
-\index{декораторы}
+\index{decorators}
 
-На атомы опираются некоторые функции Clojure, например \verb|memoize|. Это
-декоратор, который возвращает улучшенную версию функции. Она запоминает
-результат относительно аргументов и записывает во внутреннюю таблицу. Если
-вызвать функцию с теми же аргументами, получим результат из таблицы без
-вычислений.
+Some Clojure features rely on atoms, such as \verb|memoize|.
+It is a decorator that returns an improved version of the function.
+It remembers the result relative to the arguments and writes it to an internal table.
+If we call the function with the same arguments, we'll get the result without recalculating, from the table.
 
 \begin{listing}[ht!]
 
@@ -966,23 +899,20 @@ Current: 1, timeout: 5000 ;; 2
   \end{clojure}
 \end{english}
 
-\caption{Код функции memoize из поставки Clojure}
+\caption{The memoize function code from Clojure's standard library}
 \label{fig:clj-memoize}
 
 \end{listing}
 
 \index{clojure.core!find}
 
-Роль таблицы играет атом. Функция-ре\-зуль\-тат \verb|memoize| замкнута на атоме,
-который виден только ей. Изучите код декоратора
-в~листинге~\ref{fig:clj-memoize}. Заметим, что для поиска в~словаре используют
-\verb|find| вместо \verb|get|. Разница в том, как функции трактуют пустое
-значение. Если по ключу записан \verb|nil|, \verb|get| тоже вернёт \verb|nil|,
-и~форма \verb|if-let| выполнит ложную ветку. Функция \verb|find| вернёт пару
-\verb|MapEntry|, значение из которой находят при помощи \verb|val|.
+The atom plays the role of this table.
+A \verb|memoized| function closes on an atom which is visible only to it.
+See the decorator code in Listing~\ref{fig:clj-memoize}.
+By the way, they use \verb|find| instead of \verb|get| to search a map. The difference between these functions is how they interpret nil. If the key value is \verb|nil|, \verb|get| will also return \verb|nil|, and the \verb|if-let| form will execute a false branch.
+The \verb|find| function will return a \verb|MapEntry| pair, the value from which is found using \verb|val|.
 
-Проверим декоратор на функции \verb|+slow|, которую задали выше. Объявим её
-\verb|memoize|-версию и замерим вызовы:
+Let's check the decorator on the \verb|+slow| function we defined above. We'll declare its \verb|memoized| version and measure the calls:
 
 \begin{english}
   \begin{clojure}
@@ -996,17 +926,15 @@ Current: 1, timeout: 5000 ;; 2
   \end{clojure}
 \end{english}
 
-\index{классы!Thread}
+\index{classes!Thread}
 
-Первый вызов долгий, потому что работает \verb|Thread/sleep| в теле
-\verb|+slow|. Второй вызов получает результат из атома, что на порядки
-быстрее.
+The first call takes a bigger because \verb|Thread/sleep| is running in the body of \verb|+slow|. The second call gets the result from the atom, which is orders of magnitude faster.
 
-\index{счётчики}
+\index{counters}
 
-Атомы полезны в веб-разработке: это дешёвый способ хранить состояние между
-запросами. На атомах легко сделать счётчики просмотров, сессии, кэш. Счётчик
-просмотра страниц~--- это комбинация атома и middleware:
+Atoms are useful in web development — they are a cheap way to store state between requests.
+You can easily make view counters, sessions, and cache using atoms.
+The page view counter is a combination of an atom and middleware:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1049,19 +977,15 @@ Current: 1, timeout: 5000 ;; 2
 
 \index{HTTP!GET}
 
-На каждый GET-запрос мы увеличиваем счётчик для текущего адреса. Обратите
-внимание на форму \verb|fnil| в вызове \verb|update|. Она возвращает версию
-\verb|inc|, которая не вызовет исключение, если первый аргумент
-\verb|nil|. Это возможно, если в словаре ещё нет нужного ключа, и вместо
-\verb|nil| функция получит ноль.
+For each GET request, we increment the counter for the current address.
+Notice the \verb|fnil| form in the call of \verb|update|. It returns a version of \verb|inc| that will not throw an exception if the first argument is \verb|nil|.
+That is possible if the required key does not yet exist in the map, and instead of \verb|nil|, the function will receive zero.
 
-\index{форматы!HTML}
-\index{библиотеки!Hiccup}
+\index{formats!HTML}
+\index{libraries!Hiccup}
 
-Функция \verb|page-seen| вернёт число просмотров по адресу страницы. Напишем
-компонент для подвала сайта, где мелким шрифтом указано, сколько раз смотрели
-страницу. Для HTML-разметки подойдут библиотека
-\footurl{Hiccup}{https://github.com/weavejester/hiccup}[Hiccup][-10mm] и аналоги.
+The \verb|page-seen| function will return the number of views for the page address.
+Let's write a site footer component, where the small print indicates how many times the page has been viewed. The \footurl{Hiccup}{https://github.com/weavejester/hiccup}[Hiccup][-10mm] library and its analogs will be perfect for HTML markup.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1089,35 +1013,32 @@ Current: 1, timeout: 5000 ;; 2
 
 \fi
 
-\subsection{Замечания к атому}
+\subsection{Comments on Atoms}
 
-У решений на атомах есть недостатки. Атомы не связаны с другими экземплярами
-программы. Когда приложение занимает несколько нод, каждая хранит свой
-счётчик. Если запросы расходятся по ним равномерно, клиент увидит разные
-данные. Чтобы избежать странностей, используют сетевые хранилища вроде Redis.
+Atomic solutions have the following disadvantages.  
+Atoms do not link with other instances of the program. When an application occupies several nodes, each one stores its counter itself.
+If requests are sent to them evenly, the client will see different data.
+To avoid oddities, network storages like Redis are used.
 
-\index{базы данных!Redis}
+\index{databases!Redis}
 
-Атомы непостоянны: если завершить программу, они теряют состояние. С другой
-стороны, атом быстрее, чем файловая система или сетевой сервис. Встречаются
-гибридные схемы, когда на старте атом читает ресурс и раз в интервал сохраняет в
-него изменения.
+Atoms are unstable: if you end the program, they lose their state.
+On the other hand, an atom is faster than a file system or network service.
+There are hybrid schemes in which an atom reads a resource at the start and saves changes to it once every interval.
 
 \section{Volatile}
 
-Атом устроен довольно сложно: он отвечает за параллельный доступ, вызывает
-валидацию и следит за изменениями. Иногда эти возможности излишни, и пользуются
-его упрощённой версией~--- \verb|volatile|.
+An atom is quite complex: it is responsible for concurrent access, calls validation, and it monitors changes. Sometimes atom's features turn out to be unnecessary, so its simplified version~--- the \verb|volatile| object~--- is used.
 
 \index{clojure.core!volatile}
 \index{clojure.core!vreset"!}
 
-Объект \verb|volatile| тоже хранит и изменяет значение. Одноимённая функция
-создаёт объект с состоянием. Функции \verb|vreset!| и \verb|vswap!|
-аналогичны тем, что мы рассмотрели для атома. Префикс \verb|v| означает, что
-они работают с \verb|volatile|.
+It also stores and changes a value.
+The function of the same name creates an object with a state.
+The \verb|vreset!| and \verb|vswap!| functions are similar to those we have looked at for atoms. 
+The \verb|v-| prefix means they work with \verb|volatile|.
 
-Пример с ресурсами: на этот раз вместо атома используем другой тип хранилища:
+Below is an example with resources. This time, instead of an atom, we use a different type of storage:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1153,8 +1074,8 @@ Current: 1, timeout: 5000 ;; 2
 
 \fi
 
-\verb|Volatile| отличается от атома тем, что не контролирует запись
-из~нескольких потоков. Перепишем пример с футурами:
+\verb|Volatile| differs from an atom in that it does not control writes from multiple threads.
+Let's rewrite the example with futures:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1187,39 +1108,33 @@ Current: 1, timeout: 5000 ;; 2
 \fi
 
 \index{clojure.core!future}
-\index{футуры}
+\index{futures}
 
-Вывод говорит, что второе действие сработало один раз. Если для атома итог был
-3, то с \verb|volatile| получилось 2. Операцию \verb|+1| мы потеряли. Из
-этого следует, что \verb|volatile| не подходит для многопоточного кода.
+The output shows that the second action worked once. If in the example with the atom the total was 3, then with \verb|volatile| we got 2.
+We lost the operation \verb|+1|.
+That proves \verb|volatile| is not suitable for multithreaded code. 
 
-С другой стороны, в этом есть и преимущества. Из-за того, что \verb|volatile|
-не ограничивает доступ, изменения протекают быстрее. По той же причине он не
-поддерживает валидаторы и вотчеры. В целом \verb|volatile| нацелен на
-скорость.
+However, there are advantages to this.
+The \verb|volatile| object does not restrict access, so changes are faster.
+For the same reason, it does not support validators or watchers.
+Overall, \verb|volatile| is aimed at speed.
 
-\subsection{Применение}
+\subsection{Applying}
 
-У \verb|volatile| две области применения~--- трансдьюсеры и императивный
-код. Трансдьюсеры~--- это особый способ работы с коллекцией. Они оборачивают функции
-\verb|map|, \verb|reduce| и другие таким образом, что их комбинация не
-порождает промежуточных списков. Это возможно за счёт внутреннего состояния. Для
-трансдьюсера важна скорость записи, поэтому \verb|volatile| подходит на роль
-состояния лучше, чем атом.
+\verb|Volatile| has two uses: they are transducers and imperative code. Transducers are a particular way of working with a collection.
+They wrap the functions — \verb|map|, \verb|reduce|, and others — in such a way that their combination does not produce intermediate lists. 
+This is possible due to the internal state.
+Write speed is significant for a transducer, so it is better to manage state with \verb|volatile| than with an atom.
 
-\verb|Volatile| полезен, когда пишут императивный код. Относитесь к~нему
-спокойно: иногда бизнес-требования слишком сложны, чтобы накладывать их на
-функциональный стиль.
+\verb|Volatile| is useful when writing imperative code. Take it easy: sometimes, business requirements are so complicated that functional style doesn't fit well with them.
 
-Представим, что нужно получить плоский список из дерева. Алгоритм обхода
-сложный: если в первой ветке одно значение, то рассматривать вторую, а иначе~---
-третью. Когда для первой и третьей веток выполняется некое условие, добавить в
-список произведение значений.
+Let us say you want to get a flat list from a tree.
+The traversal algorithm is complex: if there is one value in the first branch, then consider the second, or else — the third.
+When a certain condition is true for the first and third branches, add the product of values to the list.
 
-\index{императивный стиль}
+\index{imperative style}
 
-Требования насквозь императивны, и выгодно задать их таким же образом. Так мы
-сделаем код ближе к бизнес-логике и облегчим поддержку. Малая часть дерева:
+These are entirely imperative requirements, and it is beneficial to set them in the same way. So we will make the code closer to business logic and make it easier to maintain. Take a look at a small part of the tree:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1249,10 +1164,8 @@ Current: 1, timeout: 5000 ;; 2
 
 \fi
 
-Код разбивают на блоки, где каждый из них~--- это каскад \verb|when-let|. На
-нижнем уровне мы изменяем коллекцию. Императивный стиль в данном случае удобен:
-если одно из правил станет лишним, блок удаляют. Полезно ставить над блоком
-комментарий или ссылку на документацию:
+The code is broken into blocks, where each one is a \verb|when-let| cascade. We modify the collection at the bottom level.
+The imperative style is convenient in this case: if one of the rules becomes redundant, you delete the block. It is useful to put a comment or a link to the documentation above the block:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1297,42 +1210,38 @@ Current: 1, timeout: 5000 ;; 2
 
 \fi
 
-\section{Переходные коллекции}
+\section{Transient Collections}
 
-\index{коллекции!транзиентные}
+\index{collections!transient}
 \index{clojure.core!transient}
 
-С помощью атома мы создали подобие изменяемых коллекций. Познакомьтесь с новой
-техникой: Clojure предлагает \emph{настоящие} изменяемые коллекции. По-другому
-они называются \verb|transient| (англ.~временный, переходный).
+Using the atom, we have created a kind of mutable collections.
+Get acquainted with the new technique: Clojure offers \emph{truly} mutable collections~--- in another way, they are called \verb|transient|.
 
-Изменяемые коллекции получают из постоянных аналогов. С ними работают лишь
-несколько функций, буквально добавить и удалить элемент. Стандартные
-\verb|map|, \verb|filter| и другие функции не поддерживают
-\verb|transient|-коллекции. Происходит своего рода обмен: мы теряем мощь
-стандартной библиотеки, но обретаем скорость и императивный подход.
+Mutable collections are derived from persistent counterparts.
+Only a few functions work with them, adding and removing an item.
+Standard functions like \verb|map|, \verb|filter|, and others do not support \verb|transient| collections.
+Yes, we are losing the power of the standard library, but in return, we gain speed and an imperative approach.
 
-Транзиентные коллекции быстрее постоянных. Изменить ячейку памяти проще, чем
-выделить новую и сдвинуть часть данных. Коллекция не должна пребывать в режиме
-\verb|transient| всё время. Когда алгоритм закончил работу, её
-замораживают и получают неизменяемую версию обратно.
+Transients are faster than persistent collections.
+It is easier to change the contents of a memory cell than to allocate a new one and shift part of the data.
+A collection mustn't be in \verb|transient| mode at all times.
+When the algorithm is finished, a collection is frozen and its unmodifiable version is returned.
 
-\subsection{Примеры}
+\subsection{Examples}
 
-Функция \verb|transient| порождает переходную коллекцию из исходной. Для
-работы с ней используют функции \verb|conj!|, \verb|assoc!|,
-\verb|dissoc!| и другие. Восклицательный знак на конце предупреждает об
-изменении данных. Функции меняют \emph{содержимое} коллекции, а не возвращают
-новую копию, как это делают обычные \verb|conj| и \verb|assoc|.
+We gain a transient collection from the original one using the \verb|transient| function.
+To work with the first, use the \verb|conj!|, \verb|assoc!|, and \verb|dissoc!| functions, etc.
+An exclamation point following names notifies of data changes.
+These functions change the collection \emph{contents} rather than returning a new copy, as the regular \verb|conj and \verb|assoc| do.
 
 \index{clojure.core!persistent"!}
 
-Функция \verb|persistent!| завершает работу с переходной коллекцией. Она
-возвращает постоянную версию и одновременно <<запечатывает>> оригинал. После
-\verb|persistent!| коллекцию уже нельзя изменить.
+The \verb|persistent!| function ends the processing of the transient.
+It returns an immutable version and simultaneously "seals" the original: after calling \verb|persistent!|, the transient collection cannot be changed.
 
-Рассмотрим переходный вектор. На него действуют функции \verb|conj!| и
-\verb|pop!|, добавить и убрать элемент из хвоста:
+Now we'll look at a transient vector.
+The \verb|conj!| function adds and the \verb|pop!| function removes the vector's last item:
 
 \begin{english}
   \begin{clojure}
@@ -1349,7 +1258,7 @@ Current: 1, timeout: 5000 ;; 2
 \index{clojure.core!dissoc"!}
 
 \noindent
-Вариант со словарём, \verb|assoc!| и \verb|dissoc!|:
+Here is an example with a map and the \verb|assoc!| and \verb|dissoc!| functions:
 
 \begin{english}
   \begin{clojure}
@@ -1362,14 +1271,14 @@ Current: 1, timeout: 5000 ;; 2
   \end{clojure}
 \end{english}
 
-Примечание: в примерах выше мы обозначили переменную звёздочкой. Это не нарушает
-синтаксис Clojure. В отличие от других языков, в имени переменной могут быть не
-совсем привычные символы: дефис, штрих, знак вопроса. Особые переменные выделяют
-штрихом или звёздочкой. Переходные коллекции встречаются редко, поэтому подходят
-на роль особых.
+Note: In the examples above, we marked the variable with an asterisk.
+This character does not break the language syntax.
+Unlike other languages, a Clojure variable name can contain characters that we usually don't use, such as hyphen, apostrophe, question mark, etc.
+We can mark special variables with an apostrophe or an asterisk.
+Transient collections are rare; therefore, they are special ones.
 
-После \verb|persistent!| коллекцию нельзя изменить. Следующий пример бросит
-исключение:
+As I mentioned before, we cannot modify a transient after calling the \verb|persistent!| function.
+The following example will throw an exception:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1398,10 +1307,9 @@ Current: 1, timeout: 5000 ;; 2
 
 \fi
 
-Форма \verb|(persistent! <data*>)|, как правило, замыкает блок с~изменяемой
-переменной. Переходные коллекции помогают там, где нужен императивный
-подход. Выше мы работали с деревом и \verb|volatile| для сбора данных. Перепишем
-код на транзиентный вектор:
+The \verb|(persistent! <data*>)| form usually closes a block with a mutable variable.
+Transient collections help where an imperative approach is needed. Above, we worked with a tree and \verb|volatile| to collect data.
+Let's rewrite that code for a transient vector:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1454,41 +1362,34 @@ Current: 1, timeout: 5000 ;; 2
 \index{clojure.core!conj"!}
 
 \mnoindent
-Чтобы не писать каждый раз \spverb|(conj! result* item)|, мы вводим
-локальную функцию \verb|push!|. Она замкнута на \verb|result*| и принимает
-только значение. Чтобы добавить элемент, достаточно вызвать
-\verb|(push! x)|. Это сокращает код и скрывает способ, которым накапливают
-данные.
+To avoid writing \spverb|(conj! result* item)| every time, we introduce the local \verb|push!| function.
+It is closed on \verb|result*| and takes only a value.
+To add an element, calling \verb|(push! x)| is enough. That shortens the code and hides the way the data is accumulated.
 
-\subsection{Итерация с изменением}
+\subsection{Iteration with Change}
 
-\index{итерация}
+\index{iteration}
 
-Мы говорили, что переходные коллекции быстрее постоянных. Это заметно на долгих
-итерациях через \verb|loop/recur|. Как правило, одна из переменных
-\verb|loop|~--- это коллекция-результат. В каждом \verb|recur| мы передаем её
-копию, дополненную через \verb|conj| или \verb|assoc|.
+We said before that transient collections are faster than permanent ones. It's noticeable on long iterations using \verb|loop/recur|.
+Typically, one of the \verb|loop| variables is a result collection.
+In each \verb|recur|, we pass its copy changed by the \verb|conj| or \verb|assoc| functions.
 
-Когда итераций много, прибегают к уловке: вместо постоянной коллекции передают
-транзиентный вариант. Этим код ускоряют в 2--4 раза. Изменения в коде малы,
-нужно лишь учесть следующее:
+When there are many iterations, we can resort to a ploy: instead of a persistent collection, pass its transient version. So, the code will speed up from two to four times. The changes in the code are small, and you only need to do the following:
 
 \begin{itemize}
 
 \item
-  изменить тип коллекции на \spverb|(transient <coll>)|;
+  change the collection type to spverb|(transient <coll>)|;
 
 \item
-  вместо \verb|conj| или \verb|assoc| вызывать их аналоги \verb|conj!|
-  и~\verb|assoc!|;
+  instead of \verb|conj| or \verb|assoc|, call their counterparts \verb|conj!| and \verb|assoc!|;
 
 \item
-  в конце вернуть постоянную коллекцию через \verb|persistent!|.
+  finally, return the persistent collection using the \verb|persistent!| function.
 
 \end{itemize}
 
-Для экспериментов объявим переменную \verb|nums|, список из миллиона целых
-чисел:
+For experimentation, let's declare the nums variable, which is a list of a million integers:
 
 \begin{english}
   \begin{clojure}
@@ -1497,10 +1398,10 @@ Current: 1, timeout: 5000 ;; 2
 \end{english}
 
 \index{clojure.core!loop}
-\index{итерация!loop}
+\index{iteration!loop}
 
 \noindent
-Построим второй список обычным \verb|loop|:
+Let's build the second list with a regular loop:
 
 \begin{english}
   \begin{clojure}
@@ -1513,7 +1414,7 @@ Current: 1, timeout: 5000 ;; 2
 \end{english}
 
 \noindent
-То же самое с изменяемым вектором:
+Now we'll do the same with a mutable vector:
 
 \begin{english}
   \begin{clojure}
@@ -1525,13 +1426,13 @@ Current: 1, timeout: 5000 ;; 2
   \end{clojure}
 \end{english}
 
-Число строк осталось прежним, изменилось имя переменной и некоторые
-детали. Правки не выходят за пределы \verb|loop|, что даёт свободу
-действий. На ранних стадиях код пишут без изменяемых коллекций. Если скорость
-критична, цикл улучшают так, что данные меняются.
+The variable name and some details have changed, but the number of lines remains the same.
+Edits do not go outside the \verb|loop|, which gives freedom of action.
+In the early stages, you should write your code without mutable collections.
+Then, if speed is critical, the loop might be improved so that the data changes.
 
-Макрос \verb|time| принимает блок кода и печатает затраченное время. Если
-обернуть в \verb|time| оба примера, получим результаты:
+The \verb|time| macro takes a block of code and prints the time spent on its execution.
+If we wrap both examples in \verb|time|, we'll get the following results:
 
 \begin{english}
   \begin{text}
@@ -1540,25 +1441,20 @@ Current: 1, timeout: 5000 ;; 2
   \end{text}
 \end{english}
 
-Точные цифры зависят от оборудования и среды, но разница в~несколько раз
-остаётся. Транзиентные коллекции действительно быстрее постоянных аналогов.
+The exact numbers depend on the equipment and environment, but there is always a difference of several times. Transient collections really are faster than permanent ones!
 
 \index{clojure.core!reduce}
-\index{свёртка}
+\index{fold}
 
-Ускорение работает и для \verb|reduce|. В других языках функция называется
-\verb|fold| или <<свёртка>>. Центральная точка \verb|reduce|~---
-аккумулятор результата. Им может быть любой тип, в том числе число или строка
-для сложения и конкатенации. Однако чаще всего это список и словарь.
+The speedup works for the \verb|reduce| function as well. In other languages, this function is called \verb|fold|. The main point of \verb|reduce| is an accumulator of the result.
+It might be any data type, including a number or a string for addition and concatenation. Most often, however, the accumulator is a list or a map.
 
-Различают два способа начать свёртку. В первом аккумулятор~--- это начальный
-элемент коллекции. Для списка \verb|(1, 2, 3)| и сложения им станет
-единица. Во втором способе аккумулятор задают отдельно, например пустым вектором, куда в
-будущем запишут данные.
+There are two ways to start folding.
+In the first one, the accumulator is the initial item of a collection. In the case of the list \verb|(1, 2, 3)| and addition, this is 1. In the second method, the accumulator is set separately, for example, as an empty vector, where data will be written.
 
-Идея в том, чтобы сделать аккумулятор транзиентной коллекцией. На каждом шаге
-\verb|reduce| меняет её функциями \verb|conj!| и~аналогами. Сравним
-обычный \verb|reduce| и его мутабельную версию:
+The idea is to turn the accumulator into a transient collection.
+At each step, \verb|reduce| changes it using the \verb|conj!| function and analogs.
+Let's compare the regular \verb|reduce| and its mutable version:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1617,51 +1513,46 @@ Current: 1, timeout: 5000 ;; 2
 \fi
 
 \mnoindent
-Второй \verb|reduce| пришлось обернуть в \texttt{per\-sis\-tent!}. В случае с
-\verb|loop| мы втянули \verb|persistent!| внутрь и изолировали изменения. В
-этом плане \verb|reduce| не такой гибкий: внутри анонимной функции мы не
-знаем, достигли конца итерации или нет. Без \verb|persistent!| второй пример
-вернёт транзиентную коллекцию, что недопустимо.
+We had to wrap the second \verb|reduce| in \texttt{per\-sis\-tent!}. In the case of \verb|loop|, we put \verb|persistent!| inside and isolated the changes. In this regard, \verb|reduce| is less flexible: inside the anonymous function, we do not know whether we have reached the iteration end or not. Without \verb|persistent!|, the second example will return a transient collection, which is invalid.
 
-\subsection{Семантика и ограничения}
+\subsection{Semantics and Limitations}
 
-Изменяемые данные~--- это продвинутая техника, которая требует внимания. Как только
-вы отказались от постоянных коллекций, контроль за изменениями ложится на вас.
+Mutable data is an advanced technique that requires attention.
+Once you have given up on permanent collections, you are in control of the changes.
 
-Выигрыш в скорости ещё не значит, что их применяют на каждом шагу. Худшее, что
-может сделать разработчик,~--- написать код, где функции обмениваются такими
-коллекциями. Если это ваш случай, задумайтесь, почему автор языка уделил так
-много внимания неизменяемости. Будет ошибкой игнорировать его идеи.
+The increase in speed is not reason enough to apply them at every step.
+Writing code where functions exchange such collections is the worst thing a developer can do.
+Think about why the language author put so much emphasis on immutability.
+It would be a mistake to ignore his ideas.
 
-\index{люди!Дональд Кнут}
+\index{people!Donald Knuth}
 
-Феномен, когда на раннем этапе пытаются выжать скорость, называется
-преждевременной оптимизацией. Как заметил Дональд Кнут, это корень всех зол. Во
-время оптимизации задавайте себе вопросы. Действительно важно ускорить этот
-цикл? Это поможет проекту или вы действуете из любопытства?
+The phenomenon of trying to accelerate at too early a stage is called premature optimization.
+As Donald Knuth pointed out, this is the root of all evil.
+While optimizing, ask yourself the following questions. Is it really important to speed up this cycle? Re you acting out of curiosity, or will this help the project?
 
-Изолируйте транзиентные коллекции в небольших функциях. Тогда переход от
-постоянных типов к изменяемым не повлияет на результат. Рефакторинг должен
-касаться только функции, а не её потребителей.
+Isolate transient collections in small functions.
+In this case, the transition from constant types to mutable types will not affect the result.
+Refactoring should only concern the function, not its consumers.
 
-Изменяемая коллекция не имеет право быть глобальной. Воздержитесь от определений
-\spverb|(def users* (transient []))| и~подобных. Вы придёте к~тому, что
-\verb|users*| станет буфером обмена между функциями. Предсказать их результат
-станет невозможно.
+A mutable collection must not be global.
+Refrain from definitions such as \spverb|(def users* (transient []))| and the like.
+Otherwise, you end up with \verb|users*| becoming a clipboard between functions.
+Functions' results will become unpredictable.
 
-В отличие от атома, транзиентные типы не регулируют обращение из разных
-потоков. Следите, чтобы только один поток изменял коллекцию. Не передавайте их в
-футуры.
+Unlike an atom, transient types do not support cross-thread access.
+Make sure only a single thread mutates the collection, and don't pass it into futures.
 
-\section{Переменные и alter-var-root}
+\section{Variables and Alter-var-root}
 
-\index{переменные}
+\index{variables}
 \index{clojure.core!alter-var-root}
 
 \label{alter-var-root}
 
-Атомы и переходные коллекции меняют объект, а не переменную. Это не всегда то,
-чего мы ожидаем. Представим, что \verb|size|~--- это атом:
+Atoms and transient collections change the object, not the variable.
+Sometimes we want something different.
+Let \verb|size| be an atom:
 
 \begin{english}
   \begin{clojure}
@@ -1669,32 +1560,27 @@ Current: 1, timeout: 5000 ;; 2
   \end{clojure}
 \end{english}
 
-Чтобы изменить его, вызовем \verb|reset!| или \verb|swap!|, как в примерах
-выше. Однако \verb|size| останется атомом. То же самое с переходными
-коллекциями: легко добавить и удалить элемент, но это будет та же самая
-коллекция. Невозможно присвоить ей \verb|nil|.
+To mutate it, call \verb|reset!| or \verb|swap!|, as in the examples above.
+But even with the changed content, \verb|size| remains an atom. The same thing happens with transient collections: it is easy to add and remove an item, but it will be the same collection.
+You cannot assign \verb|nil| to it.
 
-Иногда переменную нужно изменить: сделать так, чтобы сперва она была
-\verb|nil|, затем словарём, затем снова \verb|nil|. Авторы намеренно
-усложнили этот сценарий. Менять переменные можно, но нежелательно с точки зрения
-языка.
+Sometimes a variable needs to change: first, it was \verb|nil|, then it turned into a map, then back into \verb|nil|.
+The authors deliberately complicated this scenario.
+It is possible to change variables, but this is not desirable from a language point of view.
 
-Clojure не поощряет императивный стиль, когда переменную меняют много
-раз. Глобальная переменная без уважительной причины~--- признак плохого кода.
-Программист должен понимать, зачем она понадобилась и можно ли от неё
-избавиться.
+Clojure discourages the imperative style of changing a variable many times.
+Using a global variable for no good reason is a sign of poorly written code.
+A programmer must understand why such a variable is needed and whether it is possible to get rid of it.
 
 \index{monkey patch}
 
-Всё же бывают случаи, когда глобальные переменные полезны. Это \emph{компоненты}
-и \emph{monkey patch}. Разберём новые термины.
+Nevertheless, there are situations when global variables are useful.
+I mean \emph{components} and \emph{monkey patch}. What do they mean here?
 
-Проект на Clojure состоит из отдельных компонентов или доменов. Это веб-сервер,
-база данных, очередь сообщений. Каждый домен помещают в свой модуль:
-\verb|http.clj|, \verb|db.clj| и так далее. В модуле объявляют переменную,
-которая хранит состояние компонента. Например, \verb|server| в модуле сервера и
-\verb|conn| в модуле базы. Возникает проблема, как задать переменную. Начинающие
-делают это в лоб:
+A Clojure project consists of separate components, that is, domains: they are a web server, database, and message queue.
+Each domain is placed in its module: \verb|http.clj|, \verb|db.clj|, and so on. In each module, a variable that stores the component state is declared (e.g., \verb|server| in the server module and \verb|conn| in the database module).
+Which way to define a variable is better?
+Beginners make the impulsive choice:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1715,73 +1601,66 @@ Clojure не поощряет императивный стиль, когда п
 
 \fi
 
-Выражение запустит сервер при загрузке модуля. Это плохая практика, потому что в
-загрузке не должно быть побочных эффектов. С~кодом невозможно работать в REPL:
-он делает то, о чём не просили.
+The expression will start the server when the module is loaded. This is bad practice because there should be no side effects in loading.
+The code does unsolicited things, so it is impossible to work with it in REPL.
 
-Сервер, базы данных и другие компоненты должны включаться по требованию, поэтому
-их переменные вначале равны \verb|nil|. Функция \verb|start!| запускает
-сервер и записывает его в \verb|server|. Функция \verb|stop!| останавливает
-и меняет переменную на \verb|nil|.
+A server, databases, and other components must start on-demand, so their variables are initially \verb|nil|.
+The \verb|start!| function starts a server and writes it to the \verb|server| variable, and the \verb|stop!| function stops the server and sets the variable to \verb|nil|.
 
-\subsection{Понятие переменной}
+\subsection{Concept of a Variable}
 
-\index{переменные}
+\index{variables}
 \index{clojure.core!alter-var-root}
 
 \label{var-section}
 
-Чтобы изменить \emph{переменную}, прибегают к \verb|alter-var-root|. Функция
-меняет объекты, которые задали через \verb|def| и \verb|defn|. Вызов похож
-на \verb|swap!| для атома: функция принимает объект \verb|Var| и другую
-функцию, которая вычислит новое значение из прежнего.
+To change a \emph{variable}, resort to the \verb|alter-var-root| function.
+It changes the objects that \verb|def| and \verb|defn| specified.
+The call is like \verb|swap!| for an atom: alter-var-root takes a \verb|Var| object and applies a function to it to compute a new value from the old one.
 
-\index{классы!Var}
+\index{classes!Var}
 
-Рассмотрим, что такое \verb|Var|. Это экземпляр класса \verb|clojure.lang.Var|
-из библиотеки Clojure. \verb|Var| описывает переменную в пространстве имён.
-Чтобы получить объект переменной, её символ передают в макрос \verb|var|,
-например \verb|(var server)|. Эта запись аналогична \verb|#'server|,
-что немного короче.
+Let's see what \verb|Var| is.
+It is an instance of the \verb|clojure.lang.Var| class from the Clojure library.
+\verb|Var| describes a variable in a namespace.
+To get a variable object, pass its symbol to the \verb|var| macro, for example \verb|(var server)|.
+The \verb|#'server| is a shorthand for \verb|(var server)|.
 
-\index{синтаксис!\texttt{\#\textquotesingle} (переменная)}
+\index{ syntax!\texttt{\#\textquotesingle} (variable)}
 
-\index{символ}
+\index{symbol}
 
-\emph{Символ} переменной и её \emph{объект}~--- это разные сущности. Сам по себе
-символ ничего не значит: он равен только самому себе. Представьте, что символ~---
-это слово языка, комбинация букв. В языке не бывает одинаковых слов, однако у
-слова может быть несколько значений.
+The \emph{symbol} and \emph{object} of a variable are different entities.
+By itself, the symbol does not mean anything: it is equal only to itself. Imagine that a symbol is a word in a language, a combination of letters. There are no identical words in a language, but a word can have several meanings.
 
-\index{пространства имён}
+\index{namespaces}
 
-Символ~--- это посредник между пространством имён и переменными. Когда мы пишем
-\verb|(def num 42)|, это не значит, что переменная \verb|num| равна числу
-42. На самом деле мы создали объект \verb|Var| со значением 42. Затем
-поместили его в текущее пространство под символом \verb|num|.
+A symbol is an intermediary between namespace and variables.
+When we write \verb|(def num 42)|, this does not mean that the \verb|num| variable is equal to 42.
+In effect, we created a \verb|Var| object with a value of 42.
+Then we put it in the current namespace under the \verb|num| symbol.
 
-Пространство имён работает как словарь. Ключи~--- это символы, а~значения~---
-переменные. Формы \verb|def| и \verb|defn| наполняют этот словарь. Можно
-сказать, \verb|def| задаёт слову смысл, и в момент компиляции Clojure
-понимает это слово.
+The namespace works like a map: keys are symbols, and the values are variables.
+The \verb|def| and \verb|defn| forms fill this map.
+You could say \verb|def| gives meaning to a word, and Clojure understands that word at compile time.
 
-С символом связана операция \emph{вычисления}. Если в REPL ввести \verb|num|,
-он выполнит поиск с таким ключом в пространстве имён. Когда ключ найден, REPL
-вернёт значение переменной, в нашем случае 42. В противном случае возникнет
-ошибка.
+A \emph{computation} operation binds with a symbol.
+If you enter \verb|num| in REPL, it will search the namespace with that key. After finding the key, REPL returns the variable value; in our case, it is 42. 
+Otherwise, an error will occur.
 
-Clojure намеренно скрывает от нас стадию переменной, и это правильно. Если бы
-выражение \verb|num| вернуло переменную, в этом не было бы
-смысла. \verb|Var|~--- не цифра, а сложный объект. Значение 42~--- это лишь одно
-из множества его полей.  Как правило, переменные скрыты от
-пользователя. Разработчик видит либо их символ (\verb|num|), либо значение
-(\verb|42|). Функция \verb|alter-var-root|~--- тот случай, когда переменные
-вступают в~игру.
+Clojure deliberately hides the variable stage from us, and rightly so.
+If the expression \verb|num| returned a variable, it wouldn't make sense.
+\verb|Var| is not a number but a complex object.
+The value 42 is just one of its many fields.
+As a rule, variables are hidden from the user.
+A developer sees either their symbol (\verb|num|) or their value (\verb|42|).
+The \verb|alter-var-root| function is where variables come into play.
 
-\subsection{Запуск по требованию}
+\subsection{Start on Demand}
 
-Вернёмся к серверу. Объявим переменную, которая в будущем станет объектом
-\texttt{jetty.server\-.Server}. По умолчанию она равна \verb|nil|:
+We're to going to go back to a server.
+Let's declare a variable that eventually will become the \texttt{jetty.server\-.Server} object.
+By default, it is equal to \verb|nil|:
 
 \begin{english}
   \begin{clojure}
@@ -1789,9 +1668,8 @@ Clojure намеренно скрывает от нас стадию перем�
   \end{clojure}
 \end{english}
 
-Функция \verb|start!| заменяет \verb|server| результатом анонимной
-функции. Она принимает текущее значение переменной. Когда это \verb|nil|,
-создаём и возвращаем новый сервер. Если нет, вернём текущий.
+The \verb|start!| function replaces \verb|server| with the result of an anonymous function, which takes the current value of the variable.
+When it is \verb|nil|, we'll create, and return a new server. If not, the current one will be returned.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1825,8 +1703,7 @@ Clojure намеренно скрывает от нас стадию перем�
 \fi
 
 \noindent
-Аналогично работает \verb|stop!|: если сервер включен (не \verb|nil|),
-остановим его и вернём \verb|nil|.
+\verb|Stop!| works similarly: if the server is on (i.e., not \verb|nil|), stop it, and return \verb|nil|.
 
 \begin{english}
   \begin{clojure}
@@ -1841,18 +1718,16 @@ Clojure намеренно скрывает от нас стадию перем�
 \end{english}
 
 \mnoindent
-Вызов \verb|(start!)| запустит сервер в фоне. Браузер ответит на запросы по
-адресу \texttt{localhost\-:8080}. Переменная \verb|server| напечатает в REPL
-объект сервера.
+Calling \verb|(start!)| will start the server in the background. A browser will respond to requests at \texttt{localhost\-:8080}.
+The \verb|server| variable will print the server object to REPL.
 
-\index{пул соединений}
-\index{библиотеки!JDBC}
+\index{connection pool}
+\index{libraries!JDBC}
 
-Похожим образом работают с базой. Чтобы не открывать подключение на каждый
-запрос, применяют пулы соединений. В модуле объявляют переменную \verb|pool|
-со значением \verb|nil|. Функция \verb|start!| создаёт новый пул и обновляет
-переменную. После запуска к базе посылают запросы. Функции \verb|query|,
-\verb|insert!| и другие из пакета JDBC принимают подключение к базе или пул:
+They work with the database in a similar way.
+In order not to open a connection for every request, we use connection pools.
+In the module, declare the \verb|pool| variable, which is \verb|nil|.
+The \verb|start!| function creates a new pool and updates the variable. After the start, requests are sent to the database. The \verb|query|, \verb|insert!| functions, and others from the JDBC package will take a database connection or pool:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1875,95 +1750,88 @@ Clojure намеренно скрывает от нас стадию перем�
 
 \fi
 
-Функция \verb|stop!| выключает пул, закрывает соединения и выставляет
-\verb|pool| в \verb|nil|. Опустим код этих функций, потому что они
-аналогичны примерам для HTTP-сервера. Разница только в имени глобальной
-переменной и выражении, где создают сервер и пул.
+The \verb|stop!| function shuts down the pool, closes connections, and sets \verb|pool| to \verb|nil|.
+We will skip the code of these functions because they are similar to examples for an HTTP server.
+There are only differences in the global variable name and the expression where we create the server and pool.
 
-\subsection{Коротко о системах}
+\subsection{Systems in Brief}
 
-\index{системы}
+\index{systems}
 
 \label{systems-intro}
 
-Техника \verb|alter-var-root| сообщает модулю состояние: включен или
-выключен. С таким подходом проект удобно включать по частям, а не всё
-разом. Для отладки базы не нужен веб-сервер, а кэширование не зависит от
-рассылки писем.
+The \verb|alter-var-root| technique alters the module state to on or off. With this approach, it is convenient to enable a project in parts rather than all at once. For example, you don't need a web server to debug a database, and caching doesn't depend on mailing.
 
-Модули с состоянием называют компонентами. Вместе они образуют систему. С
-помощью \verb|alter-var-root| строят системы в небольших проектах. В основном
-это веб-приложение с сервером и базой данных. В шутку их называют системами для
-бедных.
+Stateful modules are called components.
+All components together form a system.
+Use \verb|alter-var-root| to build small projects systems, usually web applications with a server and database. These are sometimes jokingly referred to as poor man's systems.
 
-\index{системы!бедные}
+\index{systems!poor}
 
-<<Бедные>> системы не зависят от сторонних библиотек. Каждый модуль выставляет
-универсальные <<ручки управления>>: функции \verb|start!| и \verb|stop!|,
-которые обращаются к \verb|alter-var-root|. Это простая и удобная схема.
+"Poor" systems do not depend on third-party libraries.
+Each module uses "controls" — the \verb|start!| and \verb|stop!| functions — that call \verb|alter-var-root|.
+This is a simple, convenient scheme.
 
-С другой стороны, <<бедные>> системы не знают, как один компонент зависит от
-другого. Со временем зависимости становятся проблемой, поэтому большие системы
-строят с помощью библиотек. Некоторые из них тоже опираются на
-\verb|alter-var-root|. Системам посвящена отдельная глава этой
-книги \page{chapter-systems}.
+On the other hand, such systems are not aware of how one component depends on another.
+Dependencies become a problem over time, so large systems are built using libraries.
+Some of them also rely on \verb|alter-var-root|.
+A separate chapter of this book is devoted to systems \page{chapter-systems}.
 
-\subsection{Патчинг}
+\subsection{Patching}
 
 \index{clojure.core!alter-var-root}
-\index{патчинг}
+\index{patching}
 
-Выше мы изменили переменную в текущем модуле. Истинная мощь
-\verb|alter-var-root| в том, что функция работает с переменными \emph{любого}
-пространства. Под любым мы понимаем:
+Above, we have changed the variable in the current module.
+The power of \verb|alter-var-root| is that the function works on variables in \emph{any} namespace. By "any" I mean:
 
 \begin{itemize}
 
 \item
-  текущий модуль;
+  current module;
 
 \item
-  соседние модули проекта;
+  neighboring project modules;
 
 \item
-  сторонние библиотеки;
+  third-party libraries;
 
 \item
-  стандартные модули Clojure, например \texttt{clo\-ju\-re.co\-re}.
+  standard Clojure modules such as \texttt{clo\-ju\-re.co\-re}.
 
 \end{itemize}
 
 \index{monkey patch}
 
-Это мощная техника, но к ней прибегают редко. Менять код в~полёте считается
-сомнительной практикой. По-другому её называют \footurl{monkey patch}{https://en.wikipedia.org/wiki/Monkey\_patch}[Monkey patch][-7mm]. Термин означает изменение классов и функций не в~коде, а~когда программа уже запущена.
+This is a powerful but rarely used technique.
+Modifying code on the fly is considered a questionable practice.
+It's also called \footurl{monkey patch}{https://en.wikipedia.org/wiki/Monkey\_patch}[Monkey patch][-7mm]. This expression means changing classes and functions, not in the code, but when the program is already running.
 
-Если патчингом злоупотребляют, программа ведёт себя неочевидным
-образом. Коллеги не сразу поймут, почему в коде написано одно, а~выполняется
-другое. Это затрудняет поддержку и вносит раздражение. К патчингу прибегают,
-если сошлись несколько условий:
+If patching is overused, the program behaves in a non-obvious way.
+Colleagues will not immediately understand why the code says one thing and does another.
+This makes support annoying and difficult to maintain. Patching is resorted to if several of the following conditions are met:
 
 \begin{itemize}
 
 \item
-  без изменений нельзя двигаться дальше;
+  you cannot move on without modifying;
 
 \item
-  проблема в сторонней библиотеке или платформе;
+  there is a problem in a third-party library or platform;
 
 \item
-  на устранение проблемы уйдёт время.
+  it will take time to fix the problem.
 
 \end{itemize}
 
-Патчинг оправдан, когда вы нашли ошибку в чужой библиотеке. Даже если изменения
-примут сразу, выпуск новой версии займёт время. Если ошибка задерживает релиз,
-подмените проблемную функцию с~помощью \verb|alter-var-root|.
+If you find a bug in someone else's library, patching is justified.
+Even if the changes are accepted immediately, the release of the new version will take time.
+If the bug is delaying the release, replace the problematic function using \verb|alter-var-root|.
 
-Представим: условная библиотека Yamler парсит файлы YAML. Функция
-\verb|read-yaml-tag| отвечает за теги. Выяснилось, что в разборе тегов ошибка,
-а нам нужно расставить их файле. Если ошибку легко исправить, напишем функцию со
-звёздочкой и заменим оригинал:
+Suppose some Yamler library parses YAML files.
+The \verb|read-yaml-tag| function is responsible for tags.
+We need to arrange tags in the file, but there was an error in parsing them.
+If the error is easy to fix, we'll write a function with an asterisk and replace the original with it:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1998,21 +1866,20 @@ Clojure намеренно скрывает от нас стадию перем�
 
 \fi
 
-В комментарии добавьте ссылку на артефакт (GitHub, Jira). Создайте задачу,
-чтобы удалить патч по выходу новой версии библиотеки.
+Add a link to the artifact (GitHub, Jira) in the comment.
+Create a task to remove the patch when a new version of the library is released.
 
-Патчинг полезен в разработке. Данные часто печатают на экран, чтобы исследовать
-их. Недостаток \verb|println| в том, что вывод не структурирован. Коллекции
-слипаются в одну строку, поэтому их трудно читать.
+Patching is useful in development.
+Developers often print data to screen to explore.
+The \verb|println| disadvantage is that the output is not structured.
+Collections are hard to read because they stick together on one line.
 
-\index{печать!с отступами}
-\index{модули!clojure.pprint}
+\index{printing!indented}
+\index{modules!clojure.pprint}
 
-Пакет \verb|clojure.pprint| (сокращение от англ.~\textbf{p}retty \textbf{p}rinting)
-решает эту проблему. Функция \verb|pprint| выводит данные с отступами и~переносами строк,
-что удобно для вложенных словарей. Но писать \verb|(clojure.pprint/pprint data)|
-вместо \verb|(println data)| долго. Чтобы сократить код, заменим \verb|println|
-на \verb|pprint|. Для этого пропатчим функцию:
+The package \verb|clojure.pprint| (short for \textbf{p}retty \textbf{p}rinting) solves this problem. The \verb|pprint| function outputs data indented and line-wrapped, which is convenient for nested maps.
+But it takes a long time to write \verb|(clojure.pprint/pprint data)| instead of \verb|(println data)| every time. To shorten the code, replace \verb|println| with \verb|pprint|.
+To do this, patch the function:
 
 \begin{english}
   \begin{clojure}
@@ -2022,8 +1889,8 @@ Clojure намеренно скрывает от нас стадию перем�
   \end{clojure}
 \end{english}
 
-Выполните этот патч один раз в любом месте проекта. Теперь вызов
-\verb|(println data)| напечатает данные, как это делает \verb|pprint|:
+Apply this patch once, anywhere in the project.
+Now, calling \verb|(println data)| will print the data, just like \verb|pprint| does:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2053,26 +1920,25 @@ Clojure намеренно скрывает от нас стадию перем�
 
 \fi
 
-Функция заменит вложенные участки на символ \verb|#|, чтобы не обрушить на
-вас лавину данных. Глубину и длину печати задают особые переменные. Позже мы
-узнаем, как управлять ими.
+The function will replace the nested sections with the \verb|#| symbol so that a data avalanche does not fall on you.
+Specific variables set the print depth and length.
+We will see later how to control them.
 
-\subsection{В боевом режиме}
+\subsection{In Production Mode}
 
 \label{install-logger}
 
-\index{логирование!исключений}
-\index{исключения!логирование}
-\index{логирование!бекэнды}
+\index{logging!exceptions}
+\index{exceptions!logging}
+\index{logging!backends}
 
-Рассмотрим, когда \verb|alter-var-root| полезен в промышленном запуске. В
-предыдущей главе мы отметили проблему: у нас нет контроля за тем, как выглядит
-исключение в логе \page{log-ex-param}. Перевод исключения в текст остаётся на
-усмотрение бекэнда (log4j, Logback и других).
+Let's discuss when \verb|alter-var-root| is useful in production.
+In the previous chapter, we outlined a problem: we have no control over what an exception looks like in the log \page{log-ex-param}.
+Translating an exception into text is up to the backend (e.g., log4j, Logback, and others).
 
-Мы написали функцию \verb|ex-print|, которая печатает исключение как нужно
-нам. Функция не вываливает стек-трейс на весь экран, а обходит цепочку. Для
-каждого звена она выводит класс, сообщение и контекст:
+We wrote an \verb|ex-print| function that prints the exception as we want.
+The function traverses a chain rather than filling across the entire screen with a stack trace.
+For each link, it outputs the class, message, and context:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2113,7 +1979,7 @@ Clojure намеренно скрывает от нас стадию перем�
 \fi
 
 \noindent
-Минус в том, что вместо \verb|(log/error e)| приходится писать:
+The disadvantage is that instead of \verb|(log/error e)| you have to write:
 
 \begin{english}
   \begin{clojure}
@@ -2121,22 +1987,19 @@ Clojure намеренно скрывает от нас стадию перем�
   \end{clojure}
 \end{english}
 
-Это долго и вынуждает импортировать \texttt{ex-\-print} в каждый модуль, где логируют
-исключения. Будет удобней, если останется только \verb|(log/error e)|, а
-\verb|ex-print| сработает где-то за кадром. Это возможно с помощью
-\texttt{alter-var\--root}.
+This takes a long time and forces you to import \texttt{ex-\-print} into every module where exceptions are logged.
+It will be more convenient if only \verb|(log/error e)| remains, and \verb|ex-print| will fire somewhere behind the scenes.
+\texttt{Alter-var\--root} provides this capability.
 
-Заметим, что \verb|log/error|, \verb|log/info| и аналоги~--- это не функции, а
-макросы. Макрос~--- это эфемерная сущность, на которую нельзя сослаться через
-\verb|var|. Макрос живет \emph{до} компиляции программы. Позже на его месте
-остаётся код, который он произвёл. Нельзя изменить макрос, но можно подменить
-функции, которые он вызывает.
+It should be noted that \verb|log/error|, \verb|log/info|, and analogs are not functions but macros.
+A macro is a fleeting entity that you cannot reference through \verb|var|.
+The macro lives \emph{until} the program is compiled. Later, the code it produced takes its place. You cannot change a macro, but you can replace the functions that it calls.
 
-\index{логирование}
+\index{logging}
 
-Макросы \verb|log/error| и другие сводится к функции \verb|log/log*|. Это
-бутылочное горлышко, через которое проходят все логи. Вот как выглядит её
-сигнатура:
+The \verb|log/error| macro and others boil down to the \verb|log/log*| function.
+It is the bottleneck through which all logs go.
+Its signature looks like the following:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2157,30 +2020,29 @@ Clojure намеренно скрывает от нас стадию перем�
 
 \fi
 
-Параметр \verb|throwable|~--- это исключение или \verb|nil|. Подменим
-\verb|log*| на анонимную функцию со следующей логикой:
+The \verb|throwable| parameter is either an exception or \verb|nil|.
+Use the anonymous function with the following logic as a substitute for \verb|log*|:
 
 \begin{itemize}
 
 \item
-  если \verb|throwable| не \verb|nil|, перевести исключение в текст;
+
+..If \verb|throwable| is not \verb|nil|, translate the exception into text
 
 \item
-  добавить его к исходному сообщению через перенос строки;
+  Add it to the original message via line break
 
 \item
-  вызвать оригинальный \verb|log*| с новым сообщением и \verb|nil| для
-  \verb|throwable|. В исключении отпала потребность, поскольку теперь оно
-  часть сообщения;
+  Call the initial \verb|log*| (with a new message and \verb|nil|) for \verb|throwable|.
+The exclusion is no longer needed because it is part of the message now
 
 \item
-  если \verb|throwable| \verb|nil|, вызвать \verb|log*| с исходными
-  аргументами.
+  If \verb|throwable| is \verb|nil|, call \verb|log*| with initial arguments.
 
 \end{itemize}
 
 \noindent
-Реализация:
+Implementation:
 
 \index{функции!install-better-logging}
 
@@ -2228,44 +2090,37 @@ Clojure намеренно скрывает от нас стадию перем�
 \fi
 
 \mnoindent
-Хитрость кроется в параметре \verb|log*| \coderef{4}. Анонимная функция в
-\verb|alter-var-root| принимает текущее значение переменной. Это исходная
-функция \verb|clojure.tools.logging/log*|, и параметр \verb|log*| ссылается
-на неё. Новая функция замкнута на исходной и может её вызывать.
+The trick lies in the \verb|log*| parameter \coderef{4}. The anonymous function in \verb|alter-var-root| takes the current value of the variable. It is the initial \verb|clojure.tools.logging/log*|, and the \verb|log*| parameter refers to it.
+The new function is closed on the initial one and can call it.
 
-Получился декоратор: мы только меняем входные параметры и передаём дальше После
-вызова \verb|(install-better-logging)| вывод исключений изменится. Достаточно
-написать \verb|(log/error e)|, чтобы ошибка приняла нужный вид.
+The result is a decorator: we only change the input parameters and pass it on. After calling \verb|(install-better-logging)|, the exception output will change. 
+For the error to take the required form, it is enough to write \verb|(log/error e)|.
 
-Преимущество в том, что мы управляем \emph{всем} на уровне Clojure. Если
-понадобится улучшить логи, доработаем \verb|ex-print| в любой момент. Это
-удобнее, чем наследовать условный \verb|com.logging.ErrorRenderer|
-и~переопределять его методы.
+The advantage is that we control \emph{everything} at the Clojure level.
+If you need to improve the logs, we can modify \verb|ex-print| at any time.
+That is more convenient than inheriting the conditional \verb|com.logging.ErrorRenderer| and redefining its methods.
 
-Вред от необдуманного \verb|alter-var-root| сводит на нет плюсы, что мы
-рассмотрели. Функция нужна, чтобы точечно менять переменные в~особых
-случаях. Прибегайте к патчингу только если другие варианты исчерпаны.
+The harm from thoughtless usage of \verb|alter-var-root| negates the pros that we have considered.
+The function is needed to change variables individually in specific cases.
+Only resort to patching if there are no other options left.
 
-\section{Присваивание с set!}
+\section{Assignment with the set! Form}
 
-\index{печать!с отступами}
-\index{модули!clojure.pprint}
+\index{printing!indented}
+\index{modules!clojure.pprint}
 
-Вернёмся к функции \verb|pprint| для красивой печати. Она интересна тем, что
-проверяет длину и уровень коллекций. Так мы не допустим ситуации, когда печать
-заливает несколько экранов. Проверка на длину особенно важна, потому что
-некоторые коллекции не просто велики, а~\emph{бесконечны}.
+Let's go back to the \verb|pprint| function for pretty print. It is interesting because it checks the collections' length and level.
+This way, we will not allow a situation where the print fills several screens.
+Some collections are not just large but \emph{endless}, so checking for length is especially important.
 
-\index{коллекции!бесконечные}
+\index{collections! endless }
 \index{clojure.core!*print-length*}
 \index{clojure.core!set"!}
 
-Глобальные переменные \verb|*print-length*| и \verb|*print-level*| задают длину
-и вложенность вывода. По умолчанию \verb|*print-length*| равна 100. Это довольно
-много, особенно если учесть, что элементами могут быть другие
-коллекции. Результат запроса к базе~--- это список словарей. Печатать сто словарей
-расточительно, поэтому уменьшим \verb|*print-length*| на старте приложения. Для
-этого служит форма \verb|set!|:
+The global variables \verb|*print-length*| and \verb|*print-level*| set the length and nesting of the output.
+By default, \verb|*print-length*| is 100.
+It is quite a lot, especially considering that other collections can act as elements.
+The result of a request to the database is a list of maps. Printing a hundred maps is wasteful, so let's reduce the \verb|*print-length*| at the start of the application. The \verb|set!| form serves this purpose:
 
 \begin{english}
   \begin{clojure}
@@ -2273,8 +2128,7 @@ Clojure намеренно скрывает от нас стадию перем�
   \end{clojure}
 \end{english}
 
-Вывод бесконечной коллекции покажет только первые восемь элементов. Многоточие
-означает, что остальные элементы отбросили.
+The endless collection output will only show the first eight items. The ellipsis means that we've cut off the rest of the list.
 
 \begin{english}
   \begin{clojure}
@@ -2283,9 +2137,9 @@ Clojure намеренно скрывает от нас стадию перем�
   \end{clojure}
 \end{english}
 
-Вложенность или уровень коллекции~--- это воображаемый индекс. Когда одна коллекция
-становится элементом другой, её индекс увеличивается на единицу. Объявим
-вложенную структуру:
+The nesting or collection level is an imaginary index.
+When one collection becomes an element of another, its index is incremented by one.
+Let's declare a nested structure:
 
 \begin{english}
   \begin{clojure}
@@ -2295,7 +2149,7 @@ Clojure намеренно скрывает от нас стадию перем�
   \end{clojure}
 \end{english}
 
-Вывод с различными значениями \texttt{*print\--le\-vel*}:
+Here is output with different \texttt{*print\--le\-vel*} values:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2343,51 +2197,45 @@ Clojure намеренно скрывает от нас стадию перем�
 \fi
 
 \noindent
-При нулевом уровне увидим только \verb|#|.
+At zero level, we will see only \verb|#|.
 
-В Clojure около десяти переменных с <<ушками>>. По-другому их~называют
-системными, потому что они влияют на поведение языка в~целом. Две переменных мы
-уже рассмотрели: это \verb|*print-length*| и~\verb|*print-level*| для
-печати. Перечислим несколько других:
+There are about ten variables with earmuffs (a pair of asterisks before and after variable names) in Clojure. Alternatively, they are called systemic ones because they affect the behavior of the language as a whole. We have already discussed two of them using for printing: these are \verb|*print-length*| and ~\verb|*print-level*|.
+Here is the list of a few others:
 
-\index{синтаксис!\texttt{*}ушки\texttt{*}}
+\index{syntax!\texttt{*}earmuffs\texttt{*}}
 
 \begin{itemize}
 
-\index{рефлексия}
+\index{reflection}
 \index{clojure.core!*warn-on-reflection*}
 
 \item
-  \verb|*warn-on-reflection*|: если истина, компилятор предупреждает о местах,
-  где он обратился к рефлексии. Проблему решают расстановкой тегов с типами;
+  \verb|*warn-on-reflection*|: if true, the compiler warns about the places where it turned to reflection. Placing tags with types solves the problem
 
 \index{clojure.core!assert}
 \index{clojure.core!*assert*}
 
 \item
-  \verb|*assert*|: если ложь, отключает \verb|assert|-макрос. Форма
-  \verb|assert| проверяет выражение на истинность. Когда оно ложно, макрос
-  бросает исключение.  По умолчанию \verb|assert|ы включены; ими пользуются в
-  разработке и тестировании. В боевом режиме их~выключают, чтобы не тратить
-  ресурсы;
+  \verb|*assert*|: if false, disables the \verb|assert| macro. The \verb|assert| form tests the expression for true. When false, the macro throws an exception. By default, the \verb|assert| forms are enabled; they are used in development and testing. In production mode, they are turned off so as not to waste resources
 
 \label{print-meta}
 
-\index{метаданные}
-\index{печать!метаданных}
+\index{metadata}
+\index{printing!metadata}
 \index{clojure.core!*print-meta*}
-\index{библиотеки!Component}
+\index{libraries!Component}
 
 \item
-  \verb|*print-meta*|: выводить или нет метаданные объекта при печати. По
-  умолчанию~--- ложь. Иногда в метаданных хранят поля, которые влияют на работу
-  программы. Например, библиотека Component управляет зависимостями компонентов
-  через метаданные. Чтобы увидеть их, установите \verb|*print-meta*| в~истину.
+  \verb|*print-meta*| determines whether or not to print the object metadata when printing. 
+By default, it is false. Sometimes metadata stores fields that affect how the program works.
+For example, the Component library manages component dependencies through metadata.
+To see them, set \verb|*print-meta*| to true.
 
 \end{itemize}
 
-Эти и другие переменные изменяют формой \verb|set!|. Рассмотрим несколько
-примеров. Показать предупреждения, если компилятор не вывел тип:
+The \verb|set!| form modifies these variables and others.
+Let's look at some examples.
+If the compiler didn't output a type, show warnings:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2416,7 +2264,8 @@ Clojure намеренно скрывает от нас стадию перем�
 \fi
 
 \noindent
-Отключить формы \verb|assert|. Ложные выражения не вызовут ошибку:
+Disable \verb|assert| forms.
+False expressions will not throw an error:
 
 \begin{english}
   \begin{clojure}
@@ -2427,9 +2276,8 @@ Clojure намеренно скрывает от нас стадию перем�
 \end{english}
 
 \noindent
-Вывести объект с метаданными (приведём фрагмент в~листинге
-\ref{fig:print-var-meta}). Обратите внимание, что переменная хранит имя файла
-и~позицию в~нём. Эти сведения используют плагины для навигации по коду.
+Output an object with metadata (see the snippet in Listing \ref{fig:print-var-meta}).
+Please note that the variable stores the file path and the line number. Plugins use this information to navigate code.
 
 \begin{listing}[ht!]
 
@@ -2449,19 +2297,18 @@ Clojure намеренно скрывает от нас стадию перем�
   \end{clojure}
 \end{english}
 
-\caption{Печать переменной в REPL с метаданными}
+\caption{Printing a variable with metadata to REPL}
 \label{fig:print-var-meta}
 
 \end{listing}
 
-\index{утилиты!lein}
-\index{профили!lein}
+\index{ utilities!lein}
+\index{profiles!lein}
 
-Утилиты для управления проектами читают переменные с <<ушками>> из
-словаря. Конфигурация \verb|lein| учитывает ключ \verb|:global-vars|. Ещё
-большей гибкости можно добиться, если указать переменные в профилях. Ниже мы
-задаём разные переменные в зависимости от режима разработки (\verb|dev|) или
-сборки (\verb|uberjar|).
+Project management utilities read vars with earmuffs from a map.
+The \verb|lein| configuration considers the \verb|:global-vars| key.
+You can achieve even more flexibility by specifying variables in profiles.
+Below we'll set different variables depending on the development (\verb|dev|) or build (\verb|uberjar|) mode.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2491,8 +2338,8 @@ Clojure намеренно скрывает от нас стадию перем�
 
 \fi
 
-Внутри \verb|binding| форма \verb|set!| работает как оператор
-присваивания. Переменная должна быть динамической:
+Inside \verb|binding|, the \verb|set!| form acts as an assignment operator.
+The variable should be dynamic:
 
 \begin{english}
   \begin{clojure}
@@ -2511,8 +2358,7 @@ Clojure намеренно скрывает от нас стадию перем�
 \end{english}
 
 \noindent
-За пределами \verb|binding| вызов \verb|set!| обернётся ошибкой, даже если
-переменная с~<<ушками>>:
+Outside \verb|binding|, the \verb|set!| call will fail, even for the variable with earmuffs:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2539,54 +2385,51 @@ Clojure намеренно скрывает от нас стадию перем�
 
 \fi
 
-\section{Изменения в контексте}
+\section{Changes in the Context}
 
-\index{контекст}
-\index{изменения!в контексте}
+\index{context}
+\index{changes!in context}
 
-Приёмы, которые мы рассмотрели, похожи в следующем: их эффект длится до конца
-программы. Изменения в атомах, транзиентных коллекциях и глобальных переменных
-называют \emph{персистентными} (англ.~persistent~--- <<постоянный>>).
+The techniques that we have considered are similar in the following: their effect lasts until the end of the program.
+Changes to atoms, transient collections, and globals vars are called persistent.
 
-Иногда изменения должны быть временными: глобальная переменная равна $x$, но
-участок кода ожидает $y$. Можно сделать временные изменения на базе постоянных:
-окружить код вызовом \verb|alter-var-root| с новым и старым значениями. У
-такого подхода две проблемы: изоляция и откат.
+Sometimes the changes need to be temporary: the global variable is $x$, but the piece of code is expecting $y$.
+You can make transient changes based on permanent ones: surround the code with a call of \verb|alter-var-root| with the new and old values.
+This approach has two problems: isolation and rollback.
 
 \index{clojure.core!alter-var-root}
 
-Временные изменения протекают в одном потоке. У~\verb|alter-var-root|
-противоположный эффект~--- функция меняет переменную для всех потоков. Если
-фрагмент кода вызывает \verb|alter-var-root|, он задевает всех участников. Это
-приводит к странному поведению программы.
+Transient changes take place in one thread.
+But \verb|alter-var-root| has the opposite effect~--- the function changes the variable for all threads.
+If a code snippet calls \verb|alter-var-root|, then all participants are affected.
+This leads to strange program behavior.
 
-Проблема отката означает, что при выходе из блока переменную нужно вернуть в прежнее
-состояние. Когда код оборачивают в формы \verb|alter-var-root| или \verb|set!|, одна
-из них может потеряться или не получить управление из-за ошибки.
+The problem with rollback is that the variable must return to its previous state when exiting the block.
+When we are wrapping the code in the \verb|alter-var-root| or \verb|set!| forms, one of them may get lost or fail to gain control due to an error.
 
-Clojure предлагает несколько форм, чтобы выполнить код в контексте переменных с
-другими значениями. Одна из них называется \verb|binding| \eng{связывание}.
+Clojure offers several forms to execute code in the context of vars with different values.
+One of them is \verb|binding|.
 
-\index{связывание}
+\index{binding}
 \index{clojure.core!binding}
 
-Синтаксис \verb|binding| похож на \verb|let|: форма связывания и
-произвольный код. Связывание~--- это вектор, где указаны символы переменных и~новые
-значения. Символы ссылаются на уже объявленные переменные. Блок кода запускается
-с новыми значениями у переменных. Результат \verb|binding|~--- это последнее
-выражение блока. Изменения \verb|binding| протекают в рамках текущего потока и
-не влияют на соседние. При выходе переменные получат старые значения.
+The \verb|binding| syntax is similar to \verb|let|: a form of binding and arbitrary code. A binding is a vector where the variable symbols and new values are specified.
+The symbols refer to already declared variables.
+The code block executes with new values for the variables.
+The result of \verb|binding| is the last expression in the block.
+\verb|Binding| modifications occur within the current flow and do not affect neighboring ones.
+On exit, the variables will get their old values.
 
-\subsection{Динамические переменные}
+\subsection{Dynamic Variables}
 
 \label{dynamic-vars}
 
-\index{переменные!динамические}
-\index{синтаксис!\texttt{\^} (метаданные)}
+\index{variables!dynamic}
+\index{syntax!\texttt{\^} (metadata)}
 
-\verb|Binding| работает только с динамическими переменными. Компилятор считает
-переменную таковой, если ей назначили тег \verb|^:dynamic|. Это сокращённая
-форма \verb|^{:dynamic true}|:
+\verb|Binding| only works with dynamic vars.
+The compiler treats a variable as such if a \verb|^:dynamic| tag has been assigned to it.
+It is a shortcut for \verb|^{:dynamic true}|:
 
 \begin{english}
   \begin{clojure}
@@ -2596,20 +2439,20 @@ Clojure предлагает несколько форм, чтобы выпол�
   \end{clojure}
 \end{english}
 
-Словарь с крышкой в \verb|def| называют метаданными. Это дополнительные
-параметры будущей переменной. В данном случае мы сообщаем компилятору, что
-переменная динамическая и может быть изменена в~будущем.
+A map with a caret symbol in \verb|def| is called metadata.
+These are additional parameters for a future variable.
+In this case, we inform the compiler that the variable is dynamic and can be changed in the future.
 
-Глобальные переменные выделяют <<ушками>>, звёздочками по краям. В английском
-языке такую запись называют earmuffs syntax. Правило возникло в старых
-диалектах Лиспа, и Clojure следует традиции. Глобальные переменные не совсем
-вписываются в идеи Clojure, поэтому их выделяют на общем фоне.
+Global variables are marked with earmuffs, i.e., asterisks at the edges.
+That is the so-called earmuffs syntax.
+The rule originated in older Lisp dialects, and Clojure follows the tradition.
+Global variables don't quite fit into the Clojure concept, so they stand out from the crowd.
 
-\index{языки!Lisp}
+\index{languages!Lisp}
 
-<<Ушки>> и динамичность связаны между собой. Если переменная с~<<ушками>>, но не
-динамическая, компилятор скажет о расхождении. Сами по себе <<ушки>> не делают
-переменную динамической, это просто соглашение.
+Earmuffs and dynamism are linked.
+If the variable with earmuffs is not dynamic, the compiler will report a discrepancy.
+By themselves, a pair of asterisks does not make a variable dynamic; it is just a convention.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2633,7 +2476,7 @@ Clojure предлагает несколько форм, чтобы выпол�
 \fi
 
 \noindent
-Если переменная не динамическая, \verb|binding| бросит исключение:
+If the variable is not dynamic, \verb|binding| will throw an exception:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2660,10 +2503,9 @@ Clojure предлагает несколько форм, чтобы выпол�
 
 \fi
 
-\subsection{Отказ от set!}
+\subsection{Rejection of the set! Form}
 
-Вспомним параметры длины и глубины печати. Чтобы обезопасить себя от больших
-данных, мы писали что-то вроде:
+Let us recall the parameters of the print length and depth. To protect ourselves from big data, we wrote something like this:
 
 \begin{english}
   \begin{clojure}
@@ -2672,16 +2514,15 @@ Clojure предлагает несколько форм, чтобы выпол�
   \end{clojure}
 \end{english}
 
-\index{печать!с отступами}
+\index{printing!indented}
 
-Это неудачный пример: он нарушает принципы изоляции и отката, которые мы
-рассмотрели. Изменение \verb|*print-level*| не изолировано и~влияет на систему
-глобально. Если другой поток что-то напечатает, мы увидим результат с уровнем 4,
-что может нас не устроить. После \verb|(println data)| нужно восстановить
-прежнее значение \verb|*print-level*|, но об этом легко забыть.
+That is a bad example: it misses the point of isolation and rollback principles we've covered.
+The \verb|*print-level*| change is not isolated and affects the system globally.
+If another thread prints something, we will see the result with level 4, which may not suit our requirements.
+After \verb|(println data)|, you should restore the previous value of \verb|*print-level*|, but it's easy to forget about it.
 
-Код ниже избавлен от недостатков. Вне \verb|binding| переменные получат
-прежние значения, а соседние потоки ничего не заметят.
+The code below is free of these flaws.
+Outside \verb|binding|, the variables will get their previous values, and the neighboring threads will not notice anything.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2724,10 +2565,11 @@ Clojure предлагает несколько форм, чтобы выпол�
   \end{clojure}
 \end{english}
 
-Объединим эти примеры в функцию для сброса данных в файл. Функция полезна для
-отладки больших данных. Она принимает путь к файлу и коллекцию. Функция
-связывает вывод с открытым файлом и печатает данные. Чтобы увидеть все элементы,
-повысим длину и~глубину печати.
+Let's combine these examples into a function to dump data to a file.
+This one is useful for debugging big data.
+It takes a file path and collection.
+The function connects the output to the open file and prints the data.
+To see all the elements, increase the print length and depth.
 
 \begin{english}
   \begin{clojure}
@@ -2742,7 +2584,7 @@ Clojure предлагает несколько форм, чтобы выпол�
 \end{english}
 
 \noindent
-Сброс данных в файл:
+Dumping data to file:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2764,7 +2606,7 @@ Clojure предлагает несколько форм, чтобы выпол�
 \fi
 
 \noindent
-и восстановление:
+Here's the recovery:
 
 \begin{english}
   \begin{clojure}
@@ -2776,33 +2618,27 @@ Clojure предлагает несколько форм, чтобы выпол�
 \index{clojure.core!*print-level*}
 \index{clojure.core!*print-length*}
 
-Доработайте функцию так, чтобы в длину и глубину печати можно было передать свои
-значения. В идеале это необязательный словарь \verb|opt|, в~котором функция ищет
-настройки.
+Modify the function so that you can pass your values to the print length and depth.
+Ideally, this is the optional \verb|opt| map in which the function looks for settings.
 
-\subsection{Практика: перевод строк}
+\subsection{Practice: String Localization}
 
 \label{translate}
 
-Привёдем пример с \verb|binding| из реального проекта. Это веб-приложение на
-разных языках. В зависимости от настроек клиент видит английский или русский
-текст.
+Below is an example from a real project with \verb|binding|. There is a web application in various languages. Depending on the settings, a client sees English or Russian text.
 
-\index{перевод}
+\index{translation}
 
-Переводы хранят в виде словаря с двумя уровнями: локаль и теги. Локаль~--- это код
-языка: \verb|ru|, \verb|en| и другие. Локаль может быть с доменами, например
-\verb|en_US| или \verb|en_GB|. Части \verb|US| и \verb|GB| означают
-американский и~британский диалекты. В редких случаях локаль бывает тройной,
-чтобы указать местный алфавит или регион.
+Translations are stored as a map with two levels: locale and tags. A locale is the language code: \verb|ru|, \verb|en|, and others. It can be with domains, such as \verb|en_US| or \verb|en_GB|.
+The \verb|US| and \verb|GB| parts stand for American and British English.
+Rarely, the locale is triple to indicate the local alphabet or region.
 
-Под тегом понимают короткую машинную строку. Она описывает семантику фразы, на
-которую позже её заменят. По тегу \verb|ui/add-to-cart| легко угадать, что
-это надпись <<добавить в корзину>> в интерфейсе.
+A tag is a short machine string.
+It describes the semantics of a phrase that will later replace it.
+From the \verb|ui/add-to-cart| tag, you can easily guess that it is the "add to cart" inscription in the interface.
 
-Словари могут быть в коде или файлах, но принцип перевода не меняется. По локали
-и тегу библиотека ищет перевод в словаре (или <<совершает lookup>>). Напишем
-наивный подход на Clojure:
+Maps might be in code or files, but the principle of the translation does not change. By locale and tag, a library does a lookup of a translation in the map.
+Let's write a naive approach in Clojure:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2835,38 +2671,34 @@ Clojure предлагает несколько форм, чтобы выпол�
 
 \fi
 
-\index{локализация}
+\index{localization}
 
-Функция \verb|tr| возвращает перевод по локали и тегу. Если перевод не найден,
-получим машинное выражение, которое заметят локализаторы.
+The \verb|tr| function returns a translation by locale and tag. If no translation is found, we get a machine expression that will be noticed by localizers.
 
-Недостаток функции в том, что каждый раз нужно указывать локаль. Это
-утомительно, особенно с учётом того, что локаль не меняется в рамках
-запроса. Между локалью и переводом большая физическая и ментальная
-дистанция, и хотелось бы её сократить.
+The drawback of this function is that you need to specify the locale every time.
+That is tedious, especially considering that the locale does not change within the request.
+We need to shorten the physical and mental distancing between locale and translation.
 
-\index{стек вызовов}
+\index{call stack}
 
-Под физическим расстоянием понимают стек вызовов. Обычно локаль вычисляют в
-начале запроса. Перевод текста, напротив, работает ближе к его концу. Если не
-сделать локаль глобальной, придётся спускать её в аргументах по стеку вызовов,
-что усложнит код.
+Here, physical distancing is the call stack.
+Usually, the locale is calculated at the beginning of the request. By contrast, text translation is done towards the end.
+Make the locale global; otherwise, you have to push it down the call stack in arguments, which complicates the code.
 
-\index{фреймворки!Django}
+\index{ frameworks!Django}
 
-Ментальная дистанция означает, что в момент перевода нам не важно, откуда пришла
-локаль. Эти сведения избыточны. Хотелось бы примитивную операцию <<перевести
-тег>>, и не больше. Польза упрощения видна на примере шаблонной системы,
-устроенной по принципу \footurl{Django}{https://docs.djangoproject.com/en/2.2/topics/templates/}[Django templates][-23mm].
+Mental distancing means that at the time of translation, we don't care where the locale is.
+This information is redundant.
+If the primitive "translate tag" operation were enough, it would be great. The simplification benefits are evident in the example of a template system based on the \footurl{Django}{https://docs.djangoproject.com/en/2.2/topics/templates/}[Django templates][-23mm] principle.
 
-\index{библиотеки!Selmer}
-\index{шаблоны}
+\index{libraries!Selmer}
+\index{templates}
 
-Аналог такой системы в Clojure называется
-\footurl{Selmer}{https://github.com/yogthos/Selmer}[Selmer]. Её шаблоны похожи на
-обычные HTML-файлы со вставками в фигурных скобках. Код в скобках~--- это значения
-или выражения. Вертикальные линии означают фильтры, функции
-преобразования. Например, запись
+\footurl{Selmer}{https://github.com/yogthos/Selmer}[Selmer] is the Clojure analog of such a system.
+Its templates are similar to regular HTML files with insertions in curly braces.
+The code in the braces is values or expressions.
+Vertical lines stand for filters, i.e., conversion functions.
+For example, the entry below means that there is the \verb|:email| field from the \verb|user| map between the paragraph tags.
 
 \begin{english}
   \begin{htmldjango}
@@ -2875,9 +2707,8 @@ Clojure предлагает несколько форм, чтобы выпол�
 \end{english}
 
 \noindent
-означает, что между тегами параграфа находится поле \verb|:email| из словаря
-\verb|user|. Регистр поля меняют на нижний фильтром \verb|lower|. На Clojure
-это выглядело бы так:
+The \verb|lower| filter converts the field case to lowercase.
+In Clojure, it looks like this:
 
 \begin{english}
   \begin{clojure}
@@ -2885,8 +2716,8 @@ Clojure предлагает несколько форм, чтобы выпол�
   \end{clojure}
 \end{english}
 
-Фильтром может быть любая функция, в том числе \verb|tr|. Хотелось бы,
-чтобы шаблон выглядел как можно проще:
+Any function can be a filter, including \verb|tr|.
+The simpler a template looks, the better.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2916,17 +2747,15 @@ Clojure предлагает несколько форм, чтобы выпол�
 
 \fi
 
-Фильтр \verb|tr|~--- это функция одной переменной. Она принимает строку тега и
-возвращает перевод. Очевидно, локаль должна быть известна заранее. Сделаем так,
-чтобы фильтр читал её из middleware и при этом не влиял на перевод в параллельных
-запросах.
+The \verb|tr| filter is a function of one variable.
+It takes a tag string and returns the translation. Of course, the locale must be known in advance.
+Let's make it so that the filter reads it from middleware and does not affect the translation in parallel requests.
 
-Поможет связывание через \verb|binding|. Объявим переменную \verb|*locale*| без
-значения. В Clojure такая переменная называется несвязанной. Считайте её
-ячейкой, в которой нет данных.
+Binding through \verb|binding| will help.
+Let's declare the \verb|*locale*| variable without value. In Clojure, such a variable is called "unbound". 
+Think of it as a cell with no data.
 
-Изменим функцию \verb|tr|: теперь она принимает только тег, а в качестве
-локали ссылается на глобальную \verb|*locale*|:
+Let's change the \verb|tr| function: now it only takes a tag and refers to the global *\verb|*locale*| var as the locale:
 
 \begin{english}
   \begin{clojure}
@@ -2937,11 +2766,11 @@ Clojure предлагает несколько форм, чтобы выпол�
   \end{clojure}
 \end{english}
 
-\index{макросы!with-locale}
+\index{macros!with-locale}
 
-Чтобы изолировать \verb|*locale*| от потребителей, предоставим макрос
-\verb|with-locale|. Он выполняет тело, пока переменная связана с заданной
-локалью. Внутри макроса любой перевод сработает для этой локали:
+To isolate \verb|*locale*| from consumers, use the \verb|with-locale| macro.
+It executes the body while the variable is bound with the given locale. 
+Within a macro, any translation will work for that locale:
 
 \begin{english}
   \begin{clojure}
@@ -2996,9 +2825,10 @@ Clojure предлагает несколько форм, чтобы выпол�
 
 \fi
 
-Напишем middleware, чтобы определить локаль. Для простоты решим, что это
-параметр \verb|lang| из адресной строки. Если параметра нет, берём локаль по
-умолчанию. Код ниже по стеку обёрнут в макрос \verb|with-locale|:
+Let's write a middleware to determine the locale.
+For simplicity, let's assume this is the \verb|lang| parameter from an address string.
+If there is no parameter, take the default locale.
+The code below on the stack is wrapped in the \verb|with-locale| macro:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -3035,10 +2865,9 @@ Clojure предлагает несколько форм, чтобы выпол�
 
 \fi
 
-Напишем фильтр \verb|tr| для шаблонов. В Selmer нельзя указать кейворд,
-поэтому вместо \verb|{{ :ui/sign-in }}| пишут \verb|{{ "ui/sign-in"}}|.
-Фильтр \verb|tr| переводит строку в тег, а затем ищет по нему
-перевод. Функция \verb|add-filter!| добавляет \verb|tr| в регистр фильтров.
+Let's write the \verb|tr| filter for templates.
+Selmer has no way to specify a keyword, so instead of \verb|{{ :ui/sign-in }}| they write \verb|{{ "ui/sign-in"}}|.
+The \verb|tr| filter converts a string into a tag and then searches for a translation on it. The \verb|add-filter!| function adds \verb|tr| to the filter register.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -3067,33 +2896,26 @@ Clojure предлагает несколько форм, чтобы выпол�
 
 \fi
 
-Теперь нам не важен источник локали в переводах. В любой момент мы изменим код
-\verb|with-locale| и \verb|wrap-locale|, но это не отразится на
-шаблонах. Запись \verb={{ "ui/log-in"|tr }}= останется прежней, даже если
-механизм переводов изменится.
+Now we don't care about the locale source in translations. At any time, we can change the \verb|with-locale| and \verb|wrap-locale| without affecting the templates.
+The \verb={{ "ui/log-in"|tr }}= entry will remain the same even if the translation engine changes.
 
-\section{Локальные переменные в~контексте}
+\section{Local Variables in Context}
 
 \index{clojure.core!with-local-vars}
 \index{clojure.core!let}
 \index{clojure.core!var-get}
 \index{clojure.core!var-set}
-\index{переменные!локальные}
+\index{variables!local}
 
-Макрос \verb|with-local-vars| задаёт локальные переменные. Внутри макроса
-они ведут себя как маленькие атомы. В переменную можно записать значение и
-получить обратно <<дерефом>>. Локальные переменные полезны для запутанной
-бизнес-логики. Блок с ними выглядит линейно, и его проще читать.
+The \verb|with-local-vars| macro sets local variables. Within the macro, they behave like little atoms. You can write a value to a variable and get it back using the deref function.
+Local vars are useful for complicated business logic. The block with them looks linear and more human-readable.
 
-Форма \verb|with-local-vars| похожа на \verb|let|: это вектор связывания и
-произвольный код. Разница в том, что внутри макроса работают функции
-\verb|var-get| и \verb|var-set|. С их помощью переменные читают
-и~записывают. Если макрос задал переменную \verb|a|, форма \verb|(var-set a 9)|
-установит её содержимое в 9.
+The \verb|with-local-vars| form is similar to \verb|let|: it is a binding vector and arbitrary code. The difference is that the \verb|var-get| and \verb|var-set| functions work inside the macro.
+With their help, variables are read and written.
+If the macro sets the \verb|a| variable, the form \verb|(var-set a 9)| should modify its content to 9.
 
-Важно: символ переменной вернёт её \emph{объект}, а не значение. В~примере ниже
-получим не ноль, а объект типа \verb|Var|. Запись \verb|(+ a 1)| приведёт~к
-ошибке типов.
+Note: the symbol of the variable will return its \emph object|, not the value.
+In the example below, we get not zero but an object of type \verb|Var|. Writing \verb|(+ a 1)| will result in a type error.
 
 \begin{english}
   \begin{clojure}
@@ -3102,16 +2924,13 @@ Clojure предлагает несколько форм, чтобы выпол�
   \end{clojure}
 \end{english}
 
-Функция \verb|var-get| получает значение из переменной. Для краткости
-прибегают к оператору \verb|@|: \verb|(+ @a 1)|.
+The \verb|var-get| function gets a value from a variable. For the sake of brevity, use the \verb|@|: \verb|(+ @a 1)| operator.
 
-Представим: нужно найти в дереве несколько величин и вернуть их композицию. В
-прошлый раз мы работали с атомом, теперь решим задачу на локальных переменных.
+Let's say you need to find several values in the tree and return them to composition.
+Last time we worked with an atom. Now we will solve the problem with local variables.
 
-Функция \verb|calc-billing| рассчитывает сумму к оплате для клиента. Параметр
-\verb|data|~--- это данные о потреблении ресурсов. Итоговую сумму находят из трёх
-составляющих. Каждую из них рассчитывают по сложным условиям. Чтобы код был
-ближе к бизнес-логике, запишем его императивно:
+The \verb|calc-billing| function calculates the amount that a customer must pay.
+The \verb|calc-billing| parameter contains data on resource consumption. We will form the total amount from three components. Each of them is calculated according to complicated conditions. Let's write the code imperatively, so it will better match the business logic:
 
 \begin{english}
   \begin{clojure}
@@ -3131,17 +2950,15 @@ Clojure предлагает несколько форм, чтобы выпол�
   \end{clojure}
 \end{english}
 
-Расчёт делится на три блока, каждый из которых находит составляющую. Каскад
-\verb|when-let| собирает нужные переменные, и если они нашлись, завершается
-\verb|var-set|. Если исполнение не дошло до \verb|var-set|, переменная
-останется нулём.
+The calculation is performed in three blocks, each of which finds a component.
+The \verb|when-let| cascade collects the desired variables, and if found, ends with \verb|var-set|.
+If the execution does not reach \verb|var-set|, the variable will remain zero.
 
-Локальные переменные не настолько продвинуты, как атомы. Для переменных нет
-аналога \verb|swap!|, когда значение меняют функцией. \verb|With-local-vars|
-не подходит для наращивания коллекций. Если \verb|user|~--- это локальный словарь,
-добавить ему новое поле будет трудно. Функция \verb|var-set| задаёт только
-новый словарь, а комбинация \verb|var-set| и \verb|var-get| выглядит
-неуклюже:
+Local variables are not as advanced as atoms.
+For variables, there is no analog of the \verb|swap!| function (which swaps the atom value).
+\verb|With-local-vars| does not come in for building up collections.
+If \verb|user| is a local map, it will be difficult to add a new field to it.
+The \verb|var-set| function can only set a new map, while the combination of \verb|var-set| and \verb|var-get| looks awkward:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -3169,47 +2986,43 @@ Clojure предлагает несколько форм, чтобы выпол�
 
 \fi
 
-Макрос \verb|with-local-vars| полезен, когда логика завязана на простых типах
-(числах, строках). На локальных переменных удобно писать конечные автоматы и
-алгоритмы с состоянием. Техника редко встречается в Clojure, но в нужный момент
-экономит время и код.
+The \verb|with-local-vars| macro is useful when the logic relies on simple types (numbers, strings).
+It is convenient to write state machines and stateful algorithms using local variables.
+That is a rarely used technique for Clojure, but it saves time and code at the right moment.
 
-\section{Глобальные изменения в~контексте}
+\section{Global Changes in Context}
 
 \index{clojure.core!binding}
-\index{изменения!глобальные}
+\index{changes!global}
 
 \label{with-redefs}
 
-Преимущество \verb|binding| в том, что изменения протекают только в~текущем
-потоке. Говорят, что эффект \verb|binding| потокобезопасный, что расценивают
-как благо. И всё же бывают случаи, когда изменения должны быть глобальными. Для
-этого служит форма \verb|with-redefs|.
+The advantage of \verb|binding| is that changes only take place in the current thread.
+They say that the \verb|binding| effect is thread-safe, which is considered a useful quality.
+However, there are situations when changes need to be global.
+To do this, we use the \verb|with-redefs| form.
 
 \mnoindent
-Её синтаксис похож \verb|binding|: вектор связывания и произвольный
-код. Эффект \verb|with-redefs| действует \emph{на все} потоки. Представим
-веб-сервер, который отвечает на запросы параллельно. Если одна из страниц
-выполняет логику в \verb|with-redefs|, это повлияет на соседние
-запросы. По аналогии с \verb|binding| и \verb|let|, изменения откатываются при
-выходе из макроса.
+Its syntax is similar to \verb|binding|: a binding vector and arbitrary code. \verb|With-redefs| affects \emph{all} threads.
+Imagine a web server that responds to requests in parallel.
+If one of the pages is executing logic in \verb|with-redefs|, it will affect neighboring requests.
+Similarly with \verb|binding| and \verb|let|, changes are rolled back when exiting the macro.
 
-Пример ниже объясняет принципы \texttt{with\--redefs}. Мы подменяем функцию
-\verb|println| на суррогат, который печатает постоянный текст. В~теле макроса
-запускают футуру с телом \verb|(println 42)|.
+The example below explains the principles of \texttt{with\--redefs}.
+We replace the \verb|println| function with a surrogate that prints a persistent text.
+In the macro body, the future object with the \verb|(println 42)| body runs.
 
 \index{clojure.core!future}
-\index{футуры}
+\index{futures}
 
-Футура (или \emph{фьючер}, англ.~\emph{future}, <<будущее>>)~--- это посредник между
-клиентом и многопоточностью. Футура принимает блок кода и передаёт его
-исполнителю (executor). Чаще всего исполнитель занимает несколько тредов
-(потоков процессора) и распределяет по ним задачи. Когда задача выполнена,
-клиент получает результат <<дерефом>> футуры.
+Futures are an intermediary between a client and multithreading.
+A future takes a block of code and passes it to an executor.
+Most often, the executor takes several processor threads and distributes tasks across them.
+When the task is completed, the client receives the result with deref of a future.
 
-Тело \verb|(println 42)| выполняется в другом потоке. Оператор \verb|@|
-перед футурой означает: ждать до тех пор, пока не придёт результат от
-исполнителя. Код ниже напечатает fake print:
+The \verb|(println 42)| body is executed on a different thread.
+The \verb|@| operator in front of a future means: wait until the result from the executor comes.
+The code below should print "fake print":
 
 \index{clojure.core!constantly}
 
@@ -3238,43 +3051,37 @@ Clojure предлагает несколько форм, чтобы выпол�
 
 \fi
 
-Это произошло потому, что \verb|with-redefs| повлиял в том числе и на тот
-поток, в котором исполнитель обработал задачу.
+That is because \verb|with-redefs| also affected the thread in which the executor processed the task.
 
 \mnoindent
-Если убрать оператор \verb|@|, эффект \verb|with-redefs| пропадёт: футура
-напечатает 42. Причина в том, цикл футуры занимает хоть и малое, но время. Без
-оператора \verb|@| мы только запускаем футуру и сразу выходим из
-\verb|with-redefs|. Пул доберётся до задачи \verb|(println 42)|, когда
-эффект макроса уже закончится.
+Without the \verb|@| operator, the effect of \verb|with-redefs| disappears: the future will output 42. The reason is that a future cycle takes some time, albeit a short one.
+Without the \verb|@| operator, we just run the future and exit \verb|with-redefs| right away.
+The pool will reach the \verb|(println 42)| task when the effect of the macro is over.
 
-Документация \verb|with-redefs| подчёркивает, что макрос полезен при
-тестировании. Иногда приложение опирается на сторонние сервисы вроде геопоиска
-или графа социальных связей. При тестировании возникает проблема доступа к
-сервисам. Приложение не должно обращаться к~ним: это усложняет тесты и делает их
-зависимыми.
+The \verb|with-redefs| documentation emphasizes that the macro is useful for testing.
+Sometimes the application relies on third-party services like a geo search or social graph.
+During testing, there is a problem with access to services. 
+The application should not access them: this complicates tests and makes them dependent.
 
-Идея в том, чтобы на время тестов подменить функции, которые обращаются в
-сеть. Рассмотрим на практике, как это сделать.
+The idea is to replace the functions that access the network during the tests.
+Let's see in practice how to do this.
 
-\subsection{Практика: приложение с~координатами}
+\subsection{Practice: Application with Coordinates}
 
 \index{HTTP!POST}
-\index{координаты}
-\index{геолокация}
+\index{coordinates}
+\index{ geolocation }
 
-Мобильное приложение шлёт на сервер координаты пользователя~--- долготу и
-широту. Позже пользователь изучает историю путешествий. Очевидно, он ожидает не
-машинные цифры, а названия мест. Для каждой пары координат нужно найти данные об
-этом месте.
+The mobile app sends the user's coordinates (longitude and latitude) to the server.
+Later, the user studies their travel history.
+Sure, the user expects not machine numbers but names of places.
+Therefore, it is necessary to find data about the place matching each pair of coordinates.
 
-Страница \verb|POST /location| принимает координаты в теле запроса. Чтобы
-узнать данные о месте, мы обращаемся к стороннему сервису. Читаем из ответа поля
-и пишем в базу вместе с координатами. Возвращаем клиенту ответ \verb|200 OK|.
+The \verb|POST /location| page takes coordinates in a request body. To find out the location data, we address a third-party service. We read the response fields and write them to the database along with the coordinates. Then we return the \verb|200 OK| response to the client.
 
-Функция \verb|geo/place-info| выполняет геопоиск. На выходе получим
-словарь с ключами \verb|:title|, \verb|:country|, \verb|:image_url| и
-другими. Обработчик запроса:
+The \verb|geo/place-info| function performs a geo search.
+As a result, we get a map with the keys \verb|:title|, \verb|:country|, \verb|:image_url|, and others.
+Here's a request handler:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -3306,21 +3113,16 @@ Clojure предлагает несколько форм, чтобы выпол�
 
 \fi
 
-Во время поиска мобильное приложение ждёт ответа. С машинной точки зрения это
-долго, ведь сеть не гарантирует мгновенный отклик. Чем больше клиентов шлют
-координаты, тем больше запросов мы посылаем геосервису. Растёт число
-открытых соединений, система замедляется.
+During the search, the mobile app is waiting for a response. In terms of machine, it's long because the network does not guarantee an instant response.
+The more clients send coordinates, the more requests we send to the geo-service.
+The number of open connections is growing; the system is slowing down.
 
 \index{clojure.core!future}
 
-Быстрое решение в том, чтобы записать координаты в базу и сразу ответить
-клиенту, а сбор данных о месте вынести в футуру. Этим мы сократим ожидание:
-теперь приложение ждёт только запись в базу, что быстрее, чем запрос к сторонней
-службе.
+A quick solution is to write coordinates into the database and immediately respond to a client, and take out collecting the location data into the future object.
+As a result, wait times are reduced: now the app is waiting only for writes to the database, which is faster than a request to a third-party service.
 
-В новой версии функция \verb|db/create-point| пишет координаты и~возвращает
-\verb|id| новой записи. Ключ нужен, чтобы позже обновить локацию данными о
-месте. Поиск данных и запись в базу протекают в~футуре.
+In the new version, the \verb|db/create-point| functon writes coordinates and returns the \verb|id of a new record. To later update the location with a place data, the key is needed. Database search and writing are performed in a future block.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -3358,22 +3160,21 @@ Clojure предлагает несколько форм, чтобы выпол�
 
 \fi
 
-Возможны и другие варианты, например фоновый обработчик или очередь задач. Но
-они дольше в реализации, а футура займёт пару строк. Это дешёвое решение,
-которое даст время на поиск более проработанного.
+Other options are possible, such as a background handler or a task queue.
+But their implementation takes more time, and the future code will take a couple of lines. It is a cheap solution that will give you time to find a more elaborate one.
 
-\subsection{Тесты}
+\subsection{Tests}
 
-\index{тесты}
+\index{tests}
 \index{clojure.core!with-redefs}
 
-Напишем тест для нового обработчика. Чтобы не порождать сетевых запросов,
-временно заменим функцию \verb|geo/place-info|. Для полноты картины проверим,
-что случится, если геопоиск бросит исключение.
+Let's write a test for a new handler.
+In order not to generate network requests, we will temporarily replace the \verb|geo/place-info| function. 
+To complete the picture, let's check what happens if the geo search throws an exception.
 
-Каждый тест начинается с выражения \verb|with-redefs| для замены
-\verb|geo/place-info|. Для краткости напишем макрос
-\verb|with-place-info|. Он~принимает тело функции и~блок кода:
+Each test begins with the \verb|with-redefs| expression to replace \verb|geo/place-info|.
+To shorten the code, let's write the \verb|with-place-info| macro.
+It takes a function body and a block of code:
 
 \begin{english}
   \begin{clojure}
@@ -3385,10 +3186,10 @@ Clojure предлагает несколько форм, чтобы выпол�
   \end{clojure}
 \end{english}
 
-Приведём положительный сценарий. В макросе \verb|with-place-info| геопоиск
-вернёт заданный словарь. Мы вызываем обработчик и проверяем, что ответ
-положительный. Чтобы убедиться, что футура записала данные в базу, мы ждём
-и~читаем последнюю локацию. В~ней должны быть значения из геопоиска.
+Here's a positive scenario.
+In the \verb|with-place-info| macro, the geo search will return the specified map.
+We call the handler and check that the answer is positive. To make sure that the future has written the data to the database, we wait and read the last location.
+It should contain values from the geo search.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -3438,8 +3239,8 @@ Clojure предлагает несколько форм, чтобы выпол�
 
 \index{HTTP!429}
 
-Негативный сценарий: пусть геопоиск бросит исключение с кодом 429. Это
-возможно, если превышен лимит на число запросов. Объявим исключение:
+Negative scenario. Let geo search throw an exception with code 429.
+That can happen when the request limit is exceeded. Let's declare an exception:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -3467,8 +3268,7 @@ Clojure предлагает несколько форм, чтобы выпол�
 \fi
 
 \noindent
-Проверим, что приложение вернёт положительный статус, но в базе нет данных о
-месте, потому что запрос геопоиску не прошёл.
+Let's check that the application will return a positive status, but there is no location data in the database because the geo search request failed.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -3510,12 +3310,12 @@ Clojure предлагает несколько форм, чтобы выпол�
 
 \fi
 
-С помощью \verb|with-place-info| можно спровоцировать любое исключение. Приём
-полезен, когда \verb|catch| ожидает конкретные классы. Следующий тест имитирует
-сбой в сети. Если в приложении особая реакция на исключение, тест зафиксирует
-это. Правки в коде станут невозможны без изменений в тестах.
+We can throw any exception with \verb|with-place-info|. This technic is useful when the \verb|catch| form is expecting specific classes.
+The following test simulates a network failure.
+If the application has a particular reaction to the exception, the test will capture this.
+Code modifying will become impossible without changes in the tests.
 
-\index{тесты!ошибки}
+\index{tests!errors}
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -3542,24 +3342,23 @@ Clojure предлагает несколько форм, чтобы выпол�
 
 \fi
 
-\index{моки}
+\index{mocks}
 
-Подмена функций и классов называется \emph{мокинг} (англ.~mock~--- <<подделка>>). Мы
-подробно рассмотрим тесты в последней главе \page{chapter-tests}. Пока что
-заметим, что макрос \verb|with-redefs|~--- это простой способ что-то <<замокать>>,
-то есть подменить на время тестов.
+The substitution of functions and classes is called \emph{mocking}.
+We'll cover tests in detail in the last chapter \page{chapter-tests}.
+For now, note that the \verb|with-redefs| macro is a simple way to mock something, that is, to replace it during tests.
 
-\subsection{Коротко о with-redefs-fn}
+\subsection{The with-redefs-fn Function in Brief}
 
 \index{clojure.core!with-redefs-fn}
 
-Макрос \verb|with-redefs| опирается на функцию \verb|with-redefs-fn|. Отличие
-в~синтаксисе: она принимает словарь и функцию без аргументов. Ключи словаря~---
-это объекты \verb|Var|. Функция сработает в момент, когда переменные получили
-новые значения.
+The \verb|with-redefs| relies on the \verb|with-redefs-f function.
+The difference in the syntax of the latter is that it accepts a map and a function with no arguments.
+Map keys are \verb|Var| objects.
+The function will run at the moment once the variables have received new values.
 
-Перепишем пример с \verb|geo/place-info| на \verb|with-redefs-fn|. Напомним, что
-запись \verb|#'|\texttt{<some\-thing>} означает \verb|(var <something>)|:
+Let's rewrite our example using \verb|with-redefs-fn| instead of \verb|geo/place-info|.
+Recall that \verb|#'|\texttt{<some\-thing>} means \verb|(var <something>)|:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -3586,13 +3385,12 @@ Clojure предлагает несколько форм, чтобы выпол�
 
 \fi
 
-\index{синтаксис!\texttt{\#} (решётка)}
+\index{syntax!\texttt{\#} (hash)}
 
-\verb|With-redefs-fn|~--- это именно функция, поэтому она не может принять
-произвольный код, как это делают макросы. Чтобы передать код, его оборачивают в
-функцию без аргументов. Если код~--- это одна большая форма (\verb|let| или
-\verb|do|), необязательно заключать её в \verb|(fn [])|. Поставьте спереди
-знак \verb|#|, чтобы превратить форму в анонимную функцию.
+Since \verb|with-redefs-fn| is a function, it cannot accept arbitrary code as macros do.
+To pass the code, it is wrapped into a function with no arguments.
+If the code is one large form (\verb|let| or \verb|do|), you don't need to enclose it in \verb|(fn [])|.
+Use the \verb|#| character in front of the form to turn it into an anonymous function.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -3621,69 +3419,64 @@ Clojure предлагает несколько форм, чтобы выпол�
 
 \fi
 
-Функция \verb|with-redefs-fn| выглядит непривычно из-за словаря и~символов
-\verb|#'|. Она не похожа на \verb|let|, \verb|binding| и другие формы
-связывания в Clojure. Макрос \verb|with-redefs| скрывает эти особенности; по
-возможности пользуйтесь им.
+The \verb|with-redefs-fn| function looks strange because of a map and the \verb|#'| characters.
+It is not like \verb|let|, \verb|binding|, and other forms of binding in Clojure.
+The \verb|with-redefs| macro hides these features; use it whenever possible.
 
-\section{Заключение}
+\section{Summary}
 
-Clojure предлагает специальные типы для изменяемых данных. В~отличие от
-императивных языков, где изменения встроены в синтаксис, в~Clojure пользуются
-особыми формами. Язык устроен так, что данные меняют редко. Это продвинутый
-уровень, к которому приходят после азов неизменяемости. Перечислим техники,
-которые мы рассмотрели, и случаи, когда они полезны.
+Clojure offers special types for mutable data.
+Unlike imperative languages, where changes are built into the syntax, Clojure uses special forms.
+The language is designed so that data is rarely changed.
+They have risen to this advanced level from the basics of immutability.
+Let's list the techniques we've covered and situations where they are useful.
 
-\emph{Атом}~--- это обёртка вокруг значения. Чтобы получить содержимое,
-применяют оператор \verb|@| или функцию \verb|(deref <atom>)|. Новое
-значение сообщают функцией \verb|reset!|. В основном атом изменяют итеративно
-с~помощью \verb|swap!|, которая рассчитывает новое значение из текущего.
+\emph{An atom} is a wrapper around a value.
+To get content, use the \verb|@| operator or the \verb|(deref <atom>)| function.
+The \verb|reset!| function sets a new value.
+In most cases, the atom is changed iteratively using \verb|swap!|, which calculates a new value from the current one.
 
-В атомах хранят состояние проекта. Это счётчики, сессии, локальный кэш
-для ускорения расчётов. Атомы подходят на роль переменных в императивном
-коде. Иногда в атомах хранят состояние модуля, например текущее подключение к
-базе.
+Atoms store the project state.
+These are counters, sessions, and a local cache to speed up calculations.
+Atoms play the role of variables in imperative code. Sometimes the former store a module state, such as the current connection to a database.
 
-Объект \emph{volatile}~--- это облегчённый вариант атома. В отличие от него,
-\verb|volatile| не поддерживает валидаторы и вотчеры и не управляет доступом
-из разных потоков.
+The \emph{volatile} object is a lightweight version of an atom.
+Unlike the latter, \verb|volatile| does not support validators or watchers and does not control access from different threads.
 
-Переходные, или \emph{транзиентные, коллекции} получают из постоянных
-аналогов. Когда коллекция транзиентна, меняется её содержимое. С~ними
-работают функции \verb|conj!|, \verb|assoc!| и другие с восклицательным
-знаком на конце. Функция \verb|persistent!| запечатывает коллекцию
-и~возвращает постоянную копию.
+\emph{Transient collections} are derived from permanent (immutable) counterparts.
+When a collection is transient, its contents change.
+The \verb|conj!|, \verb|assoc!|, and other functions that end with an exclamation mark work with such data structures.
+The \verb|persistent!| function closes up the collection and returns its persistent version.
 
-Транзиентные коллекции полезны на больших данных, потому что быстрее
-неизменяемых. Работайте с ними из одного потока. Другие части кода не должны
-знать о том, что коллекция изменяется. Обмен переходными коллекциями~--- это грубая
-ошибка.
+Transient collections are faster than immutable ones, so they are useful for big data.
+Work with them from one thread.
+Other code parts don't need to be aware that the collection is modifying.
+Sharing transient collections is a blunder.
 
-Функция \emph{alter-var-root} заменяет глобальную переменную. С её помощью можно
-вторгнуться в чужое пространство и что-то исправить. К~\verb|alter-var-root|
-прибегают, чтобы изменить код, которым не владеют. Другое её применение~---
-модули с состоянием, из которых собирается система.
+The \emph{alter-var-root} function alters the global variable.
+With its help, you can invade another's namespace and fix something.
+You can resort to \verb|alter-var-root| to modify code that you don't own.
+Its other use is stateful modules for building a system.
 
-Форма \emph{set!} изменяет системную переменную Clojure. Это особые переменные с
-<<ушками>>, которые влияют на поведение системы в целом. \verb|Set!| редко
-встречается в коде; лучше указать переменные в настройках проекта.
+The \emph{set!} form modifies Clojure system variables.
+These are special vars with earmuffs that affect the system behavior as a whole.
+\verb|Set!| is rare in code; it's better to specify the variables in the project settings.
 
-Макрос \emph{binding} выполняет код в рамках временных изменений. Макрос
-связывает динамическую переменную с новым значением. Чтобы переменная была
-динамической, ей сообщают флаг \verb|^:dynamic| и выделяют <<ушками>>.
+The \emph{binding} macro executes the code, making temporary changes.
+The macro binds a dynamic variable to a new value.
+To make a variable dynamic, it is assigned the \verb|^:dynamic| flag and marked with earmuffs.
 
-\verb|Binding| действует только в текущем потоке. К нему прибегают, чтобы
-участок кода вёл себя по-иному. Например, выводил текст не на экран, а в
-файл. Динамические переменные легче спустить по стеку вызовов, как в примере с
-локалью.
+\verb|Binding| acts only in the current thread.
+Use it to make a piece of code behave differently: for example, to output text not to the screen but a file.
+Dynamic variables are simpler to move down the call stack, as shown in the locale example.
 
-Макрос \emph{with-local-vars} выполняет тело с произвольными переменными. Они
-похожи на атом с двумя действиями: прочитать и записать значение. Форма полезна,
-когда имеем дело со сложной императивной логикой. При выходе из макроса
-переменные исчезают.
+The \emph{with-local-vars} macro executes the body with arbitrary variables.
+They are like an atom with two actions: read and write a value.
+This form is useful when dealing with complex imperative logic.
+The variables disappear when exiting the macro.
 
-Конструкция \emph{with-redefs} временно изменяет
-\verb|def|-определения. В~отличие от \verb|binding|, она действует
-глобально. Все фоновые сущности (футуры, агенты) подхватят
-изменения. \verb|With-redefs|~--- это обёртка над низкоуровневой функцией
-\verb|with-redefs-fn|. В основном ей пользуются в~тестах (<<мокинг>>).
+The \emph{with-redefs} construct temporarily changes \verb|def| definitions.
+Unlike \verb|binding|, it acts globally.
+All background entities, such as futures or agents, will pick up the changes.
+verb|With-redefs| is a wrapper over the low-level \verb|with-redefs-fn| function.
+It is mostly useful for mocking during testing.
