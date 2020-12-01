@@ -1,12 +1,13 @@
 
 \documentclass[10pt $DRAFT]{$DOCUMENT} % ,draft
 
-\usepackage[T2A]{fontenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
 \usepackage{tikz}
 \usepackage{tocloft}
 \usepackage{geometry}
 \usepackage[utf8]{inputenc}
-\usepackage[english,russian]{babel}
+\usepackage[english]{babel}
 
 % for proper ' and `
 \usepackage{textcomp}
@@ -75,8 +76,9 @@
 % for QR codes in
 \usepackage{qrcode}
 
+% TODO: drop that
 % to have bold tt fonts in code listings
-\usepackage{bold-extra}
+%% \usepackage{bold-extra}
 
 % better macro args
 \usepackage{xparse}
@@ -201,7 +203,7 @@
 \input{hyphenation}
 
 % always add title page
-\input{title}
+\input{en/title}
 
 \ifx\PUBLISHER\RIDERO
 \includepdf[pages={1}]{media/ridero_opening.pdf}

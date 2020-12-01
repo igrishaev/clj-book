@@ -697,7 +697,7 @@ Let's say our HTTP client doesn't throw an exception. Let's do it manually~--- c
 
 Exceptions are useful in libraries. Code is conventionally divided into two types: execution and coordination. Libraries are the executive code. At the library level, we don't know what semantics the code is running in. If an exception is thrown, business logic will catch it and continue running. But if you suppress errors without explanation, consumers will be dissatisfied. That also applies to the ``return \verb|nil| and write to the log'' pattern, that is, ignore the problem.
 
-\section{More about Сhains}
+\section{More about Chains}
 
 \index{exceptions!chains}
 
@@ -1397,7 +1397,7 @@ When errors are in the form of text, you can search only by the occurrence of a 
 
 \index{libraries!Sentry-clj}
 
-An application does not collect these data on its own but rather uses libraries. They are often called Raven or similar. It's like a pun~--- а \emph{raven} carries news to a \emph{ sentry }.
+An application does not collect these data on its own but rather uses libraries. They are often called Raven or similar. It's like a pun~--- a \emph{raven} carries news to a \emph{sentry}.
 
 \footurl{Sentry-clj}{https://github.com/getsentry/sentry-clj}[Sentry-clj][-22mm] and \footurl{Exoscale Raven}{https://github.com/exoscale/raven}[Exoscale Raven] libraries are written for Clojure. The former relies on the official Java library. Add it to your project:
 
@@ -1770,7 +1770,9 @@ You can solve the pyramid problem in different ways, including exceptions. The R
   \end{clojure}
 \end{english}
 
-Напишем \verb|account-handler| по-другому:
+Let's rewrite \verb|account-handler| in this way:
+%% Напишем \verb|account-handler| по-другому:
+%% TODO
 
 \index{modules!ring.util.http-response}
 

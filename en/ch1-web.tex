@@ -85,15 +85,15 @@ The main parts of a request are \emph{method} and \emph{path}. A path points to 
 
 A request method means an action that we intend to perform on a resource. The main methods are \verb|GET|, \verb|POST|, \verb|PUT| and \verb|DELETE|, which read, create, update and delete a resource. A \verb|POST /users/| request  means ``create a user'', and a \verb|GET /users/| one~--- ``get a list of users''.
 
-The main response parameter is the status, which is a positive integer. Statuses are grouped by high-order digit. Values from 200 to 299 are considered positive. Such statuses mean that a server has processed a request without errors. For short, this range is denoted as \verb|2хх|.
+The main response parameter is the status, which is a positive integer. Statuses are grouped by high-order digit. Values from 200 to 299 are considered positive. Such statuses mean that a server has processed a request without errors. For short, this range is denoted as \verb|2xx|.
 
-Codes from the group \verb|3хх| have to do with URL redirection. The address where a new request must be sent to is specified in the header \verb|Location|. Contemporary browsers and clients do this automatically. At the address \verb|http://yandex.ru| we will get an empty document with the header \verb|Location: https://yandex.ru|. The server requires switching from HTTP to HTTPS to ensure a secure connection. We will not even notice this since a browser itself will change the address.
+Codes from the group \verb|3xx| have to do with URL redirection. The address where a new request must be sent to is specified in the header \verb|Location|. Contemporary browsers and clients do this automatically. At the address \verb|http://yandex.ru| we will get an empty document with the header \verb|Location: https://yandex.ru|. The server requires switching from HTTP to HTTPS to ensure a secure connection. We will not even notice this since a browser itself will change the address.
 
-The \verb|4хх| statuses mean that the error seems to have been caused by the client.  The most common status code is 404 (Not Found). If the client sends invalid data, the server will return code 400 (Bad request). If the user doesn't have access rights, they will get code 403.
+The \verb|4xx| statuses mean that the error seems to have been caused by the client.  The most common status code is 404 (Not Found). If the client sends invalid data, the server will return code 400 (Bad request). If the user doesn't have access rights, they will get code 403.
 
-Group \verb|5хх| of a status code tells about server errors. Mostly, these are errors in code, for example, database failure or insufficient disk space. If the server is under maintenance, it will return code 503. In rare cases, it is down and does not respond to requests.
+Group \verb|5xx| of a status code tells about server errors. Mostly, these are errors in code, for example, database failure or insufficient disk space. If the server is under maintenance, it will return code 503. In rare cases, it is down and does not respond to requests.
 
-It is generally accepted that response with a status beyond the \verb|2хх| group means an error. Many HTTP clients throw an exception on a negative response. This is only true on an abstract level. In terms of the protocol, a 404 response is as correct as a 200 one.
+It is generally accepted that response with a status beyond the \verb|2xx| group means an error. Many HTTP clients throw an exception on a negative response. This is only true on an abstract level. In terms of the protocol, a 404 response is as correct as a 200 one.
 
 \index{HTTP!HEAD}
 
