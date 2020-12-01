@@ -12,8 +12,7 @@ In this chapter, we will discuss how to make a Clojure project easy to configure
 
 In materials on Clojure, there are such examples:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def server
   (jetty/run-jetty app {:port 8080}))
 
@@ -21,8 +20,7 @@ In materials on Clojure, there are such examples:
          :dbname   "test"
          :user     "ivan"
          :password "test"})
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 Here the server on port 8080 and the parameters for connecting to the database are defined. The examples are useful because you can copy them into the REPL and evaluate their result: to open a page in a browser or read a table.
 
@@ -133,8 +131,7 @@ Let's start with the \verb|exit| helper function. It takes a completion code, a 
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn exit
   [code template & args]
   (let [out (if (zero? code)
@@ -144,21 +141,18 @@ Let's start with the \verb|exit| helper function. It takes a completion code, a 
       (println (apply format
         template args))))
   (System/exit code))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn exit
   [code template & args]
   (let [out (if (zero? code) *out* *err*)]
     (binding [*out* out]
       (println (apply format template args))))
   (System/exit code))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -166,15 +160,13 @@ Now let's move on to the loader. It is a set of steps, each of which takes the r
 
 \index{functions!load-config"!}
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn load-config! []
   (-> (get-config-path)
       (read-config-file)
       (coerce-config)
       (set-config!)))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 Now we will describe each step. The \verb|get-config-path| function reads an environment variable and checks to see if such a file exists on disk. If everything is okay, the function will return the file path; otherwise, it will call \verb|exit|:
 
@@ -182,8 +174,7 @@ Now we will describe each step. The \verb|get-config-path| function reads an env
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (import 'java.io.File)
 
 (defn get-config-path []
@@ -194,13 +185,11 @@ Now we will describe each step. The \verb|get-config-path| function reads an env
       (exit 1 "File %s does not exist"
         filepath))
     (exit 1 "File path is not set")))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (import 'java.io.File)
 
 (defn get-config-path []
@@ -209,8 +198,7 @@ Now we will describe each step. The \verb|get-config-path| function reads an env
       filepath
       (exit 1 "File %s does not exist" filepath))
     (exit 1 "File path is not set")))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -221,8 +209,7 @@ The \verb|read-config-file| step reads the file by its path. The Cheshire librar
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[cheshire.core :as json])
 
 (defn read-config-file
@@ -236,13 +223,11 @@ The \verb|read-config-file| step reads the file by its path. The Cheshire librar
         "Malformed config,
                    file: %s, error: %s"
             filepath (ex-message e)))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[cheshire.core :as json])
 
 (defn read-config-file
@@ -252,8 +237,7 @@ The \verb|read-config-file| step reads the file by its path. The Cheshire librar
     (catch Exception e
       (exit 1 "Malformed config, file: %s, error: %s"
             filepath (ex-message e)))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -268,8 +252,7 @@ If the result is \verb|::s/invalid|, generate an error report, and terminate the
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[clojure.spec.alpha :as s])
 (require '[expound.alpha :as expound])
 
@@ -289,13 +272,11 @@ If the result is \verb|::s/invalid|, generate an error report, and terminate the
           \newline report))
 
       :else result)))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[clojure.spec.alpha :as s])
 (require '[expound.alpha :as expound])
 
@@ -310,8 +291,7 @@ If the result is \verb|::s/invalid|, generate an error report, and terminate the
         (exit 1 "Invalid config values: %s %s" \newline report))
 
       :else result)))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -319,8 +299,7 @@ Now, only a spec is missing. Let's open the configuration and examine its struct
 
 \index{formats!JSON}
 
-\begin{english}
-  \begin{json}
+\begin{json}
 {
     "server_port": 8080,
     "db": {
@@ -334,30 +313,25 @@ Now, only a spec is missing. Let's open the configuration and examine its struct
         "2019-07-12T23:59:59"
     ]
 }
-  \end{json}
-\end{english}
+\end{json}
 
 \noindent
 Describe the spec from top to bottom. It is a map with keys:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (s/def ::config
   (s/keys :req-un [::server_port
                    ::db ::event]))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (s/def ::config
   (s/keys :req-un [::server_port ::db ::event]))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -365,31 +339,26 @@ Describe the spec from top to bottom. It is a map with keys:
 
 The server port is a combination of two predicates: a number check and a range check. Checking for a number is needed so that \verb|nil| and a string do not get into the second predicate. Otherwise, this will throw an exception where you least expect it.
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (s/def ::server_port
   (s/and int? #(<= 1024 % 65535)))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \index{spec!int-in}
 
 We meet number and range checks frequently, so Spec offers the \verb|s/int-in| macro for this case. Please note that the right border is of an exclusive type, i.e., it is not in the interval. The mathematical notation looks like this \verb|[1024, 65535)|.
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (s/def ::server_port
   (s/int-in 1024 (inc 65535)))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \index{spec!::ne-string}
 
 \noindent
 Database connection. As a reminder, \verb|::ne-string| means a non-empty string.
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (s/def :db/dbtype   #{"mysql"})
 (s/def :db/dbname   ::ne-string)
 (s/def :db/user     ::ne-string)
@@ -400,18 +369,15 @@ Database connection. As a reminder, \verb|::ne-string| means a non-empty string.
                    :db/dbname
                    :db/user
                    :db/password]))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 The \verb|event| field is complex. It consists of a tuple of dates and an interval check:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (s/def ::event
   (s/and (s/tuple ::->date ::->date)
          ::date-range))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \index{dates!parsing}
 \index{modules!clojure.instant}
@@ -426,26 +392,22 @@ The \verb|::->date| spec converts a string to a date. In order not to parse it m
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[clojure.instant :as inst])
 
 (s/def ::->date
   (s/and ::ne-string
     (s/conformer read-instant-date)))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[clojure.instant :as inst])
 
 (s/def ::->date
   (s/and ::ne-string (s/conformer read-instant-date)))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -454,13 +416,11 @@ The \verb|::->date| spec converts a string to a date. In order not to parse it m
 
 Let's describe range checking. It takes a couple of \verb|Date| objects and compares them. Dates cannot be compared using "greater than" or "less than" signs. To do this, use the \verb|compare| function, which will return -1, 0, and 1 for the cases of less/greater than or equal.
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (s/def ::date-range
   (fn [[date1 date2]]
     (neg? (compare date1 date2))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 At this point, you can call \verb|load-config!| and make sure that the output is
 a map with the proper types. The last step is \verb|set-config!| writes the map
@@ -472,28 +432,24 @@ use \verb|alter-var-root|.
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def CONFIG nil)
 
 (defn set-config!
   [config]
   (alter-var-root (var CONFIG)
     (constantly config)))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def CONFIG nil)
 
 (defn set-config!
   [config]
   (alter-var-root (var CONFIG) (constantly config)))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -503,8 +459,7 @@ At the start of the program, execute \texttt{(load-config!)} so that the configu
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require
   '[project.config :refer [CONFIG]])
 
@@ -514,21 +469,18 @@ At the start of the program, execute \texttt{(load-config!)} so that the configu
 
 (jdbc/query (:db CONFIG)
   "select * from users")
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[project.config :refer [CONFIG]])
 
 (jetty/run-jetty app {:port (:server_port CONFIG)
                       :join? false})
 
 (jdbc/query (:db CONFIG) "select * from users")
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -547,8 +499,7 @@ The termination of a JVM is too drastic. We should separate an error and respons
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn load-config-repl! []
   (with-redefs
     [exit
@@ -559,13 +510,11 @@ The termination of a JVM is too drastic. We should separate an error and respons
          (throw
            (new Exception message))))]
     (load-config!)))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn load-config-repl! []
   (with-redefs
     [exit (fn [_ template & args]
@@ -573,13 +522,11 @@ The termination of a JVM is too drastic. We should separate an error and respons
                   (apply format template args)]
               (throw (new Exception message))))]
     (load-config!)))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
 \index{die-fn}
-\index{функция смерти}
 \index{REPL}
 
 \mnoindent
@@ -604,14 +551,12 @@ Environment variables are sometimes called ENV for short, for example, when read
 
 To see the current variables, run \verb|env| or \verb|printenv| in a terminal. The pairs \verb|NAME=value| will appear on the screen. Variable names are in uppercase to make them stand out and emphasize their priority. Most systems are case sensitive, so \verb|home| and \verb|HOME| are different variables. Spaces and hyphens are not allowed; lexemes are separated by underscores. Here's a snippet of \verb|printenv|:
 
-\begin{english}
-  \begin{bash}
+\begin{bash}
 USER=ivan
 PWD=/Users/ivan
 SHELL=/bin/zsh
 TERM_PROGRAM=iTerm.app
-  \end{bash}
-\end{english}
+\end{bash}
 
 Each process receives a copy of this map. A process can add or remove a variable, but the changes are visible only to it and its descendants. A child process inherits the variables from its parent.
 
@@ -622,31 +567,25 @@ Each process receives a copy of this map. A process can add or remove a variable
 
 Distinguish between \emph{environment} and \emph{shell} variables; they are also global and local variables. Newbies often confuse them. Run the command in the terminal:
 
-\begin{english}
-  \begin{bash}
+\begin{bash}
 $ FOO=42
-  \end{bash}
-\end{english}
+\end{bash}
 
 You have set a shell variable. To refer to a value by name, precede it with a dollar sign. The example below will print 42:
 
-\begin{english}
-  \begin{bash}
+\begin{bash}
 $ echo $FOO
 42
-  \end{bash}
-\end{english}
+\end{bash}
 
 \index{variables!shell}
 
 If we execute \verb|printenv|, we won't see \verb|FOO| in the output. The \verb|FOO=42| instruction sets a shell variable, not an environment variable. These variables are only visible to the shell, and its descendants do not inherit them. Let's check it: start a new one from the current shell and repeat printing.
 
-\begin{english}
-  \begin{bash}
+\begin{bash}
 $ sh
 $ echo $FOO
-  \end{bash}
-\end{english}
+\end{bash}
 
 We get an empty string because the child does not have such a variable. Run \verb|exit| to return to the parent shell.
 
@@ -656,33 +595,27 @@ We get an empty string because the child does not have such a variable. Run \ver
 
 The \verb|export| command puts the variable into the environment. Printenv sees the variable set this way:
 
-\begin{english}
-  \begin{bash}
+\begin{bash}
 $ export FOO=42
 $ printenv | grep FOO
 FOO=42
-  \end{bash}
-\end{english}
+\end{bash}
 
 \noindent
 The child processes also see:
 
-\begin{english}
-  \begin{bash}
+\begin{bash}
 $ sh
 $ echo $FOO
 42
-  \end{bash}
-\end{english}
+\end{bash}
 
 Sometimes you need to start a process with a variable but so as not to affect the current state. In such a situation, you should place the expression \verb|NAME=value| before the basic command:
 
-\begin{english}
-  \begin{bash}
+\begin{bash}
 $ BAR=99 printenv | grep BAR
 BAR=99
-  \end{bash}
-\end{english}
+\end{bash}
 
 \verb|Printenv| generates a new process that has access to the \verb|BAR| variable. If we print \verb|$ BAR| once again, we'll get an empty string.
 
@@ -692,20 +625,16 @@ Programs read parameters from environment variables. A PostgreSQL client disting
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{bash}
+\begin{bash}
 $ export PGHOST=host.com \
     PGDATABASE=project,
-  \end{bash}
-\end{english}
+\end{bash}
 
 \else
 
-\begin{english}
-  \begin{bash}
+\begin{bash}
 $ export PGHOST=host.com PGDATABASE=project,
-  \end{bash}
-\end{english}
+\end{bash}
 
 \fi
 
@@ -739,15 +668,13 @@ The industry is moving from files to virtualization. If earlier we copied files 
 
 On the contrary, virtualization is tolerant of the environment variables. They are specified in the parameters when you start the image. The same image is used with different variables, so a new build is not required. The more options you can set with variables, the more convenient it is to work with the image. In the example below, the PostgreSQL server starts with a ready-to-use database and a user:
 
-\begin{english}
-  \begin{bash}
+\begin{bash}
 $ docker run \
   -e POSTGRES_DB=book \
   -e POSTGRES_USER=ivan \
   -e POSTGRES_PASSWORD=**** \
   -d postgres
-  \end{bash}
-\end{english}
+\end{bash}
 
 \index{sites!12factor.net}
 
@@ -761,24 +688,20 @@ Variables do not support types: any value is text. Type inference is up to you. 
 
 \index{languages!Python}
 
-\begin{english}
-  \begin{python}
+\begin{python}
 db_port = int(os.environ["DB_PORT"])
-  \end{python}
-\end{english}
+\end{python}
 
 When there are more than two variables, the code becomes ugly. Specify a map where a key is a variable name and value is an output function. The special code traverses the map and fills up the result. For the sake of shortness, let's skip error catching:
 
-\begin{english}
-  \begin{python}
+\begin{python}
 import os
 env_mapping = {"DB_PORT": int}
 
 result = {}
 for (env, fn) in env_mapping.iteritems():
     result[env] = fn(os.environ[env])
-  \end{python}
-\end{english}
+\end{python}
 
 The approach is also valid for other languages. In Clojure, a spec does this.
 
@@ -789,50 +712,46 @@ Environment variables do not work with hierarchy. They are a flat set of keys an
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 ;; so-so
 {:db-name "book"
  :db-user "ivan"
  :db-pass "****"}
-  \end{clojure}
+\end{clojure}
 
 \splitter
 
-  \begin{clojure}
+\begin{clojure}
 ;; better
 {:db {:name "book"
       :user "ivan"
       :pass "****"}}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
 
 \noindent
 \begin{tabular}{ @{}p{5cm} @{}p{5cm} }
 
-  \begin{clojure}
+\begin{clojure}
 ;; so-so
 {:db-name "book"
  :db-user "ivan"
  :db-pass "****"}
-  \end{clojure}
+\end{clojure}
 
 &
 
-  \begin{clojure}
+\begin{clojure}
 ;; better
 {:db {:name "book"
       :user "ivan"
       :pass "****"}}
-  \end{clojure}
+\end{clojure}
 
 \end{tabular}
 
-\end{english}
 
 \fi
 
@@ -840,54 +759,50 @@ Nested variables are read differently on different systems. For example, a singl
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 DB_NAME=book
 DB_PASS=pass
 
 {:db-name "book"
  :db-pass "pass"}
-  \end{clojure}
+\end{clojure}
 
 \splitter
 
-  \begin{clojure}
+\begin{clojure}
 DB__NAME=book
 DB__PASS=pass
 
 {:db {:name "book"
       :pass "pass"}}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
 
 \noindent
 \begin{tabular}{ @{}p{5cm} @{}p{5cm} }
 
-  \begin{clojure}
+\begin{clojure}
 DB_NAME=book
 DB_PASS=pass
 
 {:db-name "book"
  :db-pass "pass"}
-  \end{clojure}
+\end{clojure}
 
 &
 
-  \begin{clojure}
+\begin{clojure}
 DB__NAME=book
 DB__PASS=pass
 
 {:db {:name "book"
       :pass "pass"}}
-  \end{clojure}
+\end{clojure}
 
 \end{tabular}
 
-\end{english}
 
 \fi
 
@@ -908,40 +823,33 @@ The development reveals one more trade-off of these variables: they are read-onl
 
 When there are many variables, entering them manually via \verb|export| is tiresome. In such situations, we move the variables to a file called the \emph{env} configuration. Technically, it is a shell script, but the less scripting capabilities it has, the better. Ideally, such a file holds only \verb|NAME=value| pairs, one for each line. Let's just call it \verb|ENV| without extension.
 
-\begin{english}
-  \begin{bash}
+\begin{bash}
 DB_NAME=book
 DB_USER=ivan
 DB_PASS=****
-  \end{bash}
-\end{english}
+\end{bash}
 
 To read the variables into the shell, call \verb|source <file>|. It is a \verb|bash| command that will execute the script in the \emph{current} session. The shorthand for this often-used command is a dot: \verb|. <file>|. The script will add variables to the shell, and you will see them after \verb|source|. This is an important difference from \verb|bash <file>| command, which will execute the script in a new shell, and you won't see any changes in the current one.
 
-\begin{english}
-  \begin{bash}
+\begin{bash}
 $ source ENV
 $ echo $DB_NAME
 book
-  \end{bash}
-\end{english}
+\end{bash}
 
 If you run the application from the current shell, the app still won't get the variables from the file. Recall that the expression \verb|VAR=value| defines a local variable. \verb|DB_NAME| and other variables will not get into the environment, and the program will not inherit them. Let's check this with \verb|printenv|:
 
 \index{utilities!printenv}
 
-\begin{english}
-  \begin{bash}
+\begin{bash}
 $ source ENV
 $ printenv | grep DB
 # exit 1
-  \end{bash}
-\end{english}
+\end{bash}
 
 You can solve the problem two ways. The first is to open the file and place it before each \verb|export| pair. Then the \verb|source| command of this file will add variables to the environment:
 
-\begin{english}
-  \begin{bash}
+\begin{bash}
 $ cat ENV
 export DB_NAME=book
 export DB_USER=ivan
@@ -952,22 +860,19 @@ $ printenv | grep DB
 DB_NAME=book
 DB_USER=ivan
 DB_PASS=****
-  \end{bash}
-\end{english}
+\end{bash}
 
 The disadvantage of this method is that the script logic appears in the file. If you do not put \verb|export| before a variable, the application will not read it.
 
 The second way is based on the \verb|-a| (\textbf{a}llexport) parameter of the current shell. When it is set, the local variable is sent to the environment. Before reading variables from a file, set the flag to "true" and then to "false" again.
 
-\begin{english}
-  \begin{bash}
+\begin{bash}
 $ set -a
 $ source ENV
 $ printenv | grep DB
 # prints all the vars
 $ set +a
-  \end{bash}
-\end{english}
+\end{bash}
 
 The \verb|set| statement is counterintuitive: the parameter is \emph{enabled} with a minus and \emph{disabled} with a plus. This is an exception to remember.
 
@@ -975,8 +880,7 @@ If you read a variable that is already in the environment, it will replace the p
 
 Let the test settings differ by the base name. The \verb|ENV| file contains the main parameters, and in \verb|ENV_TEST| we put the new value \verb|DB_NAME=test|. Let's read both files and see how it turned out:
 
-\begin{english}
-  \begin{bash}
+\begin{bash}
 $ set -a
 $ source ENV
 $ source ENV_TEST
@@ -984,8 +888,7 @@ $ set +a
 
 $ echo $DB_NAME
 test
-  \end{bash}
-\end{english}
+\end{bash}
 
 You can notice that using ENV files is contrary to the statement above. We said that variables remove the dependency on files, but in the end, we put them in a file. Why?
 
@@ -1003,8 +906,7 @@ The static \verb|getenv| method will return either one variable by name or the e
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 ;; a single variable
 (System/getenv "HOME")
 "/Users/ivan"
@@ -1014,13 +916,11 @@ The static \verb|getenv| method will return either one variable by name or the e
 ;; truncated
 {"JAVA_ARCH" "x86_64",
  "LANG" "en_US.UTF-8"}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 ;; a single variable
 (System/getenv "HOME")
 "/Users/ivan"
@@ -1028,8 +928,7 @@ The static \verb|getenv| method will return either one variable by name or the e
 ;; all variables
 (System/getenv)
 {"JAVA_ARCH" "x86_64", "LANG" "en_US.UTF-8"} ;; truncated
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -1039,8 +938,7 @@ Let's cast the map to the Clojure type to make it easier to work with it. At the
 
 Let's write a function to convert the key:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[clojure.string :as str])
 
 (defn remap-key [^String key]
@@ -1048,26 +946,22 @@ Let's write a function to convert the key:
       str/lower-case
       (str/replace #"_" "-")
       keyword))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \noindent
 and make sure that it works correctly:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (remap-key "DB_PORT")
 :db-port
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \index{functions!remap-env}
 \index{functions!remap-key}
 
 The \verb|remap-env| function traverses the Java map and returns its Clojure version with usual keys:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn remap-env [env]
   (reduce
    (fn [acc [k v]]
@@ -1075,13 +969,11 @@ The \verb|remap-env| function traverses the Java map and returns its Clojure ver
        (assoc acc key v)))
    {}
    env))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 Here is a small part of the map:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (remap-env (System/getenv))
 
 {:home "/Users/ivan"
@@ -1090,13 +982,11 @@ Here is a small part of the map:
  :java-arch "x86_64"
  :term-program "iTerm.app"
  :shell "/bin/zsh"}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 When variables are in a map, they follow the same pipeline: type inference, validation with a spec. Since all values are strings, the spec needs to be modified so that it converts strings to numbers. Previously, there was no need for this because the numbers came from JSON. The spec, which considers both the number and the string, will be efficient. A smart number parser looks like this:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (s/def ::->int
   (s/conformer
    (fn [value]
@@ -1107,8 +997,7 @@ When variables are in a map, they follow the same pipeline: type inference, vali
             (catch Exception e
               ::s/invalid))
        :else ::s/invalid))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \noindent
 With this spec, you can change the data source without changing the code.
@@ -1118,21 +1007,19 @@ With this spec, you can change the data source without changing the code.
 The variable map has the disadvantage of many extraneous fields. The application doesn't need to know the terminal version or the path to Python. These fields introduce noise during printing and logging. If the spec fails, we'll see excessive data in \verb|explain|.
 
 \index{clojure.core!select-keys}
-\index{ keys!selection}
+\index{keys!selection}
 
 In the last step of \verb|s/conform|, you need to select only the useful data part from the map. The \verb|select-keys| function will return a subset of the list of keys. But where to get them? It takes a long time to list them manually, and besides, we duplicate the code. We have already specified the keys in the \verb|::config| spec, and we don't want to do this a second time. We'll use a trick to get the keys \emph{out of the spec}.
 
 The \verb|s/form| function takes a spec key and returns the frozen form of whatever was passed to \verb|s/def|. We will get a list where each item is a primitive or a collection of primitives (number, string, character, and others).
 For the \verb|::config| spec, we'll get the following form:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (clojure.spec.alpha/keys
  :req-un [:book.config/server_port
           :book.config/db
           :book.config/event])
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \index{collections!list}
 
@@ -1144,8 +1031,7 @@ We'll drop the first symbol of the shape.  That leaves a list, where the odd ite
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn spec->keys
   [spec-keys]
   (let [form (s/form spec-keys)
@@ -1158,13 +1044,11 @@ We'll drop the first symbol of the shape.  That leaves a list, where the odd ite
             opt
             (map ->unqualify opt-un)
             (map ->unqualify req-un))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn spec->keys
   [spec-keys]
   (let [form (s/form spec-keys)
@@ -1175,33 +1059,28 @@ We'll drop the first symbol of the shape.  That leaves a list, where the odd ite
             opt
             (map ->unqualify opt-un)
             (map ->unqualify req-un))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
 \noindent
 Let's check the spec of our loader. Indeed, we get three keys:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (spec->keys ::config)
 (:server_port :db :event)
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \noindent
 Let's rewrite reading variables into the map. In the last step, we select a subset of these keys.
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn read-env-vars []
   (let [cfg-keys (spec->keys ::config)]
     (-> (System/getenv)
         (remap-env)
         (select-keys cfg-keys))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 The advantage is that we managed to avoid repetitions. If a new field appears in \verb|::config|, the \verb|spec->keys| function will pick it up.
 
@@ -1209,14 +1088,12 @@ The advantage is that we managed to avoid repetitions. If a new field appears in
 
 Let's modify the loader to work with environment variables. Replace the first two steps with \verb|read-env-vars|. Now the program does not depend on the config file.
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn load-config! []
   (-> (read-env-vars)
       (coerce-config)
       (set-config!)))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 Make it so the data source can be specified using a parameter. For example, \verb|:source "/path/to/config.json"| means read the file, and \verb|:source :env| means environment variables.
 
@@ -1236,34 +1113,29 @@ It rarely happens that a configuration is a flat dictionary. Parameters related 
 Let's improve our loader: we will teach it to read nested variables. Let's agree that double underscore means a level change. We'll put the following variables
 in the \verb|ENV_NEST| file:
 
-\begin{english}
-  \begin{bash}
+\begin{bash}
 DB__NAME=book
 DB__USER=ivan
 DB__PASS=****
 HTTP__PORT=8080
 HTTP__HOST=api.random.com
-  \end{bash}
-\end{english}
+\end{bash}
 
 \index{REPL}
 
 \noindent
 Now read it and start the REPL with the new environment:
 
-\begin{english}
-  \begin{bash}
+\begin{bash}
 $ set -a
 $ source ENV_NEST
 $ lein repl
-  \end{bash}
-\end{english}
+\end{bash}
 
 \mnoindent
 Let's change the parsing of the environment. The \texttt{remap--key--nest} function takes a string key and returns a vector of its constituent parts (lexemes):
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn remap-key-nest
   [^String key]
   (-> key
@@ -1274,8 +1146,7 @@ Let's change the parsing of the environment. The \texttt{remap--key--nest} funct
 
 (remap-key-nest "DB__PORT")
 ;; (:db :port)
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \index{clojure.core!assoc}
 \index{clojure.core!assoc-in}
@@ -1284,8 +1155,7 @@ Let's change the parsing of the environment. The \texttt{remap--key--nest} funct
 \noindent
 The traversal function does not call \verb|assoc|, but \verb|assoc-in|, which returns a nested structure:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn remap-env-nest
   [env]
   (reduce
@@ -1294,15 +1164,13 @@ The traversal function does not call \verb|assoc|, but \verb|assoc-in|, which re
        (assoc-in acc key-path v)))
    {}
    env))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 The code below will return the parameters grouped as expected. Here is a subset of them:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (-> (System/getenv)
     (remap-env-nest)
     (select-keys [:db :http]))
@@ -1312,21 +1180,18 @@ The code below will return the parameters grouped as expected. Here is a subset 
       :name "book"}
  :http {:port "8080"
         :host "api.random.com"}}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (-> (System/getenv)
     (remap-env-nest)
     (select-keys [:db :http]))
 
 {:db {:user "ivan", :pass "****", :name "book"},
  :http {:port "8080", :host "api.random.com"}}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -1347,11 +1212,9 @@ At this point, you might decide that config in a file is a bad idea. However, do
 Let's look at how to use both files and environments. A naive solution doesn't require you to write any code: it runs on command-line utilities. The \verb|envsubst| program in the GNU gettext package provides a simple templating system. To install \verb|gettext|, run the command in a terminal:
 
 
-\begin{english}
-  \begin{bash}
+\begin{bash}
 $ <manager> install gettext,
-  \end{bash}
-\end{english}
+\end{bash}
 
 \noindent
 , where \verb|<manager>| is your system's package master (\verb|brew|, \verb|apt|, \verb|yum|, and others).
@@ -1361,8 +1224,7 @@ $ <manager> install gettext,
 
 The template text comes from \verb|stdin|, and the environment variables are the context. The utility replaces the \verb|$VAR_NAME| expressions with the values of the same name variable. Let's put the template into the \verb|config.tpl.json| file. The "tpl" part means a template.
 
-\begin{english}
-  \begin{json/lines}
+\begin{json/lines}
 {
     "server_port": $HTTP_PORT,
     "db": {
@@ -1376,14 +1238,12 @@ The template text comes from \verb|stdin|, and the environment variables are the
         "$EVENT_END"
     ]
 }
-  \end{json/lines}
-\end{english}
+\end{json/lines}
 
 \noindent
 Note that the server port is not quoted because it is a number \coderef{2}. Let's put the variables into the \verb|ENV_TPL| file:
 
-\begin{english}
-  \begin{bash}
+\begin{bash}
 $ cat ENV_TPL
 DB_NAME=book
 DB_USER=ivan
@@ -1391,23 +1251,19 @@ DB_PASS='*(&fd}A53z#$!'
 HTTP_PORT=8080
 EVENT_START='2019-07-05T12:00:00'
 EVENT_END='2019-07-12T23:59:59'
-  \end{bash}
-\end{english}
+\end{bash}
 
 \noindent
 Let's read them and render the template:
 
-\begin{english}
-  \begin{bash}
+\begin{bash}
 $ source ENV_TPL
 $ cat config.tpl.json | envsubst
-  \end{bash}
-\end{english}
+\end{bash}
 
 \begin{listing}[ht!]
 
-\begin{english}
-  \begin{json}
+\begin{json}
 {
     "server_port": 8080,
     "db": {
@@ -1421,8 +1277,7 @@ $ cat config.tpl.json | envsubst
         "2019-07-12T23:59:59"
     ]
 }
-  \end{json}
-\end{english}
+\end{json}
 
 \caption{Config after variable substitution}
 \label{fig:json-render}
@@ -1434,20 +1289,16 @@ The substitution was successful (the render result is in Listing \ref{fig:json-r
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{bash}
+\begin{bash}
 $ cat config.tpl.json |
     envsubst > config.ready.json
-  \end{bash}
-\end{english}
+\end{bash}
 
 \else
 
-\begin{english}
-  \begin{bash}
+\begin{bash}
 $ cat config.tpl.json | envsubst > config.ready.json
-  \end{bash}
-\end{english}
+\end{bash}
 
 \fi
 
@@ -1465,50 +1316,42 @@ Suppose we wrote the main parameters in a file, and the password for the databas
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (s/def ::->env
   (s/conformer
    (fn [varname]
      (or (System/getenv varname)
          ::s/invalid))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (s/def ::->env
   (s/conformer
    (fn [varname]
      (or (System/getenv varname) ::s/invalid))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
 If the variable is not set, the output will return an error. For more control, remove the white space around the edges and make sure the string is not empty.
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (s/def ::db-password
   (s/and ::->env
          (s/conformer str/trim)
          not-empty))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 A quick test: run the REPL with the \verb|DB_PASS| variable and read it using the spec:
 
-\begin{english}
-  \begin{bash}
+\begin{bash}
 DB_PASS='*(&fd}A53z#$!' lein repl
 
 (s/conform ::db-password "DB_PASS")
 "*(&fd}A53z#$!"
-  \end{bash}
-\end{english}
+\end{bash}
 
 To move a field out of the file to the environment, replace its value with the variable name. Update the spec for this field: add \verb|::->env| to the beginning of the \verb|s/and| chain.
 
@@ -1525,8 +1368,7 @@ Add the \verb|#env| tag that will return the value of the variable by name. The 
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn tag-env
   [varname]
   (cond
@@ -1538,13 +1380,11 @@ Add the \verb|#env| tag that will return the value of the variable by name. The 
     (throw
       (new Exception
         "Wrong variable type"))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn tag-env
   [varname]
   (cond
@@ -1554,8 +1394,7 @@ Add the \verb|#env| tag that will return the value of the variable by name. The 
     (System/getenv varname)
     :else
     (throw (new Exception "Wrong variable type"))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -1564,50 +1403,42 @@ Now we'll read the EDN line with the new tag:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[clojure.edn :as edn])
 
 (edn/read-string
   {:readers {'env tag-env}}
   "{:db-password #env DB_PASS}")
 ;; {:db-password "*(&fd}A53z#$!"}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[clojure.edn :as edn])
 
 (edn/read-string {:readers {'env tag-env}}
                  "{:db-password #env DB_PASS}")
 ;; {:db-password "*(&fd}A53z#$!"}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
 To avoid passing the tags every time, let's prepare the \verb|partial| function for the \verb|edn/read-string| one. The new function accepts only a string:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def read-config
   (partial edn/read-string
            {:readers {'env tag-env}}))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 To parse a file with tags, read it into a string and pass it to \verb|read-config|:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (-> "/path/to/config.edn"
     slurp
     read-config)
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 YAML tags start with one or two exclamation marks, depending on the semantics. Standard tags have two marks, while third-party (custom) tags have one. This way, when we run into a tag, we immediately understand its semantics.
 
@@ -1617,23 +1448,20 @@ YAML tags start with one or two exclamation marks, depending on the semantics. S
 
 The Yummy library offers a YAML parser that has useful tags. Among others, we are interested in the \verb|!envvar| tag, which returns the value of a variable by name. Let's describe the configuration in the \verb|config.yaml| file:
 
-\begin{english}
-  \begin{yaml}
+\begin{yaml}
 server_port: 8080
 db:
   dbtype:   mysql
   dbname:   book
   user:     !envvar DB_USER
   password: !envvar DB_PASS
-  \end{yaml}
-\end{english}
+\end{yaml}
 
 Now we'll include the library and read the file. In place of the tags, we get the environment values:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[yummy.config :as yummy])
 (yummy/load-config
   {:path "config.yaml"})
@@ -1643,13 +1471,11 @@ Now we'll include the library and read the file. In place of the tags, we get th
       :dbname "book"
       :user "ivan"
       :password "*(&fd}A53z#$!"}}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[yummy.config :as yummy])
 (yummy/load-config {:path "config.yaml"})
 
@@ -1658,8 +1484,7 @@ Now we'll include the library and read the file. In place of the tags, we get th
       :dbname "book"
       :user "ivan"
       :password "*(&fd}A53z#$!"}}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -1694,26 +1519,22 @@ Developers have come up with tricks to get around this limitation in JSON.  For 
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{json}
+\begin{json}
 {
     "server_port":
     "A port for the HTTP server.",
     "server_port": 8080
 }
-  \end{json}
-\end{english}
+\end{json}
 
 \else
 
-\begin{english}
-  \begin{json}
+\begin{json}
 {
     "server_port": "A port for the HTTP server.",
     "server_port": 8080
 }
-  \end{json}
-\end{english}
+\end{json}
 
 \fi
 
@@ -1733,8 +1554,7 @@ Compare data in JSON and YAML (on the right). The YAML entry is shorter and visu
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{json}
+\begin{json}
 {
     "server_port": 8080,
     "db": {
@@ -1748,11 +1568,11 @@ Compare data in JSON and YAML (on the right). The YAML entry is shorter and visu
         "2019-07-12T23:59:59"
     ]
 }
-  \end{json}
+\end{json}
 
 \splitter
 
-  \begin{yaml}
+\begin{yaml}
 server_port: 8080
 db:
   dbtype:   mysql
@@ -1762,17 +1582,15 @@ db:
 event:
   - 2019-07-05T12:00:00
   - 2019-07-12T23:59:59
-  \end{yaml}
-\end{english}
+\end{yaml}
 
 \else
 
-\begin{english}
 
 \noindent
 \begin{tabular}{ @{}p{6cm} @{}p{4cm} }
 
-  \begin{json}
+\begin{json}
 {
     "server_port": 8080,
     "db": {
@@ -1786,13 +1604,13 @@ event:
         "2019-07-12T23:59:59"
     ]
 }
-  \end{json}
+\end{json}
 
 &
 
 \linegap
 
-  \begin{yaml}
+\begin{yaml}
 server_port: 8080
 db:
   dbtype:   mysql
@@ -1802,11 +1620,10 @@ db:
 event:
   - 2019-07-05T12:00:00
   - 2019-07-12T23:59:59
-  \end{yaml}
+\end{yaml}
 
 \end{tabular}
 
-\end{english}
 
 \fi
 
@@ -1818,23 +1635,19 @@ The YAML language, like JSON, has basic types: scalars, null, and collections. Y
 
 \index{collections!in YAML}
 
-\begin{english}
-  \begin{yaml}
+\begin{yaml}
 numbers: [1, 2, 3]
-  \end{yaml}
-\end{english}
+\end{yaml}
 
 \noindent
 But for columns, commas and square brackets disappear:
 
-\begin{english}
-  \begin{yaml}
+\begin{yaml}
 numbers:
   - 1
   - 2
   - 3
-  \end{yaml}
-\end{english}
+\end{yaml}
 
 DevOps engineers like YAML because it supports Python-style comments (with hashes). Programs like Docker-compose and Kubernetes can read settings from YAML files.
 
@@ -1844,8 +1657,7 @@ YAML allows you to write text across multiple lines. It is easier to read and co
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{yaml}
+\begin{yaml}
 description: |
   To solve the problem,
   please do the following:
@@ -1855,13 +1667,11 @@ description: |
   - Walk for a while.
 
   Then try again.
-  \end{yaml}
-\end{english}
+\end{yaml}
 
 \else
 
-\begin{english}
-  \begin{yaml}
+\begin{yaml}
 description: |
   To solve the problem, please do the following:
 
@@ -1870,8 +1680,7 @@ description: |
   - Walk for a while.
 
   Then try again.
-  \end{yaml}
-\end{english}
+\end{yaml}
 
 \fi
 
@@ -1888,37 +1697,31 @@ The cons of YAML stem from its pros. Indentation seems to be a good solution unt
 
 Sometimes, missing quotes will result in incorrect types or structure. Suppose the \verb|phrases| field lists phrases that a user will see:
 
-\begin{english}
-  \begin{yaml}
+\begin{yaml}
 phrases:
   - Welcome!
   - See you soon!
   - Warning: wrong email address.
-  \end{yaml}
-\end{english}
+\end{yaml}
 
 Because of the colon in the last line, the parser will think it is a nested map. As a result, we get the wrong structure:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 {:phrases
  ["Welcome!"
   "See you soon!"
   {:Warning "wrong email address."}]}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 {:phrases ["Welcome!"
            "See you soon!"
            {:Warning "wrong email address."}]}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -1942,8 +1745,7 @@ Here's an example with different types, collections, and tags:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 {:user/banned? false
  :task-state
  #{:pending :in-progress :done}
@@ -1955,21 +1757,18 @@ Here's an example with different types, collections, and tags:
  [#inst "2019-07-01" #inst "2019-07-31"]
  :cassandra-id #uuid
  "26577362-902e-49e3-83fb-9106be7f60e1"}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 {:user/banned? false
  :task-state #{:pending :in-progress :done}
  :account-ids [1001 1002 1003 nil]
  :server {:host "127.0.0.1" :port 8080}
  :date-range [#inst "2019-07-01" #inst "2019-07-31"]
  :cassandra-id #uuid "26577362-902e-49e3-83fb-9106be7f60e1"}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -1977,22 +1776,18 @@ In EDN, data does not differ from code. If you copy them to the REPL or a module
 
 The \verb|pr-str| function converts data to text. In EDN, a dump comes down to simple steps: convert the data into a string and write it to a file. Below the function result is written to the \verb|dataset.edn| file:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (-> (get-dataset)
     (pr-str)
     (->> (spit "dataset.edn")))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 The opposite action is to read the file and parse the code in Clojure using \verb|read-string|:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (-> "dataset.edn" slurp read-string)
 ;; {:some ["data"]}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \index{syntax!\texttt{\#\_} (ignoring)}
 
@@ -2002,13 +1797,11 @@ EDN supports more than just regular comments. The \verb|#_| tag ignores any item
 
 This way, you can disable entire sections of the configuration. In the following example, we ignore the third element of the vector. If you put a regular comment (semicolon) on a line, it will touch the closing brackets, and the expression will become invalid.
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 {:users [{:id 1 :name "Ivan"}
          {:id 2 :name "Juan"}
          #_{:id 3 :name "Huan"}]}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 When both the backend and the frontend run on the Clojure and ClojureScript stack, EDN is the right choice.
 
@@ -2035,57 +1828,47 @@ Properties are Java machine variables, similar to the JVM environment. When load
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{bash}
+\begin{bash}
 $ java \
    -Dconf="/path/to/config.properties" \
    -jar project.jar
-  \end{bash}
-\end{english}
+\end{bash}
 
 \else
 
-\begin{english}
-  \begin{bash}
+\begin{bash}
 $ java -Dconf="/path/to/config.properties" -jar project.jar
-  \end{bash}
-\end{english}
+\end{bash}
 
 \fi
 
 \mnoindent
 The \verb|.properties| files are \verb|field=value| pairs, one per line. Fields are like domains: they are lexemes separated by dots. Lexemes are in descending order of priority:
 
-\begin{english}
-  \begin{ini}
+\begin{ini}
 db.type=mysql
 db.host=127.0.0.1
 db.pool.connections=8
-  \end{ini}
-\end{english}
+\end{ini}
 
 The library treats dots as nested maps. The file above will return the following structure:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 {:db {:type "mysql"
       :host "127.0.0.1"
       :pool {:connections 8}}}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 After receiving the configuration, Cprop looks for overriding in the environment variables. The same rules work for them as in our loader.
 For example, the variable \texttt{DB\_\_POOL\_\_CONNEC\-TIONS=16} will replace the value 8 in the nested map. Cprop ignores variables that are not part of the config and thus keeps it tidy.
 
 Non-standard paths to the resource and file are specified with the keys:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (load-config
  :resource "private/config.edn"
  :file "/path/custom/config.edn")
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \index{modules!cprop.source}
 
@@ -2095,8 +1878,7 @@ The \verb|:merge| key merges the config with any source. The former holds a sequ
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (load-config
  :resource "path/within/classpath/to.edn"
  :file "/path/to/some.edn"
@@ -2109,13 +1891,11 @@ The \verb|:merge| key merges the config with any source. The former holds a sequ
    "/path/to/some.properties")
   (from-system-props)
   (from-env)])
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (load-config
  :resource "path/within/classpath/to.edn"
  :file "/path/to/some.edn"
@@ -2125,8 +1905,7 @@ The \verb|:merge| key merges the config with any source. The former holds a sequ
          (from-props-file "/path/to/some.properties")
          (from-system-props)
          (from-env)])
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -2148,8 +1927,7 @@ The \verb|read-config| function reads an EDN file or resource:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require
   '[aero.core :refer (read-config)])
 
@@ -2157,19 +1935,16 @@ The \verb|read-config| function reads an EDN file or resource:
 (read-config
   (clojure.java.io/resource
     "config.edn"))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[aero.core :refer (read-config)])
 
 (read-config "config.edn")
 (read-config (clojure.java.io/resource "config.edn"))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -2177,42 +1952,34 @@ The \verb|read-config| function reads an EDN file or resource:
 
 Tags are the main point in Aero, so let's take a look at the main ones. The familiar \verb|#env| changes the name of the environment variable to a value:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 {:db {:passwod #env DB_PASS}}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 The \verb|#envf| tag formats a string using environment variables. Let's say the connection to the database consists of separate fields, but you prefer the JDBC URI, a long string that looks like a web address. In order not to repeat, the address is calculated from the original fields:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 {:db-uri
  #envf ["jdbc:postgresql://%s/%s?user=%s"
         DB_HOST DB_NAME DB_USER]}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 {:db-uri #envf ["jdbc:postgresql://%s/%s?user=%s"
                 DB_HOST DB_NAME DB_USER]}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
 The \verb|#or| tag is similar to its Clojure counterpart and is needed for default values. Suppose no database port is specified in the file. To avoid an error, let's specify the standard PostgreSQL port:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 {:db {:port #or [#env DB_PORT 5432]}}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \index{profiles!Aero}
 
@@ -2222,8 +1989,7 @@ The example below shows how to find the base name by profile. Without a profile,
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 {:db
  {:name
   #profile {:default "book"
@@ -2233,61 +1999,50 @@ The example below shows how to find the base name by profile. Without a profile,
 (read-config "aero.test.edn"
   {:profile :test})
 {:db {:name "book_test"}}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 {:db {:name #profile {:default "book"
                       :dev     "book_dev"
                       :test    "book_test"}}}
 
 (read-config "aero.test.edn" {:profile :test})
 {:db {:name "book_test"}}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
 The \verb|#include| tag puts another EDN file in the config. The file can also contain tags, and the library will execute them recursively. We use imports when the configuration becomes too large.
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 {:queue #include "message-queue.edn"}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 The \verb|#ref| tag refers to any part of the configuration file. It is a vector of keys that is usually passed to \verb|get-in|. A reference will allow you to avoid duplication. For example, a background task component needs the user we specified for the database. In order not to copy it, let's put the link:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 ;; config.edn
 {:db {:user #env DB_USER}
  :worker {:user #ref [:db :user]}}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \noindent
 When reading a file, the link resolves to the value:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 {:db {:user "ivan"}
  :worker {:user "ivan"}}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 {:db {:user "ivan"}, :worker {:user "ivan"}}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -2316,85 +2071,69 @@ The file path either the parameters specify, or the library searches for it acco
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require
   '[yummy.config :refer [load-config]])
 
 (load-config
   {:path "/path/to/config.yaml"})
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[yummy.config :refer [load-config]])
 
 (load-config {:path "/path/to/config.yaml"})
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
 In the second case, we specified the name of the project instead of the path. Yummy looks for the file path in the \verb|<project> _CONFIGURATION| environment variable or the \verb|<project> .configuration| property:
 
-\begin{english}
-  \begin{bash}
+\begin{bash}
 $ export BOOK_CONFIGURATION=config.yaml
-  \end{bash}
-\end{english}
+\end{bash}
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (load-config {:program-name :book})
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 The library extends YAML with several tags. One is the familiar \verb|!envvar| for environment variables:
 
 \index{tags!Yummy}
 
-\begin{english}
-  \begin{yaml}
+\begin{yaml}
 db:
   password: !envvar DB_PASS
-  \end{yaml}
-\end{english}
+\end{yaml}
 
 \noindent
 The \verb|keyword!| tag is useful for converting a string to the keyword:
 
-\begin{english}
-  \begin{yaml}
+\begin{yaml}
 states:
   - !keyword task/pending
   - !keyword task/in-progress
   - !keyword task/done
-  \end{yaml}
-\end{english}
+\end{yaml}
 
 \noindent
 Here is the result:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 {:states [:task/pending
           :task/in-progress
           :task/done]}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 {:states [:task/pending :task/in-progress :task/done]}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -2402,44 +2141,36 @@ The \verb|!uuid| tag is similar to the \verb|#uuid| one for EDN; it returns the 
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{yaml}
+\begin{yaml}
 system-user: !uuid
     cb7aa305-997c-4d53-a61a-38e0d8628dbb
-  \end{yaml}
-\end{english}
+\end{yaml}
 
 \else
 
-\begin{english}
-  \begin{yaml}
+\begin{yaml}
 system-user: !uuid cb7aa305-997c-4d53-a61a-38e0d8628dbb
-  \end{yaml}
-\end{english}
+\end{yaml}
 
 \fi
 
 The \verb|!slurp| tag reads the file, which is useful for encryption certificates. Their content is a long string that is inconvenient to store in a general configuration. The \verb|:auth|, \verb|:cert|, and \verb|:pkey| keys will hold the contents of the files from the \verb|certs| folder.
 
-\begin{english}
-  \begin{yaml}
+\begin{yaml}
 tls:
   auth: !slurp "certs/ca.pem"
   cert: !slurp "certs/cert.pem"
   pkey: !slurp "certs/key.pk8"
-  \end{yaml}
-\end{english}
+\end{yaml}
 
 \index{spec!assert}
 
 To check the configuration, pass the spec key to the \verb|load-config| parameters. When a key is specified, Yummy executes \verb|s/assert| with the data from the file. If the validation returns false, an exception will float up. To improve text about an error, Yummy uses Expound.
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (load-config {:program-name :book
               :spec ::config})
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \index{die-fn}
 \index{death function}
@@ -2453,8 +2184,7 @@ If \verb|:die-fn| is not specified, Yummy will call the default handler. It prin
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (load-config
  {:program-name :book
   :spec ::config
@@ -2462,21 +2192,18 @@ If \verb|:die-fn| is not specified, Yummy will call the default handler. It prin
             (binding [*out* *err*]
               (println msg
                 (ex-message e))))})
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (load-config
  {:program-name :book
   :spec ::config
   :die-fn (fn [e msg]
             (binding [*out* *err*]
               (println msg (ex-message e))))})
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -2487,8 +2214,7 @@ In production mode, write the exception to the log and exit the program.
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (load-config
  {:program-name :book
   :spec ::config
@@ -2496,21 +2222,18 @@ In production mode, write the exception to the log and exit the program.
             (log/error e
               "Config error" msg)
             (System/exit 1))})
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (load-config
  {:program-name :book
   :spec ::config
   :die-fn (fn [e msg]
             (log/error e "Config error" msg)
             (System/exit 1))})
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 

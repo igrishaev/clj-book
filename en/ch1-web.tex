@@ -35,31 +35,26 @@ A body follows headers. A body can contain anything~--- a text, pairs of fields 
 
 Let's look at some examples of HTTP traffic. It is transmitted over a network in this form. Below you see a request to the Google homepage for the word Clojure:
 
-\begin{english}
-  \begin{http}
+\begin{http}
 GET /search?q=clojure HTTP/1.1
 Host: google.com
 Accept-Language: en-us
 User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)
-  \end{http}
-\end{english}
+\end{http}
 
 Here is a POST request with JSON:
 
-\begin{english}
-  \begin{http}
+\begin{http}
 POST /api/users/ HTTP/1.1
 Host: example.com
 Content-Type: application/json
 
 {"username": "John", "city": "NY"}
-  \end{http}
-\end{english}
+\end{http}
 
 Pay attention to an empty line above, it separates the body from the headers. The response to that request:
 
-\begin{english}
-  \begin{http}
+\begin{http}
 HTTP/1.1 200 OK
 Date: Tue, 19 Mar 2019 15:57:11 GMT
 Server: Nginx
@@ -70,8 +65,7 @@ Content-Type: application/json
   "code": "CREATED",
   "message": "User has been created successfully."
 }
-  \end{http}
-\end{english}
+\end{http}
 
 You can see how elegantly the protocol is arranged: data goes in descending order of importance. After the first line, a client and a server are ready to decide what to do next.
 
@@ -176,8 +170,7 @@ Now we can write the first application even without the library. Here you are:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn app [request]
  (let [{:keys [uri request-method]}
        request]
@@ -188,13 +181,11 @@ Now we can write the first application even without the library. Here you are:
                name
                .toUpperCase)
            uri)}))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn app [request]
   (let [{:keys [uri request-method]} request]
     {:status 200
@@ -202,8 +193,7 @@ Now we can write the first application even without the library. Here you are:
      :body (format "You requested %s %s"
                    (-> request-method name .toUpperCase)
                    uri)}))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -211,8 +201,7 @@ Our application reads the path and method of the request and builds the response
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (app {:request-method :get
       :uri "/index.html"})
 {:status 200
@@ -224,13 +213,11 @@ Our application reads the path and method of the request and builds the response
 {:status 200
  :headers {"Content-Type" "text/plain"}
  :body "You requested POST /users"}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (app {:request-method :get :uri "/index.html"})
 {:status 200
  :headers {"Content-Type" "text/plain"}
@@ -240,8 +227,7 @@ Our application reads the path and method of the request and builds the response
 {:status 200
  :headers {"Content-Type" "text/plain"}
  :body "You requested POST /users"}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -253,33 +239,27 @@ Maps are everywhere, and it is not clear what will be in the browser. Let's run 
 
 Let's add dependencies to the project:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 [ring/ring-core "1.7.1"]
 [ring/ring-jetty-adapter "1.7.1"]
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 Let's start the server:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[ring.adapter.jetty
            :refer [run-jetty]])
 (run-jetty app {:port 8080 :join? true})
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[ring.adapter.jetty :refer [run-jetty]])
 (run-jetty app {:port 8080 :join? true})
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -287,28 +267,24 @@ Here's what happened. We have added the \verb|run-jetty| function to the current
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def server
   (run-jetty app {:port 8080
                   :join? false}))
 
 ;; after a while
 (.stop server)
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def server
   (run-jetty app {:port 8080 :join? false}))
 
 ;; after a while
 (.stop server)
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -326,15 +302,13 @@ We must pay attention to request fields \verb|:headers| and \verb|:body|. Header
 
 \index{syntax!:keys (splitting)}
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn some-handler
   [request]
   (let [{:keys [headers]} request
         {:keys [host]} headers]
     ...))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \index{syntax!:strs (splitting)}
 
@@ -342,36 +316,30 @@ To extract the headers properly, we'll use \verb|:strs|:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn some-handler
   [{:keys [headers]}]
   (let [{:strs [host
                 user-agent]} headers]
     ...))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn some-handler
   [{:keys [headers]}]
   (let [{:strs [host user-agent]} headers]
     ...))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
 \noindent or the \verb|get| function with the string:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (get headers "host") ;; "127.0.0.1"
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \index{headers!Content-Type}
 
@@ -381,11 +349,9 @@ Header values are also strings. The standard defines some types of headers, but 
 
 Newbies sometimes forget that header keys are strings. In this case, an error appears, and instead of the correct value, \verb|nil| is returned:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (get headers :host) ;; nil
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 We can process headers, changing the type of keys. It's ok for one occasion. But if every handler does this, there will be extra work. We should change the application so that the preprocessed headers will come to the function. The technique is called middleware, and we'll look at it below.
 
@@ -401,28 +367,24 @@ The body is most easily read as a string with the \verb|slurp| function:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn handler [request]
  (let [content (-> request :body slurp)]
   {:status 200
    :headers {"content-type" "text/plain"}
    :body (format "The content was %s"
                  content)}))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn handler [request]
   (let [content (-> request :body slurp)]
     {:status 200
      :headers {"content-type" "text/plain"}
      :body (format "The content was %s" content)}))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -444,24 +406,20 @@ Ring request is a map with the \verb|:status|, \verb|:headers|, and \verb|:body|
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 {:status 302
  :headers
    {"content-length" 0
     "location" "/new/page.html"}}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 {:status 302
  :headers {"content-length" 0
            "location" "/new/page.html"}}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -482,8 +440,7 @@ There is no routing class in Clojure and Ring. It's a function that plays its ro
 
 Let's imagine that at the address \verb|/| we would like to see the name of the website, and by~\verb|/hello| a greeting. Other addresses should return \verb|404 Page not found|. Now we will write the handlers:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn page-index [request]
   {:status 200
    :headers {"content-type" "text/plain"}
@@ -498,8 +455,7 @@ Let's imagine that at the address \verb|/| we would like to see the name of the 
   {:status 404
    :headers {"content-type" "text/plain"}
    :body "Page not found."})
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 We can run each handler as a server and open it in~a~browser. Now we must form them into a single whole.
 
@@ -507,16 +463,14 @@ We can run each handler as a server and open it in~a~browser. Now we must form t
 
 Let's do the simplest thing that comes to mind. We will write a handler that finds the route manually. To do this, we'll check the path with the \verb|case| operator:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn app [request]
   (let [{:keys [uri]} request]
     (case uri
       "/"      (page-index request)
       "/hello" (page-hello request)
       (page-404 request))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 The function's response depends on the \verb|:uri| request field. Now we can run the application in a browser and check for different addresses. This approach is naive, but it works.
 
@@ -533,18 +487,15 @@ Libraries solve these and other problems. We'll look at Compojure and Bidi. Both
 The \footurl{Compojure}{https://github.com/weavejester/compojure}[Compo-\\*jure] library provides macros for describing routes. Macros are like a rules table.
 Let's add a dependency to the project:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 [compojure "1.6.1"]
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 Here you are: it's our Compojure app. It is cleaner and shorter than what we wrote at the beginning.
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[compojure.core
            :refer [GET defroutes]])
 
@@ -554,21 +505,18 @@ Here you are: it's our Compojure app. It is cleaner and shorter than what we wro
   (GET "/hello" request
     (page-hello request))
   page-404)
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[compojure.core :refer [GET defroutes]])
 
 (defroutes app
   (GET "/"      request (page-index request))
   (GET "/hello" request (page-hello request))
   page-404)
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -597,20 +545,16 @@ We have identified the problem: the rules \verb|GET /users/1| and \verb|GET /use
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (GET "/users/:id" [id :as request]
     (page-user request))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (GET "/users/:id" [id :as request] (page-user request))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -621,8 +565,7 @@ Suppose a \verb|page-user| page will show the first and last name of the user by
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn page-user [request]
    (let [user (-> request
                   :params
@@ -632,20 +575,17 @@ Suppose a \verb|page-user| page will show the first and last name of the user by
      {:status 200
       :body (format "User is %s %s"
                     fname lname)}))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn page-user [request]
   (let [user (-> request :params :id get-user-by-id)
         {:keys [fname lname]} user]
     {:status 200
      :body (format "User is %s %s" fname lname)}))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -657,8 +597,7 @@ The rules overlap. We will use the \verb|context| macro to avoid repetition:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (context "/content/order/:id" [order-id]
   (GET  "/view" request
         (order-view request))
@@ -667,20 +606,17 @@ The rules overlap. We will use the \verb|context| macro to avoid repetition:
           (order-form request))
     (POST "/" request
           (order-save request))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (context "/content/order/:id" [order-id]
   (GET  "/view" request (order-view request))
   (context "/edit" []
     (GET  "/" request (order-form request))
     (POST "/" request (order-save request))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -696,30 +632,24 @@ We will put the response into the rule to avoid creating a new handler \verb|(pa
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (ANY "/health" _
      {:status 200 :body "ok"})
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (ANY "/health" _ {:status 200 :body "ok"})
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
 We can make it easier: Compojure covers a case where an expression is a string. It becomes the body of a positive response:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (ANY "/health" _ "ok")
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \subsection{Routing with Bidi}
 
@@ -745,51 +675,43 @@ Let's rewrite the example from the beginning of the chapter to the Bidi approach
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 ;; project.clj
 [bidi "2.1.5"]
 
 ;; namespace
 (:require [bidi.bidi :as bidi])
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 [bidi "2.1.5"]                  ;; project.clj
 (:require [bidi.bidi :as bidi]) ;; namespace
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
 Let's start with the route tree. The option with \verb|page-index|, \verb|page-hello| and \verb|page-404| looks like that:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def routes
   ["/" {""      :page-index
         "hello" :page-hello
         true    :not-found}])
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \index{functions!match-route}
 
 We need to check the search for a path along this tree. The \verb|match-route| function takes routes, a path, and returns a map with a tag:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (bidi/match-route routes "/hello")
 {:handler :page-hello}
 
 (bidi/match-route routes "/test")
 {:handler :not-found}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \index{functions!match-route}
 
@@ -797,8 +719,7 @@ Let's add the tag to the request. We can do it in one step with the \verb|match-
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (let [request {:request-method :get
                :uri "/test"}]
   (bidi/match-route*
@@ -807,13 +728,11 @@ Let's add the tag to the request. We can do it in one step with the \verb|match-
 {:request-method :get
  :uri "/test"
  :handler :not-found}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (let [request {:request-method :get
                :uri "/test"}]
   (bidi/match-route* routes (:uri request) request))
@@ -821,8 +740,7 @@ Let's add the tag to the request. We can do it in one step with the \verb|match-
 {:request-method :get
  :uri "/test"
  :handler :not-found}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -830,28 +748,24 @@ We can see the \verb|match-route*| function returned the initial request and add
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn wrap-handler [handler]
   (fn [req]
     (let [{:keys [uri]} req
            req* (bidi/match-route*
                   routes uri req)]
       (handler req*))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn wrap-handler [handler]
   (fn [request]
     (let [{:keys [uri]} request
           request* (bidi/match-route* routes uri request)]
       (handler request*))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -859,8 +773,7 @@ We haven't applied middleware techniques yet, but we have to do it now. Below we
 
 Let's quickly check \verb|wrap-handler|. For convenience, we'll wrap the \verb|identity| function, which will return the argument passed to it:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def wrapped (wrap-handler identity))
 
 (wrapped {:request-method :get
@@ -869,15 +782,13 @@ Let's quickly check \verb|wrap-handler|. For convenience, we'll wrap the \verb|i
 {:request-method :get
  :uri "/hello?foo=42"
  :handler :page-hello}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \index{multi-methods!multi-handler}
 
 The request handler is a multi-method. The dispatcher function is just the \verb|:handler| key.
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defmulti multi-handler
   :handler)
 
@@ -892,41 +803,34 @@ The request handler is a multi-method. The dispatcher function is just the \verb
   {:status 404
    :headers {"content-type" "text/plain"}
    :body "Page not found."})
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 Now we'll wrap \verb|multi-handler| in middleware to get the final application. You should run your web server and check the result in the browser.
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def app (wrap-handler multi-handler))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 It was a simple routing scenario with Bidi. Now let's take a look at the products, their views, and changes. The new tree looks like that:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def routes
   [["/content/order/" :id]
    {"/view" {:get  :page-view}
     "/edit" {:get  :page-form
              :post :page-save}}])
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def routes
   [["/content/order/" :id] {"/view" {:get  :page-view}
                             "/edit" {:get  :page-form
                                      :post :page-save}}])
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -939,8 +843,7 @@ Let's extend the multi-method with HTML pages. \verb|Page-view| should find an i
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defmethod multi-handler :page-view
   [request]
   (if-let [order (some->
@@ -954,13 +857,11 @@ Let's extend the multi-method with HTML pages. \verb|Page-view| should find an i
      :body (render-order-page
              {:order order})}
     page-404))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defmethod multi-handler :page-view
   [request]
   (if-let [order (some-> request
@@ -971,8 +872,7 @@ Let's extend the multi-method with HTML pages. \verb|Page-view| should find an i
      :headers {"content-type" "text/html"}
      :body (render-order-page {:order order})}
     page-404))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -980,8 +880,7 @@ The \verb|:page-form| page builds an edit form. It differs from a view form by t
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defmethod multi-handler :page-save
   [req]
   (let [{:keys [params route-params]} req
@@ -995,13 +894,11 @@ The \verb|:page-form| page builds an edit form. It differs from a view form by t
       params ["id = ?" order-id])
     {:status 302
      :headers {"Location" location}}))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defmethod multi-handler :page-save
   [request]
   (let [{:keys [params route-params]} request
@@ -1012,8 +909,7 @@ The \verb|:page-form| page builds an edit form. It differs from a view form by t
     (jdbc/update! *db* :orders params ["id = ?" order-id])
     {:status 302
      :headers {"Location" location}}))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -1045,28 +941,24 @@ The decorator pattern is a type of middleware. A decorator is the \verb|A| funct
 
 Let's look at some simple decorators. The \verb|With-echo| one adds a side effect to the function — it prints the arguments and the result.
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn with-echo [func]
   (fn [& args]
     (apply println "The args are" args)
     (let [result (apply func args)]
       (println "The result is" result)
       result)))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 Here's how to use it:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def +echo (with-echo +))
 (+echo 1 2 3)
 ;; The args are 1 2 3
 ;; The result is 6
 6
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \index{exceptions!try}
 \index{exceptions!catch}
@@ -1074,16 +966,14 @@ Here's how to use it:
 
 The \verb|With-catch| decorator wraps a function in the \verb|try/catch| method. If an exception occurs, the result will be its object.
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn with-catch [func]
   (fn [& args]
     (try
       (apply func args)
       (catch Throwable e
         e))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \index{languages!Python}
 \index{frameworks!Django}
@@ -1130,55 +1020,45 @@ Let's say \verb|app| is your web application. We must pass it to \verb|wrap-para
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[ring.middleware.params
            :refer [wrap-params]])
 (def final-app (wrap-params app))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[ring.middleware.params :refer [wrap-params]])
 (def final-app (wrap-params app))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
 To avoid confusion in the names, follow the rules. Name the original application \verb|app-naked| or \verb|app-raw| and the final one just \verb|app|.
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def app (wrap-params app-naked))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 We can modify the app so that it takes parameters into account. For example, the \verb|who| parameter contains the name of the person to be greeted:
 \verb|/hello?who=John|. We can get to it like this:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn page-hello [req]
   (let [who (get-in req [:params "who"])]
     ...))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn page-hello [request]
   (let [who (get-in request [:params "who"])]
     ...))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -1188,41 +1068,35 @@ Please, note that the keys are strings. The address is a string, and the algorit
 
 \index{middleware!wrap-keyword-params}
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[ring.middleware.keyword-params
            :refer [wrap-keyword-params]])
 
 (def app (wrap-keyword-params
            (wrap-params app-naked)))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \index{macros!\arr}
 
 Since a keyword is a function, a parameter can be reached with an arrow operator. Some prefer this way instead of the \verb|get-in| one.
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (-> request :params :who)
 (get-in request [:params :who])
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \subsection{Stack middleware}
 
 A typical application includes about ten middleware components. If you wrap them all, you'll get a ladder:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def app
   (wrap-something-else
     (wrap-current-user
       (wrap-session
         (wrap-keyword-params
           (wrap-params app-naked))))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \index{nesting}
 
@@ -1230,8 +1104,7 @@ If you add one more component in the middle, it cascades down the elements below
 
 \index{clojure.core!\arr (arrow operator)}
 
-\begin{english}
-  \begin{clojure/lines}
+\begin{clojure/lines}
 (def app
   (-> app-naked
       wrap-params
@@ -1239,8 +1112,7 @@ If you add one more component in the middle, it cascades down the elements below
       wrap-session
       wrap-current-user
       wrap-something-else))
-  \end{clojure/lines}
-\end{english}
+\end{clojure/lines}
 
 \index{middleware!stack}
 
@@ -1275,20 +1147,16 @@ Wrong middleware order costs hours of debugging. But there is a trick: if two or
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def wrap-params+
   (comp wrap-params wrap-keyword-params))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def wrap-params+ (comp wrap-params wrap-keyword-params))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -1296,55 +1164,51 @@ Let's see why the arguments of \verb|comp| go in that order. We'll designate the
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (comp foo bar)
-  \end{clojure}
+\end{clojure}
 
 \splitter
 
-  \begin{clojure}
+\begin{clojure}
 (fn [x]
   (foo (bar x)))
-  \end{clojure}
+\end{clojure}
 
 \splitter
 
-  \begin{clojure}
+\begin{clojure}
 (fn [x] (-> x
             bar
             foo))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
 \noindent
 \begin{tabular}{ @{}p{3.2cm} @{}p{3.5cm} @{}p{3.5cm} }
 
-  \begin{clojure}
+\begin{clojure}
 (comp foo bar)
-  \end{clojure}
+\end{clojure}
 
 &
 
-  \begin{clojure}
+\begin{clojure}
 (fn [x]
   (foo (bar x)))
-  \end{clojure}
+\end{clojure}
 
 &
 
-  \begin{clojure}
+\begin{clojure}
 (fn [x] (-> x
             bar
             foo))
-  \end{clojure}
+\end{clojure}
 
 \end{tabular}
 
-\end{english}
 
 \fi
 
@@ -1364,11 +1228,9 @@ the browser will remember them for this website. Next time the browser will send
 
 The simplest case of using cookies is determining if the user has already visited the website. The application first looks for cookies named \verb|visited| in the request. If they are not found, the server will add a header:
 
-\begin{english}
-  \begin{http}
+\begin{http}
 Set-Cookie: visited=true;
-  \end{http}
-\end{english}
+\end{http}
 
 After getting cookies, the browser will add them to all requests to the server. A outgoing header looks the same, but without the \verb|Set-| part in the name. The application checks: if the value is true, the client has already been on the website. This affects ad impressions, pop-ups, and so on.
 
@@ -1380,8 +1242,7 @@ The \verb|page-seen| page below checks if we see it for the first time.
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure/lines}
+\begin{clojure/lines}
 (require '[ring.middleware.cookies
            :refer [wrap-cookies]])
 
@@ -1401,13 +1262,11 @@ The \verb|page-seen| page below checks if we see it for the first time.
 
 (def app (-> page-seen
              wrap-cookies))
-  \end{clojure/lines}
-\end{english}
+\end{clojure/lines}
 
 \else
 
-\begin{english}
-  \begin{clojure/lines}
+\begin{clojure/lines}
 (require '[ring.middleware.cookies
            :refer [wrap-cookies]])
 
@@ -1424,8 +1283,7 @@ The \verb|page-seen| page below checks if we see it for the first time.
 
 (def app (-> page-seen
              wrap-cookies))
-  \end{clojure/lines}
-\end{english}
+\end{clojure/lines}
 
 \fi
 
@@ -1444,47 +1302,39 @@ Cookies are closely related to security. Make sure they are secure against theft
 
 The \verb|:http-only| and \verb|:secure| attributes can significantly reduce the risk of theft. The former means that cookies cannot be accessed from JavaScript. This will protect you from malicious scripts that read cookies and send them to someone else's server.  Now open the developer console in your browser and execute the expression:
 
-\begin{english}
-  \begin{js}
+\begin{js}
 document.cookie
 "ring-session=<uuid>; seen=true"
-  \end{js}
-\end{english}
+\end{js}
 
 \noindent Modify the \verb|cookies*| variable so that \verb|seen| has an attribute:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (let [cookies*
       (assoc cookies "seen"
         {:value true
          :http-only true})]
   ...)
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (let [cookies* (assoc cookies "seen"
                       {:value true :http-only true})]
   ...)
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
 Now JavaScript will not see the value of \verb|seen|:
 
-\begin{english}
-  \begin{js}
+\begin{js}
 document.cookie
 "ring-session=<uuid>"
-  \end{js}
-\end{english}
+\end{js}
 
 The \verb|:secure| attribute means that cookies are only transmitted over a secure connection using SSL. You can neglect it during development, but it is a must when your application goes into production. Apps without SSL are insecure, and browsers point this out to users.
 
@@ -1519,8 +1369,7 @@ Next, let's look at an example with a hit counter. We will count how many times 
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[ring.middleware.session
            :refer [wrap-session]])
 
@@ -1536,13 +1385,11 @@ Next, let's look at an example with a hit counter. We will count how many times 
 
 (def app (-> page-counter
              wrap-session))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[ring.middleware.session :refer [wrap-session]])
 
 (defn page-counter [request]
@@ -1554,8 +1401,7 @@ Next, let's look at an example with a hit counter. We will count how many times 
 
 (def app (-> page-counter
              wrap-session))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -1574,11 +1420,9 @@ JSON format is used to transmit data. Its basic data types are number, string, b
 
 Ring offers a few middleware functions for JSON. For convenience, they were placed in the separate library Ring-JSON. Now we'll add a dependency:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 [ring/ring-json "0.4.0"]
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \index{middleware!wrap-json-response}
 \index{HTTP!JSON}
@@ -1589,8 +1433,7 @@ Let's have a look at the API for reading user info. If we find it by number, we 
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn page-data [request]
   (let [user-id (-> request :params :id)
         user (get-user-by-id user-id)]
@@ -1600,13 +1443,11 @@ Let's have a look at the API for reading user info. If we find it by number, we 
        :body
        {:error_code "MISSING_USER"
         :error_msg "No such user"}})))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn page-data [request]
   (let [user-id (-> request :params :id)]
     (if-let [user (get-user-by-id user-id)]
@@ -1614,23 +1455,20 @@ Let's have a look at the API for reading user info. If we find it by number, we 
       {:status 404
        :body {:error_code "MISSING_USER"
               :error_message "No such user"}})))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
 \noindent In both cases, the programmer does not need to encode the data manually; \verb|wrap-json-response| does it.
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[ring.middleware.json
            :refer [wrap-json-response]])
 
 (def app (-> page-data
              wrap-params+
              wrap-json-response))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 Now your should run \verb|app| and switch to browser. Open the Network tab in the developer panel. Pay attention to the request to the server, and especially the response headers and body. If it's JSON, the browser will parse the data and display it as a tree.
 
@@ -1640,8 +1478,7 @@ The difference between these middleware functions is where they put data. \verb|
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[ring.middleware.json
            :refer [wrap-json-body]])
 
@@ -1657,13 +1494,11 @@ The difference between these middleware functions is where they put data. \verb|
   (->
     page-body
     (wrap-json-body {:keywords? true})))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[ring.middleware.json :refer [wrap-json-body]])
 
 (defn page-body [request]
@@ -1676,8 +1511,7 @@ The difference between these middleware functions is where they put data. \verb|
 
 (def app (-> page-body
              (wrap-json-body {:keywords? true})))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -1686,16 +1520,14 @@ The difference between these middleware functions is where they put data. \verb|
 
 You will need the special program to send the JSON to a server. You can use the \verb|cURL| utility or the \footurl{Postman}{https://www.postman.com}[Post\-man][-8mm] graphic application.  Let's see an example with \verb|cURL|:
 
-\begin{english}
-  \begin{bash}
+\begin{bash}
 curl --request POST
      --header "Content-Type:
                  application/json"
      --data '{"username":"John",
                       "city":"NY"}'
      http://localhost:8080/
-  \end{bash}
-\end{english}
+\end{bash}
 
 \verb|Wrap-json-params| acts a little differently~--- it writes data to the \verb|:json-params| field. If a map is in the data, it supplements the \verb|:params| field. Why?
 
@@ -1733,8 +1565,7 @@ In responses, header keys must also be strings. If a keyword is specified, Jetty
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require
  '[clojure.walk :refer [keywordize-keys
                         stringify-keys]])
@@ -1746,13 +1577,11 @@ In responses, header keys must also be strings. If a keyword is specified, Jetty
         handler
         (update :headers
                 stringify-keys))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[clojure.walk :refer
            [keywordize-keys stringify-keys]])
 
@@ -1762,8 +1591,7 @@ In responses, header keys must also be strings. If a keyword is specified, Jetty
         (update :headers keywordize-keys)
         handler
         (update :headers stringify-keys))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -1771,8 +1599,7 @@ Further down the stack, the application treats headers like keywords. In the exa
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn app* [request]
   (let [{:keys [headers]} request
         {:keys [host]} headers]
@@ -1782,13 +1609,11 @@ Further down the stack, the application treats headers like keywords. In the exa
                 "</h1>")}))
 
 (def app (wrap-headers-kw app*))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn app* [request]
   (let [{:keys [headers]} request
         {:keys [host]} headers]
@@ -1797,8 +1622,7 @@ Further down the stack, the application treats headers like keywords. In the exa
      :body (format "<h1>Host header: %s</h1>" host)}))
 
 (def app (wrap-headers-kw app*))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -1822,8 +1646,7 @@ Let's write a wrapper for ID. Headers are keywords since \verb|wrap-headers-kw| 
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (import 'java.util.UUID)
 
 (defn wrap-request-id [handler]
@@ -1843,13 +1666,11 @@ Let's write a wrapper for ID. Headers are keywords since \verb|wrap-headers-kw| 
           (assoc-in [:headers
                      :x-request-id]
                     uuid)))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (import 'java.util.UUID)
 
 (defn wrap-request-id [handler]
@@ -1862,8 +1683,7 @@ Let's write a wrapper for ID. Headers are keywords since \verb|wrap-headers-kw| 
           handler
           (assoc :request-id uuid)
           (assoc-in [:headers :x-request-id] uuid)))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -1877,24 +1697,20 @@ IDs are stored in headers, but duplicated in the request and response \verb|:req
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn some-handler [req]
   (let [{:keys [params request-id]} req]
     (log/info "Request id: %s"
               request-id)))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn some-handler [request]
   (let [{:keys [params request-id]} request]
     (log/info "Request id: %s" request-id)))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -1909,8 +1725,7 @@ This wrapper adds the current user into the header. In this case, we are looking
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn wrap-current-user [handler]
   (fn [request]
     (let [user-id (-> request
@@ -1922,13 +1737,11 @@ This wrapper adds the current user into the header. In this case, we are looking
       (-> request
           (assoc :user user)
           handler))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn wrap-current-user [handler]
   (fn [request]
     (let [user-id (-> request :session :user-id)
@@ -1937,8 +1750,7 @@ This wrapper adds the current user into the header. In this case, we are looking
       (-> request
           (assoc :user user)
           handler))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -1967,8 +1779,7 @@ Let our application be available only by authorization. With \verb|wrap-current-
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn wrap-auth-user-only [handler]
   (fn [request]
     (if (:user request)
@@ -1977,13 +1788,11 @@ Let our application be available only by authorization. With \verb|wrap-current-
        :headers
        {"content-type" "text/plain"}
        :body "Sign in to get access."})))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn wrap-auth-user-only [handler]
   (fn [request]
     (if (:user request)
@@ -1991,8 +1800,7 @@ Let our application be available only by authorization. With \verb|wrap-current-
       {:status 403
        :headers {"content-type" "text/plain"}
        :body "Please sign in to access this page."})))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -2012,8 +1820,7 @@ It's up to you to decide what to do with the exception. Below we show a middlewa
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn wrap-exception [handler]
   (fn [{:keys [uri request-method]
         :as request}]
@@ -2027,13 +1834,11 @@ It's up to you to decide what to do with the exception. Below we show a middlewa
            :headers
            {"content-type" "text/plain"}
            :body "Sorry, try later."}))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn wrap-exception [handler]
   (fn [request]
     (try
@@ -2045,8 +1850,7 @@ It's up to you to decide what to do with the exception. Below we show a middlewa
           {:status 500
            :headers {"content-type" "text/plain"}
            :body "Sorry, please try later."})))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -2073,41 +1877,35 @@ The implementation depends on how we build the routes. Compojure offers a middle
 
 Let's build separate routes with personal information:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defroutes app-account
   (GET "/cart"    _ "cart")
   (GET "/orders"  _ "orders")
   (GET "/profile" _ "profile"))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \noindent Let's mount it to the \verb|/account| prefix and wrap it in an access check.
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defroutes app
   (GET "/"     _ "index")
   (GET "/help" _ "help")
   (context "/account" []
     (wrap-routes app-account
                  wrap-auth-user-only)))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defroutes app
   (GET "/"     _ "index")
   (GET "/help" _ "help")
   (context "/account" []
     (wrap-routes app-account wrap-auth-user-only)))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -2131,39 +1929,33 @@ The naive solution is to read the file with the \verb|slurp| function and return
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn page-terminals [request]
   {:status 200
    :headers
    {"content-type" "application/json"}
    :body (slurp "terminals.json")})
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn page-terminals [request]
   {:status 200
    :headers {"content-type" "application/json"}
    :body (slurp "terminals.json")})
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
 The disadvantage of this solution is that we are reading the entire file into memory. The larger the file, the more resources we consume. If a client reads data slowly, the data will hang in memory for nothing. We won't start the response until the entire file is in memory. This method is not suitable for large files due to memory consumption. Also, \verb|slurp| reads a string from a file that is not suitable for binaries (images, PDF). In the example below, the browser will receive corrupted content.
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn app [request]
   {:status 200
    :headers {"content-type" "image/png"}
    :body (slurp "/path/to/image.png")})
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \index{formats!PDF}
 \index{modules!clojure.java.io}
@@ -2172,8 +1964,7 @@ RING allows that the response body is a file, an instance of the \verb|java.io.F
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[clojure.java.io :as io])
 
 (defn page-terminals
@@ -2182,13 +1973,11 @@ RING allows that the response body is a file, an instance of the \verb|java.io.F
    :headers
    {"content-type" "application/json"}
    :body (io/file "terminals.json")})
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[clojure.java.io :as io])
 
 (defn page-terminals
@@ -2196,8 +1985,7 @@ RING allows that the response body is a file, an instance of the \verb|java.io.F
   {:status 200
    :headers {"content-type" "application/json"}
    :body (io/file "terminals.json")})
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -2209,25 +1997,21 @@ When there are several files, it is tedious to produce a rule for each of them:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defroutes app
   (GET "/terminals.json"
        req (page-terminals req))
   (GET "/departments.json"
        req (page-departments req)))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defroutes app
   (GET "/terminals.json"   request (page-terminals request))
   (GET "/departments.json" request (page-departments request)))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -2237,27 +2021,23 @@ You can match the path to a file and its folder. The \verb|wrap-file| middleware
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[ring.middleware.file
            :refer [wrap-file]])
 
 (def app
   (-> app-naked
       (wrap-file "/var/www/public")))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[ring.middleware.file :refer [wrap-file]])
 
 (def app (-> app-naked
              (wrap-file "/var/www/public")))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -2271,15 +2051,13 @@ The advantage of such resources is that the application does not depend on third
 
 \index{middleware!wrap-resource}
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[ring.middleware.resource
            :refer [wrap-resource]])
 
 (def app (-> app-naked
              (wrap-resource "public")))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 By analogy with \verb|wrap-files|, it takes a path, relative to which we need to search for resources. Everything we said about prefixes is also valid for resources. For the \verb|/static/img/logo.png| link to lead to the required resource, it must be at \verb|resources/public/static/img/logo.png|. We'll go into more detail about resources in the following chapters \page{resources}.
 
@@ -2290,8 +2068,7 @@ The save window appears because the \verb|Content-Type| header for files and res
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[ring.middleware.content-type
            :refer [wrap-content-type]])
 
@@ -2304,13 +2081,11 @@ The save window appears because the \verb|Content-Type| header for files and res
   (-> app-naked
       (wrap-content-type
         {:mime-types mime-types})))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[ring.middleware.content-type
            :refer [wrap-content-type]])
 
@@ -2321,8 +2096,7 @@ The save window appears because the \verb|Content-Type| header for files and res
          {"json" "application/json"
           "png" "image/png"
           "xls" "application/vnd.ms-excel"}})))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -2342,8 +2116,7 @@ Let's write a proxy application that will return the Yandex home page. In the re
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[clj-http.client :as client])
 
 (defn app-proxy [req]
@@ -2356,13 +2129,11 @@ Let's write a proxy application that will return the Yandex home page. In the re
      :headers (select-keys
                 headers ["Content-Type"])
      :body body}))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[clj-http.client :as client])
 
 (defn app-proxy [request]
@@ -2372,8 +2143,7 @@ Let's write a proxy application that will return the Yandex home page. In the re
     {:status status
      :headers headers*
      :body body}))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -2381,8 +2151,7 @@ Run \verb|app-proxy| in the browser. You should see the Yandex home page, althou
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn app-proxy [request]
   (-> "https://ya.ru"
       (client/get {:stream? true})
@@ -2390,20 +2159,17 @@ Run \verb|app-proxy| in the browser. You should see the Yandex home page, althou
                     :body :headers])
       (update :headers
         select-keys ["Content-Type"])))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn app-proxy [request]
   (-> "https://ya.ru"
       (client/get {:stream? true})
       (select-keys [:status :body :headers])
       (update :headers select-keys ["Content-Type"])))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 

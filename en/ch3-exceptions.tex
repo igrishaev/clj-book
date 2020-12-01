@@ -134,25 +134,21 @@ Conditions imposed by company management to help develop their business are know
 \ifx\DEVICETYPE\MOBILE
 
 \index{languages!Python}
-\begin{english}
-  \begin{python}
+\begin{python}
 def get-user(id):
   url = "http://api.company.com/" + \
         "user/" + str(id)
   return http.GET(url).body.json()
-  \end{python}
-\end{english}
+\end{python}
 
 \else
 
 \index{languages!Python}
-\begin{english}
-  \begin{python}
+\begin{python}
 def get-user(id):
   url = "http://api.company.com/user/" + str(id)
   return http.GET(url).body.json()
-  \end{python}
-\end{english}
+\end{python}
 
 \fi
 
@@ -165,8 +161,7 @@ Let us place \verb|try/catch| in our code. If the exception came from technical 
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{python}
+\begin{python}
 def get-user(id):
   try:
     url = "http://api.company.com/" + \
@@ -175,13 +170,11 @@ def get-user(id):
   except Exception as e:
     raise Exception ("Cannot fetch " + \
           "user " + str(id)) from e
-  \end{python}
-\end{english}
+\end{python}
 
 \else
 
-\begin{english}
-  \begin{js}
+\begin{js}
 def get_user(id):
   try:
     url = "http://api.company.com/user/" + str(id)
@@ -189,8 +182,7 @@ def get_user(id):
   except Exception as e:
     raise Exception("Cannot fetch user " + str(id)) from e
 
-  \end{js}
-\end{english}
+\end{js}
 
 \fi
 
@@ -208,12 +200,10 @@ To get acquainted with the exception, let's provoke it. A surefire trick is to d
 
 \index{divide by zero}
 
-\begin{english}
-  \begin{text}
+\begin{text}
 Execution error (ArithmeticException)...
 Divide by zero
-  \end{text}
-\end{english}
+\end{text}
 
 This is the bug report. It looks different depending on the editor and settings. Emacs with the CIDER module will open the \texttt{*cider\--error*} buffer with detailed information.
 
@@ -227,14 +217,12 @@ To catch the exception, place the code in the \verb|try| form. It is followed by
 
 \index{arithmetic}
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (try
   (/ 1 0)
   (catch ArithmeticException e
     (println "Weird arithmetics")))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 The \verb|catch| form takes a class and an arbitrary symbol. An exception will be bound with it if control is taken to that branch. Next goes the arbitrary code. There, the exception is available as the local variable \verb|e|.
 
@@ -243,42 +231,36 @@ The \verb|catch| form takes a class and an arbitrary symbol. An exception will b
 We display the text about the failure of calculations.
 This explanation is of little use. The \verb|.getMessage| method will return the message assigned to the exception when it was created. Since version 1.10, Clojure offers the \verb|ex-message| function that does the same:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (try
   (/ 1 0)
   (catch ArithmeticException e
     (println (ex-message e))))
 ;; Divide by zero
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 The \verb|ArithmeticException| class fails to catch some computation errors.
 What will happen if you add 1 to \verb|nil|? Even if we put the calculations in \verb|try/catch|, we won't catch the exception:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (try
   (+ 1 nil)
   (catch ArithmeticException e
     (println "Weird arithmetics")))
 ;;Execution error (NullPointerException)
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (try
   (+ 1 nil)
   (catch ArithmeticException e
     (println "Weird arithmetics")))
 ;; Execution error (NullPointerException)...
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -291,16 +273,14 @@ That is because the \verb|ArithmeticException| and \verb|NullPointerException| c
 
 The \verb|try| form takes several \verb|catch| ones. Let's catch both cases :
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (try
   (+ 1 nil)
   (catch ArithmeticException e
     (println "Weird arithmetics"))
   (catch NullPointerException e
     (println "You've got a null value")))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 The macro iterates over the classes from each \verb|catch| and stops at the first one that matches. The \verb|try| will result in the last expression from the \verb|catch| block that matched. In the example above, the result will be \verb|nil| because \verb|println| will return it. If no branches match, the exception will continue to go up the call stack.
 
@@ -308,15 +288,13 @@ The macro iterates over the classes from each \verb|catch| and stops at the firs
 
 The higher the exception class in the tree, the more cases it covers. If you replace \verb|ArithmeticException| with \verb|Throwable|, the branch will catch any exception, whether it's division by zero or \verb|NPE|:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (try
   (/ 1 0)
   (+ 1 nil)
   (catch Throwable e
     (println "I catch everything!")))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 Unlike Java, Clojure doesn't have strict rules about which exceptions to catch. That's up to you. Common sense dictates that intercepting with \verb|Throwable| should not be used: there will be a false impression that the code works without errors.
 
@@ -330,22 +308,18 @@ Sometimes an exception is thrown deliberately to report an abnormal situation. T
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (let [e (new Exception
           "Something is wrong!")]
   (throw e))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (let [e (new Exception "Something is wrong!")]
   (throw e))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -355,8 +329,7 @@ The message above is not informative. But even if we indicated that the problem 
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn add [a b]
   (if (and a b)
     (+ a b)
@@ -365,20 +338,17 @@ The message above is not informative. But even if we indicated that the problem 
         (format
           "Value error, a: %s, b: %s"
           a b)))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn add [a b]
   (if (and a b)
     (+ a b)
     (let [message (format "Value error, a: %s, b: %s" a b)]
       (throw (new Exception message)))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -387,32 +357,26 @@ Calling \verb|add| with \verb|nil| makes the message clearer:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 ;; Execution error at book.exceptions/add
 ;; Value error, a: 1, b: null
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 Execution error at book.exceptions/add (exceptions.clj:86).
 Value error, a: 1, b: null
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
 The \verb|format| function is useful in that it displays \verb|nil| as \verb|null|. That is its advantage over \verb|str|, which converts \verb|nil| to an empty string. The \verb|str| variant looks like this:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (str "Value error, a:" 1 ", b: " nil)
 ;; Value error, a:1, b:
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \noindent
 The text is misleading: is \verb|b| an empty string or \verb|nil|? In the case of \verb|format|, you won't get confused.
@@ -430,8 +394,7 @@ The key \verb|ex-info| function creates an instance of \verb|ExceptionInfo|. The
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (throw (ex-info
         "Cannot fetch user."
         {:user-id 42
@@ -439,21 +402,18 @@ The key \verb|ex-info| function creates an instance of \verb|ExceptionInfo|. The
          :http-method "GET"
          :http-url
          "https://host.com/users/42"}))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (throw (ex-info
         "Cannot fetch user."
         {:user-id 42
          :http-status 404
          :http-method "GET"
          :http-url "https://host.com/users/42"}))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -470,8 +430,7 @@ Let's split it into fields and build a message.
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (try
   (get-user 42)
   (catch clojure.lang.ExceptionInfo e
@@ -480,21 +439,18 @@ Let's split it into fields and build a message.
       (format "HTTP error: %s %s"
         http-method http-url))))
 ;; HTTP error: GET https://host.com...
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (try
   (get-user 42)
   (catch clojure.lang.ExceptionInfo e
     (let [{:keys [http-method http-url]} (ex-data e)]
       (format "HTTP error: %s %s" http-method http-url))))
 ;; HTTP error: GET https://host.com/users/42
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -504,55 +460,49 @@ It is still unclear when to throw exceptions and when to check only. Let's look 
 
 There is no point in throwing exceptions when walking through collections. \verb|Nil| behaves like an empty collection of the type that the function accepts.
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (assoc nil :test 42)
 (update nil :test (fnil inc 0))
 (into nil [1 2 3])
 (merge nil {:test 42})
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \noindent
 The expressions above should return lists and maps. The key for \verb|nil| will return \verb|nil|. Parsing a map or vector will set the variables to \verb|nil| if the fields don't match. Both of the \verb|let| directives below will create a vector of three \verb|nil| references.
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (let [{:keys [a b c]} nil]
   [a b c])
-  \end{clojure}
+\end{clojure}
 
 \splitter
 
-  \begin{clojure}
+\begin{clojure}
 (let [[a b c] nil]
   [a b c])
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
 \noindent
 \begin{tabular}{ @{}p{5cm} @{}p{5cm} }
 
-  \begin{clojure}
+\begin{clojure}
 (let [{:keys [a b c]} nil]
   [a b c])
-  \end{clojure}
+\end{clojure}
 
 &
 
-  \begin{clojure}
+\begin{clojure}
 (let [[a b c] nil]
   [a b c])
-  \end{clojure}
+\end{clojure}
 
 \end{tabular}
 
-\end{english}
 
 \fi
 
@@ -567,8 +517,7 @@ When in doubt about a collection, use a spec. The \verb|s/valid?| and \verb|s/co
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[clojure.spec.alpha :as s])
 
 (s/def ::data (s/coll-of int?))
@@ -579,13 +528,11 @@ When in doubt about a collection, use a spec. The \verb|s/valid?| and \verb|s/co
   (throw (ex-info
            "Some item is not an integer"
            {:explain explain})))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[clojure.spec.alpha :as s])
 
 (s/def ::data (s/coll-of int?))
@@ -593,8 +540,7 @@ When in doubt about a collection, use a spec. The \verb|s/valid?| and \verb|s/co
 (when-let [explain (s/explain-data ::data [1 2 nil])]
   (throw (ex-info "Some item is not an integer"
                   {:explain explain})))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -605,8 +551,7 @@ For the sake of shortness, use the assert \verb|assert| from Spec. It does the s
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[clojure.spec.alpha :as s])
 
 (s/def ::ne-string
@@ -621,13 +566,11 @@ For the sake of shortness, use the assert \verb|assert| from Spec. It does the s
 
 (s/check-asserts false)
 (s/assert ::ne-string nil) ;; nil
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[clojure.spec.alpha :as s])
 
 (s/def ::ne-string (s/and string? not-empty))
@@ -641,8 +584,7 @@ For the sake of shortness, use the assert \verb|assert| from Spec. It does the s
 
 (s/check-asserts false)
 (s/assert ::ne-string nil) ;; nil
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -659,8 +601,7 @@ Let's say our HTTP client doesn't throw an exception. Let's do it manually~--- c
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn authenticate-user [user-id]
   (let [url (str
               "http://auth.company.com/"
@@ -674,13 +615,11 @@ Let's say our HTTP client doesn't throw an exception. Let's do it manually~--- c
                {:http-url url
                 :http-status status
                 :http-body body})))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn authenticate-user [user-id]
   (let [url (str "http://auth.company.com/" user-id)
         {:keys [status body]} (client/get url)]
@@ -690,8 +629,7 @@ Let's say our HTTP client doesn't throw an exception. Let's do it manually~--- c
                       {:http-url url
                        :http-status status
                        :http-body body})))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -707,8 +645,7 @@ Now let's see how to work with exception chains exactly. The \verb|ex-info| func
 
 \label{re-throw-example}
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn divide [a b]
   (try
     (/ a b)
@@ -717,47 +654,40 @@ Now let's see how to work with exception chains exactly. The \verb|ex-info| func
                "Calculation error"
                {:a a :b b}
                e)))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 The \verb|ex-cause| function returns a cause of an exception. If there is no cause, we'll get \verb|nil|.
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (try
   (divide 1 0)
   (catch Exception e
     (println (ex-message e))
     (println (ex-message
                (ex-cause e)))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (try
   (divide 1 0)
   (catch Exception e
     (println (ex-message e))
     (println (ex-message (ex-cause e)))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
 \noindent
 The code will output:
 
-\begin{english}
-  \begin{text}
+\begin{text}
 Calculation error
 Divide by zero
-  \end{text}
-\end{english}
+\end{text}
 
 Let's write a function that returns an exception list in descending order of precedence. The original exception comes first, the cause of the exception comes second, then~--- the cause of the cause, and so on. Using the \verb|loop| shape is the simplest means of doing this:
 
@@ -767,8 +697,7 @@ Let's write a function that returns an exception list in descending order of pre
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn ex-chain [e]
   (loop [e e
          result []]
@@ -776,21 +705,18 @@ Let's write a function that returns an exception list in descending order of pre
       result
       (recur (ex-cause e)
         (conj result e)))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn ex-chain [e]
   (loop [e e
          result []]
     (if (nil? e)
       result
       (recur (ex-cause e) (conj result e)))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -800,8 +726,7 @@ To experiment, let's declare the variable \verb|e|. That is a three-link chain o
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def e
   (ex-info
    "Get user info error"
@@ -813,13 +738,11 @@ To experiment, let's declare the variable \verb|e|. That is a three-link chain o
        "HTTP error"
        {:method "POST"
         :url "http://api.site.com"}))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def e
   (ex-info
    "Get user info error"
@@ -829,8 +752,7 @@ To experiment, let's declare the variable \verb|e|. That is a three-link chain o
             (ex-info "HTTP error"
                      {:method "POST"
                       :url "http://api.site.com"}))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -840,22 +762,18 @@ We got an exception tree as a result, but it is not always convenient to work wi
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (map ex-message (ex-chain e))
 ("Get user info error"
  "Auth error" "HTTP error")
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (map ex-message (ex-chain e))
 ("Get user info error" "Auth error" "HTTP error")
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -864,33 +782,27 @@ And so~--- print line by line (we'll get a column of the same lines):
 
 \index{printing!exceptions}
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (doseq [e (ex-chain e)]
   (-> e ex-message println))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 Let's express \verb|ex-chain| in short through the \verb|iterate| function. This function applies another one to the argument step by step. We need the \verb|take-while| constraint to stop at the first empty element.
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn ex-chain [^Exception e]
   (take-while some?
     (iterate ex-cause e)))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn ex-chain [^Exception e]
   (take-while some? (iterate ex-cause e)))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -906,8 +818,7 @@ The last exception in the chain is called the \emph{root}. For convenience, \ver
 
  \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 #error {
  :cause HTTP error
  :data {:method POST,
@@ -928,13 +839,11 @@ The last exception in the chain is called the \emph{root}. For convenience, \ver
   [clojure.lang.AFn applyTo AFn.java 144]
   [clojure.lang.Compiler......]
   ..........]}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 #error {
  :cause HTTP error
  :data {:method POST, :url http://api.site.com}
@@ -953,8 +862,7 @@ The last exception in the chain is called the \emph{root}. For convenience, \ver
   [clojure.lang.AFn applyTo AFn.java 144]
   [clojure.lang.Compiler$InvokeExpr eval Compiler.java 3701]
   ..........]}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -971,24 +879,20 @@ The \verb|clojure.stacktrace| package has several functions for printing excepti
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (clojure.stacktrace/print-throwable e)
 ;; clojure.lang.ExceptionInfo:
 ;; Get user info error
 ;; {:user-id 42}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (clojure.stacktrace/print-throwable e)
 clojure.lang.ExceptionInfo: Get user info error
 {:user-id 42}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -996,22 +900,18 @@ The \verb|with-out-str| macro intercepts the output to the console. The code bel
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (with-out-str
   (clojure.stacktrace/print-stack-trace
     e))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (with-out-str
   (clojure.stacktrace/print-stack-trace e))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -1037,44 +937,36 @@ Logging solves the above problems. This system gets messages and sends them to t
 
 \index{libraries!clojure.tools.logging}
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 [org.clojure/tools.logging "0.4.1"]
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \noindent
 Let's write a simple message:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require
   '[clojure.tools.logging :as log])
 (log/info "A message from my module")
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[clojure.tools.logging :as log])
 (log/info "A message from my module")
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
 \noindent
 A line will appear in REPL. By default, the log adds a severity level. In our case, this is an informational message, \verb|INFO|.
 
-\begin{english}
-  \begin{text}
+\begin{text}
 INFO: A message from my module
-  \end{text}
-\end{english}
+\end{text}
 
 Clojure logging has two levels. The first one is the entry point, the \verb|log/info|, \verb|log/error|, and other macros. The second level is called the backend. It is a Java library that does the bulk of the work: writes messages to files, sends them over the network, and so on.
 
@@ -1090,11 +982,9 @@ To pick up the required backend, add it to the dependencies. The \verb|Logback| 
 
 Add Logback to your project:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 [ch.qos.logback/logback-classic "1.2.3"]
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \index{formats!XML}
 
@@ -1102,8 +992,7 @@ Logging libraries look for settings in standard locations. If you put an XML fil
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{xml}
+\begin{xml}
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
   <appender name="STDOUT"
@@ -1119,13 +1008,11 @@ Logging libraries look for settings in standard locations. If you put an XML fil
     <appender-ref ref="STDOUT"/>
   </root>
 </configuration>
-  \end{xml}
-\end{english}
+\end{xml}
 
 \else
 
-\begin{english}
-  \begin{xml}
+\begin{xml}
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
   <appender name="STDOUT" class="...ConsoleAppender">
@@ -1138,8 +1025,7 @@ Logging libraries look for settings in standard locations. If you put an XML fil
     <appender-ref ref="STDOUT"/>
   </root>
 </configuration>
-  \end{xml}
-\end{english}
+\end{xml}
 
 \fi
 
@@ -1149,22 +1035,18 @@ So, we have set the appender to output to the console. The \verb|pattern| tag co
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (log/info "Hello Logback!")
 ;; 2019-05-03 17:36:04,001
 ;; INFO book.exceptions - Hello Logback!
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (log/info "Hello Logback!")
 ;; 2019-05-03 17:36:04,001 INFO book.exceptions - Hello Logback!
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -1174,8 +1056,7 @@ The \verb|log/info|, \verb|log/error|, and other macros first argument might be 
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (log/error e "HTTP Error")
 
 ;; 2019-05-03 17:41:03,913
@@ -1183,13 +1064,11 @@ The \verb|log/info|, \verb|log/error|, and other macros first argument might be 
 ;; clojure.lang.ExceptionInfo:
 ;; Get user info error
 ;; at java.lang.Thread.run .........
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (log/error e "HTTP Error")
 
 2019-05-03 17:41:03,913 ERROR book.exceptions - HTTP Error
@@ -1201,8 +1080,7 @@ Caused by: clojure.lang.ExceptionInfo: Auth error
 Caused by: clojure.lang.ExceptionInfo: HTTP error
     at clojure.lang.Compiler$InvokeExpr.eval(Compiler.java:3701)
     ... 31 common frames omitted
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -1223,8 +1101,7 @@ Let's write a function for logging errors. This wrapper over \verb|log/error| ch
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn ex-print
   [^Throwable e]
   (let [indent "  "]
@@ -1237,13 +1114,11 @@ Let's write a function for logging errors. This wrapper over \verb|log/error| ch
       (when-let [data (ex-data e)]
         (print indent)
         (clojure.pprint/pprint data)))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn ex-print
   [^Throwable e]
   (let [indent "  "]
@@ -1254,8 +1129,7 @@ Let's write a function for logging errors. This wrapper over \verb|log/error| ch
       (when-let [data (ex-data e)]
         (print indent)
         (clojure.pprint/pprint data)))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -1263,8 +1137,7 @@ The result looks more attractive than the trace pyramid. The data that led to th
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 clojure.lang.ExceptionInfo
   Get user info error
   {:user-id 42}
@@ -1275,13 +1148,11 @@ clojure.lang.ExceptionInfo
   HTTP error
   {:method "POST",
    :url "http://api.site.com"}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 clojure.lang.ExceptionInfo
   Get user info error
   {:user-id 42}
@@ -1291,8 +1162,7 @@ clojure.lang.ExceptionInfo
 clojure.lang.ExceptionInfo
   HTTP error
   {:method "POST", :url "http://api.site.com"}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -1301,50 +1171,42 @@ clojure.lang.ExceptionInfo
 
 To intercept printing to the screen, we wrap the call of \verb|ex-print| in \verb|with-out-str|:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn log-error
   [^Throwable e & [^String message]]
   (log/error
    (with-out-str
      (println (or message "Error"))
      (ex-print e))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 We pass a message to \verb|log-error| as the second argument. If it does not exist, write a neutral Error. To prevent the message and body from sticking together, we use \verb|println| to break a line. Here are some examples:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (log-error e)
 (log-error e "HTTP Error 500")
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 The second call will log the following:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{text}
+\begin{text}
 2019-05-03 19:00:05,590 ERROR
 book.exceptions - HTTP Error 500
 clojure.lang.ExceptionInfo
   Get user info error
   ...
-  \end{text}
-\end{english}
+\end{text}
 
 \else
 
-\begin{english}
-  \begin{text}
+\begin{text}
 2019-05-03 19:00:05,590 ERROR book.exceptions - HTTP Error 500
 clojure.lang.ExceptionInfo
   Get user info error
   ...
-  \end{text}
-\end{english}
+\end{text}
 
 \fi
 
@@ -1352,21 +1214,17 @@ Modify the \verb|log-error| so that the message will be a template, and the func
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (log-error e
   "Cannot find user %s, status %s"
   42 404)
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (log-error e "Cannot find user %s, status %s" 42 404)
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -1401,11 +1259,9 @@ An application does not collect these data on its own but rather uses libraries.
 
 \footurl{Sentry-clj}{https://github.com/getsentry/sentry-clj}[Sentry-clj][-22mm] and \footurl{Exoscale Raven}{https://github.com/exoscale/raven}[Exoscale Raven] libraries are written for Clojure. The former relies on the official Java library. Add it to your project:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 [io.sentry/sentry-clj "0.7.2"]
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \index{DSN}
 
@@ -1413,36 +1269,30 @@ Set the required DSN to the library. DSN is a project address in Sentry. The pro
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[sentry-clj.core :as sentry])
 
 (def DSN
  "https://user:pass@sentry.io/projectid")
 (sentry/init! DSN)
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[sentry-clj.core :as sentry])
 
 (def DSN "https://user:pass@sentry.io/project-id")
 (sentry/init! DSN)
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
 Once the library knows the DSN, send the message using the \verb|send-event| function. We're especially interested in the \verb|:throwable| parameter that gets an exception.
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (sentry/send-event {:throwable e})
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 In response, we will receive the event number, and a new entry will appear in the project.
 Suppose we passed in an instance of \verb|e|~--- the chain of three exceptions~--- that we've defined above \page{e-sample}. In the Sentry interface, we will see information about each link. The \verb|:extra| field will contain the data of the top-level exception~--- the map \verb|{:user-id 42}|.
@@ -1453,21 +1303,18 @@ Suppose we passed in an instance of \verb|e|~--- the chain of three exceptions~-
 
 The Exoscale Raven library is written in Clojure and therefore takes the language nuances into account. Starting with the recently released version, it transmits the complete exception data. Include it in the project and send an exception \verb|e|:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 [exoscale/raven "0.4.13"] ;; project.clj
 
 (require '[raven.client :as raven])
 (raven/capture! DSN e)
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \begin{listing}[ht!]
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{json}
+\begin{json}
 [ {
   "type": "clojure.lang.ExceptionInfo",
   "message": "Get user info error",
@@ -1485,13 +1332,11 @@ The Exoscale Raven library is written in Clojure and therefore takes the languag
   "at": ["clojure.lang.AFn",
          "applyToHelper", "AFn.java"...]
 } ]
-  \end{json}
-\end{english}
+\end{json}
 
 \else
 
-\begin{english}
-  \begin{json}
+\begin{json}
 [ {
   "type": "clojure.lang.ExceptionInfo",
   "message": "Get user info error",
@@ -1507,8 +1352,7 @@ The Exoscale Raven library is written in Clojure and therefore takes the languag
   },
   "at": ["clojure.lang.AFn", "applyToHelper", "AFn.java", 160]
 } ]
-  \end{json}
-\end{english}
+\end{json}
 
 \fi
 
@@ -1529,8 +1373,7 @@ Map items are strings and characters, so the result can be easily written in JSO
 
 Now that you are familiar with Sentry, let's write a protective decorator for a Ring application. It catches errors, sends them to Sentry, and returns a neutral response that the request failed. The decorator should be at the top of the middleware stack.
 
-\begin{english}
-  \begin{clojure/lines*}{firstnumber=1}
+\begin{clojure/lines*}{firstnumber=1}
 (require '[raven.client :as r])
 
 (defn wrap-exception
@@ -1538,8 +1381,7 @@ Now that you are familiar with Sentry, let's write a protective decorator for a 
   (fn [request]
     (try
       (handler request)
-  \end{clojure/lines*}
-\end{english}
+\end{clojure/lines*}
 
 \wavebottom
 
@@ -1550,8 +1392,7 @@ If you need to brush up on how middleware and decorators work, go back to the ch
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure/lines*}{firstnumber=8}
+\begin{clojure/lines*}{firstnumber=8}
 (catch Exception e
   (let [event
         (-> nil
@@ -1561,13 +1402,11 @@ If you need to brush up on how middleware and decorators work, go back to the ch
             (r/add-extra!
               {:something "else"}))]
     (try @(r/capture! DSN event))))
-  \end{clojure/lines*}
-\end{english}
+\end{clojure/lines*}
 
 \else
 
-\begin{english}
-  \begin{clojure/lines*}{firstnumber=8}
+\begin{clojure/lines*}{firstnumber=8}
       (catch Exception e
         (let [event (-> nil
                         (r/add-exception! e)
@@ -1575,8 +1414,7 @@ If you need to brush up on how middleware and decorators work, go back to the ch
                         (r/add-extra! {:something "else"}))]
           (try
             @(r/capture! DSN event))))
-  \end{clojure/lines*}
-\end{english}
+\end{clojure/lines*}
 
 \fi
 
@@ -1588,8 +1426,7 @@ For the sake of completeness, we are passing to Sentry not just an exception, bu
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure/lines*}{firstnumber=17}
+\begin{clojure/lines*}{firstnumber=17}
 (catch Exception e-sentry
   (log/errorf e-sentry
     "Sentry error: %s" DSN)
@@ -1598,21 +1435,18 @@ For the sake of completeness, we are passing to Sentry not just an exception, bu
   {:status 500
    :body  "Internal error, please try
    later"})))))))
-  \end{clojure/lines*}
-\end{english}
+\end{clojure/lines*}
 
 \else
 
-\begin{english}
-  \begin{clojure/lines*}{firstnumber=15}
+\begin{clojure/lines*}{firstnumber=15}
             (catch Exception e-sentry
               (log/errorf e-sentry "Sentry error: %s" DSN)
               (log/error e "Request failed"))
             (finally
               {:status 500
                :body "Internal error, please try later"})))))))
-  \end{clojure/lines*}
-\end{english}
+\end{clojure/lines*}
 
 \fi
 
@@ -1633,8 +1467,7 @@ Until now, we have regarded an exception as an error signal. Recall the fundamen
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure/lines}
+\begin{clojure/lines}
 (try
   (do-step-1)
   (do-step-2)
@@ -1644,13 +1477,11 @@ Until now, we have regarded an exception as an error signal. Recall the fundamen
   (catch MyGOTOException e
     (println "The third step
                   has been skipped")))
-  \end{clojure/lines}
-\end{english}
+\end{clojure/lines}
 
 \else
 
-\begin{english}
-  \begin{clojure/lines}
+\begin{clojure/lines}
 (try
   (do-step-1)
   (do-step-2)
@@ -1659,8 +1490,7 @@ Until now, we have regarded an exception as an error signal. Recall the fundamen
   (do-step-3)
   (catch MyGOTOException e
     (println "The third step has been skipped")))
-  \end{clojure/lines}
-\end{english}
+\end{clojure/lines}
 
 \fi
 
@@ -1678,8 +1508,7 @@ Writing in imperative languages, this is easy to solve. Python code might look l
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{python}
+\begin{python}
 class AccountHandler(RequestHandler):
   def on_get(self, request):
     if not self.check_params(request):
@@ -1690,13 +1519,11 @@ class AccountHandler(RequestHandler):
       return QuotasReached("Request " + \
              "rate is limited")
     return JSONResponse(self.get_data())
-  \end{python}
-\end{english}
+\end{python}
 
 \else
 
-\begin{english}
-  \begin{python}
+\begin{python}
 class AccountHandler(RequestHandler):
   def on_get(self, request):
     if not self.check_params(request):
@@ -1706,8 +1533,7 @@ class AccountHandler(RequestHandler):
     if not self.check_quotas(request):
       return QuotasReached("Request rate is limited")
     return JSONResponse(self.get_data_from_db())
-  \end{python}
-\end{english}
+\end{python}
 
 \fi
 
@@ -1721,8 +1547,7 @@ The \verb|if/else| cascade works, but looks unwieldy. It is not called the pyram
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn account-handler [request]
   (if (check-this request)
     (if (check-that request)
@@ -1733,13 +1558,11 @@ The \verb|if/else| cascade works, but looks unwieldy. It is not called the pyram
           "Request rate is limited"))
       (not-found "No such an account"))
     (bad-request "Wrong input data")))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn account-handler [request]
   (if (check-this request)
     (if (check-that request)
@@ -1749,8 +1572,7 @@ The \verb|if/else| cascade works, but looks unwieldy. It is not called the pyram
         (quotas-reached "Request rate is limited"))
       (not-found "No such an account"))
     (bad-request "Wrong input data")))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -1764,11 +1586,9 @@ The \verb|if/else| cascade works, but looks unwieldy. It is not called the pyram
 
 You can solve the pyramid problem in different ways, including exceptions. The Ring HTTP Response library offers functions to throw HTTP response exceptions. A decorator is added to the middleware to catch such exceptions and return a response composed of them. Add the library to your project:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 [metosin/ring-http-response "0.9.1"]
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 Let's rewrite \verb|account-handler| in this way:
 %% Напишем \verb|account-handler| по-другому:
@@ -1778,8 +1598,7 @@ Let's rewrite \verb|account-handler| in this way:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[ring.util.http-response
            :refer [not-found!
                    bad-request!
@@ -1795,13 +1614,11 @@ Let's rewrite \verb|account-handler| in this way:
       "Request rate is limited"))
   {:status 200
    :body (get-data-from-db)})
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[ring.util.http-response
            :refer [not-found!
                    bad-request!
@@ -1816,8 +1633,7 @@ Let's rewrite \verb|account-handler| in this way:
     (enhance-your-calm! "Request rate is limited"))
   {:status 200
    :body (get-data-from-db)})
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -1829,8 +1645,7 @@ Functions of the texttt{ring.util.http\--res\-ponse} module are available with a
 
 To make the scheme work, let's add the \verb|wrap-http-response| decorator. It catches errors from functions with an exclamation mark, extracts an answer from them, and returns it to a client.
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[ring.middleware.http-response
            :refer [wrap-http-response]])
 
@@ -1840,8 +1655,7 @@ To make the scheme work, let's add the \verb|wrap-http-response| decorator. It c
       wrap-session
       wrap-cookies
       wrap-http-response))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 Try to use code jumping only as a last resort: if you win something with it~--- shorten the code or quickly solve the problem. If you have to take this step, use the library to refer to examples and documentation.
 
@@ -1862,8 +1676,7 @@ Let's take a look at manual access to a file: write a few bytes to it. \verb|Fin
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (import '[java.io File FileWriter])
 
 (let [out (new FileWriter
@@ -1874,13 +1687,11 @@ Let's take a look at manual access to a file: write a few bytes to it. \verb|Fin
     (.write out "Clojure")
     (finally
       (.close out))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (import '[java.io File FileWriter])
 
 (let [out (new FileWriter (new File "test.txt"))]
@@ -1890,8 +1701,7 @@ Let's take a look at manual access to a file: write a few bytes to it. \verb|Fin
     (.write out "Clojure")
     (finally
       (.close out))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -1910,12 +1720,10 @@ The Python manager is remarkably elegant. It is the \verb|with| statement that e
 
 \index{files}
 
-\begin{english}
-  \begin{python}
+\begin{python}
 with open("/path/to/file.txt", "w") as f:
     f.write("test")
-  \end{python}
-\end{english}
+\end{python}
 
 Let's write a similar manager for Clojure. It is a macro that takes a symbol and a file path. Within a macro, a file is bound with a symbol. \verb|Finally| ensures the file will close when exiting the block.
 
@@ -1923,8 +1731,7 @@ Let's write a similar manager for Clojure. It is a macro that takes a symbol and
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defmacro with-file-writer
   [[bind path] & body]
   `(let [~bind (new FileWriter
@@ -1933,13 +1740,11 @@ Let's write a similar manager for Clojure. It is a macro that takes a symbol and
        ~@body
        (finally
          (.close ~bind)))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defmacro with-file-writer
   [[bind path] & body]
   `(let [~bind (new FileWriter (new File ~path))]
@@ -1947,20 +1752,17 @@ Let's write a similar manager for Clojure. It is a macro that takes a symbol and
        ~@body
        (finally
          (.close ~bind)))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
 Execute the code and check the \verb|test.txt| file:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (with-file-writer [out "test.txt"]
   (.write out "Hello macro!")
   (\ 0 0))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 Context managers' name begins with the prefix \verb|with-|. So they emphasize that the code works within the resource.
 
@@ -1995,25 +1797,21 @@ The \verb|throw+| macro accepts any object, not just an exception. A map works b
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require
   '[slingshot.slingshot
     :refer [try+ throw+]])
 
 (throw+ {:user-id 42 :action :create})
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[slingshot.slingshot :refer [try+ throw+]])
 
 (throw+ {:user-id 42 :action :create})
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -2021,28 +1819,24 @@ The \verb|throw+| macro accepts any object, not just an exception. A map works b
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (let [path "/var/lib/file.txt"]
   (try
     (slurp path)
     (catch Exception e
       (throw+ {:path path} e
       "File error: %s" path))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (let [path "/var/lib/file.txt"]
   (try
     (slurp path)
     (catch Exception e
       (throw+ {:path path} e "File error: %s" path))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -2050,8 +1844,7 @@ The \verb|throw+| macro accepts any object, not just an exception. A map works b
 
 The \verb|catch| form inside \verb|try+| catches exceptions not only with classes. Slingshot offers selectors and predicates for that. Here, a selector is a vector: its odd element is a map key, and even one is a value. The selector checks if keys and values are included in the context. If so, control passes to the branch with that selector.
 
-\begin{english}
-  \begin{clojure/lines}
+\begin{clojure/lines}
 (try+
  (throw+ {:type ::user-error
           :user 42
@@ -2059,8 +1852,7 @@ The \verb|catch| form inside \verb|try+| catches exceptions not only with classe
           :data {:name "Ivan"}})
  (catch [:type ::user-error] e
    (clojure.pprint/pprint e)))
-  \end{clojure/lines}
-\end{english}
+\end{clojure/lines}
 
 When the map is thrown, add the \verb|:type| field \coderef{2}. It specifies a key with the current space, in our case~--- \verb|::user-error|.
 When catching exceptions in another module, the selector looks like this: \spverb|[:type :book.exceptions/user-error]|. The namespace guarantees that we will not intercept \texttt{:user\--error} of someone else's library.
@@ -2077,8 +1869,7 @@ Unfortunately, there is neither the \verb|ChecksumError| class nor an equivalent
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn aws-checksum-error? [e]
   (and
     (instance? AmazonS3Exception e)
@@ -2087,42 +1878,36 @@ Unfortunately, there is neither the \verb|ChecksumError| class nor an equivalent
         #"(?i)The Content-Md5
             you specified did not match"
         (ex-message e)))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn aws-checksum-error? [e]
   (and (instance? AmazonS3Exception e)
        (some?
         (re-find
          #"(?i)The Content-Md5 you specified did not match"
          (ex-message e)))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
 \noindent
 We should put it in \verb|try+| to catch the checksum case:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (try+
   (s3/put-object ...)
   (catch aws-checksum-error? e
     (s3/delete-object ...)))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \footurl{Clj-http}{https://github.com/dakrone/clj-http}[Clj-http], a popular HTTP client for Clojure, uses Slingshot. In case of an error, it throws a response with \verb|throw+|. If we wrap the request in \verb|try+|, we'll get a more detailed analysis of errors. For example, we can get separate branches for status 500 and for the general negative response.
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[clj-http.client :as client])
 
 (try+
@@ -2132,13 +1917,11 @@ We should put it in \verb|try+| to catch the checksum case:
  (catch
   [:type :client/unexceptional-status] e
   (println "Negative response")))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[clj-http.client :as client])
 
 (try+
@@ -2147,8 +1930,7 @@ We should put it in \verb|try+| to catch the checksum case:
    (println "The service is unavailable"))
  (catch [:type :client/unexceptional-status] e
    (println "Negative response")))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -2174,40 +1956,34 @@ Let's look at several techniques for exceptions. They are simple, so you shouldn
 
 \index{functions!pcall}
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn pcall [f & args]
   (try
     [true (apply f args)]
     (catch Exception e [false e])))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 To make the result more concise, process it with \verb|let|:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (let [[ok? result-error] (pcall inc 1)]
   (if ok?
     (println
       (str "The result is "
         result-error))
     (println "Failure")))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (let [[ok? result-error] (pcall inc 1)]
   (if ok?
     (println (str "The result is " result-error))
     (println "Failure")))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -2215,40 +1991,34 @@ To make the result more concise, process it with \verb|let|:
 
 A different semantics is popular in JavaScript: callback functions take the \verb|error| and \verb|result| arguments. The \verb|pcall-js| function is a modified version of \verb|pcall| that returns an \tuple {error, result} pair.
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn pcall-js [f & args]
   (try
     [nil (apply f args)]
     (catch Exception e [e nil])))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \noindent
 The split looks different:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (let [[e user]
       (pcall-js get-user-by-id 42)]
   (if e
     (println (ex-message e))
     (println user)))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (let [[e user] (pcall-js get-user-by-id 42)]
   (if e
     (println (ex-message e))
     (println user)))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -2262,8 +2032,7 @@ Internally, the \verb|pcall| we defined above is used.
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn pcall-retry [n f & args]
   (loop [attempt n]
     (let [[ok? res] (apply pcall f args)]
@@ -2276,13 +2045,11 @@ Internally, the \verb|pcall| we defined above is used.
             (recur (inc n)))
 
         :else (throw res)))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn pcall-retry [n f & args]
   (loop [attempt n]
     (let [[ok? res] (apply pcall f args)]
@@ -2294,8 +2061,7 @@ Internally, the \verb|pcall| we defined above is used.
             (recur (inc n)))
 
         :else (throw res)))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -2303,19 +2069,16 @@ That is a naive version; you can improve it by changing the waiting strategy and
 
 By the way, these functions are compatible with each other. Let's build a combination of \verb|pcall| and \verb|pcall-retry|. Even if the service is not available and we have knocked on it many times, we will get a pair \verb|[ok? result]|.
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (pcall pcall-retry get-user-by-id 42)
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \textbf{ Exceptions in a loop.} The \verb|loop| form is designed in a special way: its \verb|recur| part cannot be inside \verb|try|. Let's say we want to write a recur function without \verb|pcall|. Here is a snippet of code:
 
 \index{iteration}
 \index{clojure.core!loop}
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn pcall-retry [n f & args]
   (loop [attempt n]
     ...
@@ -2323,8 +2086,7 @@ By the way, these functions are compatible with each other. Let's build a combin
       (apply f args)
       (catch Exception e
         (recur (inc n))))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 The compiler will not accept the code with the message: ``Can only recur from tail position''. To fix the error, you need to take out \verb|recur| from \verb|try|. The easiest way to do this is with \verb|pcall|, as in the example with \verb|pcall-retry|.
 
@@ -2334,35 +2096,29 @@ The compiler will not accept the code with the message: ``Can only recur from ta
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn error! [message & [data e]]
   (throw (ex-info message
            (or data {}) e)))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn error! [message & [data e]]
   (throw (ex-info message (or data {}) e)))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
 \noindent
 The function needs only one parameter~--- a string~--- to throw an exception, and the others are optional:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (error! "Error")
 (error! "Error" {:type ::error})
 (error! "Error" {:type ::error} e)
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \textbf{ Messages with parameters.} Sometimes a detailed string is enough for an error. In this case, \verb|ex-info| is redundant because it requires a map as an argument. Now, we'll write a function that throws \verb|Exception| with a formatted message. It takes a template and substitution values.
 The \verb|f| added to the function name means formatting.
@@ -2371,8 +2127,7 @@ The \verb|f| added to the function name means formatting.
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn errorf! [template & args]
   (let [message (apply format
                   template args)]
@@ -2381,20 +2136,17 @@ The \verb|f| added to the function name means formatting.
 
 (errorf! "Error, user: %s, action: %s"
   42 :delete)
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn errorf! [template & args]
   (let [message (apply format template args)]
     (throw (new Exception ^String message))))
 
 (errorf! "Error, user: %s, action: %s" 42 :delete)
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -2402,24 +2154,20 @@ The \verb|f| added to the function name means formatting.
 
 \index{macros!with-safe}
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defmacro with-safe [& body]
   `(try
      ~@body
      (catch Exception e#)))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \noindent
 An empty \verb|catch| form will return \verb|nil|. We'll get it if an error occurs:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (with-safe (/ 0 0))
 nil
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 In practice, \verb|nil| does not always mean an error, so the \verb|:error| or \verb|:invalid| keys are returned. That is how the Spec library works, which we discussed in the last chapter \page{spec-invalid}. Sometimes, we add logging or a Sentry call in the \verb|catch| block. Only suppress the error if the result is unimportant at all.
 

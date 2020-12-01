@@ -35,14 +35,13 @@ Then the program initiates the classes, fills in the fields, and the objects cha
 
 Investigating some errors is difficult because the code and state diverge. To fix the error, we will have to repeat it in the local environment. However, getting the code into a concrete state is not easy. Immutable data cuts off a whole layer of errors that imperative languages are prone to.
 
-\index{ languages!Python}
+\index{languages!Python}
 
 Let’s take a look at the following examples in Python. The module holds default request parameters. The \verb|api_call| function gets additional parameters, combines them with the standard ones, and sends them to an HTTP client:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{python/lines}
+\begin{python/lines}
 DEFAULT_PARAMS = {
     "allow_redirects": True,
     "timeout": 5,
@@ -58,13 +57,11 @@ def api_call(**params):
     response = \
       requests.post(url, **api_params)
     return response.json()
-  \end{python/lines}
-\end{english}
+\end{python/lines}
 
 \else
 
-\begin{english}
-  \begin{python/lines}
+\begin{python/lines}
 DEFAULT_PARAMS = {
     "allow_redirects": True,
     "timeout": 5,
@@ -77,8 +74,7 @@ def api_call(**params):
     api_params.update(params)
     resp = requests.post("https://api.host.com", **api_params)
     return resp.json()
-  \end{python/lines}
-\end{english}
+\end{python/lines}
 
 \fi
 
@@ -90,21 +86,17 @@ The state of the program and the code in our minds are out of sync.
 
 In a job interview, you may often hear a question like the one below. Imagine a function with the following signature. Please, explain what is wrong with it and give an example of the error.
 
-\begin{english}
-  \begin{python}
+\begin{python}
 def foo(bar=[]):
-  \end{python}
-\end{english}
+\end{python}
 
 Answer: The default function parameters are created once. In this case, \verb|bar| is equal to an empty list. In Python, the list is mutable. If nothing was passed to \verb|bar|, we get the original list. Let's add an element to it, and next time \verb|bar| will be not empty:
 
-\begin{english}
-  \begin{python}
+\begin{python}
 def foo(bar=[]):
     bar.append(1)
     return bar
-  \end{python}
-\end{english}
+\end{python}
 
 Calling \verb|foo| will return lists \verb|[1]|, \verb|[1, 1]|, and so on. Even worse: if you save the result of \verb|foo| to a variable and later add an element to it, in fact, the same ill-fated \verb|bar| will change.
 
@@ -113,16 +105,14 @@ All analyzers and linters know about a list in a signature. But we cannot entire
 
 Clojure beginners often write code like this:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (let [result (atom [])
       data [1 2 3 4 5]]
   (doseq [item data]
     (let [new-item (* 2 item)]
       (swap! result conj new-item)))
   @result)
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \index{imperative style}
 
@@ -131,42 +121,38 @@ There is a noticeable habit of imperative languages in it. The atom accumulator 
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (map (partial * 2)
      [1 2 3 4 5])
-  \end{clojure}
+\end{clojure}
 
 \splitter
 
-  \begin{clojure}
+\begin{clojure}
 (for [n [1 2 3 4 5]]
   (* n 2))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
 
 \noindent
 \begin{tabular}{ @{}p{5cm} @{}p{5cm} }
 
-  \begin{clojure}
+\begin{clojure}
 (map (partial * 2)
      [1 2 3 4 5])
-  \end{clojure}
+\end{clojure}
 
 &
 
-  \begin{clojure}
+\begin{clojure}
 (for [n [1 2 3 4 5]]
   (* n 2))
-  \end{clojure}
+\end{clojure}
 
 \end{tabular}
 
-\end{english}
 
 \fi
 
@@ -189,7 +175,7 @@ The rule applies: working with an open resource is cheaper than when you need to
 State speeds up a program.
 
 \index{web development}
-\index{ protocols!CGI}
+\index{protocols!CGI}
 
 Years ago, web servers used the \footurl{Common Gateway Interface}{https://en.wikipedia.org/wiki/Common\_Gateway\_Interface}[CGI] (CGI).
 For each request, the server ran a script or a binary file.
@@ -231,11 +217,9 @@ Machine architecture itself encourages data changing. At school, we are taught t
 Writing to a cell at the address is cheap.
 In both C\Plus\Plus and Python, it is equally simple to update an array element:
 
-\begin{english}
-  \begin{python}
+\begin{python}
 items[i] = 5;
-  \end{python}
-\end{english}
+\end{python}
 
 Persistent structures fit this memory model worse.
 Therefore, they are more complex — an immutable list is not a chain but a tree of nodes with a pointer.
@@ -255,19 +239,15 @@ Clojure offers several ways to modify data.
 An atom is the simplest of them all. It is an object that hides another one within itself.
 Atoms are created using the function of the same name with an initial value:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def store (atom 42))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 If we print the atom, we see the following:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 #<Atom@10ed2e87: 42>
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 To extract a value, use the \verb|@| operator.
 The \verb|@| is a shorthand for \verb|(deref store)|.
@@ -280,11 +260,9 @@ by pointer.
 \index{syntax!@ (deref)}
 \index{clojure.core!deref}
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 @store ;; 42
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 Unlike collections, this one changes its content but remains the same object.
 That is important: if you add a key to a map, we get a new map, while the old one will not change.
@@ -296,24 +274,20 @@ The simplified way to change an atom is to call \verb|reset!|. The function gets
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (reset! store nil)
 (reset! store {:items [1 2 3]})
 (reset! store (ex-info "error"
                 {:id 42}))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (reset! store nil)
 (reset! store {:items [1 2 3]})
 (reset! store (ex-info "error" {:id 42}))
-  \end{clojure}
-\end{english}
+\end{clojure}
 \fi
 
 If we execute \verb|@store| after each expression, we get what was passed to \verb|reset!|.
@@ -334,12 +308,10 @@ An atom and a function are passed to the \verb|swap!| function to calculate a ne
 
 \index{clojure.core!swap"!}
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def counter (atom 0))
 (swap! counter inc) ;; 1
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \noindent
 The counter value will increment by one each time with the calling of \verb|swap!|.
@@ -348,41 +320,33 @@ The counter value will increment by one each time with the calling of \verb|swap
 Suppose we want to increase the counter by three positions at once or rewind. Instead of \verb|inc|, we will apply addition and subtraction, the functions \verb|+| and \verb|-|.
 Their first argument is the current value of atom and the second one is passed to \verb|swap!|:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (swap! counter + 3) ;; increase by 3
 (swap! counter - 2) ;; decrease by 2
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 The atom will calculate a new value according to the rule:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (+ <current> 3)
 (- <current> 2),
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \noindent
 where <current> is the current value.
 
 The example above is a specific case of \verb|swap!| with one argument. In general, the function accepts an arbitrary number of these:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (swap! <atom> func arg2 arg3 arg4 ...)
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \noindent
 We find a new value using the following form:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (func <current> arg2 arg3 arg4 ...)
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 Until now, we have stored counters in atoms.
 But in practice, one entity is rarely counted.
@@ -392,27 +356,23 @@ In order not to create one atom for each entity, the former are combined into a 
 Let’s take a look at counting system resources.
 Map keys stand for a resource type, and values — for consumption in bytes or percent.
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def usage
   (atom {:cpu 35
          :store 63466734
          :memory 10442856}))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 A separate function calculates disk consumption.
 To write a new value to an atom using the \verb|:store| key, call \verb|swap!| as follow:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn get-disk-usage []
   (rand-int 99999999))
 
 (let [store (get-disk-usage)]
   (swap! usage assoc :store store))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 This form will overwrite the value in the field of \verb|:store| with a new one. Another approach is also possible: we record the difference for each change and do not count all the occupied disk space.
 For instance, if a user has created or deleted a file, we read the event and update \verb|:store| incrementally.
@@ -422,8 +382,7 @@ It is a map with the \verb|:action| and \verb|:size| keys.
 We increase or decrease disk consumption depending on \verb|:action|.
 Our version of \texttt{get-file\--event} is a stub that will randomly return one of two events:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn get-file-event []
   (rand-nth
    [{:action :delete
@@ -432,16 +391,14 @@ Our version of \texttt{get-file\--event} is a stub that will randomly return one
     {:action :create
      :path "/path/to/new/photo.jpg"
      :size 7345626}]))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \noindent
 The recalculation of disk consumption will change:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (let [{:keys [action size]}
       (get-file-event)]
   (case action
@@ -449,21 +406,18 @@ The recalculation of disk consumption will change:
     (swap! usage update :store - size)
     :create
     (swap! usage update :store + size)))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (let [{:keys [action size]} (get-file-event)]
   (case action
     :delete
     (swap! usage update :store - size)
     :create
     (swap! usage update :store + size)))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -482,48 +436,40 @@ For each user, we keep a list of their processes, i.e., a set of \footurl{\textt
 \coderef{5}.
 
 \ifx\DEVICETYPE\MOBILE
-\begin{english}
-  \begin{clojure/lines}
+\begin{clojure/lines}
 (def usage-all
   (atom {1005 {:cpu 35
                :store 63466734
                :memory 10442856
                :pids #{6266 5426
                        6542}}}))
-  \end{clojure/lines}
-\end{english}
+\end{clojure/lines}
 
 \else
 
-\begin{english}
-  \begin{clojure/lines}
+\begin{clojure/lines}
 (def usage-all
   (atom {1005 {:cpu 35
                :store 63466734
                :memory 10442856
                :pids #{6266, 5426, 6542}}}))
-  \end{clojure/lines}
-\end{english}
+\end{clojure/lines}
 \fi
 
 To add a process to user 1005, execute the \verb|swap!| function:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (swap! usage-all
   update-in [1005 :pids] conj 9999)
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (swap! usage-all update-in [1005 :pids] conj 9999)
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -558,20 +504,16 @@ Replace \verb|conj| with \verb|disj|, to remove a process. The latter is the inv
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (swap! usage-all
   update-in [1005 :pids] disj 9999)
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (swap! usage-all update-in [1005 :pids] disj 9999)
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -613,11 +555,9 @@ The atom changes the current value to a new one and exits the loop.
 We will show the above with an example.
 Let's take an atom with a map:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def sample (atom {:number 0}))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 We'll need the "\emph{slow} addition" function.
 It takes the current value, increment, and timeout.
@@ -625,8 +565,7 @@ Let's add the output to the console for clarity.
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn +slow
   [num delta timeout]
   (println
@@ -634,20 +573,17 @@ Let's add the output to the console for clarity.
       num timeout))
   (Thread/sleep timeout)
   (+ num delta))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn +slow
   [num delta timeout]
   (println (format "Current: %s, timeout: %s" num timeout))
   (Thread/sleep timeout)
   (+ num delta))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -658,46 +594,38 @@ Let's update the atom simultaneously from two threads. To do this, we call \verb
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (do (future (swap! sample update
               :number +slow 1 2000))
     (future (swap! sample update
               :number +slow 2 5000)))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (do (future (swap! sample update :number +slow 1 2000))
     (future (swap! sample update :number +slow 2 5000)))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
 \noindent
 Check the atom:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 @sample ;; {:number 3}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \noindent
 The following value is correct: $0 + 1 + 2 = 3$
 Console output:
 
-\begin{english}
-  \begin{text}
+\begin{text}
 Current: 0, timeout: 2000 ;; 1
 Current: 0, timeout: 5000 ;; 2
 Current: 1, timeout: 5000 ;; 2
-  \end{text}
-\end{english}
+\end{text}
 
 The second function worked twice, which follows from the algorithm.
 The second \verb|swap!| started calculation with the initial value \verb|{:number 0}|, and by the end, it became \verb|{:number 1}|, the first \verb|swap!| wrote it.
@@ -709,7 +637,7 @@ That is unallowable for environment dependent functions.
 \subsection{Validators and Watchers}
 
 \index{atom!validation}
-\index{ validation!in atom}
+\index{validation!in atom}
 
 Validators and watchers extend atom behavior.
 Validators are validation functions that take on a new value \emph{before} it replaces the current one.
@@ -723,8 +651,7 @@ Attempting to decrease its value when it is zero will throw an exception:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def counter (atom 2))
 (set-validator!
   counter (complement neg?))
@@ -732,20 +659,17 @@ Attempting to decrease its value when it is zero will throw an exception:
 (swap! counter dec)
 ;; Execution error IllegalStateException
 ;; Invalid reference state
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def counter (atom 2))
 (set-validator! counter (complement neg?))
 (swap! counter dec) ;; repeat 3 times...
 ;; Execution error (IllegalStateException)
 ;; Invalid reference state
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -779,8 +703,7 @@ However, we have kept readable names in the example to convey semantics.
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def STORE_LIMIT (* 1024 1024 1024 25))
 ;; 25 Gb
 
@@ -792,13 +715,11 @@ However, we have kept readable names in the example to convey semantics.
         "Disk usage %s has
                    reached the limit %s"
         store STORE_LIMIT))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def STORE_LIMIT (* 1024 1024 1024 25)) ;; 25 Gb
 
 (defn store-watcher
@@ -807,8 +728,7 @@ However, we have kept readable names in the example to convey semantics.
     (when (> store STORE_LIMIT)
       (log/errorf "Disk usage %s has reached the limit %s"
                   store STORE_LIMIT))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -817,8 +737,7 @@ Let's add a watch function with the \verb|:watch-store| key to our atom:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def usage
   (atom {:cpu 35
          :store 63466734
@@ -826,21 +745,18 @@ Let's add a watch function with the \verb|:watch-store| key to our atom:
 
 (add-watch usage
   :watch-store store-watcher)
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def usage
   (atom {:cpu 35
          :store 63466734
          :memory 10442856}))
 
 (add-watch usage :watch-store store-watcher)
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -849,22 +765,18 @@ If disk consumption exceeds the limit, we will see a log entry:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (swap! usage update :store + STORE_LIMIT)
 ;; Disk usage 26907012334
 ;; has reached the limit 26843545600
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (swap! usage update :store + STORE_LIMIT)
 ;; Disk usage 26907012334 has reached the limit 26843545600
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -886,8 +798,7 @@ If we call the function with the same arguments, we'll get the result without re
 
 \begin{listing}[ht!]
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn memoize [f]
   (let [mem (atom {})]
     (fn [& args]
@@ -896,8 +807,7 @@ If we call the function with the same arguments, we'll get the result without re
         (let [ret (apply f args)]
           (swap! mem assoc args ret)
           ret)))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \caption{The memoize function code from Clojure's standard library}
 \label{fig:clj-memoize}
@@ -914,8 +824,7 @@ The \verb|find| function will return a \verb|MapEntry| pair, the value from whic
 
 Let's check the decorator on the \verb|+slow| function we defined above. We'll declare its \verb|memoized| version and measure the calls:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def +mem (memoize +slow))
 
 (time (+mem 1 2 2000))
@@ -923,8 +832,7 @@ Let's check the decorator on the \verb|+slow| function we defined above. We'll d
 
 (time (+mem 1 2 2000))
 ;; Elapsed time: 0.078052 msecs
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \index{classes!Thread}
 
@@ -938,8 +846,7 @@ The page view counter is a combination of an atom and middleware:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def page-counter
   (atom {"/" 0}))
 
@@ -952,13 +859,11 @@ The page view counter is a combination of an atom and middleware:
         (swap! page-counter
           update uri (fnil inc 0)))
       (handler request))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def page-counter
   (atom {"/" 0}))
 
@@ -970,8 +875,7 @@ The page view counter is a combination of an atom and middleware:
       (when (= request-method :get)
         (swap! page-counter update uri (fnil inc 0)))
       (handler request))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -989,27 +893,23 @@ Let's write a site footer component, where the small print indicates how many ti
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn component-footer [uri]
   [:div {:class "footer"}
    (let [seen (get @page-counter uri 0)]
      [:p [:small
           "The page has been seen " seen
           " time(s)."]])])
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn component-footer [uri]
   [:div {:class "footer"}
    (let [seen (get @page-counter uri 0)]
      [:p [:small "The page has been seen " seen " time(s)."]])])
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -1042,8 +942,7 @@ Below is an example with resources. This time, instead of an atom, we use a diff
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def vusage (volatile! nil))
 (vreset! vusage
          {:cpu 35
@@ -1054,13 +953,11 @@ Below is an example with resources. This time, instead of an atom, we use a diff
 (println
   "Disk usage is" (get @vusage :store))
 ;; Disk usage is 68709614
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def vusage (volatile! nil))
 (vreset! vusage
          {:cpu 35
@@ -1069,8 +966,7 @@ Below is an example with resources. This time, instead of an atom, we use a diff
 (vswap! vusage update :store + (* 1024 1024 5))
 (println "Disk usage is" (get @vusage :store))
 ;; Disk usage is 68709614
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -1079,8 +975,7 @@ Let's rewrite the example with futures:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def vsample (volatile! {:number 0}))
 (do (future (vswap! vsample update
               :number +slow 1 2000))
@@ -1089,21 +984,18 @@ Let's rewrite the example with futures:
 ;; Current: 0, timeout: 2000
 ;; Current: 0, timeout: 5000
 @vsample ;; {:number 2}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def vsample (volatile! {:number 0}))
 (do (future (vswap! vsample update :number +slow 1 2000))
     (future (vswap! vsample update :number +slow 2 5000)))
 ;; Current: 0, timeout: 2000
 ;; Current: 0, timeout: 5000
 @vsample ;; {:number 2}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -1138,8 +1030,7 @@ These are entirely imperative requirements, and it is beneficial to set them in 
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def data
   {:items [{:result {:value 74}}
            {:result {:value 65}}]
@@ -1147,20 +1038,17 @@ These are entirely imperative requirements, and it is beneficial to set them in 
               :date "2018-09-09"}
              {:usage 52
               :date "2018-11-05"}]})
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def data
   {:items [{:result {:value 74}}
            {:result {:value 65}}]
    :records [{:usage 99 :date "2018-09-09"}
              {:usage 52 :date "2018-11-05"}]})
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -1169,8 +1057,7 @@ The imperative style is convenient in this case: if one of the rules becomes red
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (let [result (volatile! [])]
 
   ;; see section 5.4 from the doc
@@ -1188,13 +1075,11 @@ The imperative style is convenient in this case: if one of the rules becomes red
 
   ;; more blocks...
   @result)
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (let [result (volatile! [])]
 
   ;; see section 5.4 from the doc
@@ -1205,8 +1090,7 @@ The imperative style is convenient in this case: if one of the rules becomes red
 
   ;; more blocks...
   @result)
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -1243,16 +1127,14 @@ It returns an immutable version and simultaneously "seals" the original: after c
 Now we'll look at a transient vector.
 The \verb|conj!| function adds and the \verb|pop!| function removes the vector's last item:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (let [items* (transient [1 2 3])]
   (conj! items* :a)
   (conj! items* :b)
   (pop! items*)
   (persistent! items*))
 ;; [1 2 3 :a]
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \index{clojure.core!assoc"!}
 \index{clojure.core!dissoc"!}
@@ -1260,16 +1142,14 @@ The \verb|conj!| function adds and the \verb|pop!| function removes the vector's
 \noindent
 Here is an example with a map and the \verb|assoc!| and \verb|dissoc!| functions:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (let [params* (transient {:a 1})]
   (assoc! params* :b 2)
   (assoc! params* :c 3)
   (dissoc! params* :b)
   (persistent! params*))
 ;; {:a 1, :c 3}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 Note: In the examples above, we marked the variable with an asterisk.
 This character does not break the language syntax.
@@ -1282,28 +1162,24 @@ The following example will throw an exception:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (let [params* (transient {:a 1})]
   (assoc! params* :b 2)
   (persistent! params*)
   (assoc! params* :c 3))
 ;; IllegalAccessError:
 ;; Transient used after persistent! call
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (let [params* (transient {:a 1})]
   (assoc! params* :b 2)
   (persistent! params*)
   (assoc! params* :c 3))
 ;; IllegalAccessError: Transient used after persistent! call
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -1313,8 +1189,7 @@ Let's rewrite that code for a transient vector:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (let [result* (transient [])
       push! (fn [item]
               (conj! result* item))]
@@ -1335,13 +1210,11 @@ Let's rewrite that code for a transient vector:
 
   ;; more blocks...
   (persistent! result*))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (let [result* (transient [])
       push! (fn [item]
               (conj! result* item))]
@@ -1354,8 +1227,7 @@ Let's rewrite that code for a transient vector:
 
   ;; more blocks...
   (persistent! result*))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -1391,11 +1263,9 @@ When there are many iterations, we can resort to a ploy: instead of a persistent
 
 For experimentation, let's declare the nums variable, which is a list of a million integers:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def nums (range 999999))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \index{clojure.core!loop}
 \index{iteration!loop}
@@ -1403,28 +1273,24 @@ For experimentation, let's declare the nums variable, which is a list of a milli
 \noindent
 Let's build the second list with a regular loop:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (loop [result []
        [n & nums] nums]
   (if n
     (recur (conj result n) nums)
     result))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \noindent
 Now we'll do the same with a mutable vector:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (loop [result* (transient [])
        [n & nums] nums]
   (if n
     (recur (conj! result* n) nums)
     (persistent! result*)))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 The variable name and some details have changed, but the number of lines remains the same.
 Edits do not go outside the \verb|loop|, which gives freedom of action.
@@ -1434,12 +1300,10 @@ Then, if speed is critical, the loop might be improved so that the data changes.
 The \verb|time| macro takes a block of code and prints the time spent on its execution.
 If we wrap both examples in \verb|time|, we'll get the following results:
 
-\begin{english}
-  \begin{text}
+\begin{text}
 ;; 166.688721 msecs (persistent)
 ;;  69.415038 msecs (transient)
-  \end{text}
-\end{english}
+\end{text}
 
 The exact numbers depend on the equipment and environment, but there is always a difference of several times. Transient collections really are faster than permanent ones!
 
@@ -1458,57 +1322,53 @@ Let's compare the regular \verb|reduce| and its mutable version:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (reduce
  (fn [result n]
    (conj result n))
  []
  nums)
-  \end{clojure}
+\end{clojure}
 
 \splitter
 
-  \begin{clojure}
+\begin{clojure}
 (persistent!
  (reduce
   (fn [result* n]
     (conj! result* n))
   (transient [])
   nums))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
 \noindent
 \begin{tabular}{ @{}p{5cm} @{}p{5cm} }
 
 \linegap
 
-  \begin{clojure}
+\begin{clojure}
 (reduce
  (fn [result n]
    (conj result n))
  []
  nums)
-  \end{clojure}
+\end{clojure}
 
 &
 
-  \begin{clojure}
+\begin{clojure}
 (persistent!
  (reduce
   (fn [result* n]
     (conj! result* n))
   (transient [])
   nums))
-  \end{clojure}
+\end{clojure}
 
 \end{tabular}
 
-\end{english}
 
 \fi
 
@@ -1554,11 +1414,9 @@ Atoms and transient collections change the object, not the variable.
 Sometimes we want something different.
 Let \verb|size| be an atom:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def size (atom 0))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 To mutate it, call \verb|reset!| or \verb|swap!|, as in the examples above.
 But even with the changed content, \verb|size| remains an atom. The same thing happens with transient collections: it is easy to add and remove an item, but it will be the same collection.
@@ -1584,20 +1442,16 @@ Beginners make the impulsive choice:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def server
   (jetty/run-jetty app {:port 8080}))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def server (jetty/run-jetty app {:port 8080}))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -1626,7 +1480,7 @@ It is an instance of the \verb|clojure.lang.Var| class from the Clojure library.
 To get a variable object, pass its symbol to the \verb|var| macro, for example \verb|(var server)|.
 The \verb|#'server| is a shorthand for \verb|(var server)|.
 
-\index{ syntax!\texttt{\#\textquotesingle} (variable)}
+\index{syntax!\texttt{\#\textquotesingle} (variable)}
 
 \index{symbol}
 
@@ -1662,19 +1516,16 @@ We're to going to go back to a server.
 Let's declare a variable that eventually will become the \texttt{jetty.server\-.Server} object.
 By default, it is equal to \verb|nil|:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def server nil)
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 The \verb|start!| function replaces \verb|server| with the result of an anonymous function, which takes the current value of the variable.
 When it is \verb|nil|, we'll create, and return a new server. If not, the current one will be returned.
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn start! []
   (alter-var-root
    (var server)
@@ -1683,13 +1534,11 @@ When it is \verb|nil|, we'll create, and return a new server. If not, the curren
        (run-jetty app {:port 8080
                        :join? false})
        server))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn start! []
   (alter-var-root
    (var server)
@@ -1697,16 +1546,14 @@ When it is \verb|nil|, we'll create, and return a new server. If not, the curren
      (if-not server
        (run-jetty app {:port 8080 :join? false})
        server))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
 \noindent
 \verb|Stop!| works similarly: if the server is on (i.e., not \verb|nil|), stop it, and return \verb|nil|.
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn stop! []
   (alter-var-root
    (var server)
@@ -1714,8 +1561,7 @@ When it is \verb|nil|, we'll create, and return a new server. If not, the curren
      (when server
        (.stop server))
      nil)))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \mnoindent
 Calling \verb|(start!)| will start the server in the background. A browser will respond to requests at \texttt{localhost\-:8080}.
@@ -1731,22 +1577,18 @@ The \verb|start!| function creates a new pool and updates the variable. After th
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (jdbc/query pool "select * from users")
 (jdbc/insert! pool
   :users {:name "Ivan"})
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (jdbc/query pool "select * from users")
 (jdbc/insert! pool :users {:name "Ivan"})
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -1835,8 +1677,7 @@ If the error is easy to fix, we'll write a function with an asterisk and replace
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn read-yaml-tag*
   "The fixed version of
   `yamler.tags/read-yaml-tag`."
@@ -1846,13 +1687,11 @@ If the error is easy to fix, we'll write a function with an asterisk and replace
 (alter-var-root
  (var yamler.tags/read-yaml-tag)
  (constantly read-yaml-tag*))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn read-yaml-tag*
   "The fixed version of `yamler.tags/read-yaml-tag`."
   [stream tag]
@@ -1861,8 +1700,7 @@ If the error is easy to fix, we'll write a function with an asterisk and replace
 (alter-var-root
  (var yamler.tags/read-yaml-tag)
  (constantly read-yaml-tag*))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -1881,21 +1719,18 @@ The package \verb|clojure.pprint| (short for \textbf{p}retty \textbf{p}rinting) 
 But it takes a long time to write \verb|(clojure.pprint/pprint data)| instead of \verb|(println data)| every time. To shorten the code, replace \verb|println| with \verb|pprint|.
 To do this, patch the function:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (alter-var-root
  (var println)
  (constantly clojure.pprint/pprint))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 Apply this patch once, anywhere in the project.
 Now, calling \verb|(println data)| will print the data, just like \verb|pprint| does:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (println <vector-of-dicts-of-vectors>)
 
 [{:foo 42
@@ -1904,19 +1739,16 @@ Now, calling \verb|(println data)| will print the data, just like \verb|pprint| 
  {:foo 42
   :bar [1 2 {:foo 42
              :bar [1 2 {#, #}]}]}]
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (println <vector-of-dicts-of-vectors>)
 
 [{:foo 42, :bar [1 2 3 4 5 {:foo 42, :bar [1 2 {#, #}]}]}
  {:foo 42, :bar [1 2 {:foo 42, :bar [1 2 {#, #}]}]}]
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -1942,8 +1774,7 @@ For each link, it outputs the class, message, and context:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn ex-print
   [^Throwable e]
   (let [indent "  "]
@@ -1956,13 +1787,11 @@ For each link, it outputs the class, message, and context:
       (when-let [data (ex-data e)]
         (print indent)
         (clojure.pprint/pprint data)))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn ex-print
   [^Throwable e]
   (let [indent "  "]
@@ -1973,19 +1802,16 @@ For each link, it outputs the class, message, and context:
       (when-let [data (ex-data e)]
         (print indent)
         (clojure.pprint/pprint data)))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
 \noindent
 The disadvantage is that instead of \verb|(log/error e)| you have to write:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (log/error (with-out-str (ex-print e)))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 This takes a long time and forces you to import \texttt{ex-\-print} into every module where exceptions are logged.
 It will be more convenient if only \verb|(log/error e)| remains, and \verb|ex-print| will fire somewhere behind the scenes.
@@ -2003,20 +1829,16 @@ Its signature looks like the following:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn log*
   [logger level throwable message])
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn log* [logger level throwable message])
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -2044,12 +1866,11 @@ The exclusion is no longer needed because it is part of the message now
 \noindent
 Implementation:
 
-\index{функции!install-better-logging}
+\index{functions!install-better-logging}
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure/lines}
+\begin{clojure/lines}
 (defn install-better-logging []
   (alter-var-root
    (var clojure.tools.logging/log*)
@@ -2067,13 +1888,11 @@ Implementation:
              level nil message*))
            (log* logger level
              throwable message))))))
-  \end{clojure/lines}
-\end{english}
+\end{clojure/lines}
 
 \else
 
-\begin{english}
-  \begin{clojure/lines}
+\begin{clojure/lines}
 (defn install-better-logging []
   (alter-var-root
    (var clojure.tools.logging/log*)
@@ -2084,8 +1903,7 @@ Implementation:
                message* (str message \newline ex-out)]
            (log* logger level nil message*))
          (log* logger level throwable message))))))
-  \end{clojure/lines}
-\end{english}
+\end{clojure/lines}
 
 \fi
 
@@ -2122,77 +1940,67 @@ By default, \verb|*print-length*| is 100.
 It is quite a lot, especially considering that other collections can act as elements.
 The result of a request to the database is a list of maps. Printing a hundred maps is wasteful, so let's reduce the \verb|*print-length*| at the start of the application. The \verb|set!| form serves this purpose:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (set! *print-length* 8)
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 The endless collection output will only show the first eight items. The ellipsis means that we've cut off the rest of the list.
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (println (repeat 1))
 ;; (1 1 1 1 1 1 1 1 ...)
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 The nesting or collection level is an imaginary index.
 When one collection becomes an element of another, its index is incremented by one.
 Let's declare a nested structure:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def data {:foo
             {:bar
               {:baz [42]}}})
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 Here is output with different \texttt{*print\--le\-vel*} values:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (set! *print-level* 4)
 (println data)
 ;; {:foo {:bar #}}
-  \end{clojure}
+\end{clojure}
 
 \splitter
 
-  \begin{clojure}
+\begin{clojure}
 (set! *print-level* 2)
 (println data)
 ;; {:foo #}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
 \noindent
 \begin{tabular}{ @{}p{5cm} @{}p{5cm} }
 
 
-  \begin{clojure}
+\begin{clojure}
 (set! *print-level* 4)
 (println data)
 ;; {:foo {:bar #}}
-  \end{clojure}
+\end{clojure}
 
 &
 
-  \begin{clojure}
+\begin{clojure}
 (set! *print-level* 2)
 (println data)
 ;; {:foo #}
-  \end{clojure}
+\end{clojure}
 
 \end{tabular}
 
-\end{english}
 
 \fi
 
@@ -2239,27 +2047,23 @@ If the compiler didn't output a type, show warnings:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (set! *warn-on-reflection* true)
 (def ms (System/currentTimeMillis))
 
 (.toString ms) ;; reflection warning
 (.toString ^Long ms) ;; no warning
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (set! *warn-on-reflection* true)
 (def ms (System/currentTimeMillis))
 
 (.toString ms)       ;; reflection warning
 (.toString ^Long ms) ;; no warning
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -2267,13 +2071,11 @@ If the compiler didn't output a type, show warnings:
 Disable \verb|assert| forms.
 False expressions will not throw an error:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (set! *assert* false)
 (assert (get {:foo 3} :bar))
 ;; won't throw an exception
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \noindent
 Output an object with metadata (see the snippet in Listing \ref{fig:print-var-meta}).
@@ -2281,8 +2083,7 @@ Please note that the variable stores the file path and the line number. Plugins 
 
 \begin{listing}[ht!]
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (set! *print-meta* true)
 (var +)
 
@@ -2294,15 +2095,14 @@ Please note that the variable stores the file path and the line number. Plugins 
   :arglists ([] [x] [x y] [x y & more])
   :doc "Returns the sum of nums..."}
 #'clojure.core/+
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \caption{Printing a variable with metadata to REPL}
 \label{fig:print-var-meta}
 
 \end{listing}
 
-\index{ utilities!lein}
+\index{utilities!lein}
 \index{profiles!lein}
 
 Project management utilities read vars with earmuffs from a map.
@@ -2312,8 +2112,7 @@ Below we'll set different variables depending on the development (\verb|dev|) or
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 {:profiles
  :dev {:global-vars
        {*warn-on-reflection* true
@@ -2321,28 +2120,24 @@ Below we'll set different variables depending on the development (\verb|dev|) or
  :uberjar {:global-vars
            {*warn-on-reflection* false
             *assert* false}}}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 {:profiles
  :dev {:global-vars {*warn-on-reflection* true
                      *assert* true}}
  :uberjar {:global-vars {*warn-on-reflection* false
                          *assert* false}}}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
 Inside \verb|binding|, the \verb|set!| form acts as an assignment operator.
 The variable should be dynamic:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def ^:dynamic *rate*)
 (def ^:dynamic *days*)
 
@@ -2354,34 +2149,29 @@ The variable should be dynamic:
     (set! *days* days))
   (* *rate* *days*))
 ;; 12
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \noindent
 Outside \verb|binding|, the \verb|set!| call will fail, even for the variable with earmuffs:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def ^:dynaimc *data* nil)
 
 (set! *data* {:user 1})
 ;; Unhandled IllegalStateException
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def ^:dynaimc *data* nil)
 
 (set! *data* {:user 1})
 ;; Unhandled java.lang.IllegalStateException
 ;; Can't change/establish root binding of: *data* with set
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -2431,13 +2221,11 @@ On exit, the variables will get their old values.
 The compiler treats a variable as such if a \verb|^:dynamic| tag has been assigned to it.
 It is a shortcut for \verb|^{:dynamic true}|:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def ^:dynamic *server* nil)
 ;; or
 (def ^{:dynamic true} *server* nil)
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 A map with a caret symbol in \verb|def| is called metadata.
 These are additional parameters for a future variable.
@@ -2456,22 +2244,18 @@ By themselves, a pair of asterisks does not make a variable dynamic; it is just 
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def *server* nil)
 ;; Warning: *server* not declared dynamic
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def *server* nil)
 ;; Warning: *server* not declared dynamic and thus [...]
 ;; Please either indicate ^:dynamic *server* or change the name.
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -2480,26 +2264,22 @@ If the variable is not dynamic, \verb|binding| will throw an exception:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (binding [*server* {:port 8080}]
   (println *server*))
 ;; IllegalStateException
 ;; Can't dynamically bind
 ;; non-dynamic var: *server*
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (binding [*server* {:port 8080}]
   (println *server*))
 ;; Execution error (IllegalStateException)
 ;; Can't dynamically bind non-dynamic var: *server*
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -2507,12 +2287,10 @@ If the variable is not dynamic, \verb|binding| will throw an exception:
 
 Let us recall the parameters of the print length and depth. To protect ourselves from big data, we wrote something like this:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (set! *print-level* 4)
 (println data)
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \index{printing!indented}
 
@@ -2526,31 +2304,27 @@ Outside \verb|binding|, the variables will get their previous values, and the ne
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (binding [*print-level* 8
           *print-length* 4]
   (println
     {:foo {:bar {:baz (repeat 1)}}}))
 ;; {:foo {:bar {:baz (1 1 1 1 ...)}}}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (binding [*print-level* 8
           *print-length* 4]
   (println {:foo {:bar {:baz (repeat 1)}}}))
 ;; {:foo {:bar {:baz (1 1 1 1 ...)}}}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
 \index{clojure.core!*out*}
-\index{классы!Writer}
+\index{classes!Writer}
 
 To let the console output go to a file, bind the variable \verb|*out*| to the
 \verb|Writer| object:
@@ -2559,15 +2333,13 @@ To let the console output go to a file, bind the variable \verb|*out*| to the
 %% \verb|Writer|:
 %% TODO
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[clojure.java.io :as io])
 
 (with-open [out (io/writer "dump.edn")]
   (binding [*out* out]
     (clojure.pprint/pprint {:test 42})))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 Let's combine these examples into a function to dump data to a file.
 This one is useful for debugging big data.
@@ -2575,8 +2347,7 @@ It takes a file path and collection.
 The function connects the output to the open file and prints the data.
 To see all the elements, increase the print length and depth.
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn dump-data
   [path data]
   (with-open [out (io/writer path)]
@@ -2584,40 +2355,33 @@ To see all the elements, increase the print length and depth.
               *print-level* 32
               *print-length* 512]
       (clojure.pprint/pprint data))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \noindent
 Dumping data to file:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (dump-data "sample.edn"
   {:foo [1 2 3 {:foo [1 2 3]}]})
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (dump-data "sample.edn" {:foo [1 2 3 {:foo [1 2 3]}]})
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
 \noindent
 Here's the recovery:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (-> "sample.edn" slurp read-string)
 ;; {:foo [1 2 3 {:foo [1 2 3]}]}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \index{clojure.core!*print-level*}
 \index{clojure.core!*print-length*}
@@ -2644,34 +2408,32 @@ From the \verb|ui/add-to-cart| tag, you can easily guess that it is the "add to 
 Maps might be in code or files, but the principle of the translation does not change. By locale and tag, a library does a lookup of a translation in the map.
 Let's write a naive approach in Clojure:
 
+%% TODO fix russian
+
 \ifx\DEVICETYPE\MOBILE
 
-%% \begin{english}
-  \begin{clojure}
-(def tr-map
-  {:en {:ui/add-to-cart "Add to Cart"}
-   :ru {:ui/add-to-cart
-        "Добавить в корзину"}})
+%% \begin{clojure}
+%% (def tr-map
+%%   {:en {:ui/add-to-cart "Add to Cart"}
+%%    :ru {:ui/add-to-cart
+%%         "Добавить в корзину"}})
 
-(defn tr [locale tag]
-  (or (get-in tr-map [locale tag])
-      (format "<%s%s>" locale tag)))
-  \end{clojure}
-%% \end{english}
+%% (defn tr [locale tag]
+%%   (or (get-in tr-map [locale tag])
+%%       (format "<%s%s>" locale tag)))
+%% \end{clojure}
 
 \else
 
-%% \begin{english}
-  \begin{clojure}
-(def tr-map
-  {:en {:ui/add-to-cart "Add to Cart"}
-   :ru {:ui/add-to-cart "Добавить в корзину"}})
+%% \begin{clojure}
+%% (def tr-map
+%%   {:en {:ui/add-to-cart "Add to Cart"}
+%%    :ru {:ui/add-to-cart "Добавить в корзину"}})
 
-(defn tr [locale tag]
-  (or (get-in tr-map [locale tag])
-      (format "<%s%s>" locale tag)))
-  \end{clojure}
-%% \end{english}
+%% (defn tr [locale tag]
+%%   (or (get-in tr-map [locale tag])
+%%       (format "<%s%s>" locale tag)))
+%% \end{clojure}
 
 \fi
 
@@ -2689,7 +2451,7 @@ Here, physical distancing is the call stack.
 Usually, the locale is calculated at the beginning of the request. By contrast, text translation is done towards the end.
 Make the locale global; otherwise, you have to push it down the call stack in arguments, which complicates the code.
 
-\index{ frameworks!Django}
+\index{frameworks!Django}
 
 Mental distancing means that at the time of translation, we don't care where the locale is.
 This information is redundant.
@@ -2704,29 +2466,24 @@ The code in the braces is values or expressions.
 Vertical lines stand for filters, i.e., conversion functions.
 For example, the entry below means that there is the \verb|:email| field from the \verb|user| map between the paragraph tags.
 
-\begin{english}
-  \begin{htmldjango}
+\begin{htmldjango}
 <p>{{ user.email|lower }}</p>
-  \end{htmldjango}
-\end{english}
+\end{htmldjango}
 
 \noindent
 The \verb|lower| filter converts the field case to lowercase.
 In Clojure, it looks like this:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (str/lower-case (:name user))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 Any function can be a filter, including \verb|tr|.
 The simpler a template looks, the better.
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{htmldjango}
+\begin{htmldjango}
 <div class="widget">
   <a href="/login">
     {{ "ui/log-in"|tr }}
@@ -2735,19 +2492,16 @@ The simpler a template looks, the better.
     {{ "ui/help"|tr }}
   </a>
 </div>
-  \end{htmldjango}
-\end{english}
+\end{htmldjango}
 
 \else
 
-\begin{english}
-  \begin{htmldjango}
+\begin{htmldjango}
 <div class="widget">
   <a href="/login">{{ "ui/log-in"|tr }}</a>
   <a href="/help">{{ "ui/help"|tr }}</a>
 </div>
-  \end{htmldjango}
-\end{english}
+\end{htmldjango}
 
 \fi
 
@@ -2761,14 +2515,12 @@ Think of it as a cell with no data.
 
 Let's change the \verb|tr| function: now it only takes a tag and refers to the global *\verb|*locale*| var as the locale:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def ^:dynamic *locale*)
 
 (defn tr [tag]
   (get-in tr-map [*locale* tag]))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \index{macros!with-locale}
 
@@ -2776,14 +2528,12 @@ To isolate \verb|*locale*| from consumers, use the \verb|with-locale| macro.
 It executes the body while the variable is bound with the given locale.
 Within a macro, any translation will work for that locale:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defmacro with-locale
   [locale & body]
   `(binding [*locale* ~locale]
      ~@body))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \index{middleware!wrap-locale}
 \ifx\DEVICETYPE\MOBILE
@@ -2796,37 +2546,38 @@ Within a macro, any translation will work for that locale:
 
 \splitter
 
-\begin{clojure}
-(with-locale :ru
-  (tr :ui/add-to-cart))
-;; "Добавить в корзину"
-\end{clojure}
+%% TODO fix Russian
+%% \begin{clojure}
+%% (with-locale :ru
+%%   (tr :ui/add-to-cart))
+%% ;; "Добавить в корзину"
+%% \end{clojure}
 
 \else
 
-%% \begin{english}
-
+%%
 \noindent
 \begin{tabular}{ @{}p{5cm} @{}p{5cm} }
 
-  \begin{clojure}
+\begin{clojure}
 (with-locale :en
   (tr :ui/add-to-cart))
 ;; "Add to Cart"
-  \end{clojure}
+\end{clojure}
 
 &
 
-  \begin{clojure}
-(with-locale :ru
-  (tr :ui/add-to-cart))
-;; "Добавить в корзину"
-  \end{clojure}
+
+%% TODO fix Russian
+%% \begin{clojure}
+%% (with-locale :ru
+%%   (tr :ui/add-to-cart))
+%% ;; "Добавить в корзину"
+%% \end{clojure}
 
 \end{tabular}
 
-%% \end{english}
-
+%%
 \fi
 
 Let's write a middleware to determine the locale.
@@ -2836,8 +2587,7 @@ The code below on the stack is wrapped in the \verb|with-locale| macro:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn request->locale [request]
   (let [lang (get-in request
                [:params "lang"])]
@@ -2849,13 +2599,11 @@ The code below on the stack is wrapped in the \verb|with-locale| macro:
     (with-locale
       (request->locale request)
       (handler request))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn request->locale [request]
   (let [lang (get-in request [:params "lang"])]
     (keyword (get #{"en" "ru"} lang "en"))))
@@ -2864,8 +2612,7 @@ The code below on the stack is wrapped in the \verb|with-locale| macro:
   (fn [request]
     (with-locale (request->locale request)
       (handler request))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -2875,28 +2622,24 @@ The \verb|tr| filter converts a string into a tag and then searches for a transl
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require
  '[selmer.filters :refer [add-filter!]])
 
 (add-filter! :tr
  (fn [line]
    (-> line keyword tr)))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (require '[selmer.filters :refer [add-filter!]])
 
 (add-filter! :tr
  (fn [line]
    (-> line keyword tr)))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -2921,12 +2664,10 @@ If the macro sets the \verb|a| variable, the form \verb|(var-set a 9)| should mo
 Note: the symbol of the variable will return its \emph object|, not the value.
 In the example below, we get not zero but an object of type \verb|Var|. Writing \verb|(+ a 1)| will result in a type error.
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (with-local-vars [a 0] a)
 ;; #<Var: --unnamed-->
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 The \verb|var-get| function gets a value from a variable. For the sake of brevity, use the \verb|@|: \verb|(+ @a 1)| operator.
 
@@ -2936,8 +2677,7 @@ Last time we worked with an atom. Now we will solve the problem with local varia
 The \verb|calc-billing| function calculates the amount that a customer must pay.
 The \verb|calc-billing| parameter contains data on resource consumption. We will form the total amount from three components. Each of them is calculated according to complicated conditions. Let's write the code imperatively, so it will better match the business logic:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn calc-billing [data]
   (with-local-vars
     [a 0 b 0 c 0]
@@ -2951,8 +2691,7 @@ The \verb|calc-billing| parameter contains data on resource consumption. We will
         (var-set b (* limits vms))))
     ;; find c ...
     (+ (* @a @b) @c)))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 The calculation is performed in three blocks, each of which finds a component.
 The \verb|when-let| cascade collects the desired variables, and if found, ends with \verb|var-set|.
@@ -2966,27 +2705,23 @@ The \verb|var-set| function can only set a new map, while the combination of \ve
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (with-local-vars [user {:name "Ivan"}]
   ;; won't work
   ;; (var-set user assoc :age 33)
   ;; ugly
   (var-set user (assoc @user :age 33))
   @user)
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (with-local-vars [user {:name "Ivan"}]
   ;; (var-set user assoc :age 33) ;; won't work
   (var-set user (assoc @user :age 33)) ;; ugly
   @user)
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -3032,26 +2767,22 @@ The code below should print "fake print":
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (with-redefs
   [println (constantly
              (print "fake print"))]
   @(future (println 42)))
 ;; fake print
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (with-redefs
   [println (constantly (print "fake print"))]
   @(future (println 42)))
 ;; fake print
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -3074,7 +2805,7 @@ Let's see in practice how to do this.
 
 \index{HTTP!POST}
 \index{coordinates}
-\index{ geolocation }
+\index{geolocation }
 
 The mobile app sends the user's coordinates (longitude and latitude) to the server.
 Later, the user studies their travel history.
@@ -3089,8 +2820,7 @@ Here's a request handler:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn location-handler [request]
   (let [{:keys [params]} request
         point (select-keys params
@@ -3099,21 +2829,18 @@ Here's a request handler:
     (db/create-location
       (merge place point))
     {:status 200 :body "OK"}))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn location-handler [request]
   (let [{:keys [params]} request
         point (select-keys params [:lat :lon])
         place (geo/place-info point)]
     (db/create-location (merge place point))
     {:status 200 :body "OK"}))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -3136,8 +2863,7 @@ block.
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn location-handler
   [request]
   (let [{:keys [params]} request
@@ -3149,13 +2875,11 @@ block.
                     point)]
         (db/update-place row-id place)))
     {:status 200 :body "OK"}))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defn location-handler
   [request]
   (let [{:keys [params]} request
@@ -3165,8 +2889,7 @@ block.
       (let [place (geo/place-info point)]
         (db/update-place row-id place)))
     {:status 200 :body "OK"}))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -3188,15 +2911,13 @@ Each test begins with the \verb|with-redefs| expression to replace \verb|geo/pla
 To shorten the code, let's write the \verb|with-place-info| macro.
 It takes a function body and a block of code:
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (defmacro with-place-info
   [result & body]
   `(with-redefs [geo/place-info
                  (fn [~'point] ~result)]
      ~@body))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 Here's a positive scenario. In the \verb|with-place-info| macro, the geo search
 will return the specified map. We call the handler and check that the answer is
@@ -3205,8 +2926,7 @@ wait and read the last location. It should contain values from the geo search.
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (deftest test-place-ok
   (with-place-info
     {:title "test_title"
@@ -3225,13 +2945,11 @@ wait and read the last location. It should contain values from the geo search.
         (is (= "test_title" title))
         (is (= "test_country"
                country))))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (deftest test-place-ok
   (with-place-info
     {:title "test_title"
@@ -3244,8 +2962,7 @@ wait and read the last location. It should contain values from the geo search.
             {:keys [title country]} location]
         (is (= "test_title" title))
         (is (= "test_country" country))))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -3256,26 +2973,22 @@ That can happen when the request limit is exceeded. Let's declare an exception:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def ex-quota
   (ex-info
     "The limit of requests
                has been reached"
     {:status 429
      :body {:code :QUOTA_REACHED}}))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (def ex-quota
   (ex-info "The limit of requests has been reached"
            {:status 429 :body {:code :QUOTA_REACHED}}))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -3284,8 +2997,7 @@ Let's check that the application will return a positive status, but there is no 
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (deftest test-place-quota-reached
   (with-place-info (throw ex-quota)
   (let [request {:params {:lat 11.111
@@ -3300,13 +3012,11 @@ Let's check that the application will return a positive status, but there is no 
             location]
         (is (nil? title))
         (is (nil? country))))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (deftest test-place-quota-reached
   (with-place-info (throw ex-quota)
     (let [request {:params {:lat 11.111 :lon 22.222}}
@@ -3317,8 +3027,7 @@ Let's check that the application will return a positive status, but there is no 
             {:keys [title country]} location]
         (is (nil? title))
         (is (nil? country))))))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -3331,26 +3040,22 @@ Code modifying will become impossible without changes in the tests.
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (deftest test-place-conn-err
   (with-place-info
     (throw (new java.net.ConnectException
              "test_timeout"))
     ...))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (deftest test-place-conn-err
   (with-place-info
     (throw (new java.net.ConnectException "test_timeout"))
     ...))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -3374,26 +3079,22 @@ Recall that \verb|#'|\texttt{<some\-thing>} means \verb|(var <something>)|:
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (with-redefs-fn
   {#'geo/place-info (fn [point]
                       {:title "test"})}
   (fn []
     (geo/place-info {:lat 1 :lon 2})))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (with-redefs-fn
   {#'geo/place-info (fn [point] {:title "test"})}
   (fn []
     (geo/place-info {:lat 1 :lon 2})))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
@@ -3406,28 +3107,24 @@ Use the \verb|#| character in front of the form to turn it into an anonymous fun
 
 \ifx\DEVICETYPE\MOBILE
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (with-redefs-fn
   {#'geo/place-info (fn [point]
                       {:title "test"})}
   #(let [point {:lat 1 :lon 2}
          place (geo/place-info point)]
      ...))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \else
 
-\begin{english}
-  \begin{clojure}
+\begin{clojure}
 (with-redefs-fn
   {#'geo/place-info (fn [point] {:title "test"})}
   #(let [point {:lat 1 :lon 2}
          place (geo/place-info point)]
      ...))
-  \end{clojure}
-\end{english}
+\end{clojure}
 
 \fi
 
