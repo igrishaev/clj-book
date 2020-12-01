@@ -272,7 +272,7 @@ If we print the atom, we see the following:
 To extract a value, use the \verb|@| operator.
 The \verb|@| is a shorthand for \verb|(deref store)|.
 The \verb|deref| function takes an atom and returns the content.
-Semantically, this is the same as getting a value 
+Semantically, this is the same as getting a value
 by pointer.
 
 \index{deref}
@@ -605,9 +605,9 @@ It remembers the initial value at the moment of calculating a new one.
 The atom checks that the current value matches the initial value before updating the content.
 If they are not equal, then the atom has been updated from another thread.
 
-In this case, the atom repeats the cycle. The current value becomes the initial value, and a new one is calculated from it. The atom compares the current and initial values again. 
+In this case, the atom repeats the cycle. The current value becomes the initial value, and a new one is calculated from it. The atom compares the current and initial values again.
 The cycle is repeated until they are equal.
-This means that the atom was not updated during the computation. 
+This means that the atom was not updated during the computation.
 The atom changes the current value to a new one and exits the loop.
 
 We will show the above with an example.
@@ -1015,7 +1015,7 @@ Let's write a site footer component, where the small print indicates how many ti
 
 \subsection{Comments on Atoms}
 
-Atomic solutions have the following disadvantages.  
+Atomic solutions have the following disadvantages.
 Atoms do not link with other instances of the program. When an application occupies several nodes, each one stores its counter itself.
 If requests are sent to them evenly, the client will see different data.
 To avoid oddities, network storages like Redis are used.
@@ -1035,7 +1035,7 @@ An atom is quite complex: it is responsible for concurrent access, calls validat
 
 It also stores and changes a value.
 The function of the same name creates an object with a state.
-The \verb|vreset!| and \verb|vswap!| functions are similar to those we have looked at for atoms. 
+The \verb|vreset!| and \verb|vswap!| functions are similar to those we have looked at for atoms.
 The \verb|v-| prefix means they work with \verb|volatile|.
 
 Below is an example with resources. This time, instead of an atom, we use a different type of storage:
@@ -1112,7 +1112,7 @@ Let's rewrite the example with futures:
 
 The output shows that the second action worked once. If in the example with the atom the total was 3, then with \verb|volatile| we got 2.
 We lost the operation \verb|+1|.
-That proves \verb|volatile| is not suitable for multithreaded code. 
+That proves \verb|volatile| is not suitable for multithreaded code.
 
 However, there are advantages to this.
 The \verb|volatile| object does not restrict access, so changes are faster.
@@ -1122,7 +1122,7 @@ Overall, \verb|volatile| is aimed at speed.
 \subsection{Applying}
 
 \verb|Volatile| has two uses: they are transducers and imperative code. Transducers are a particular way of working with a collection.
-They wrap the functions — \verb|map|, \verb|reduce|, and others — in such a way that their combination does not produce intermediate lists. 
+They wrap the functions — \verb|map|, \verb|reduce|, and others — in such a way that their combination does not produce intermediate lists.
 This is possible due to the internal state.
 Write speed is significant for a transducer, so it is better to manage state with \verb|volatile| than with an atom.
 
@@ -1645,7 +1645,7 @@ The \verb|def| and \verb|defn| forms fill this map.
 You could say \verb|def| gives meaning to a word, and Clojure understands that word at compile time.
 
 A \emph{computation} operation binds with a symbol.
-If you enter \verb|num| in REPL, it will search the namespace with that key. After finding the key, REPL returns the variable value; in our case, it is 42. 
+If you enter \verb|num| in REPL, it will search the namespace with that key. After finding the key, REPL returns the variable value; in our case, it is 42.
 Otherwise, an error will occur.
 
 Clojure deliberately hides the variable stage from us, and rightly so.
@@ -2093,7 +2093,7 @@ Implementation:
 The trick lies in the \verb|log*| parameter \coderef{4}. The anonymous function in \verb|alter-var-root| takes the current value of the variable. It is the initial \verb|clojure.tools.logging/log*|, and the \verb|log*| parameter refers to it.
 The new function is closed on the initial one and can call it.
 
-The result is a decorator: we only change the input parameters and pass it on. After calling \verb|(install-better-logging)|, the exception output will change. 
+The result is a decorator: we only change the input parameters and pass it on. After calling \verb|(install-better-logging)|, the exception output will change.
 For the error to take the required form, it is enough to write \verb|(log/error e)|.
 
 The advantage is that we control \emph{everything} at the Clojure level.
@@ -2226,7 +2226,7 @@ Here is the list of a few others:
 \index{libraries!Component}
 
 \item
-  \verb|*print-meta*| determines whether or not to print the object metadata when printing. 
+  \verb|*print-meta*| determines whether or not to print the object metadata when printing.
 By default, it is false. Sometimes metadata stores fields that affect how the program works.
 For example, the Component library manages component dependencies through metadata.
 To see them, set \verb|*print-meta*| to true.
@@ -2752,7 +2752,7 @@ It takes a tag string and returns the translation. Of course, the locale must be
 Let's make it so that the filter reads it from middleware and does not affect the translation in parallel requests.
 
 Binding through \verb|binding| will help.
-Let's declare the \verb|*locale*| variable without value. In Clojure, such a variable is called "unbound". 
+Let's declare the \verb|*locale*| variable without value. In Clojure, such a variable is called "unbound".
 Think of it as a cell with no data.
 
 Let's change the \verb|tr| function: now it only takes a tag and refers to the global *\verb|*locale*| var as the locale:
@@ -2769,7 +2769,7 @@ Let's change the \verb|tr| function: now it only takes a tag and refers to the g
 \index{macros!with-locale}
 
 To isolate \verb|*locale*| from consumers, use the \verb|with-locale| macro.
-It executes the body while the variable is bound with the given locale. 
+It executes the body while the variable is bound with the given locale.
 Within a macro, any translation will work for that locale:
 
 \begin{english}
@@ -3060,7 +3060,7 @@ The pool will reach the \verb|(println 42)| task when the effect of the macro is
 
 The \verb|with-redefs| documentation emphasizes that the macro is useful for testing.
 Sometimes the application relies on third-party services like a geo search or social graph.
-During testing, there is a problem with access to services. 
+During testing, there is a problem with access to services.
 The application should not access them: this complicates tests and makes them dependent.
 
 The idea is to replace the functions that access the network during the tests.
@@ -3113,16 +3113,22 @@ Here's a request handler:
 
 \fi
 
-During the search, the mobile app is waiting for a response. In terms of machine, it's long because the network does not guarantee an instant response.
+During the search, the mobile app is waiting for a response. In terms of
+machine, it's long because the network does not guarantee an instant response.
 The more clients send coordinates, the more requests we send to the geo-service.
 The number of open connections is growing; the system is slowing down.
 
 \index{clojure.core!future}
 
-A quick solution is to write coordinates into the database and immediately respond to a client, and take out collecting the location data into the future object.
-As a result, wait times are reduced: now the app is waiting only for writes to the database, which is faster than a request to a third-party service.
+A quick solution is to write coordinates into the database and immediately
+respond to a client, and take out collecting the location data into the future
+object. As a result, wait times are reduced: now the app is waiting only for
+writes to the database, which is faster than a request to a third-party service.
 
-In the new version, the \verb|db/create-point| functon writes coordinates and returns the \verb|id of a new record. To later update the location with a place data, the key is needed. Database search and writing are performed in a future block.
+In the new version, the \verb|db/create-point| functon writes coordinates and
+returns the \verb|id| of a new record. To later update the location with a place
+data, the key is needed. Database search and writing are performed in a future
+block.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -3160,17 +3166,19 @@ In the new version, the \verb|db/create-point| functon writes coordinates and re
 
 \fi
 
-Other options are possible, such as a background handler or a task queue.
-But their implementation takes more time, and the future code will take a couple of lines. It is a cheap solution that will give you time to find a more elaborate one.
+Other options are possible, such as a background handler or a task queue.  But
+their implementation takes more time, and the future code will take a couple of
+lines. It is a cheap solution that will give you time to find a more elaborate
+one.
 
 \subsection{Tests}
 
 \index{tests}
 \index{clojure.core!with-redefs}
 
-Let's write a test for a new handler.
-In order not to generate network requests, we will temporarily replace the \verb|geo/place-info| function. 
-To complete the picture, let's check what happens if the geo search throws an exception.
+Let's write a test for a new handler. In order not to generate network requests,
+we will temporarily replace the \verb|geo/place-info| function. To complete the
+picture, let's check what happens if the geo search throws an exception.
 
 Each test begins with the \verb|with-redefs| expression to replace \verb|geo/place-info|.
 To shorten the code, let's write the \verb|with-place-info| macro.
@@ -3186,10 +3194,10 @@ It takes a function body and a block of code:
   \end{clojure}
 \end{english}
 
-Here's a positive scenario.
-In the \verb|with-place-info| macro, the geo search will return the specified map.
-We call the handler and check that the answer is positive. To make sure that the future has written the data to the database, we wait and read the last location.
-It should contain values from the geo search.
+Here's a positive scenario. In the \verb|with-place-info| macro, the geo search
+will return the specified map. We call the handler and check that the answer is
+positive. To make sure that the future has written the data to the database, we
+wait and read the last location. It should contain values from the geo search.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -3352,10 +3360,10 @@ For now, note that the \verb|with-redefs| macro is a simple way to mock somethin
 
 \index{clojure.core!with-redefs-fn}
 
-The \verb|with-redefs| relies on the \verb|with-redefs-f function.
-The difference in the syntax of the latter is that it accepts a map and a function with no arguments.
-Map keys are \verb|Var| objects.
-The function will run at the moment once the variables have received new values.
+The \verb|with-redefs| relies on the \verb|with-redefs-f| function. The
+difference in the syntax of the latter is that it accepts a map and a function
+with no arguments.  Map keys are \verb|Var| objects. The function will run at
+the moment once the variables have received new values.
 
 Let's rewrite our example using \verb|with-redefs-fn| instead of \verb|geo/place-info|.
 Recall that \verb|#'|\texttt{<some\-thing>} means \verb|(var <something>)|:

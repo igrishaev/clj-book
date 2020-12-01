@@ -65,8 +65,8 @@
 
 \captionsetup{labelsep=period}
 
-\captionsetup[listing]{name=Листинг}
-\captionsetup[figure]{name=Рис.}
+\captionsetup[listing]{name=Listing}
+\captionsetup[figure]{name=Fig.}
 
 
 % wavy lines
@@ -107,7 +107,7 @@
 
 % index
 \usepackage{index}
-\newindex{default}{idx}{ind}{Предметный указатель}
+\newindex{default}{idx}{ind}{Index}
 \usepackage[
   unbalanced,
   itemlayout=abshang,
@@ -157,8 +157,8 @@
 \input{charts}
 \input{macro}
 
-\author{Иван Гришаев}
-\title{Clojure на производстве}
+\author{Ivan Grishaev}
+\title{Clojure in Production}
 \date{}
 
 \usepackage{pdfpages}
@@ -193,7 +193,6 @@
 \setlength{\cftaftertoctitleskip}{2em}
 \fi
 
-
 %% reduce size of the main font
 \let\normalsize\small
 
@@ -207,7 +206,7 @@
 \ifx\PUBLISHER\RIDERO
 \includepdf[pages={1}]{media/ridero_opening.pdf}
 \else
-\input{abstract}
+\input{en/abstract}
 \fi
 
 %%
@@ -219,13 +218,13 @@
 \tableofcontents
 
 \clearpage
-\input{about}
+\input{en/about}
 
 \blank\include{en/ch1-web}
 \blank\include{en/ch2-spec}
 \blank\include{en/ch3-exceptions}
-%% \blank\include{en/ch4-mutability}
-%% \blank\include{en/ch5-config}
+\blank\include{en/ch4-mutability}
+\blank\include{en/ch5-config}
 %% \blank\include{en/ch6-systems}
 %% \blank\include{en/ch7-tests}
 
@@ -234,7 +233,7 @@
 \backmatter
 \fi
 
-\include{afterword}
+\include{en/afterword}
 
 % https://tex.stackexchange.com/questions/203720/
 \makeatletter\@openrightfalse\makeatother
@@ -246,7 +245,7 @@
 \fi
 
 \ifx\MODE\EBOOK
-\input{author}
+\input{en/author}
 \fi
 
 \end{document}

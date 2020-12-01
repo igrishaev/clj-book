@@ -10,22 +10,22 @@
 
 \newcommand{\slurp}{\vspace{-1em}}
 
-\newcommand{\coderef}[1]{(строка~#1)\xspace}
+\newcommand{\coderef}[1]{(line~#1)\xspace}
 
 \newenvironment{teaser}{\vspace{-3em}\slshape}{\vspace{1em}}
 
-\newcommand{\eng}[1]{(англ.~#1)}
+\newcommand{\eng}[1]{(eng.~#1)}
 
 \ifx\MODE\PRINT
-\newcommand{\page}[1]{(с.~\pageref{#1})}
-\newcommand{\fig}[1]{(рис.~\ref{#1})}
-\newcommand{\lis}[1]{(листинг~\ref{#1})}
+\newcommand{\page}[1]{(p.~\pageref{#1})}
+\newcommand{\fig}[1]{(fig.~\ref{#1})}
+\newcommand{\lis}[1]{(listing~\ref{#1})}
 \fi
 
 \ifx\MODE\EBOOK
-\newcommand{\page}[1]{\hyperref[#1]{\uline{(с.~\pageref{#1})}}}
-\newcommand{\fig}[1]{\hyperref[#1]{\uline{(рис.~\ref{#1})}}}
-\newcommand{\lis}[1]{\hyperref[#1]{\uline{(листинг~\ref{#1})}}}
+\newcommand{\page}[1]{\hyperref[#1]{\uline{(p.~\pageref{#1})}}}
+\newcommand{\fig}[1]{\hyperref[#1]{\uline{(fig.~\ref{#1})}}}
+\newcommand{\lis}[1]{\hyperref[#1]{\uline{(listing~\ref{#1})}}}
 \fi
 
 \ifx\DEVICETYPE\MOBILE
@@ -61,6 +61,8 @@
 \fi
 }
 
+
+%% todo: add xspace
 \def\EMAILLINK{\smartlink{\EMAIL}{mailto:\EMAIL}}
 
 \def\SITELINK{\smartlink{\DOMAIN}{https://\DOMAIN}}

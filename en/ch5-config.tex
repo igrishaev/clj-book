@@ -34,14 +34,14 @@ The code written by a programmer goes through several stages. These stages may d
 
 \label{hardcode}
 
-At each stage, the application runs alongside other projects. The assumption that port 8080 is free anytime is fanciful. In developer slang, the situation is called "hardcode" or "nailed down." If there are nailed-down values in the code, they introduce problems into 
+At each stage, the application runs alongside other projects. The assumption that port 8080 is free anytime is fanciful. In developer slang, the situation is called "hardcode" or "nailed down." If there are nailed-down values in the code, they introduce problems into
 its life cycle. You cannot work on a project and test it at the same time.
 
 The application does not need to know the server port~--- information about this comes from the outside. In a simple case, this source is the config file. The program reads the port from it and starts the server exactly as it needs to do on a specific machine.
 
 \index{configuration manager}
 
-In more complex scenarios, the file is not compiled by a person but a special program~--- a configuration manager. The manager stores information about network topology, machine addresses, and database access parameters. On request, it generate a config file for a specific machine or network segment. 
+In more complex scenarios, the file is not compiled by a person but a special program~--- a configuration manager. The manager stores information about network topology, machine addresses, and database access parameters. On request, it generate a config file for a specific machine or network segment.
 
 The process of passing parameters to an application and accepting them is called configuration. This step in software development deserves close attention. When this step is well organized, the project can easily go through all the stages of production.
 
@@ -72,7 +72,7 @@ Files and environment variables complement each other. For example, an applicati
 
 \index{tags}
 
-Advanced configurations use tags. In the file, the tag is placed before the value: \verb|:password #env DB_PASSWORD|. This means that the \verb|password| field contains not the \verb|DB_PASSWORD| string but the value of 
+Advanced configurations use tags. In the file, the tag is placed before the value: \verb|:password #env DB_PASSWORD|. This means that the \verb|password| field contains not the \verb|DB_PASSWORD| string but the value of
 the same name variable.
 
 The first stage ends when we have received the data. It doesn't matter if it was a file, environment variables, or something else. The application moves on to the second stage, \textbf{type inference}.
@@ -176,7 +176,7 @@ Now let's move on to the loader. It is a set of steps, each of which takes the r
   \end{clojure}
 \end{english}
 
-Now we will describe each step. The \verb|get-config-path| function reads an environment variable and checks to see if such a file exists on disk. If everything is okay, the function will return the file path; otherwise, it will call \verb|exit|: 
+Now we will describe each step. The \verb|get-config-path| function reads an environment variable and checks to see if such a file exists on disk. If everything is okay, the function will return the file path; otherwise, it will call \verb|exit|:
 
 \index{files}
 
@@ -462,7 +462,11 @@ Let's describe range checking. It takes a couple of \verb|Date| objects and comp
   \end{clojure}
 \end{english}
 
-At this point, you can call \verb|load-config!| and make sure that the output is a map with the proper types. The last step is \verb|set-config!| writes the map to the global \verb|CONFIG| variable. We chose an uppercase name for it to avoid shadowing it with the local \verb|config| variable. To substitute a variable, use \verb|alter-var-root.
+At this point, you can call \verb|load-config!| and make sure that the output is
+a map with the proper types. The last step is \verb|set-config!| writes the map
+to the global \verb|CONFIG| variable. We chose an uppercase name for it to avoid
+shadowing it with the local \verb|config| variable. To substitute a variable,
+use \verb|alter-var-root|.
 
 \index{clojure.core!alter-var-root}
 
@@ -530,7 +534,7 @@ At the start of the program, execute \texttt{(load-config!)} so that the configu
 
 \subsection{Work on Bugs}
 
-We have written a configuration loader. It is simple to maintain: every step is a function that is easy to modify. 
+We have written a configuration loader. It is simple to maintain: every step is a function that is easy to modify.
 Our code does not pretend to be an industrial solution, but it is suitable for small projects.
 
 Its advantage is that the configuration can be re-read at any time. This is handy for development: modify the file and run \verb|load-config!| in the REPL. A new configuration appears in the \verb|CONFIG|.
@@ -579,7 +583,7 @@ The termination of a JVM is too drastic. We should separate an error and respons
 \index{REPL}
 
 \mnoindent
-A better solution is to pass additional parameters to \texttt{load-config!|. Let's call one of them \verb|die-fn| (the "death function") that takes an exception. In production, it terminates the JVM, and in development, it writes a message to the REPL. Modify the loader to support the \verb|:die-fn| parameter. Consider default behavior if the parameter is not specified.
+A better solution is to pass additional parameters to \texttt{load-config!}. Let's call one of them \verb|die-fn| (the "death function") that takes an exception. In production, it terminates the JVM, and in development, it writes a message to the REPL. Modify the loader to support the \verb|:die-fn| parameter. Consider default behavior if the parameter is not specified.
 
 The loader relies on the \verb|s/conform| spec for type inference. In the chapter on Spec, we looked at the case when \verb|s/conform| adds boolean tags and changes the data structure \page{jdbc-conform-warning}. If we replace the \verb|::db| spec with the \verb|::jdbc/db-spec| one, we get the same case. We have set our \verb|::db| version without \verb|s/or| macros in order not to distort the data.
 
@@ -642,7 +646,7 @@ If we execute \verb|printenv|, we won't see \verb|FOO| in the output. The \verb|
 $ sh
 $ echo $FOO
   \end{bash}
-\en{english}
+\end{english}
 
 We get an empty string because the child does not have such a variable. Run \verb|exit| to return to the parent shell.
 
@@ -1118,7 +1122,7 @@ The variable map has the disadvantage of many extraneous fields. The application
 
 In the last step of \verb|s/conform|, you need to select only the useful data part from the map. The \verb|select-keys| function will return a subset of the list of keys. But where to get them? It takes a long time to list them manually, and besides, we duplicate the code. We have already specified the keys in the \verb|::config| spec, and we don't want to do this a second time. We'll use a trick to get the keys \emph{out of the spec}.
 
-The \verb|s/form| function takes a spec key and returns the frozen form of whatever was passed to \verb|s/def|. We will get a list where each item is a primitive or a collection of primitives (number, string, character, and others). 
+The \verb|s/form| function takes a spec key and returns the frozen form of whatever was passed to \verb|s/def|. We will get a list where each item is a primitive or a collection of primitives (number, string, character, and others).
 For the \verb|::config| spec, we'll get the following form:
 
 \begin{english}
@@ -1218,7 +1222,10 @@ Make it so the data source can be specified using a parameter. For example, \ver
 
 \index{collections!merger}
 
-An even more difficult problem is how to read both sources and combine them? Is the order important, and how to ensure it? How to combine maps asymmetrically, that is, when the second map only \emph{replaces| the fields of the first one but does not add new fields?
+An even more difficult problem is how to read both sources and combine them? Is
+the order important, and how to ensure it? How to combine maps asymmetrically,
+that is, when the second map only \emph{replaces} the fields of the first one
+but does not add new fields?
 
 \subsection{Inference of Structure}
 
@@ -1226,7 +1233,7 @@ An even more difficult problem is how to read both sources and combine them? Is 
 
 It rarely happens that a configuration is a flat dictionary. Parameters related by their meaning are placed in nested dictionaries; for example, server and database fields are separate. When the settings are in a group, they are easier to maintain. A good example is splitting config into pieces using \spverb|{keys [db server]}|. Each component of the system accepts the part of the same name as a mini config.
 
-Let's improve our loader: we will teach it to read nested variables. Let's agree that double underscore means a level change. We'll put the following variables 
+Let's improve our loader: we will teach it to read nested variables. Let's agree that double underscore means a level change. We'll put the following variables
 in the \verb|ENV_NEST| file:
 
 \begin{english}
@@ -1653,8 +1660,8 @@ Now we'll include the library and read the file. In place of the tags, we get th
       :password "*(&fd}A53z#$!"}}
   \end{clojure}
 \end{english}
-\fi
 
+\fi
 
 \noindent
 We'll take a closer look at Yummy in the next section of the chapter.
@@ -1685,7 +1692,7 @@ But JSON does not provide an opportunity to comment. At first glance, this is a 
 
 Developers have come up with tricks to get around this limitation in JSON.  For example, put the same name field in front of the one to which the comment relates:
 
-{\ifx\DEVICETYPE\MOBILE
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{json}
@@ -1707,8 +1714,8 @@ Developers have come up with tricks to get around this limitation in JSON.  For 
 }
   \end{json}
 \end{english}
-\fi
 
+\fi
 
 We expect the library to walk through the fields in turn, and the second field will replace the first. The JSON standard does not specify the order of the fields, so proceed at your own risk. The library logic can be different, for example, to throw an exception or skip an already processed key.
 
@@ -1877,7 +1884,7 @@ The language officially supports tags.
 
 \index{indentation!in YAML}
 
-The cons of YAML stem from its pros. Indentation seems to be a good solution until the file gets too large. The gaze hops between the screens to check structure levels. Sometimes part of the data moves to the side due to an unnecessary indent. In terms of YAML, there is no error, so it's hard to find it. 
+The cons of YAML stem from its pros. Indentation seems to be a good solution until the file gets too large. The gaze hops between the screens to check structure levels. Sometimes part of the data moves to the side due to an unnecessary indent. In terms of YAML, there is no error, so it's hard to find it.
 
 Sometimes, missing quotes will result in incorrect types or structure. Suppose the \verb|phrases| field lists phrases that a user will see:
 
@@ -1892,7 +1899,7 @@ phrases:
 
 Because of the colon in the last line, the parser will think it is a nested map. As a result, we get the wrong structure:
 
-ifx\DEVICETYPE\MOBILE
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -1933,7 +1940,7 @@ A tag starts with a hash character. The standard offers two tags by default: \ve
 
 Here's an example with different types, collections, and tags:
 
-ifx\DEVICETYPE\MOBILE
+\ifx\DEVICETYPE\MOBILE
 
 \begin{english}
   \begin{clojure}
@@ -2357,7 +2364,7 @@ db:
 \end{english}
 
 \noindent
-The \verb|!keyword! tag is useful for converting a string to the keyword:
+The \verb|keyword!| tag is useful for converting a string to the keyword:
 
 \begin{english}
   \begin{yaml}
