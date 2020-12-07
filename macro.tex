@@ -42,6 +42,11 @@
 
 \def\blank{\clearpage{\pagestyle{empty}\cleardoublepage}}
 
+%% footnote text,
+%% QR URL
+%% QR label
+%% QR offset
+
 \ifx\MODE\PRINT
 \NewDocumentCommand{\footurl}{ m m O{} O{1mm} }{%
   #1\footnote{\StrSubstitute{#2}{https://}{}}%

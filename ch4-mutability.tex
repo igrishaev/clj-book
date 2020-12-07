@@ -1320,11 +1320,11 @@ Current: 1, timeout: 5000 ;; 2
 
 \subsection{Примеры}
 
-Функция \verb|transient| порождает переходную коллекцию из исходной. Для
-работы с ней используют функции \verb|conj!|, \verb|assoc!|,
-\verb|dissoc!| и другие. Восклицательный знак на конце предупреждает об
-изменении данных. Функции меняют \emph{содержимое} коллекции, а не возвращают
-новую копию, как это делают обычные \verb|conj| и \verb|assoc|.
+Функция \verb|transient| порождает переходную коллекцию из исходной. Для работы
+с ней используют функции \verb|conj!|, \verb|assoc!|, \verb|dissoc!| и
+другие. Восклицательный знак на конце предупреждает об изменении данных. Функции
+меняют \emph{содержимое} коллекции и возвращают её же по аналогии с обычными
+\verb|conj| и \verb|assoc|
 
 \index{clojure.core!persistent"!}
 
@@ -1334,6 +1334,8 @@ Current: 1, timeout: 5000 ;; 2
 
 Рассмотрим переходный вектор. На него действуют функции \verb|conj!| и
 \verb|pop!|, добавить и убрать элемент из хвоста:
+
+\index{clojure.core!conj"!}
 
 \begin{english}
   \begin{clojure}
@@ -1369,8 +1371,85 @@ Current: 1, timeout: 5000 ;; 2
 штрихом или звёздочкой. Переходные коллекции встречаются редко, поэтому подходят
 на роль особых.
 
-После \verb|persistent!| коллекцию нельзя изменить. Следующий пример бросит
-исключение:
+Поскольку \verb|conj!| и аналоги возвращают переходную коллекцию, примеры выше
+легко переписать на стрелочный оператор. С ним результат мутирующего вызова
+переходит в следующее выражение:
+
+\ifx\DEVICETYPE\MOBILE
+
+\begin{english}
+
+  \begin{clojure}
+(-> [1 2 3]
+    (transient)
+    (conj! :a)
+    (conj! :b)
+    (pop!)
+    (persistent!))
+
+;; [1 2 3 :a]
+  \end{clojure}
+
+\splitter
+
+  \begin{clojure}
+(-> {:a 1}
+    (transient)
+    (assoc! :b 2)
+    (assoc! :c 3)
+    (dissoc! :b)
+    (persistent!))
+
+;; {:a 1 :c 3}
+  \end{clojure}
+
+\end{english}
+
+\else
+
+\begin{english}
+
+\noindent
+\begin{tabular}{ @{}p{5cm} @{}p{5cm} }
+
+  \begin{clojure}
+(-> [1 2 3]
+    (transient)
+    (conj! :a)
+    (conj! :b)
+    (pop!)
+    (persistent!))
+
+;; [1 2 3 :a]
+  \end{clojure}
+
+&
+
+  \begin{clojure}
+(-> {:a 1}
+    (transient)
+    (assoc! :b 2)
+    (assoc! :c 3)
+    (dissoc! :b)
+    (persistent!))
+
+;; {:a 1 :c 3}
+  \end{clojure}
+
+\end{tabular}
+
+\end{english}
+
+\fi
+
+Переход к изменяемым коллекциями сводится к формам \verb|transient| и
+\verb|persistent!| на границах стрелочного оператора и восклицательным знакам в
+\verb|assoc!| и аналогах. Заметим, что для одиночных \verb|transient| и
+\verb|persistent!| скобки не обязательны, но мы добавили их, чтобы стиль кода
+был одинаков.
+
+После вызова \verb|persistent!| коллекцию нельзя изменить. Следующий пример
+бросит исключение:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1398,68 +1477,6 @@ Current: 1, timeout: 5000 ;; 2
 \end{english}
 
 \fi
-
-Форма \verb|(persistent! <data*>)|, как правило, замыкает блок с~изменяемой
-переменной. Переходные коллекции помогают там, где нужен императивный
-подход. Выше мы работали с деревом и \verb|volatile| для сбора данных. Перепишем
-код на транзиентный вектор:
-
-\ifx\DEVICETYPE\MOBILE
-
-\begin{english}
-  \begin{clojure}
-(let [result* (transient [])
-      push! (fn [item]
-              (conj! result* item))]
-
-  ;; see section 5.4 from the doc:
-  ;; http://...
-  (when-let [a (some-> data
-                       :items
-                       first
-                       :result
-                       :value)]
-    (when-let [b (some-> data
-                       :records
-                       last
-                       :usage)]
-      (when (> a b)
-        (push! (* a b)))))
-
-  ;; more blocks...
-  (persistent! result*))
-  \end{clojure}
-\end{english}
-
-\else
-
-\begin{english}
-  \begin{clojure}
-(let [result* (transient [])
-      push! (fn [item]
-              (conj! result* item))]
-
-  ;; see section 5.4 from the doc: http://...
-  (when-let [a (some-> data :items first :result :value)]
-    (when-let [b (some-> data :records last :usage)]
-      (when (> a b)
-        (push! (* a b)))))
-
-  ;; more blocks...
-  (persistent! result*))
-  \end{clojure}
-\end{english}
-
-\fi
-
-\index{clojure.core!conj"!}
-
-\mnoindent
-Чтобы не писать каждый раз \spverb|(conj! result* item)|, мы вводим
-локальную функцию \verb|push!|. Она замкнута на \verb|result*| и принимает
-только значение. Чтобы добавить элемент, достаточно вызвать
-\verb|(push! x)|. Это сокращает код и скрывает способ, которым накапливают
-данные.
 
 \subsection{Итерация с изменением}
 
@@ -1564,6 +1581,7 @@ Current: 1, timeout: 5000 ;; 2
 \ifx\DEVICETYPE\MOBILE
 
 \begin{english}
+
   \begin{clojure}
 (reduce
  (fn [result n]
@@ -1582,11 +1600,13 @@ Current: 1, timeout: 5000 ;; 2
   (transient [])
   nums))
   \end{clojure}
+
 \end{english}
 
 \else
 
 \begin{english}
+
 \noindent
 \begin{tabular}{ @{}p{5cm} @{}p{5cm} }
 
@@ -1623,6 +1643,132 @@ Current: 1, timeout: 5000 ;; 2
 этом плане \verb|reduce| не такой гибкий: внутри анонимной функции мы не
 знаем, достигли конца итерации или нет. Без \verb|persistent!| второй пример
 вернёт транзиентную коллекцию, что недопустимо.
+
+\subsection{Скрытые детали}
+
+Кажется, что изменяемые коллекции снимают преграды на пути к императивному
+стилю. Это особенно помогает в сложной бизнес-логике. Достаточно объявить
+мутабельный вектор и постепенно наполнить его данными по условию:
+
+\begin{english}
+  \begin{clojure}
+(let [result* (transient [])
+      push! (fn [item]
+              (conj! result* item))]
+
+  (when-let [a ...]
+    (when-let [b ...]
+      (when (> a b)
+        (push! (- a b)))))
+
+  ;; ... more of when/push! blocks
+
+  (persistent! result*))
+  \end{clojure}
+\end{english}
+
+Функция \verb|push!| выше замкнута на аккумуляторе \verb|result*|, чтобы не
+требовать его в аргументах при каждом вызове. Обратите внимание, что результат
+\verb|conj!| мы игнорируем. В английском языке приём называют
+\footurl{<<bash in place>>}{https://clojure.org/reference/transients}[Transient\\*Data\\*Structures].
+Действительно, зачем нужен результат \verb|conj!|, если \verb|result*| доступен
+в любом месте \verb|let|? Схема кажется простой и удобной, но лучше воздержаться
+от неё по двум причинам.
+
+Во-первых, если код отталкивается от результата \verb|conj!| или \verb|assoc!|,
+это делает его похожим на обычный вариант с постоянными коллекциями. Выше мы
+рассмотрели пример со стрелочным оператором: изменяемая версия отличалась только
+дополнительными \verb|persistent| и \verb|transient!| на границах. Похоже ведут
+себя итерация и свёртка: чтобы ускорить обход, на каждом шаге передают
+транзиентный аккумулятор.
+
+Из этого следует, что переход к транзиентным коллекциям (или вынужденный откат)
+должен проходить легко. В идеале вы добавляете \verb|persistent| и
+\verb|transient!| и меняете \verb|conj| и \verb|assoc| на версии с
+восклицательным знаком. Пример с локальной функцией \verb|push!| противится
+этому правилу: его нельзя переписать на постоянные коллекции без серьёзных
+изменений. В лучшем случае мы заменим \verb|transient| на \verb|atom|, а функция
+\verb|push!| будет вызывать \verb|swap!| вместо \verb|conj!|.
+
+Вторая и более важная причина в том, что иногда повторный вызов \verb|assoc!| на
+исходной коллекции даёт неверный результат. Предположим, вы часто объединяете
+словари и провели оптимизацию: написали функцию \verb|fast-merge|, которая
+опирается на переходные коллекции\footnote{Пример основан на комментариях
+  к~функции \texttt{conj!} на сайте \texttt{clo\-ju\-re\-docs.org}}. Функция принимает
+два словаря. Из первого она получает \verb|transient|-версию, затем в цикле
+добавляет пары из второго словаря. Результат~--- постоянная коллекция:
+
+\begin{english}
+  \begin{clojure}
+(defn fast-merge [map1 map2]
+  (let [map-tr (transient map1)]
+    (doseq [[k v] map2]
+      (assoc! map-tr k v))
+    (persistent! map-tr)))
+  \end{clojure}
+\end{english}
+
+Простая проверка показывает, что все верно: работает и замена ключей, и их
+дополнение:
+
+\begin{english}
+  \begin{clojure}
+(fast-merge {:a 1 :b 2} {:a 3 :c 5})
+;; {:a 3 :b 2 :c 5}
+  \end{clojure}
+\end{english}
+
+Но для словаря объёмом более восьми ключей вы потеряете данные: в результат не
+попал ключ \verb|:extra|:
+
+\begin{english}
+  \begin{clojure}
+(fast-merge
+ {:a 1 :b 2 :c 3 :d 4
+  :e 5 :f 6 :g 7 :h 8}
+ {:extra 9})
+
+{:a 1 :b 2 :c 3 :d 4
+ :e 5 :f 6 :g 7 :h 8}
+  \end{clojure}
+\end{english}
+
+Если же сократить первый словарь до семи ключей, \verb|:extra| попадёт в
+него. Конечно, будет нелепо считать число ключей и в зависимости от этого менять
+алгоритм. Перепишем \verb|fast-merge| так, чтобы каждый \verb|assoc!| работал
+относительно прошлого результата. Для этого подойдёт свёртка:
+
+\begin{english}
+  \begin{clojure}
+(defn fast-merge [map1 map2]
+  (persistent!
+   (reduce-kv
+    (fn [map-tr k v]
+      (assoc! map-tr k v))
+    (transient map1)
+    map2)))
+  \end{clojure}
+\end{english}
+
+Новая функция не теряет ключи, хотя их порядок отличается от исходного:
+
+\begin{english}
+  \begin{clojure}
+(fast-merge
+ {:a 1 :b 2 :c 3 :d 4
+  :e 5 :f 6 :g 7 :h 8}
+ {:extra 9})
+
+{:extra 9 :e 5 :g 7 :c 3
+ :h 8 :b 2 :d 4 :f 6 :a 1}
+  \end{clojure}
+\end{english}
+
+Такое поведение связано со внутренним устройством класса
+\texttt{Tran\-si\-ent\-Hash\-Map}, в который мы не будем сейчас
+углубляться. Достаточно запомнить, что многократный вызов \verb|assoc!| на одной
+и той же коллекции может подвести вас. Тесты на малых словарях пройдут без
+ошибок, но в бою вы потеряете данные.
 
 \subsection{Семантика и ограничения}
 
