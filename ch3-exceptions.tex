@@ -1856,7 +1856,7 @@ Ring-приложения. Он ловит ошибки, отправляет и
 middleware.
 
 \begin{english}
-  \begin{clojure/lines*}{firstnumber=1}
+  \begin{clojure/lines}
 (require '[raven.client :as r])
 
 (defn wrap-exception
@@ -1864,97 +1864,96 @@ middleware.
   (fn [request]
     (try
       (handler request)
+      (catch Exception e
+        (report-exception request e)
+        {:status 500
+         :body "Internal error"}))))
+  \end{clojure/lines}
+\end{english}
+
+Главное место декоратора приходится на девятую строку. Именно здесь мы решаем,
+что делать с исключением в HTTP-запросе. Чтобы не усложнять код, вынесем эту
+часть в отдельную функцию. Вместе с исключением она принимает запрос, чтобы
+зафиксировать его метод и путь. Функция довольная плотная, поэтому рассмотрим её
+по частям.
+
+\ifx\DEVICETYPE\MOBILE
+
+\begin{english}
+  \begin{clojure/lines}
+(defn report-exception [request e]
+ (let
+   [event
+    (-> nil
+     (r/add-exception! e)
+     (r/add-ring-request! request)
+     (r/add-extra! {:some "data"}))]
+  \end{clojure/lines}
+\end{english}
+
+\else
+
+\begin{english}
+  \begin{clojure/lines}
+(defn report-exception [request e]
+  (let [event (-> nil
+                  (r/add-exception! e)
+                  (r/add-ring-request! request)
+                  (r/add-extra! {:some "data"}))]
+  \end{clojure/lines}
+\end{english}
+
+\fi
+
+\wavebottom
+
+Мы передаём в Sentry не просто исключение, а событие \coderef{2}. Сперва мы
+наращиваем его исключением, запросом Ring и произвольными данными. Функции
+\verb|(r/add-<something>)| дополняют событие различными полями. Raven предлагает
+функции, чтобы добавить теги, пользователя и другие сущности. Второй этап~---
+безопасно отправить событие:
+
+\wavetop
+
+\ifx\DEVICETYPE\MOBILE
+
+\begin{english}
+  \begin{clojure/lines*}{firstnumber=6}
+(try
+  @(r/capture! DSN event)
+  (catch Exception e-sentry
+    (log/errorf
+      e-sentry "Sentry error: %s" DSN)
+    (log/error e "Request failed")))))
   \end{clojure/lines*}
 \end{english}
 
-\wavebottom
+\else
+
+\begin{english}
+  \begin{clojure/lines*}{firstnumber=6}
+    (try
+      @(r/capture! DSN event)
+      (catch Exception e-sentry
+        (log/errorf e-sentry "Sentry error: %s" DSN)
+        (log/error e "Request failed")))))
+  \end{clojure/lines*}
+\end{english}
+
+\fi
 
 Обратите внимание, что запрос к Sentry тоже обёрнут в \verb|try/catch|. Sentry~---
 это отдельный сервис, который может быть недоступен. В этом случае в лог пишут
 оба исключения: и первичное, и связанное с Sentry. Если вы забыли, как работают
 декораторы и middleware, вернитесь к~главе про веб-разработку \page{decorator}.
 
-\wavetop
-
-\ifx\DEVICETYPE\MOBILE
-
-\begin{english}
-  \begin{clojure/lines*}{firstnumber=8}
-(catch Exception e
-  (let [event
-        (-> nil
-            (r/add-exception! e)
-            (r/add-ring-request!
-              request)
-            (r/add-extra!
-              {:something "else"}))]
-    (try @(r/capture! DSN event))))
-  \end{clojure/lines*}
-\end{english}
-
-\else
-
-\begin{english}
-  \begin{clojure/lines*}{firstnumber=8}
-      (catch Exception e
-        (let [event (-> nil
-                        (r/add-exception! e)
-                        (r/add-ring-request! request)
-                        (r/add-extra! {:something "else"}))]
-          (try
-            @(r/capture! DSN event))))
-  \end{clojure/lines*}
-\end{english}
-
-\fi
-
-\wavebottom
-
-Для полной картины мы передаём в Sentry не просто исключение, а событие
-\coderef{9}. Мы наращиваем его исключением, запросом Ring и произвольными
-данными. Функции \verb|(r/add-<something>)| дополняют событие различными
-полями. Raven предлагает функции, чтобы добавить теги, пользователя и другие
-сущности.
-
-\wavetop
-
-\ifx\DEVICETYPE\MOBILE
-
-\begin{english}
-  \begin{clojure/lines*}{firstnumber=17}
-(catch Exception e-sentry
-  (log/errorf e-sentry
-    "Sentry error: %s" DSN)
-  (log/error e "Request failed"))
-(finally
-  {:status 500
-   :body  "Internal error, please try
-   later"})))))))
-  \end{clojure/lines*}
-\end{english}
-
-\else
-
-\begin{english}
-  \begin{clojure/lines*}{firstnumber=15}
-            (catch Exception e-sentry
-              (log/errorf e-sentry "Sentry error: %s" DSN)
-              (log/error e "Request failed"))
-            (finally
-              {:status 500
-               :body "Internal error, please try later"})))))))
-  \end{clojure/lines*}
-\end{english}
-
-\fi
-
 \index{библиотеки!Manifold}
 \index{асинхронность}
 \index{синтаксис!@ (дереф)}
 
 \mnoindent
-Объясним оператор \verb|@| перед вызовом \verb|r/capture!| \ifx\DEVICETYPE\MOBILE\coderef{16}\else\coderef{14}\fi. Функция
-работает асинхронно за счёт библиотеки Manifold. Результат~--- это особый
+Объясним оператор \verb|@| перед вызовом \verb|r/capture!| \coderef{7}.
+Функция работает асинхронно за счёт библиотеки Manifold. Результат~--- это особый
 объект \verb|deferred|, похожий на футуру. Даже если в нём случилась ошибка, мы
 не узнаем этого, пока не <<дерефнем>> его. Оператор~\verb|@| ещё встретится нам
 в будущих главах.
@@ -2352,6 +2351,59 @@ with open("/path/to/file.txt", "w") as f:
 что мы написали. В отличие от нашего примера, \verb|with-open| работает с
 более абстрактным источником, в том числе и файлом. Выход из макроса, даже с
 ошибкой, закрывает источник.
+
+Важно помнить, что код из \verb|finally| не попадёт в результат. Форма
+\verb|try| устроена так, что при ошибке результат приходит из одной из веток
+\verb|catch|, а в \verb|finally| находятся побочные эффекты. Лучше всего это
+видно на примере с печатью:
+
+\begin{english}
+  \begin{clojure}
+(try (/ 0 0)
+     (catch Exception e
+       (println "catch")
+       :result-catch)
+     (finally
+       (println "finally")
+       :result-finally))
+  \end{clojure}
+\end{english}
+
+Если выполнить форму в REPL, увидим вывод:
+
+\begin{english}
+  \begin{clojure}
+catch
+finally
+:result-catch
+  \end{clojure}
+\end{english}
+
+Такой порядок говорит о том, что сначала Clojure выполнит код из \verb|catch|
+(печать <<catch>>) и запомнит результат (\verb|:result-catch|). Потом выполнит
+\verb|finally| (печать <<finally>>) и отбросит результат
+(\verb|:result-finally|). Кейворд \verb|:result-catch| станет итогом \verb|try|.
+
+Для сравнения приведём неудачный пример из практики. Нужно выполнить какое-то
+действие и независимо от исхода вернуть положительный результат. Программист
+обернул код в \verb|try/catch| и записал ошибку в лог. Однако результат он
+поместил в \verb|finally|, что вызвало странное поведение.
+
+\begin{english}
+  \begin{clojure}
+(try
+  (do-something)
+  (catch Exception e
+    (log/error e "some error"))
+  (finally
+    {:status 200}))
+  \end{clojure}
+\end{english}
+
+Видимо, программист решил, что \verb|finally|~--- в буквальном смысле финальный
+результат \verb|try|. Это не совсем так: \verb|finally| и правда сработает
+последним, но \verb|try| вернёт либо результат основного кода, либо одной из
+веток catch.
 
 В \verb|finally| нет смысла при работе с коллекциями или чистыми
 функциями. Пользуйтесь им только если ресурс занят и должен быть освобожден.
