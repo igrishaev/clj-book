@@ -25,3 +25,11 @@ mktextfm latt0800
 mktextfm larm0700
 mktextfm lasl1000
 mktextfm labx1000
+
+# 9pt extbook
+mktextfm larm1728
+mktextfm labx1728
+mktextfm larm1095
+mktextfm labx1095
+mktextfm lasl0800
+mktextfm lati0800
