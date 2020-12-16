@@ -91,6 +91,7 @@
 % code highlight
 \usepackage[newfloat=true]{minted}
 \usemintedstyle{print}
+%% \setminted{fontsize=\small} %% to reduce minted font
 \SetupFloatingEnvironment{listing}{placement=H}
 
 \ifx\DEVICETYPE\MOBILE
@@ -193,9 +194,8 @@
 \setlength{\cftaftertoctitleskip}{2em}
 \fi
 
-
-%% reduce size of the main font
-\let\normalsize\small
+%% globally reduce size of the main font
+%% \let\normalsize\small
 
 \begin{document}
 
