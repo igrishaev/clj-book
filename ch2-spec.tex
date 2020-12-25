@@ -3112,418 +3112,588 @@ blocked;1;test@test.com;active
 
 \subsection{Практика}
 
-\index{форматы!INI}
+\index{библиотеки!Etaoin}
+\index{Selenium}
+
+Рассмотрим задачу, которую автор решал в работе над библиотекой
+\footurl{Etaoin}{https://github.com/igrishaev/etaoin}[Etaoin]. Один из
+ее модулей выполняет команды Selenium IDE. Это расширение для браузера и один из
+продуктов одноименной компании. Расширение записывает действия в браузере в файл
+JSON. Получается сценарий, который можно запустить вручную или с помощью
+утилиты. Представим, что наша задача~--- написать интерпретатор этих сценариев.
+
+Внутри JSON-файла нас ожидает поле \verb|commands| с массивом команд. Каждая
+команда~--- словарь с ключами \verb|id|, \verb|command|, \verb|target|,
+\verb|value| и другими. Наиболее важно для нас поле \verb|command|, в котором
+находится имя команды: <<open>>, <<click>>, <<assert>> и другие. Приведем
+отрывок из файла:
+
+\begin{english}
+  \begin{json}
+"commands": [{
+  "id": "af046c62-d3e2-445b-a8b4-53a16251705f",
+  "command": "open",
+  "target": "/",
+  "value": ""
+}, {
+  "id": "ecc21655-be42-4c4e-bacb-91da3f4abba7",
+  "command": "setWindowSize",
+  "target": "1680x960",
+  "value": ""
+}]
+  \end{json}
+\end{english}
+
+\index{мультиметоды}
+
+На первый взгляд всё просто: обойдем команды в цикле и для каждой вызовем
+мультиметод \verb|do-cmd|. Мультиметод находит реализацию по полю
+\verb|:command|. Останется наполнить его всеми командами, и задача готова.
+
+\begin{english}
+  \begin{clojure}
+(defmulti do-cmd
+  (fn [command]
+    (-> command :command keyword)))
+
+(defmethod do-cmd :open
+  [command]
+  ...)
+
+(doseq [command commands]
+  (do-cmd command))
+  \end{clojure}
+\end{english}
+
+Ситуация усложняется из-за так называемых
+\footurl{flow-команд}{https://www.selenium.dev/selenium-ide/docs/en/introduction/control-flow}[Control\\*flow]:
+условия и повтора. В отличии от обычных команд, они включают себя другие (дочерние)
+команды. Их нельзя выполнить в лоб: при обработке \verb|if| мы сперва проверяем
+условие, а потом переходим на нужную ветку. В случае с for или repeat внутренний
+блок нужно выполнить определенное число раз.
+
+\index{control flow}
+
+Ниже показан минимальный пример с командой \texttt{if}. С точки зрения данных
+эти команды — вектор словарей, но мы добавили отступы для читаемости. Чтобы код
+не вышел громоздким, оставим с каждой команде минимальный набор полей.
+
+\begin{english}
+  \begin{clojure}
+(def data-if
+  [{:command "if" :condition ...}
+     {:command "print" :text "this is true"}
+   {:command "else"}
+     {:command "print" :text "this is false"}
+   {:command "end"}])
+  \end{clojure}
+\end{english}
+
+Как в настоящем языке программирования, команды Selenium IDE могут быть
+неограниченно вложены друг в друга. Например, если верно условие, открыть цикл:
+
+\begin{english}
+  \begin{clojure}
+[{:command "if" :condition ...}
+   {:command "for"}
+     ...
+   {:command "end"}
+ {:command "end"}]
+  \end{clojure}
+\end{english}
+
+\noindent
+или условие в цикле внутри цикла:
+
+\begin{english}
+  \begin{clojure}
+[{:command "for"}
+   {:command "if" :condition ...}
+      ...
+   {:command "else"}
+      ...
+   {:command "end"}
+ {:command "end"}]
+  \end{clojure}
+\end{english}
+
+Ожидается, что наш код принимает JSON-файл, некоторые параметры и выполняет
+команды с учетом условий и повторов. На страницах книги мы не будем решать
+задачу досконально, но разберем ее основную часть~--- группировку команд с
+учетом flow-операторов. И поможет нам в этом спека, а именно ее
+regex-функциональность.
+
 \index{парсинг}
 
-С помощью Spec парсят не только данные, но и текст. Рассмотрим, как прочитать
-INI-файл в словарь данных. \footurl{INI}{https://en.wikipedia.org/wiki/INI\_file}[INI][-3mm]~---
-это старый формат конфигурации. Он состоит из заголовков и пар полей и
-значений. Пример условного \verb|config.ini|:
-
-\begin{english}
-  \begin{ini}
-[database]
-host=localhost
-port=5432
-user=test
-
-[server]
-host=127.0.0.1
-port=8080
-  \end{ini}
-\end{english}
-
-Наша цель~--- получить словарь, где на первом уровне заголовки, а~под ними поля
-и значения.
+Очевидно, набор команд с \texttt{if} или \texttt{for} нельзя выполнить линейным
+обходом. Условные операторы наделяют код структурой, и мы должны отразить
+это. Для этого приведем плоский список к более сложному виду. Это будет список
+пар, где первый элемент~--- тег, а второй~--- команда или ее сгруппированный
+вариант. Например, для обычного \texttt{print} получим пару:
 
 \begin{english}
   \begin{clojure}
-{:database {:host "localhost"
-            :port 5432
-            :user "test"}
- :server {:host "127.0.0.1"
-          :port 8080}}
-  \end{clojure}
-\end{english}
-
-Если отбросить пустые строки и комментарии, формат сводится к~грамматике
-\verb|([title], (key=value)*)*|, где звёздочка означает сколько угодно раз, в
-том числе ничего.
-
-\index{clojure.core!doall}
-\index{clojure.core!with-open}
-
-Для начала прочитаем строки из файла. Спеки не должны иметь побочных эффектов,
-поэтому чтение выносят в отдельный шаг. Функция \verb|line-seq| ленива: она
-возвращает коллекцию строк, которая наполняется по мере обхода. Форма
-\verb|doall| насильно перебирает её, чтобы считать все элементы. Без
-\verb|doall| мы выйдем из макроса \verb|with-open| с~незаполненной
-коллекцией, но файл уже будет закрыт.
-
-\index{итерация!doall}
-
-\index{clojure.core!doall}
-
-\begin{english}
-  \begin{clojure}
-(require '[clojure.java.io :as io])
-
-(defn get-ini-lines [path]
-  (with-open [src (io/reader path)]
-    (doall (line-seq src))))
-  \end{clojure}
-\end{english}
-
-Переходим к парсеру. Это спека, которая принимает список строк. Алгоритм
-следующий:
-
-\begin{itemize}
-
-\item
-  удалить пустые строки и комментарии;
-
-\item
-  сгруппировать оставшиеся строки по заголовкам;
-
-\item
-  разбить поля и значения по знаку равенства;
-
-\item
-  построить вложенный словарь;
-
-\item
-  вывести типы и проверить результат.
-
-\end{itemize}
-
-Опишем спеку по принципу <<сверху вниз>>, словно все компоненты готовы. Ниже~---
-композиция, которая решает задачу:
-
-\begin{english}
-  \begin{clojure}
-(s/def ::->ini-config
-  (s/and
-   (s/conformer clear-ini-lines)
-   (s/* :ini/section)
-   (s/conformer remap-ini-data)
-   ::ini-config))
-  \end{clojure}
-\end{english}
-
-\index{функции!clear-ini-lines}
-\index{clojure.core!some-fn}
-
-Перейдём к недостающим элементам. Функция \verb|clear-ini-lines| убирает
-пустые строки и комментарии. В INI они начинаются с символа решётки.
-
-\ifx\DEVICETYPE\MOBILE
-
-\begin{english}
-  \begin{clojure}
-(defn comment? [line]
-  (str/starts-with? line "#"))
-
-(defn clear-ini-lines [lines]
-  (remove
-    (some-fn comment? str/blank?) lines))
-  \end{clojure}
-\end{english}
-
-\else
-
-\begin{english}
-  \begin{clojure}
-(defn comment? [line]
-  (str/starts-with? line "#"))
-
-(defn clear-ini-lines [lines]
-  (remove (some-fn comment? str/blank?) lines))
-  \end{clojure}
-\end{english}
-
-\fi
-
-\index{spec!*}
-
-Функция \verb|some-fn| объединяет несколько предикатов логикой <<любой
-из>>. Спека \spverb|(s/* :ini/section)| читается как <<ноль и более
-секций>>. Под секцией понимают заголовок и прилегающие поля и значения. Запишем
-её в виде \verb|s/cat|:
-
-\ifx\DEVICETYPE\MOBILE
-
-\begin{english}
-  \begin{clojure}
-(s/def :ini/section
-  (s/cat :title
-    :ini/title :fields (s/* :ini/field)))
-  \end{clojure}
-\end{english}
-
-\else
-
-\begin{english}
-  \begin{clojure}
-(s/def :ini/section
-  (s/cat :title :ini/title :fields (s/* :ini/field)))
-  \end{clojure}
-\end{english}
-
-\fi
-
-Объявим спеку \verb|:ini/title|. Она проверяет, что строка~--- это
-заголовок. Согласно формату, заголовок пишут в квадратных скобках. Если первый и
-последний символы~--- это скобки, отбросим их и вернём заголовок:
-
-\begin{english}
-  \begin{clojure}
-(s/def :ini/title
-  (s/and
-   #(str/starts-with? % "[")
-   #(str/ends-with? % "]")
-   (with-conformer [line]
-     (subs line 1 (dec (count line))))))
+[:cmd {:command "print" :text "hello"}],
   \end{clojure}
 \end{english}
 
 \noindent
-То же самое с регулярным выражением:
-
-\ifx\DEVICETYPE\MOBILE
+а для \texttt{if}~--- нечто следующее:
 
 \begin{english}
   \begin{clojure}
-(s/def :ini/title
-  (with-conformer [line]
-    (or (second
-         (re-matches #"^\[(.+)\]$" line))
-        ::s/invalid)))
+[:if {:tag {...}
+      :condition ...
+      :branch-true [{...} {...}]
+      :branch-false [{...} {...}]}]
   \end{clojure}
 \end{english}
 
-\else
+Видно, что второй элемент включает в себя все команды до завершающего
+end. Обработать такой узел гораздо легче, потому что он содержит все
+необходимое: головной \texttt{if}, команды из положительной и негативной веток.
+
+Начнем код с простой функции \texttt{parse-flow}, которая принимает вектор
+команд и возвращает вектор пар:
 
 \begin{english}
   \begin{clojure}
-(s/def :ini/title
-  (with-conformer [line]
-    (or (second (re-matches #"^\[(.+)\]$" line))
-        ::s/invalid)))
+(defn parse-flow [data]
+  (s/conform ::flow data))
   \end{clojure}
 \end{english}
 
-\fi
-
-\index{алгоритмы!base64}
-
-Спека \verb|:ini/field| парсит поле и значение. Строку разбивают по знаку
-равенства. Цифра 2 означает, что в результате должно быть не более двух
-элементов: ключ и значение. Это важно, потому что в~значении может быть знак
-равенства, например если это base64-строка. Если не получили пару, сигналим об
-ошибке.
+Определим спеку \texttt{::flow}. Это один и более элементов, каждый из которых
+либо \texttt{if}, либо обычная команда (для краткости пока что не будем
+учитывать \texttt{for}). Спека не допустит пустого списка команд, потому что
+обычно в этом нет смысла.
 
 \begin{english}
   \begin{clojure}
-(s/def :ini/field
-  (with-conformer [line]
-    (let [pair (str/split line #"=" 2)]
-      (if (= (count pair) 2)
-        pair
-        ::s/invalid))))
+(s/def ::flow
+  (s/+ (s/alt :if ::flow-if
+              :cmd ::command)))
   \end{clojure}
 \end{english}
 
-Не терпится проверить нашу работу. Обернём черновую спеку в~функцию
-\verb|parse-ini|, которая читает файл.
+Подумаем, какой смысл мы вкладываем в термин <<обычная команда>>. Если коротко,
+это действие, которое не зависит от других команд, то если не \texttt{if},
+\texttt{else}, \texttt{for} или \texttt{end}. В классических языках мы бы
+сказали, что не оператор ветвления. Чтобы отличить обычные команды от служебных,
+заведем множество flow-тегов:
 
 \begin{english}
   \begin{clojure}
-(s/def ::->ini-config
-  (s/and
-   (s/conformer clear-ini-lines)
-   (s/* :ini/section)))
-
-(defn parse-ini [path]
-  (let [lines (get-ini-lines path)]
-    (s/conform ::->ini-config lines)))
+(def flow-tags #{"if" "else" "end" "for"})
   \end{clojure}
 \end{english}
 
 \noindent
-Пробный результат:
+и объявим спеку \texttt{::command}. Она проверяет, что поле \texttt{:command}
+словаря заполнено, но не входит в особые теги:
 
 \begin{english}
   \begin{clojure}
-(parse-ini "config.ini")
-
-[{:title "database"
-  :fields [["host" "localhost"]
-           ["port" "5432"]
-           ["user" "test"]]}
- {:title "server"
-  :fields [["host" "127.0.0.1"]
-           ["port" "8080"]]}]
+(s/def ::command
+  (fn [obj]
+    (when-let [command (get obj :command)]
+      (not (contains? flow-tags command)))))
   \end{clojure}
 \end{english}
 
-Разбор прошёл удачно, хотя структура отличается от той, что мы планировали. Это
-неважно: мы вывели данные из текста, а привести словарь к нужному виду
-легко. Напишем функцию \verb|remap-ini-data|:
-
-\ifx\DEVICETYPE\MOBILE
+Введем вспомогательную функцию \texttt{tag=}. Она принимает тег и возвращает
+функцию, которая принимает команду и проверяет, что у нее такой же тег. Она
+пригодится, чтобы описывать предикаты без вспомогательных функций:
 
 \begin{english}
   \begin{clojure}
-(defn remap-ini-data [data-old]
-  (reduce
-   (fn [data-new entry]
-     (let [{:keys [title fields]} entry]
-       (assoc data-new
-         title (into {} fields))))
-   {}
-   data-old))
+(defn tag= [tag]
+  (fn [obj]
+    (= (get obj :command) tag)))
   \end{clojure}
 \end{english}
 
-\else
+Например:
 
 \begin{english}
   \begin{clojure}
-(defn remap-ini-data [data-old]
-  (reduce
-   (fn [data-new entry]
-     (let [{:keys [title fields]} entry]
-       (assoc data-new title (into {} fields))))
-   {}
-   data-old))
+(def tag-print? (tag= "print"))
+
+(tag-print? {:command "print"})
+;; true
   \end{clojure}
 \end{english}
 
-\fi
-
-\noindent
-Если передать в неё вектор из последнего шага, получим словарь:
-
-\ifx\DEVICETYPE\MOBILE
+Самое интересное кроется в спеке \texttt{::flow-if}. Приведем ее описание:
 
 \begin{english}
   \begin{clojure}
-{"database" {"host" "localhost"
-             "port" "5432"
-             "user" "test"}
- "server" {"host" "127.0.0.1"
-           "port" "8080"}}
+(s/def ::flow-if
+  (s/cat :this (tag= "if")
+         :flow ::flow
+         :else (s/? (s/cat :this (tag= "else")
+                           :flow ::flow))
+         :end (tag= "end")))
   \end{clojure}
 \end{english}
 
-\else
+Спека читается так. Сперва идет открывающий элемент с тегом
+\texttt{if}. Поместим его в словарь с ключом \texttt{:this}. Затем~--- одна и
+более любых команд, включая вложенные \texttt{if}. В поле \texttt{:else} попадет
+негативная ветка, однако лишь в том случае, если она нашлась (обертка
+\verb|s/?|~--- ни разу или один раз). Ветка обнаружится, если встретился тег
+else с последующими командами. Спека завершается элементом end.
+
+Уже на этом этапе можно проверить парсинг. Подберем минимальный пример с
+командой печати и условием:
 
 \begin{english}
   \begin{clojure}
-{"database" {"host" "localhost" "port" "5432" "user" "test"}
- "server" {"host" "127.0.0.1" "port" "8080"}}
+[{:command "if" :condition ...}
+   {:command "print" :text "this is true"}
+ {:command "else"}
+   {:command "print" :text "this is false"}
+ {:command "end"}]
   \end{clojure}
 \end{english}
 
-\fi
-
-Напишем спеку для вывода типов и проверки. Номера портов приводим к числам, хост
-и пользователь~--- не пустые строки.
-
-\ifx\DEVICETYPE\MOBILE
+Результат разбора:
 
 \begin{english}
   \begin{clojure}
-(s/def :db/host ::ne-string)
-(s/def :db/port ::->int)
-(s/def :db/user ::ne-string)
-
-(s/def ::database
-  (s/keys :req-un
-    [:db/host :db/port :db/user]))
-
-(s/def :server/host ::ne-string)
-(s/def :server/port ::->int)
-
-(s/def ::server
-  (s/keys :req-un
-    [:server/host :server/port]))
-
-(s/def ::ini-config
-  (s/keys :req-un [::database ::server]))
+[[:if
+  {:this {:command "if", :condition "..."},
+   :flow [[:cmd {:command "print", :text "this is true"}]],
+   :else
+   {:this {:command "else"},
+    :flow [[:cmd {:command "print", :text "this is false"}]]},
+   :end {:command "end"}}]]
   \end{clojure}
 \end{english}
 
-\else
+Более сложный вариант со вложенным \texttt{if}:
 
 \begin{english}
   \begin{clojure}
-(s/def :db/host ::ne-string)
-(s/def :db/port ::->int)
-(s/def :db/user ::ne-string)
-
-(s/def ::database
-  (s/keys :req-un [:db/host :db/port :db/user]))
-
-(s/def :server/host ::ne-string)
-(s/def :server/port ::->int)
-
-(s/def ::server
-  (s/keys :req-un [:server/host :server/port]))
-
-(s/def ::ini-config
-  (s/keys :req-un [::database ::server]))
-  \end{clojure}
-\end{english}
-
-\fi
-
-\index{модули!clojure.walk}
-\index{функции!keywordize-keys}
-
-Последний штрих~--- исправить тип ключей в словаре. В настоящий момент это
-строки, но спека \verb|::ini-config| ожидает кейворды. Модуль
-\verb|clojure.walk| предлагает функцию \verb|keywordize-keys| на этот
-случай. Она обходит словарь любой вложенности и меняет ключи. Итоговая спека:
-
-\begin{english}
-  \begin{clojure}
-(require '[clojure.walk :as walk])
-
-(s/def ::->ini-config
-  (s/and
-   (s/conformer clear-ini-lines)
-   (s/* :ini/section)
-   (s/conformer remap-ini-data)
-   (s/conformer walk/keywordize-keys)
-   ::ini-config))
+[{:command "if" :condition "..."}
+   {:command "if" :condition "..."}
+     {:command "print" :text "hello"}
+   {:command "end"}
+ {:command "end"}]
   \end{clojure}
 \end{english}
 
 \noindent
-Результат:
+Видно, что структура кода сохраняется:
 
 \begin{english}
   \begin{clojure}
-(parse-ini "config.ini")
-
-{:database {:host "localhost"
-            :port 5432
-            :user "test"}
- :server {:host "127.0.0.1"
-          :port 8080}}
+[[:if
+  {:this {:command "if", :condition "..."},
+   :flow
+   [[:if
+     {:this {:command "if", :condition "..."},
+      :flow [[:cmd {:command "print", :text "hello"}]],
+      :end {:command "end"}}]],
+   :end {:command "end"}}]]
   \end{clojure}
 \end{english}
 
-Получились аккуратные данные из текста. Обратите внимание, что в коде нет
-состояния и в целом он выглядит как цепочка шагов. Каждый шаг легко исправить
-или добавить новый между ними.
+Еще более важно, что ошибки в структуре не пройдут валидацию спекой. Например,
+незакрытый тег \texttt{end} породит сбой в \texttt{::flow-if}, потому что он
+обязателен на конце. Двойной \texttt{end} или \texttt{else} тоже нарушает спеку,
+ровно как и пустая ветка. Все варианты ниже вернут \texttt{::s/invalid}.
 
-Устраните мелкие недостатки в коде. Пусть пара \verb|"foo="| становится
-\verb|{:foo nil}|, а не \spverb|{:foo ""}|.  Удалите пустые символы из
-имён полей и~значений. Опробуйте код на больших INI-файлах.
+\begin{english}
+  \begin{clojure}
+(def data-broken1
+  [{:command "if" :condition "..."}
+   {:command "print" :text "hello"}])
 
-\section{Разбор кода (теория)}
+(def data-broken2
+  [{:command "if" :condition "..."}
+   {:command "print" :text "hello"}
+   {:command "end"}
+   {:command "end"}])
+
+(def data-broken3
+  [])
+  \end{clojure}
+\end{english}
+
+Исследуйте отчет \verb|s/explain| для этих случаев и подумайте над показом
+ошибки.
+
+Парсинг легко дополнить новым оператором ветвления. До сих пор мы игнорировали
+тег for для цикла, и теперь добавим его в три шага.
+
+Во-первых, убедимся, что он входит в множество \texttt{flow-tags}, чтобы for не
+считался обычной командой.
+
+Во-вторых, расширим главную спеку \texttt{::flow}. Теперь ее элемент либо
+\texttt{if}, либо \texttt{for}, либо обычная команда:
+
+\begin{english}
+  \begin{clojure}
+(s/def ::flow
+  (s/+
+   (s/alt :if ::flow-if
+          :for ::flow-for
+          :cmd ::command)))
+  \end{clojure}
+\end{english}
+
+В-третьих, напишем спеку \texttt{::flow-for}. Она проще \texttt{if}, потому что
+включает в себя только один блок команд.
+
+\begin{english}
+  \begin{clojure}
+(s/def ::flow-for
+  (s/cat :this (tag= "for")
+         :flow ::flow
+         :end (tag= "end")))
+  \end{clojure}
+\end{english}
+
+Пример с циклом, в теле которого условие:
+
+\begin{english}
+  \begin{clojure}
+[{:command "for"}
+   {:command "if" :condition "..."}
+     {:command "print" :text "hello"}
+   {:command "end"}
+ {:command "end"}]
+
+[[:for
+  {:this {:command "for"},
+   :flow
+   [[:if
+     {:this {:command "if", :condition "..."},
+      :flow [[:cmd {:command "print", :text "hello"}]],
+      :end {:command "end"}}]],
+   :end {:command "end"}}]]
+  \end{clojure}
+\end{english}
+
+По аналогии легко добавить операторы \texttt{repeat} и другие, которые
+оборачивают блок кода и выполняют его несколько раз или по условию.
+
+Подумайте, как составить спеку для оператора \texttt{switch}. Он принимает один
+и более блоков case; внутри каждого блока~--- произвольные команды, которые
+выполняются, если управление переходи на этот блок.
+
+\begin{english}
+  \begin{clojure}
+[{:command "switch" :value "..."}
+   {:command "case" :value 1}
+     {:command "print" :text "one"}
+   {:command "end"}
+     {:command "case" :value 2}
+   {:command "print" :text "two"}
+     {:command "end"}
+ {:command "end"}]
+  \end{clojure}
+\end{english}
+
+\subsubsection{Исполнение кода}
+
+\index{интерпретация}
+
+Мы выполнили большую работу~--- из плоского списка команд вывели структуру с
+учетом вложенности. Интересно, для этого понадобился только один модуль из
+поставки Clojure и менее ста строк кода. Система проста и может быть легко
+расширена новыми тегами.
+
+Чтобы оценить результат, напишем минимальный интерпретатор новой структуры. Для
+удобства решим, что среди обычных команд встречается только печать на экран,
+\texttt{print}. Начнем с общей функции \texttt{run-data}:
+
+\begin{english}
+  \begin{clojure}
+(defn run-data [data]
+  (let [result (parse-flow data)]
+    (if (s/invalid? result)
+      (println "Wrong data!")
+      (run-flow result))))
+  \end{clojure}
+\end{english}
+
+Она принимает список команд и парсит их \texttt{parse-flow}, которую мы задали
+выше. Если парсинг не удался, напечатаем ошибку. Если же все в порядке, запустим
+выполнение с помощью пока что неизвестной функции \texttt{run-flow}. Напомним,
+что при удачном разборе переменная \texttt{result} получит вектор пар или
+flow-узлов. Выполнить их означает пройтись по всем узлам и передать их в
+неизвестный пока \texttt{do-flow}:
+
+\begin{english}
+  \begin{clojure}
+(defn run-flow [flow]
+  (doseq [flow flow]
+    (do-flow flow)))
+  \end{clojure}
+\end{english}
+
+Подумаем, что такое \texttt{do-flow}. Поскольку для каждого типа узла нужна своя
+реализация, логично объявить мультиметод. Он ищет свою реализацию по первому
+элементу пары~--- тегу:
+
+\begin{english}
+  \begin{clojure}
+(defmulti do-flow
+  (fn [[tag flow]]
+    tag))
+  \end{clojure}
+\end{english}
+
+Если узел~--- обычная команда, выполним ее с помощью обработчика \texttt{do-cmd}:
+
+\begin{english}
+  \begin{clojure}
+(defmethod do-flow :cmd
+  [[_ command]]
+  (do-cmd command))
+  \end{clojure}
+\end{english}
+
+Роль \texttt{do-cmd} тоже играет мультиметод, потому что у команд может быть
+много реализаций. Мультиметод опирается на поле команды \texttt{:command}:
+
+\begin{english}
+  \begin{clojure}
+(defmulti do-cmd
+  (fn [command]
+    (-> command :command keyword)))
+  \end{clojure}
+\end{english}
+
+\noindent
+В нашем случае добавим только печать:
+
+\begin{english}
+  \begin{clojure}
+(defmethod do-cmd :print
+  [{:keys [text]}]
+  (println text))
+  \end{clojure}
+\end{english}
+
+Позже у нас появятся \texttt{:click}, \texttt{:open}, \texttt{:assert} и много
+других действий.  \footurl{Полный список}{https://www.selenium.dev/selenium-ide/docs/en/api/commands}[Commands]
+к документации Selenium IDE включает несколько десятков команд.
+
+Итак, выполнить простую команду для нас не проблема. Теперь добавим реализацию
+для блока \texttt{if}:
+
+\begin{english}
+  \begin{clojure/lines}
+(defmethod do-flow :if
+  [[_ {:keys [this flow else]}]]
+  (if ...
+    (run-flow flow)
+    (when else
+      (let [{:keys [this flow]} else]
+        (run-flow flow)))))
+  \end{clojure/lines}
+\end{english}
+
+В третьей строке мы должны проверить условие, которое обычно помещают в поле
+\texttt{:expression} тега \texttt{if}. Головной тег \texttt{if} находится в
+\texttt{:this}, поэтому условие мы бы получили как \texttt{(:expression
+  this)}. Пока что не ясно, как проверить условие, поэтому мы оставили
+многоточие. Если условие истина, рекурсивно вызываем \texttt{run-flow} для
+положительной ветви \texttt{if}. Вложенные \texttt{if} и \texttt{for} будут
+обработаны должным образом. Если же условие ложно и при этом заполнена
+негативная ветка, выполним блок \texttt{flow} из нее.
+
+Чтобы добиться исполнения кода, пойдем на еще несколько упрощений. Во-первых,
+решим, что в выражении \texttt{if} могут быть только литералы \texttt{TRUE} и
+\texttt{FALSE}. Во-вторых, для демонстрации \texttt{for} сделаем так, что он
+просто выполняет блок три раза. Конечно, в промышленной системе это не так, но
+сейчас нам главное убедиться в результате.
+
+Напишем наивную функцию для проверки условия:
+
+\begin{english}
+  \begin{clojure}
+(defn test-condition [condition]
+  (case condition
+    "TRUE" true
+    "FALSE" false
+    (throw
+     (new Exception
+          (format "Wrong condition: %s" condition)))))
+  \end{clojure}
+\end{english}
+
+С ней версия \texttt{do-flow} для \texttt{if} выглядит так:
+
+\begin{english}
+  \begin{clojure}
+(defmethod do-flow :if
+  [[_ flow-if]]
+  (let [{:keys [this flow else]} flow-if
+        {:keys [condition]} this]
+    (if (test-condition condition)
+      ...)))
+  \end{clojure}
+\end{english}
+
+Реализация для \texttt{for}:
+
+\begin{english}
+  \begin{clojure}
+(defmethod do-flow :for
+  [[_ flow-for]]
+  (let [{:keys [this flow]} flow-for]
+    (dotimes [_ 3]
+      (run-flow flow))))
+  \end{clojure}
+\end{english}
+
+Составим простой пример со вложенными операторами:
+
+\begin{english}
+  \begin{clojure}
+(def data-test
+  [{:command "print" :text "begin"}
+   {:command "if" :condition "TRUE"}
+     {:command "for"}
+       {:command "print" :text "this is true"}
+     {:command "end"}
+   {:command "else"}
+     {:command "print" :text "this is false"}
+   {:command "end"}
+   {:command "print" :text "end"}])
+  \end{clojure}
+\end{english}
+
+При запуске увидим на экране строки:
+
+\begin{english}
+  \begin{clojure}
+(run-data data-test)
+
+begin
+this is true
+this is true
+this is true
+end
+  \end{clojure}
+\end{english}
+
+Видим, что сработала только положительная ветка, причем в цикле
+\texttt{for}. Разбор и выполнение команд написаны правильно.
+
+Интерпретация кода~--- крайне интересная тема. Она открывает неожиданные
+решения, например языки сценариев, описание бизнес процессов и многое
+другое. Для экономии места мы опустили важные детали: контекст переменных,
+перехват исключений и отладку. Но наиболее важный шаг~--- разбор команд до их
+исполнения~--- рассмотрен нами полностью. Мы описали его спекой без участия
+сторонних библиотек, что, на наш взгляд, только доказывает, насколько это
+здорово~--- иметь столь мощный инструмент под рукой.
+
+\section{Разбор Clojure-кода (теория)}
 
 \index{парсинг}
 \index{макросы}
