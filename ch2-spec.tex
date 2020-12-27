@@ -3375,11 +3375,11 @@ regex-функциональность.
 \begin{english}
   \begin{clojure}
 [[:if
-  {:this {:command "if", :condition "..."},
-   :flow [[:cmd {:command "print", :text "this is true"}]],
+  {:this {:command "if" :condition "..."}
+   :flow [[:cmd {:command "print" :text "this is true"}]]
    :else
-   {:this {:command "else"},
-    :flow [[:cmd {:command "print", :text "this is false"}]]},
+   {:this {:command "else"}
+    :flow [[:cmd {:command "print" :text "this is false"}]]}
    :end {:command "end"}}]]
   \end{clojure}
 \end{english}
@@ -3402,12 +3402,12 @@ regex-функциональность.
 \begin{english}
   \begin{clojure}
 [[:if
-  {:this {:command "if", :condition "..."},
+  {:this {:command "if" :condition "..."}
    :flow
    [[:if
-     {:this {:command "if", :condition "..."},
-      :flow [[:cmd {:command "print", :text "hello"}]],
-      :end {:command "end"}}]],
+     {:this {:command "if" :condition "..."}
+      :flow [[:cmd {:command "print" :text "hello"}]]
+      :end {:command "end"}}]]
    :end {:command "end"}}]]
   \end{clojure}
 \end{english}
@@ -3487,12 +3487,12 @@ regex-функциональность.
 \begin{english}
   \begin{clojure}
 [[:for
-  {:this {:command "for"},
+  {:this {:command "for"}
    :flow
    [[:if
-     {:this {:command "if", :condition "..."},
-      :flow [[:cmd {:command "print", :text "hello"}]],
-      :end {:command "end"}}]],
+     {:this {:command "if" :condition "..."}
+      :flow [[:cmd {:command "print" :text "hello"}]]
+      :end {:command "end"}}]]
    :end {:command "end"}}]]
   \end{clojure}
 \end{english}
