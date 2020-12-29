@@ -1203,50 +1203,18 @@ Unix. Добейтесь следующего результата:
 
 Вывод числа:
 
-\ifx\DEVICETYPE\MOBILE
-
 \begin{english}
   \begin{clojure}
-(def ->int
-  (with-conformer [val]
-    (Integer/parseInt val)))
-  \end{clojure}
-
-\splitter
-
-  \begin{clojure}
 (s/def ::->int
-  (s/and ::ne-string
-         ->int))
+  (s/and
+    ::ne-string
+    (with-conformer [val]
+      (Integer/parseInt val))))
+
+(s/conform ::->int "123")
+;; 123
   \end{clojure}
 \end{english}
-
-\else
-
-\begin{english}
-
-\noindent
-\begin{tabular}{ @{}p{5cm} @{}p{5cm} }
-
-  \begin{clojure}
-(def ->int
-  (with-conformer [val]
-    (Integer/parseInt val)))
-  \end{clojure}
-
-&
-
-  \begin{clojure}
-(s/def ::->int
-  (s/and ::ne-string
-         ->int))
-  \end{clojure}
-
-\end{tabular}
-
-\end{english}
-
-\fi
 
 \noindent
 и булева типа:
@@ -1265,6 +1233,9 @@ Unix. Добейтесь следующего результата:
 
        ("false" "0" "off" "no" )
        false))))
+
+(s/conform ::->bool "no")
+;; false
   \end{clojure}
 \end{english}
 
@@ -1279,13 +1250,17 @@ Unix. Добейтесь следующего результата:
      (case val
        ("true"  "1" "on"  "yes") true
        ("false" "0" "off" "no" ) false))))
+
+(s/conform ::->bool "no")
+;; false
   \end{clojure}
 \end{english}
 
 \fi
 
 \noindent
-Переменная \verb|->lower|~--- это обёртка для приведения регистра:
+В последнем примере переменная \verb|->lower|~--- обёртка для приведения к
+нижнему регистру:
 
 \ifx\DEVICETYPE\MOBILE
 
