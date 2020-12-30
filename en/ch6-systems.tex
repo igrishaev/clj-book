@@ -1,153 +1,83 @@
-\chapter{Системы}
+\chapter{Systems}
 
 \label{chapter-systems}
 
-\index{системы}
+\index{systems}
 
 \begin{teaser}
-В этой главе мы поговорим о системах. Так называют набор компонентов со связями
-между ними. Рассмотрим, как большие проекты складываются из малых частей; как
-победить сложность и заставить части работать как одно целое.
+In this chapter, I'll tell you about systems, i.e., collections of interrelated components. We'll look at how large projects are assembled of small parts as well as how to overcome complexity and make the parts work as one.
 \end{teaser}
 
-Понятие системы связано с конфигурацией, которую мы только что обсудили. Отличие
-в том, что конфигурация отвечает на вопрос, как \emph{получить} параметры, а
-система знает, как ими \emph{распорядиться}.
+The concept of a system is related to the configuration we just discussed. The configuration answers the question of how to \emph{get} the parameters, and the system knows how \emph{to use} them.
 
-Системы появились, когда возник спрос на долгоиграющие приложения. Для скриптов
-и утилит вопрос не стоял остро: их время работы коротко, и состояние живет
-недолго. При завершении ресурсы освобождаются, поэтому нет смысла в контроле за
-ними.
+Systems emerged when the demand for long-running applications arose. We don't require such things from scripts and utilities as they have a short runtime and a state that does not last long. When scripts and utilities finish their work, resources get released, so there is no point in monitoring them.
 
-С серверными приложениями всё по-дру\-го\-му: они работают постоянно и поэтому
-устроены иначе, чем скрипты. Приложение состоит из компонентов, которые работают
-в фоне. Каждый компонент выполняет узкую задачу. При запуске приложение включает
-компоненты в~правильном порядке и строит между ними связи.
+Things are different for server applications: they work all the time, and therefore, are designed differently than scripts. The application consists of components that run in the background. Each component performs its specific task. At startup, the app enables enables components in the correct order and builds connections between them.
 
-\section{Подробнее о системе}
+\section{More Details on Systems}
 
-\index{состояние}
+\index{state}
 
-Компонент~--- это объект, который несёт состояние. На него действуют операции
-<<включить>> и <<выключить>>. Как правило, включить компонент означает открыть
-ресурс, а выключить~--- закрыть его.
+A component is a stateful object. It is affected by the "on" and "off" operations. As a rule, to enable a component means to open the resource, and to disable~--- means to close it.
 
-\index{граф зависимостей}
+\index{dependency graph}
 
-Типичные компоненты приложения~--- это сервер, база данных, кэш. Чтобы не открывать
-соединение на каждый запрос к базе, понадобится пул соединений. Не хотелось бы
-создавать его вручную и передавать в функции JDBC. Должен быть компонент,
-который при включении открывает пул и хранит его. Потребителям компонент
-предлагает методы для работы с базой. Внутри они используют открытый пул.
+Typical application components are server, database, and cache. In order not to open a connection for every database request, you need a connection pool. I should hate to create it manually and pass it into JDBC functions. There should be a component that, when enabled, opens the pool and stores it. Such a component offers consumers methods for working with a database. Internally, they use an open pool.
 
-\index{ООП}
+\index{OOP}
 
-На первый взгляд, схема напоминает ООП и инкапсуляцию. Не торопитесь с выводами:
-компоненты в Clojure работают иначе. Ниже мы рассмотрим разницу между объектами
-и компонентами.
+At first glance, the scheme resembles OOP and encapsulation. But don't jump to conclusions: components in Clojure work differently. Below we will look at how objects differ from components.
 
-\subsection{Зависимости}
+\subsection{Dependencies}
 
-Главная точка системы~--- это зависимости компонентов. Сервер, база и~кэш не зависят
-друг от друга. Это базовые компоненты системы, на которые опираются другие,
-уровнем выше. Предположим, фоновый поток читает базу и отправляет письма. Будет
-неправильно, если компонент откроет новые подключения к базе и почте. Вместо
-этого он принимает включённые компоненты и работает с ними как с чёрным ящиком.
+The main point of the system is component dependencies. A server, database, and cache are independent of each other. These are the base components of the system on which others, a level higher, rely. Suppose a background thread reads the database and sends emails. It will be wrong if the component opens new connections to the database and email. Instead, it takes the enabled components and works with them like with a black box.
 
-Система запускает и останавливает компоненты в верном порядке. Если компонент A
-зависит от B и C, то к моменту запуска A последние два должны быть включены. При
-завершении компоненты B и C нельзя выключить до тех пор, пока работает~A, потому
-что это нарушит его работу. Система строит граф зависимостей между
-компонентами. Граф обходят так, чтобы удовлетворить всех участников.
+A system starts and stops components in the correct order. If component A depends on B and C, then by the time A starts up, the other two should be enabled. On completion, the B and C components must not be shut down as long as A is running because this will disrupt its operation. The system builds a dependency graph between components. The graph is traversed so as to satisfy all participants.
 
-В систему должно быть легко добавить новый компонент. В идеальном случае система~---
-это комбинация словарей и списков. Код загрузки пробегает по ним и включает
-компоненты. Расширить систему означает добавить новый узел в дерево.
+It should be easy to add a new component to a system. Ideally, the system is a combination of maps and lists.  The boot code runs through them and enables the components. Extending the system means adding a new node to the tree.
 
-Когда система знает о зависимостях, можно включить её подмножество. Представим,
-нужно отладить обработчик почты, который зависит от базы и
-SMTP-сервера. Веб-сервер и кэш в данном случае не нужны, и запуск всей системы
-избыточен. Продвинутые системы предлагают функцию с семантикой <<запусти этот
-компонент и его зависимости>>.
+Once the system is aware of the dependencies, a subset of it can be included. Let's say you need to debug an email handler that depends on a database and SMTP server. You don't need the web server and cache in this case, and starting the entire system is redundant. Advanced systems offer a feature with "run this component and its dependencies" semantics.
 
-\subsection{Преимущества}
+\subsection{Advantages}
 
-На первый взгляд кажется, что система~--- лишнее усложнение. Это новая
-библиотека, соглашения в команде и рефакторинг. Однако первичные неудобства
-окупаются со временем.
+At first glance, it seems that the system only overcomplicates things. It will require a new library, team conventions, and refactoring. However, the inconvenience pays off over time.
 
-Система приводит проект в порядок. С ростом кодовой базы становится важно, чтобы
-части проекта были в одном стиле. Если этому следовать, служебные компоненты
-уйдут в библиотеки, а в проекте останется только логика. Проще начать проект,
-когда под рукой база внутренних компонентов, испытанных в бою.
+The system puts the project in order. As the codebase grows, it becomes important that the components of a project are in the same style. If you follow this path, the service components will go to the libraries, and only the logic will remain in the project. It's easier to start a project with a tried-and-tested base of internal components.
 
-Системы полезны на всех стадиях производства, особенно тестировании. В тестах
-запускают систему, где некоторые компоненты работают по-другому. Например,
-отправитель СМС пишет сообщения в файл или атом. Компонент авторизации читает
-код подтверждения из этих источников. Подход не гарантирует полной надёжности,
-но выполнит тесты изолировано, без обращения к~сторонним сервисам. Проблему
-изоляции мы рассмотрим в~главе про тесты \page{test-isolation}.
+Systems are useful at all stages, especially when testing. Tests run a system where some components work differently. For example, an SMS sender writes messages to a file or atom. The authorization component reads the verification code from these sources. The approach does not guarantee complete reliability, but it will execute tests in isolation, without resorting to third-party services. We'll go into more detail about the problem of isolation in the chapter on tests \page{test-isolation}.
 
-\section{Подготовка к обзору}
+\section{Preparing for the Overview}
 
-\index{переменные!глобальные}
+\index{variables!global}
 \index{clojure.core!alter-var-root}
 
-В главе об изменяемых данных мы упоминали системы \page{systems-intro}. Способ
-работает на \verb|alter-var-root| и глобальных переменных. Идея в том, чтобы
-вынести компонент в модуль и снабдить функциями \verb|start!| и
-\verb|stop!|, которые переключают состояние модуля. Запуск системы сводится к
-их вызову в верном порядке.
+We've talked a little about systems in the chapter on mutable data \page{systems-intro}. The method uses \verb|alter-var-root| and global variables. The idea is to move the component into a module and provide the \verb|start!| and \verb|stop!| functions, which shift the module state. Starting the system comes down to calling them in the correct order.
 
-Это любительское решение, потому что система не знает о зависимостях между
-компонентами. Она хрупкая, работает в ручном режиме, и каждое изменение требует
-проверки.
+That is an amateur solution because the system is not aware of the dependencies between the components. It is fragile, operates in manual mode, and each change requires verification.
 
-Clojure предлагает несколько библиотек для систем. Мы рассмотрим Mount,
-Component и Integrant. Библиотеки различаются подходом: они по-разному описывают
-компоненты и зависимости. Так мы рассмотрим проблему с разных сторон.
+Clojure offers several libraries for systems. We'll take a look at Mount, Component, and Integrant. These libraries differ in their approach to describing components and dependencies. So we will look at the problem from different angles.
 
-Библиотеки нарочно следуют в таком порядке. Mount устроен проще, поэтому начнём
-с него в качестве знакомства с темой. Component стал промышленным
-стандартом. Уделим ему больше внимания и поэтому ставим в середину. Integrant
-замыкает обзор: его рассматривают как альтернативу Component, с которым читатель
-должен быть знаком.
+I deliberately arranged the libraries in this order. Mount is the simplest of them, so let's start with it as an introduction to the topic. Component has become an industry standard. Let's pay more attention to it and therefore put it in the middle. Integrant completes our overview. We'll discuss it as an alternative to the Component library, which you will be familiar with by then.
 
-Наша система похожа на то, с чем вы столкнётесь на практике. Она состоит из
-веб-сервера, базы данных и воркера~--- фоновой задачи, которая обновляет записи
-в базе. Мы добавили его специально, чтобы научиться работать с
-зависимостями. Чтобы лучше понять систему, нарисуем её топологию \fig{fig:chart-system}.
+Our system is similar to what you might come across in practice. It consists of a web server, a database, and a worker (a background task that updates records in the database). We added the worker specifically to help you learn how to work with dependencies. To better understand the system, let's draw its topology \fig{fig:chart-system}.
 
 \begin{figure}[ht!]
   \chart{chart-sys-1}
-  \caption{Схема будущей системы с зависимостями}
+  \caption{Diagram of a future system with dependencies}
   \label{fig:chart-system}
 \end{figure}
 
-Стрелки означают отношения между компонентами. Выражение A~\arr~B означает
-<<А зависит от В>>. В нашей схеме все компоненты зависят от конфигурации.
-Дополнительно фоновый обработчик нуждается в базе данных. Над этой
-системой мы будем работать до конца главы.
+Arrows indicate relationships between components. The expression ~\arr~B means "A depends on B." In our block diagram, all components are configuration dependent. The background worker additionally needs the database. We will work on this system until the end of the chapter.
 
-\subsection{База и воркер}
+\subsection{Database and Worker \}
 
-Мы упоминали, что открывать соединение на каждый запрос не оптимально. В
-настоящих проектах с базой работают через пул. Это сущность с состоянием,
-поэтому его тоже включают и выключают.
+We've mentioned previously that opening a connection for every request is suboptimal. In real projects, they work with the base through a pool. It is a stateful entity, so it is can be on and off as well.
 
-\index{базы данных!SQLite}
+\index{databases!SQLite}
 
-Базы вроде SQLite и H2 хранят данные в памяти. Это удобно для быстрого старта,
-но не отражает реалии производства~--- то, к чему мы стремимся в этой книге. Для
-in-memory баз не используют пулы соединений, потому что данные в памяти, а не в
-сети. Будем работать с реляционной БД PostgreSQL и пулом HikariCP.
+Databases like SQLite and H2 store data in memory. This is convenient for a quick start, but does not reflect the realities of production, which is what we are aiming for in this book. For in-memory databases, connection pools are not used because the data is in memory, rather than in the network. We will work with the PostgreSQL relational database and the HikariCP pool.
 
-Фоновый процесс (или воркер) дополняет записи в базе информацией из
-сети. Предположим, фирма ведёт аналитику посещений сайта. Когда кто-то открывает
-страницу, приложение сохраняет URL и IP-адрес клиента. Чтобы строить отчёты по
-странам и городам, нужно получить геоданные по IP из сторонних сервисов. Это
-долгая операция, поэтому записи ставят флаг <<в обработке>> и выносят логику
-в фон.
+The background process (aka worker) supplements the records in the database with information from the network. Let's say the company conducts an analysis of its website visits. When someone opens the page, the app stores the client's URL and IP address. To build reports by country and city, you need to get geodata by IP from third-party services. This operation is long, so the "in processing" flag is set for the database record and the logic is moved to the background.
 
 \subsection{Docker}
 
@@ -155,37 +85,20 @@ in-memory баз не используют пулы соединений, пот
 
 \label{docker-db}
 
-Если у вас установлен PostgreSQL, создайте новую базу и таблицу в ней. Если нет,
-самое время попробовать Docker. Это программа для запуска приложений из
-образов. Под образом понимают специальный файл, в котором упаковано приложение
-со всем необходимым для запуска. Запущенный образ называют контейнером.
+If you have PostgreSQL installed, create a new database and a table in it. If not, it's time to try Docker. It is a program for running applications from images. Here, an image is a package containing an app and everything needed for running. The running image is called a container.
 
-У контейнеров несколько преимуществ. Приложение живёт в изолированной среде и
-поэтому отделено от основной системы. Кроме безопасности, это решает проблему
-\emph{чистоты}~--- контейнер не оставляет следов работы, если это не задано
-специально.
+Containers have several advantages. The application lives in an isolated environment and, therefore, is separated from the main system. Along with the safety problem, this solves the problem of \emph{cleanliness} — the container does not leave traces of working unless otherwise indicated.
 
-Docker ищет образы в открытом репозитории. В нём публикуют программы разных
-версий и комплектации. Если нужен PostgreSQL версии строго 9.3, скачайте образ с
-этим тегом. Установка этой версии в~систему, скорее всего, обернётся конфликтом
-с уже работающей базой.
+Docker searches for images in an open repository where programs of different versions and bundles are published. If you specifically need PostgreSQL version 9.3, download the image with this tag. Installing this version on the system will most likely result in a conflict with an already working database.
 
 \mnoindent
-Некоторые образы можно настроить переменными среды или файлами. Образ PostgreSQL
-устроен так, что при старте он загружает все \verb|*.sql| файлы из папки
-\texttt{/docker-entrypoint\--initdb.d}. Если сопоставить ей локальный путь с
-миграциями, получим готовую базу. При этом мы не написали ни строчки кода,
-а~только указали настройки.
+Some images can be configured with environment variables or files. At startup, a PostgreSQL image loads all \verb|*.sql| files from the \texttt{/docker-entrypoint--initdb.d} folder. If we associate the folder to the local path with migrations, we'll get a ready-to-use database. At the same time, we did not write a single line of code but only specified the settings.
 
-\index{утилиты!docker-compose}
+\index{utilities!docker-compose}
 
-В комплекте с Docker идёт утилита \texttt{docker\--compose}. Она запускает
-контейнер из файла конфигурации. По умолчанию файл называется
-\verb|docker-compose.yaml|. Это YAML-документ, где указаны образ и параметры
-запуска. Мы задали образ \verb|postgres| и его опции: порт, файловые пути и
-переменные среды.
+Docker includes the \texttt{docker\--compose} utility. It runs a container from a config file. By default, the file is named \verb|docker-compose.yaml|. It is a YAML document that specifies running options and the image. We have set up the \verb|postgres| image and its options: the port, file paths, and environment variables.
 
-\index{форматы!YAML}
+\index{formats!YAML}
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -229,10 +142,9 @@ services:
 \fi
 
 \mnoindent
-В папке \verb|initdb.d| находятся SQL-файлы для старта базы. Достаточно файла
-\verb|01.init.sql| с таблицей:
+The \verb|initdb.d| folder contains SQL files for starting the database. The \verb|01.init.sql| file with the table is enough:
 
-\index{языки!SQL}
+\index{languages!SQL}
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -275,33 +187,21 @@ create table requests (
 
 \fi
 
-Если запустить \verb|docker-compose up|, поднимется сервер PostgreSQL на порту
-5432 с базой \verb|book|. Этого хватит для дальнейшей работы. Больше мы не
-будем говорить о Docker, поскольку это тема отдельной книги. Все детали вы
-найдёте \footurl{на сайте проекта}{https://docker.com}[Docker][-10mm].
+Running \verb|docker-compose up| brings up the PostgreSQL server on port 5432 with the \verb|book| database. This is enough for further work. We will not talk about Docker anymore, as this is a topic for a separate book. You can find all details \footurl{on the project website}{https://docker.com}[Docker][-10mm].
 
 \section{Mount}
 
-\index{библиотеки!Mount}
+\index{libraries!Mount}
 
-Библиотека \footurl{Mount}{https://github.com/tolitius/mount}[Mount][1mm] описывает сущность с
-двумя состояниями: запуск и остановка. По команде она <<включается>> и принимает
-значение, которое вернул код запуска. При выключении сработает код
-остановки. Сущность похожа на глобальную переменную, которая меняется по
-команде. Mount прост, поэтому подойдёт начинающим. С него мы начнём
-практическую часть.
+The \footurl{Mount}{https://github.com/tolitius/mount}[Mount][1mm] library describes an entity with two states: starting and stopping. On command, the entity gets "on" and takes the value returned by the startup code. On shutdown, the stop code will work. The entity is like a global variable that changes on command. Mount is simple, so it's perfect for beginners. We will start the practical part with it.
 
-\subsection{Первая сущность}
+\subsection{First Entity}
 
-\index{макросы!defstate}
+\index{macros!defstate}
 
-Макрос \verb|defstate| задаёт новую сущность. Он напоминает \verb|def|,
-потому что объявляет переменную в текущем пространстве. Разница в том, что
-вместо значения \verb|defstate| принимает код запуска и остановки.
+The \verb|defstate| macro defines a new entity. This macro is somewhat similar to \verb|def| because it declares a variable in the current space. The difference is that \verb|defstate| takes startup and shutdown code instead of a value.
 
-Добавьте в проект зависимость Mount. С помощью макроса опишем компонент
-веб-сервера. Поместим его в модуль \verb|server.clj|. Функция \verb|app|~--- это
-примитивное приложение, которое вернёт статус 200 на все запросы.
+Add the Mount dependency to the project. Let's describe the web server component using the macro. We'll put it in the \verb|server.clj| module. The \verb|app| function is a primitive application that returns the 200 status on all requests.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -351,8 +251,7 @@ create table requests (
 
 \fi
 
-Пока что мы только объявили состояние, но ничего не включили. Если выполнить
-\verb|server|, увидим следующее:
+So far, we have only declared the state but have not turned anything on. If we execute \verb|server|, we should see the following:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -374,11 +273,7 @@ create table requests (
 \fi
 
 \mnoindent
-Чтобы запустить компонент, выполните \texttt{(mount\-/start)}. Функция пробегает
-по компонентам и включает их. Выражение \verb|(run-jetty ...)| под ключом
-\verb|:start| вернёт сервер, который работает в фоне. После запуска браузер
-покажет приветствие по адресу \verb|http://127.0.0.1:8080|. Переменная
-\verb|server| станет экземпляром \verb|Server| из пакета \verb|jetty|:
+Execute \texttt{(mount\-/start)} to start the component. The function runs through the components and turns them on. The \verb| (run-jetty ...)| expression under the \verb|:start| key will return the server running in the background. Once started, your browser will show a greeting at \verb|http://127.0.0.1:8080|. The \verb|server| variable will become the \verb|Server| instance from the \verb|jetty| package:
 
 \begin{english}
   \begin{clojure}
@@ -387,9 +282,7 @@ create table requests (
   \end{clojure}
 \end{english}
 
-Чтобы выключить систему, выполните \verb|(mount/stop)|. Обратите внимание, что
-в выражении \verb|(.stop server)| сущность обращается к~самой себе. После
-остановки \verb|server| станет значением, которое означает завершение.
+To stop the system, execute \verb|(mount/stop)|. Note that in the \verb| (.stop server)| expression, the entity refers to itself. After stopping, \verb|server| will become a value that signifies termination.
 
 \begin{english}
   \begin{clojure}
@@ -399,24 +292,15 @@ create table requests (
   \end{clojure}
 \end{english}
 
-Так строят систему. Сперва находят сущности, которые работают на протяжении всей
-программы. В основном это сетевые подключения и фоновые задачи. Затем объявляют
-компонент с логикой запуска и~остановки.
+This is how the system is built. First, we find entities that run throughout the entire program. These are mainly network connections and background tasks. Then we declare a component with a start and stop logic.
 
-\subsection{Связь с конфигурацией}
+\subsection{Relationship with Configuration}
 
-Выше мы допустили ошибку: параметры сервера <<захардкожены>> в~компоненте. Мы
-уже обсудили, чем это плохо; параметры должны быть в
-конфигурации \page{hardcode}. Поскольку у нас система, вынесем конфигурацию
-в~компонент.
+Above, we made a mistake by explicitly setting the server parameters in the component. We have already discussed why this is a bad thing; parameters must be in configuration \page{hardcode}. Since we have a system, let's move the config into a component.
 
-\index{конфигурация!в Mount}
+\index{config!in Mount}
 
-Сущность \verb|config|~--- это упрощённый загрузчик конфигурации. Для краткости
-опустим перехват ошибок и другие детали. Фаза \verb|:start| читает файл
-EDN. Замените \texttt{edn/read\--string}| на Yummy, Aero или своё
-решение. Компоненту не нужна фаза \verb|:stop|, потому что он не хранит
-состояние.
+The \verb|config| entity is a lightweight configuration loader. For the sake of brevity, we will skip catching errors and other details. The \verb|:start| phase reads the EDN file. Replace \texttt{edn/read\--string}| with Yummy, Aero, or your solution. The component doesn't need the \verb|stop| phase because it is stateless.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -442,8 +326,7 @@ EDN. Замените \texttt{edn/read\--string}| на Yummy, Aero или сво
 
 \fi
 
-В файле \verb|system.config.edn| записан словарь, где ключ~--- это имя компонента, а
-значение~--- параметры. Поместим сервер под ключ \verb|:jetty|:
+The \verb|system.config.edn| file contains a map, in which the key is the component name, and the value is parameters. Let's put the server under the \verb|:jetty| key:
 
 \begin{english}
   \begin{clojure}
@@ -451,10 +334,9 @@ EDN. Замените \texttt{edn/read\--string}| на Yummy, Aero или сво
   \end{clojure}
 \end{english}
 
-\index{зависимости!Mount}
+\index{dependencies!Mount}
 
-Улучшим сервер так, чтобы он зависел от конфигурации. В список \verb|:require|
-модуля добавим компонент \verb|config|:
+Let's modify the server so that it depends on the config. Add the \verb|config| component to the \verb|require| list of the module:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -480,7 +362,7 @@ EDN. Замените \texttt{edn/read\--string}| на Yummy, Aero или сво
 \fi
 
 \noindent
-Перепишем сервер, чтобы он читал конфигурацию:
+Let's rewrite the server to read the configuration:
 
 \begin{english}
   \begin{clojure}
@@ -492,19 +374,14 @@ EDN. Замените \texttt{edn/read\--string}| на Yummy, Aero или сво
   \end{clojure}
 \end{english}
 
-Получилась система из двух компонентов, где один зависит от другого. Убедитесь,
-что после вызова \verb|(mount/start)| сервер работает как ожидалось.
+The result is a system of two components, where one depends on the other. Make sure that after calling \verb|(mount/start)|, the server is working as expected.
 
-\subsection{База данных}
+\subsection{Databases}
 
-\index{библиотеки!JDBC}
-\index{библиотеки!HikariCP}
+\index{libraries!JDBC}
+\index{libraries!HikariCP}
 
-Подготовим компонент базы данных. Понадобятся библиотеки
-\footurl{JDBC}{https://github.com/clojure/java.jdbc}[JDBC][1mm] и
-\footurl{HikariCP}{https://github.com/tomekw/hikari-cp}[HikariCP][20mm]. Первая предлагает доступ
-к реляционным базам данных. Это набор функций, которые работают одинаково для
-разных баз. Выражения:
+Let's prepare a database component. We'll need \footurl{JDBC}{https://github.com/clojure/java.jdbc}[JDBC][1mm] and \footurl{HikariCP}{https://github.com/tomekw/hikari-cp}[HikariCP][20mm] libraries. The former offers access to relational databases. It is a set of functions that work the same for different bases. The following statements will read and write a user to PostgreSQL, MySQL, or Oracle:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -528,24 +405,17 @@ EDN. Замените \texttt{edn/read\--string}| на Yummy, Aero или сво
 \fi
 
 \noindent
-прочитают и запишут пользователя в Postgre\-SQL, MySQL или Oracle. Для каждого
-бекэнда JDBC строит запрос с учётом его особенностей.
+For each backend, JDBC builds a request taking into account its peculiarities.
 
-\index{JDBC!спека}
+\index{JDBC!spec}
 
-Функции JDBC принимают первым параметром \emph{JDBC-спеку}. Обычно это словарь
-подключения: адрес и порт сервера, имя базы, пользователь и пароль. На каждый
-запрос JDBC открывает соединение, обменивается данными и закрывает его.
+JDBC functions take \emph{the JDBC spec} as the first parameter. Usually, it is a connection map: the server address and port, the database name, the user, and the password. For each request, JDBC opens a connection, exchanges data, and closes the connection.
 
-В спеке может быть ключ \verb|:datasource| с готовым источником данных. Тогда
-JDBC игнорирует другие ключи и работает напрямую с~\verb|:datasource|. HikariCP
-предлагает функцию, чтобы построить источник с пулом соединений. Каждый раз,
-когда мы запросим соединение у источника, получим одно из открытых ранее.
+The spec may contain the \verb|:datasource| key with a ready data source. In this case, JDBC ignores other keys and works directly with ~\verb|:datasource|. HikariCP offers a function to build a source with a connection pool. Each time we request a connection from the source, we'll get one of the previously opened.
 
 \index{JDBC!datasource}
 
-Источник хранит состояние, поэтому вынесем его в компонент. Подготовим модуль
-\verb|db.clj|:
+The source stores the state, so let's move it into the component. Let's prepare the \verb|db.clj| module:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -594,11 +464,9 @@ JDBC игнорирует другие ключи и работает напря
 
 \fi
 
-\index{пул соединений}
+\index{connection pool}
 
-Код старта вернёт JDBC-спеку~--- словарь с ключом \verb|:datasource|, внутри
-которого пул. При выключении функция \verb|close-datasource| закрывает его и
-открытые соединения. Добавим в конфигурацию настройки пула:
+The start code will return a JDBC spec~--- a map with the \verb|:datasource| key, inside which there is a pool. On terminate, the \verb|close-datasource| function closes it along with all opened connections. Let's add the pool settings to the config:
 
 \begin{english}
   \begin{clojure}
@@ -613,12 +481,9 @@ JDBC игнорирует другие ключи и работает напря
   \end{clojure}
 \end{english}
 
-Для экономии укажем только основные параметры. Это свойства подключения (хост,
-порт, пользователь, пароль) и размерность пула. При желании можно настроить
-тайминги соединений: время простоя, соединения и другие. Полный список опций
-смотрите на странице проекта в GitHub.
+To save space, we will only indicate the basic parameters. These are connection properties (host, port, user, password) and the pool dimension. If desired, you can configure connection timings: idle time, connection time, and others. For a complete list of options, see the project's GitHub page.
 
-Запустите систему и выполните запрос:
+Start the system and execute a request:
 
 \begin{english}
   \begin{clojure}
@@ -629,51 +494,38 @@ JDBC игнорирует другие ключи и работает напря
   \end{clojure}
 \end{english}
 
-\subsection{Фоновая задача}
+\subsection{Background Task}
 
 \label{worker}
 
-Всё готово для последнего компонента системы. Это воркер, который работает в
-отдельном потоке. Он выбирает из базы сырые записи и~дополняет полями из
-стороннего сервиса.
+Everything is ready for the last system component. It is a worker that runs on a separate thread. It selects raw records from the database and supplements them with fields from a third-party service.
 
-Таблица \verb|requests| хранит адрес страницы и IP клиента. Флаг
-\verb|is_processed| определяет, была ли уже обработана запись. Поля \verb|city|,
-\verb|country| и другие по умолчанию равны \verb|NULL|.
+The \verb|requests| table stores the page address and client IP. The \verb|is_processed| flag indicates whether the entry has already been processed. The \verb|city|, \verb|country|, and other fields are \verb|NULL| by default.
 
-\index{null!в SQL}
+\index{null!in SQL}
 
-Цикл воркера состоит из шагов:
+The worker cycle consists of the following steps:
 
 \begin{itemize}
 
 \item
-  раз в интервал выбрать запись с флагом \verb|NOT is_processed|;
+  once per interval, select an entry with the \verb|NOT is_processed| flag;
 
 \item
-  сделать запрос к сервису, который вернёт геоданные по IP;
+  request a service that will return geodata by IP;
 
 \item
-  обновить запись в транзакции.
+  update a record in a transaction.
 
 \end{itemize}
 
-Выразим воркер в терминах Mount. Задача работает в отдельном потоке, поэтому
-нужен тред или футура с бесконечным циклом. Чтобы остановить воркер по запросу,
-цикл должен быть с условием~--- проверкой флага на каждом шаге. Флаг доступен и
-воркеру, и тому, кто им управляет.
+Let's express the worker in terms of Mount. The task runs in a separate thread, so we need a thread or future with an infinite loop. In order to stop the process on request, the loop must be conditional, with a flag check at each step. The flag is available both to the worker and to the one who controls it.
 
-\index{футуры!реализация}
+\index{futures!implementation}
 
-В Clojure это решается футурой и атомом. В атоме хранят флаг~--- признак
-продолжения цикла. На каждом шаге футура <<дерефит>> атом, и если он истина,
-выполняет задачу. Чтобы завершить футуру, совершают два действия. Первое~---
-возводят флаг в ложь. Второе~--- ждут до тех пор, пока футура не станет
-\emph{реализованной} \eng{realized}. В терминах Clojure это значит, что
-исполнитель (executor) выполнил задание и передал футуре ответ.
+In Clojure, this is solved using a future and atom. The atom stores the flag that is a sign of the continuation of the loop. At every step, a future dereferences the atom, and if it is true, executes the task. To complete the future, take two actions. First, set the flag to false. Second, wait until the future becomes \emph{realized}. In Clojure, this means that the executor has completed the task and responded to the future.
 
-Подготовим модуль воркера. Понадобится конфигурация, база данных, логирование и
-HTTP-клиент:
+Let's prepare a worker module. You will need a config, database, logging, and HTTP client:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -706,10 +558,7 @@ HTTP-клиент:
 
 \fi
 
-Воркер~--- это словарь с полями \verb|:flag| и \verb|:task|, состояние и
-футура. Фаза \verb|:start| готовит этот словарь. Функции \verb|make-task|
-пока что не существует, но считаем, что она вернёт футуру. В фазе \verb|:stop|
-флаг становится ложью, и мы ждём, пока футура не остановится.
+The worker is a map with the \verb|:flag| and \verb|:task| fields, a state, and a future. The \verb|:start| phase prepares this map. The \verb|make-task| function does not exist yet, but we believe that it will return a future. In the \verb|:stop| phase, the flag becomes false, and we wait for the future to stop.
 
 \index{clojure.core!realized?}
 
@@ -755,12 +604,9 @@ HTTP-клиент:
 
 \fi
 
-Код \verb|:start| и \verb|:stop| должен быть небольшим. Чтобы упростить его,
-технические шаги выносят в функции. Если этого не сделать, логику запуска и
-остановки будет трудно понять.
+The \verb|:start| and \verb|:stop| code should be small. Move technical steps into functions to make the code simpler. If you don't, the start and stop logic will be difficult to understand.
 
-Добавим в файл EDN параметры воркера. Нужно одно поле~--- сколько миллисекунд
-ждать в промежутках между обработкой записи.
+Let's add worker parameters to the EDN file. We need one field~--- how many milliseconds to wait between processing records.
 
 \begin{english}
   \begin{clojure}
@@ -768,10 +614,9 @@ HTTP-клиент:
   \end{clojure}
 \end{english}
 
-\index{функции!make-task}
+\index{functions!make-task}
 
-Опишем функцию \verb|make-task|. Она принимает атом с флагом и~параметры
-EDN. Функция вернёт футуру с циклом:
+Let's describe the \verb|make-task| function. It takes an atom with flag and EDN parameters. The function will return a future with a loop:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -812,18 +657,11 @@ EDN. Функция вернёт футуру с циклом:
 
 \fi
 
-Функция \verb|task-fn| выполняет бизнес-логику приложения \coderef{7}. Её
-оборачивают в \verb|try/catch|, чтобы футура не завершилась аварийно. Если
-поймали исключение, пишем его в лог. В конце итерации небольшая задержка, чтобы
-не обрушить на базу шквал запросов \coderef{11}. Если кто-то установит
-\verb|flag| в ложь, управление выйдет из \verb|while| и~футура завершится.
+The \verb|task-fn| function executes the business logic of the application \coderef{7}. We wrap it in \verb|try/catch| to prevent the future from crashing. If we caught an exception, we write it to the log. There is a slight delay at the end of the iteration to avoid the flurry of database requests \coderef{11}. If someone sets \verb|flag| false, control will exit from \verb|while| and the future will end.
 
-Теперь опишем \verb|task-fn|. Функция читает из базы одну запись, которая
-ждёт обработки. С помощью функции \verb|get-ip-info| ищем геоданные по
-IP. Пока что мы не знаем, как работает поиск, но известно, что он вернёт словарь
-с полями \verb|:city|, \verb|:country| и другими.
+Now let's describe the \verb|task-fn| function. It reads one record from the database, which is awaiting processing. We are looking for geodata by IP using the \verb|get-ip-info| function. We don't know yet how the search works, but we know that it will return a map with the \verb|city|, \verb|country|, and other fields.
 
-\index{транзакции}
+\index{transactions}
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -876,9 +714,7 @@ IP. Пока что мы не знаем, как работает поиск, н
 
 \index{SQL!FOR UPDATE}
 
-Запрос на поиск записи мы вынесли в переменную \verb|query|, чтобы сократить
-код \verb|task-fn|. Это SQL с оператором \verb|FOR UPDATE|, который
-блокирует запись на изменение в других подключениях.
+We moved the request to find a record to the \verb|query| variable. This shortens the \verb|task-fn| code. It is an SQL query with a \verb|FOR UPDATE| statement locking the record to change in other connections.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -903,18 +739,12 @@ IP. Пока что мы не знаем, как работает поиск, н
 
 \fi
 
-\verb|FOR UPDATE| работает только в транзакции, поэтому тело функции обёрнуто
-в~\texttt{(jdbc/with\--db-transaction)}. Это макрос, внутри которого доступно
-транзакционное соединение с базой. На него указывает символ~\verb|tx|. В~функции
-JDBC мы передаём \verb|tx|, а~не~\verb|db| \ifx\DEVICETYPE\MOBILE(строки 5 и~18)\else(строки 3 и~12)\fi.
+\verb|FOR UPDATE| works only in a transaction, so the function body is wrapped in \texttt{(jdbc/with\--db-transaction)}. It is a macro within which a transactional connection to the database is available. The \verb|tx| symbol points to it. We're passing \verb|tx|, not \verb|db|, to the JDBC function \ifx\DEVICETYPE\MOBILE(lines 5 and ~18)\else(lines 3 and 12)\fi.
 
-\index{функции!get-ip-info}
-\index{сайты!iplocation.com}
+\index{functions!get-ip-info}
+\index{websites!iplocation.com}
 
-Напишем функцию \verb|get-ip-info|. Она обращается к сервису, который принимает
-IP и возвращает сведения о нём в JSON. В нашем случае это сайт
-\verb|iplocation.com|. В промышленных системах базы адресов разворачивают
-локально, чтобы не зависеть от сторонних служб.
+Let's write the \verb|get-ip-info| function. It accesses a service that accepts an IP and returns information about it in JSON. In our case, this is the \verb|iplocation.com| site. In high-performance systems, address databases are deployed locally, so they do not depend on third-party services.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -942,7 +772,7 @@ IP и возвращает сведения о нём в JSON. В нашем с�
 \fi
 
 \noindent
-Если вызвать \verb|get-ip-info| с адресом Берлина, получим словарь:
+If we call \verb|get-ip-info| with the Berlin address, we get the following map:
 
 \begin{english}
   \begin{clojure}
@@ -963,8 +793,7 @@ IP и возвращает сведения о нём в JSON. В нашем с�
   \end{clojure}
 \end{english}
 
-Мы описали последний элемент воркера, и он готов к работе. Добавим в базу
-несколько записей, запустим воркер и через некоторое время прочтём их снова.
+We have described the last element of the worker, and it is ready to go. Let's add a few records to the database and start the worker. After a while, we'll read these records again.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1005,24 +834,15 @@ IP и возвращает сведения о нём в JSON. В нашем с�
 
 \fi
 
-Адрес \verb|31.148.198.0| разрешится в город Пинск в Беларуси. Система работает
-правильно.
+The address \verb|31.148.198.0| will resolve in Pinsk, the city of Belarus. The system is working properly.
 
-\subsection{Сбор системы}
+\subsection{System Build}
 
-\index{компоненты}
+\index{components}
 
-Компоненты готовы и работают по отдельности; осталось собрать вместе. Для этого
-напишем центральный модуль \verb|core|, который импортирует все известные
-компоненты. Вызов \verb|(mount/start)| из него запустит систему
-целиком. Разберёмся, зачем нужен этот модуль.
+The components are ready and working separately; all that remains is to put them together. To do this, we'll write a central module, \verb|core|, which will import all known components. The \verb|(mount/start)| call from it will start the entire system. Let's see why this module is needed.
 
-Функции \verb|start| и \verb|stop| работают только с теми компонентами, которые
-известны Mount. Если загрузить модуль воркера, Mount получит информацию о
-\verb|worker|, \verb|db| и \verb|config|, но не \verb|server|, потому что никто
-не ссылается на него в \verb|require|. Модуль сервера не загрузится, и~система
-не узнает об этом компоненте. Проблему решит импорт всех компонентов без
-исключений.
+The \verb|start| and \verb|stop| functions work nothing but on components known to Mount. If you load the worker module, then Mount gets information about \verb|worker|, \verb|db|, and \verb|config|, but not \verb|server|, because no one refers to it in \verb|require|. Therefore, the server module will not load, and the system will not know about this component. You can solve the problem by importing all components without exception.
 
 \label{mount-main}
 
@@ -1042,30 +862,17 @@ IP и возвращает сведения о нём в JSON. В нашем с�
   \end{clojure}
 \end{english}
 
-Читатель заметит, что модули \verb|config| и \verb|db| указывать
-необязательно. Компилятор загрузит их автоматически, потому что на них ссылаются
-\verb|server| и \verb|worker|. Мы оставили их для наглядности и советуем делать так
-же, особенно если вы только начали с Clojure. Модуль \verb|core|~--- это реестр
-компонентов: достаточно одного взгляда, чтобы понять, как устроен
-проект. Указывайте в нём все компоненты без исключения.
+You may notice that specifying the \verb|config| and \verb|db| modules is optional. The compiler will load them automatically because \verb|server| and \verb|worker| refer to them. We have specified them for clarity, and we recommend doing the same, especially if you are just getting started with Clojure. The \verb|core| module is a component registry: a mere glance at it is enough to understand how the project works. Indicate all components in it, without exception.
 
-\subsection{Зависимости}
+\subsection{Dependencies}
 
-\index{зависимости}
+\index{dependencies}
 
-Главная задача системы~--- обойти компоненты в правильном порядке с~учётом
-зависимостей. Рассмотрим, как с этим справляется Mount.
+The main system task is to traverse components in the correct order, taking into account the dependencies. Let's take a look at how Mount handles this.
 
-При объявлении компонента мы не указываем его зависимости. \verb|Worker|
-нуждается в \verb|config| и \verb|db|, но об этом нигде не сказано. Когда мы
-вызываем \verb|(mount/start)|, система угадывает порядок запуска:
-\verb|config|~\arr{} \verb|db|~\arr{} \verb|worker|. Если переставить любые два
-элемента, произойдёт сбой. Как это работает?
+We don't specify component dependencies when declaring it. \verb|Worker| needs \verb|config| and \verb|db|, but this is not stated anywhere. When we call \verb|(mount/start)|, the system guesses the startup order: \verb|config|~\arr{} \verb|db|~\arr{} \verb|worker|. If you swap any two elements, it will fail. How does it work?
 
-Чтобы вычислить порядок, Mount полагается на компилятор Clojure. Пространства
-имён зависят друг от друга, как компоненты в системе. Компилятор ищет в теле
-\verb|ns| ссылки на другие модули и загружает их первыми. Вспомним, как
-выглядит шапка воркера:
+Mount relies on the Clojure compiler to compute the order. Namespaces depend on each other, like components in a system. The compiler looks for references to other modules in the \verb|ns| body and loads them first. Let's remember what the worker's header looks like:
 
 \begin{english}
   \begin{clojure}
@@ -1077,12 +884,12 @@ IP и возвращает сведения о нём в JSON. В нашем с�
   \end{clojure}
 \end{english}
 
-\index{граф зависимостей}
+\index{graph of references}
 
 \ifx\MODE\PRINT
 
 \noindent
-Начертим граф ссылок:
+Let's draw a graph of references:
 
 \begin{figure}[h!]
   \chart{chart-sys-2}
@@ -1093,18 +900,17 @@ IP и возвращает сведения о нём в JSON. В нашем с�
 \ifx\MODE\EBOOK
 
 \noindent
-Начертим граф ссылок \fig{fig:chart-sys-2}.
+Let's draw a graph of references \fig{fig:chart-sys-2}.
 
 \begin{figure}[ht!]
   \chart{chart-sys-2}
-  \caption{Зависимости первого уровня}
+  \caption{First level dependencies}
   \label{fig:chart-sys-2}
 \end{figure}
 
 \fi
 
-Компилятор не загрузит \verb|mount.worker| до тех пор, пока не разрешит
-зависимости. Он начнёт с модуля базы данных. Его упрощённое определение:
+The compiler will load \verb|mount.worker| only after resolving the dependencies. It will start with the database module, which simplified definition is as follows:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1132,7 +938,7 @@ IP и возвращает сведения о нём в JSON. В нашем с�
 \ifx\MODE\PRINT
 
 \noindent
-Что с точки зрения компилятора:
+From the compiler's point of view, it looks like this:
 
 \begin{figure}[h!]
   \chart{chart-sys-3}
@@ -1143,8 +949,7 @@ IP и возвращает сведения о нём в JSON. В нашем с�
 \ifx\MODE\EBOOK
 
 \noindent
-Что с точки зрения компилятора выглядит как на второй схеме
-\fig{fig:chart-sys-3}:
+From the compiler's point of view, it looks like this \fig{fig:chart-sys-3}:
 
 \begin{figure}[b!]
   \chart{chart-sys-3}
@@ -1154,28 +959,15 @@ IP и возвращает сведения о нём в JSON. В нашем с�
 
 \fi
 
-Прежде чем загрузить \verb|db|, компилятор займётся \verb|config|. Последний
-не зависит от других модулей и загрузится первым. Затем компилятор вернётся к
-\verb|db| и загрузит его. Дальше он поднимется на уровень
-\verb|worker|. Модуль \verb|db| готов, следующий по списку
-\verb|config|. Конфигурацию уже загрузили на этапе \verb|db|. Clojure не
-загружает модуль дважды, поэтому компилятор его. На последнем шаге
-загрузится \verb|worker|.
+Before loading the \verb|db|, the compiler takes care of \verb|config|. The latter is independent of other modules and will be loaded first. Then the compiler will return to\verb|db| and load it. After that, it will rise to the \verb|worker| level. The \verb|db| module is ready; \verb|config| is next on the list. We've loaded the configuration in the \verb|db| stage. Clojure doesn't load a module twice, so the compiler skips it. The last step will load \verb|worker|.
 
-\index{пространства имён}
+\index{namespaces}
 
-Мы вывели порядок \emph{пространств}: \verb|config|, \verb|db|,
-\verb|worker|. Каждая форма \verb|defstate| выполняется в той же очереди. В
-этом и заключается трюк: вызов \verb|defstate| увеличивает внутренний счётчик
-Mount, а компонент запоминает это число. Сущности \verb|config|, \verb|db| и
-\verb|worker| получат номера 1, 2 и 3. Чтобы запустить систему, Mount
-обходит компоненты по возрастанию номера, а для остановки~--- по убыванию.
+We have deduced the order of the \emph{namespaces}: \verb|config|, \verb|db|, \verb|worker|. Each \verb|defstate| form is executed on the same queue. Therein lies a trick: the \verb|defstate| call increments the internal Mount counter, and the component remembers this number. The \verb|config|, \verb|db|, and \verb|worker| entities will be numbered 1, 2, and 3. Mount walks through components in ascending order to start the system and descending to stop it.
 
-\subsection{Внутреннее устройство}
+\subsection{Internal Structure}
 
-Mount хранит сведения о компонентах в приватных атомах. Они скрыты для
-потребителей, но Clojure позволяет добраться до них. Когда компоненты загружены,
-выполните:
+Mount stores information about components in private atoms. They are hidden from consumers, but Clojure allows you to reach them. When the components are loaded, run:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1198,17 +990,10 @@ Mount хранит сведения о компонентах в приватн�
 
 \index{clojure.core!resolve}
 
-В переменной \verb|_state| окажется словарь компонентов. Двойной оператор
-\verb|@| играет следующую роль. Функция \verb|resolve| по символу вернёт
-объект \verb|Var|. Мы выяснили, что это контейнер, который хранит
-значение \page{var-section}. Первый \verb|@| извлекает значение из
-\verb|Var|; это атом со словарём. Второй \verb|@| получает словарь из атома.
+The \verb|_state| variable will contain a component map. The double \verb|@| operator plays the following role. The \verb|resolve| function will return a \verb|Var| object by a symbol. Earlier, we found out that the \verb|Var| object is a container that stores a value \page{var-section}. The first \verb|@| retrieves a value from \verb|Var|; it is an atom with a map. The second \verb|@| gets the map from the atom.
 
 \mnoindent
-Ключ словаря~--- это текстовая ссылка на компонент, в нашем случае
-\texttt{\#'book.systems.mount\-.config/config}. Значение~--- это другой словарь с
-состоянием компонента. Нас интересует поле \verb|:order|~--- его
-номер. Отсортируем по нему компоненты и получим верный порядок:
+The map's key is a text link to the component. In our case, it is \texttt{\#'book.systems.mount\-.config/config}. The value is another map with the state of the component. We are interested in the \verb|order| field, i.e., its number. Let's sort the components by it and get the correct order:
 
 \begin{english}
   \begin{clojure}
@@ -1220,7 +1005,7 @@ Mount хранит сведения о компонентах в приватн�
   \end{clojure}
 \end{english}
 
-Код ниже вернёт словарь запущенных компонентов с похожей структурой:
+The code below will return a map of running components with a similar structure:
 
 \begin{english}
   \begin{clojure}
@@ -1228,8 +1013,7 @@ Mount хранит сведения о компонентах в приватн�
   \end{clojure}
 \end{english}
 
-Атом \verb|state-seq| хранит глобальный счётчик компонентов. Чтобы прочитать
-его, выполните:
+The \verb|state-seq| atom stores a global component counter. To read it, run the following:
 
 \begin{english}
   \begin{clojure}
@@ -1238,20 +1022,15 @@ Mount хранит сведения о компонентах в приватн�
 \end{english}
 
 \noindent
-Получится 4, потому что значения от 0 до 3 уже заняты нашими компонентами:
-сервером, базой и~другими.
+Since our components (server, database, and others) have occupied values from 0 to 3, we get 4.
 
-При работе с Mount вы не должны менять его внутренности. Примеры выше нужны,
-чтобы читатель лучше понял устройство библиотеки.
+When working with Mount, you should not edit its contents. The examples above are needed so that you better understand the structure of this library.
 
-\subsection{Состояние}
+\subsection{State}
 
-\index{состояние}
+\index{state}
 
-Лёгкость, с которой компонент меняется при вызове \verb|start| и
-\verb|stop|, похожа магию. Раскроем секрет \verb|defstate|: он работает на
-функции \verb|alter-var-root|, которую мы рассмотрели в главе про
-изменяемость \page{alter-var-root}. Вспомним компонент сервера:
+The ease of changing a component when calling \verb|start| and \verb|stop| is like magic. Here's the secret behind \verb|defstate|: it works using the \verb|alter-var-root| function, which we covered in the chapter on mutability \page{alter-var-root}. Let's remember the server's component:
 
 \begin{english}
   \begin{clojure}
@@ -1262,10 +1041,9 @@ Mount хранит сведения о компонентах в приватн�
   \end{clojure}
 \end{english}
 
-Форма \verb|defstate| раскрывается в несколько выражений. Это глобальная
-переменная без значения:
+The \verb|def-state| form expands  into multiple expressions. These are the global variable with no value:
 
-\index{переменные!без значения}
+\index{variables!without value}
 
 \begin{english}
   \begin{clojure}
@@ -1274,8 +1052,7 @@ Mount хранит сведения о компонентах в приватн�
 \end{english}
 
 \noindent
-и анонимные функции запуска и остановки. Тела функций получат код из~ключей
-\verb|:start| и \verb|:stop|.
+and anonymous start and stop functions. The function bodies will get the code from the \verb|:start| and \verb|:stop| keys.
 
 \begin{english}
   \begin{clojure}
@@ -1292,23 +1069,16 @@ Mount хранит сведения о компонентах в приватн�
   \end{clojure}
 \end{english}
 
-Mount помещает ссылки на эти функции в атом \verb|meta-state|. Чтобы включить
-компонент, нужно найти в словаре функцию включения и~вызвать её. Функция
-назначит переменной \verb|#'server| новое значение. Остановка работает
-аналогично.
+Mount places references to these functions in the \verb|meta-state| atom. To start a component, you need to find a start function in the map and call it. The function will assign a new value to the \verb|#'server| variable. Stopping works the same way.
 
-\subsection{Выборочный запуск}
+\subsection{Selective Startup}
 
 \label{mount-selective}
-\index{системы!выборочный запуск}
+\index{systems!selective startup}
 
-До сих пор мы запускали систему целиком. Вызов \verb|(mount/start)| без
-параметров пробегает по \verb|meta-state| и включает все компоненты. Это не
-всегда удобно. Предположим, мы работаем над воркером и хотели бы запустить
-только его и зависимости. В этом случае веб-сервер не~требуется.
+So far, we have run the entire system. The call \verb| (mount/start)| without parameters runs through the \verb|meta-state| and enables all components. This is not always convenient. Let's say we are working on a worker and would like to run only it and its dependencies. In this case, we do not need a webserver.
 
-Чтобы запустить только нужные компоненты, их ссылки передают в функцию
-\verb|mount/start|. Важно: функция ожидает именно ссылку, объект \verb|Var|.
+To start only the required components, their references are passed to the \verb|mount/start| function. Note: This function expects precisely a reference, a \verb|Var| object.
 
 \begin{english}
   \begin{clojure}
@@ -1319,10 +1089,7 @@ Mount помещает ссылки на эти функции в атом \verb
   \end{clojure}
 \end{english}
 
-Если передать простое значение (без \verb|#'|), Mount не запустит
-компонент. Связь между переменной и значением работает в одну сторону: по
-второму нельзя найти первое. В примере ниже не будет ошибки, просто ничего не
-произойдёт:
+If you pass a value without \verb|#'|, Mount will not start the component. The relationship between a variable and a value works one-way: the former cannot be found using the latter. In the example below, there will be no error; nothing will happen:
 
 \begin{english}
   \begin{clojure}
@@ -1334,13 +1101,11 @@ Mount помещает ссылки на эти функции в атом \verb
   \end{clojure}
 \end{english}
 
-\index{переменные!Var}
+\index{variables!Var}
 
-Тот факт, что функция ожидает именно \verb|Var|, а не значение, сбивает с толку
-новичков. Это не очевидно, поскольку в Clojure к переменным прибегают редко.
+Newbies are confused by the fact that the function expects \verb|Var|, not a value. This is not obvious since variables are rarely used in Clojure.
 
-При ручном запуске за порядок компонентов отвечаете вы. Предположим, вы забыли,
-что базе и воркеру нужна конфигурация:
+With a manual startup, you are responsible for the order of the components. Let's say you forgot that the database and the worker need a configuration:
 
 \begin{english}
   \begin{clojure}
@@ -1350,19 +1115,11 @@ Mount помещает ссылки на эти функции в атом \verb
   \end{clojure}
 \end{english}
 
-Получим странное исключение. Оно возникнет в компоненте \verb|db|, где создаётся
-пул. Объект \verb|config| не запущен, и выражение \spverb|(:pool config)| вернёт
-\verb|nil|. При попытке создать пул из \verb|nil| получим \verb|NPE|.
+We'll get a weird exception. It will be thrown in the \verb|db| component where the pool is created. The \verb|config| object is not running, and the expression \spverb|(:pool config)| will return \verb|nil|. If we try to create a pool from nil, we get \verb|NPE|.
 
-С ростом системы всё сложнее отслеживать зависимости. Mount знает только порядок
-компонентов, но не как они связаны. Это слабое место библиотеки~--- чтобы
-включить подсистему, компоненты указывают вручную. Чтобы облегчить этот
-сценарий, библиотека предлагает \emph{селекторы} компонентов. Это функции,
-которые вернут ссылки на них по какому-то признаку.
+As the system grows, it becomes more difficult to track dependencies. Mount only knows the order of the components, not how they are related. This is the weak point of this library~--- programmers have to specify components manually to enable the subsystem. To improve this scenario, the library offers component \emph{selectors}. These are functions that return references to components by some hallmark.
 
-Селектор \verb|except| вернёт имена компонентов \emph{кроме}
-перечисленных. Если передать результат в \verb|start|, получим систему без
-указанных компонентов. Ниже запускается подмножество без веб-сервера:
+For example, the \verb|except| selector will return component names \emph{other than} those listed. If we pass the result into \verb|start|, we get a system without the specified components. Below, a subset is enabled without a web server:
 
 \begin{english}
   \begin{clojure}
@@ -1372,42 +1129,22 @@ Mount помещает ссылки на эти функции в атом \verb
   \end{clojure}
 \end{english}
 
-Другие селекторы и их комбинации смотрите на странице проекта в~GitHub. Кроме
-селекторов, Mount предлагает функции для инверсии системы: включить то, что не
-работает, и~наоборот.
+For other selectors and their combinations, see the project's GitHub page. In addition to selectors, Mount offers functions to invert the system: to enable what is not working and vice versa.
 
-\subsection{Проблема перезагрузки}
+\subsection{Reboot problem}
 
-При работе с проектом мы подключаемся к нему из редактора через REPL. Чтобы
-состояние Лисп-машины совпадало с кодом, мы выполняем изменённые участки на
-сервере. Вопрос: что случится, если исправить уже запущенный компонент? Как
-Mount отреагирует на перезагрузку модуля?
+When working with a project, we connect to it from the editor via the REPL. To make the Lisp machine state match the code, we execute the changed sections on the server. Question: what happens if you fix a component that is already running? How will Mount react to module reboots?
 
 \index{Emacs}
 \index{CIDER}
 
-Если вы работаете в Emacs и CIDER, подключитесь к проекту через
-\verb|M-x cider-connect|. Запустите систему, как мы делали это выше.
-Откройте модуль сервера и выполните \verb|M-x cider-eval-buffer|
-(или клавишами \verb|C-c C-k|). Команда выполнит файл на сервере.
-Все определения, включая \verb|ns|, \verb|def| и \verb|defstate|,
-сработают повторно.
+If you are using Emacs and CIDER, connect to the project via \verb|M-x cider-connect|. Start the system as we did above. Open the server module and execute \verb|M-x cider-eval-buffer| (or with keyboard buttons \verb|C-c C-k|). The command will execute the file on the server. All definitions, including \verb|ns|, \verb|def|, and \verb|defstate, will trigger again.
 
-Появится сообщение, что сервер перезагружен. Макрос \verb|defstate| проверяет,
-что компонент с таким именем существует и работает. Mount выключит компонент и
-запустит с новыми версиями \verb|start| и \verb|stop|.
+A message will appear saying that the server rebooted. The \verb|defstate| macro checks if a component with that name exists and is running. Mount will stop the component and start it with new versions of \verb|start| and \verb|stop|.
 
-Перезагрузка~--- это не всегда желаемое поведение. При частых изменениях случается
-<<рассинхрон>>~--- ситуация, когда компонент считается выключенным, но его
-ресурс занят. Например, в блоке \verb|:stop| мы не вызвали метод
-\verb|(.stop)|. Если перезагрузить такой компонент, получим ошибку, что порт
-занят.
+Rebooting is not always the desired behavior. With frequent changes, "out of sync" occurs~--- a situation when a component is considered disabled, but its resource is busy. For example, in the \verb|:stop| block, we did not call the \verb|(.stop)| method. If we restart such a component, we get an error that the port is busy.
 
-Реакцию компонента на перезагрузку указывают в метаданных. Это поле
-\verb|:on-reload|, которое по умолчанию равно \verb|:restart|. С ним
-компонент перезапускает себя при повторном вызове \verb|defstate|. Если задать
-\verb|:stop|, компонент остановится. Ключ \verb|:noop| означает <<не делать
-ничего>>. Компонент с метаданными выглядит так:
+The component's response to reloading is indicated in metadata. It is the \verb|:on-reload| field, which by default is \verb|:restart|. With it, the component restarts itself when \verb|defstate| is called again. If you set \verb|:stop|, the component will stop. The \verb|:noop| key means "do nothing." The component with metadata looks like this:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1436,20 +1173,13 @@ Mount отреагирует на перезагрузку модуля?
 
 \fi
 
-Если вы не уверены, выбирайте \verb|:noop|: с ним загрузка кода в REPL не
-несёт побочных эффектов. Изменения в коде не всегда относятся к компоненту: это
-может быть опечатка или комментарий. Если вы исправили компонент, перезагрузите
-его вручную.
+If unsure, choose \verb|noop|; with it, loading code into the REPL has no side effects. Changes to the code are not always component-related: there may be a typo or a comment. If you modified the component, restart it manually.
 
-\subsection{Самостоятельная работа}
+\subsection{Independent Work}
 
-\index{библиотеки!Clj-http}
+\index{libraries!Clj-http}
 
-Вернёмся к функции \verb|get-ip-info| из модуля воркера. На каждый вызов она
-выполняет HTTP-запрос. На низком уровне мы открываем TCP-соединение, работаем с
-ним и закрываем. Это не оптимально, и~проблему решают как с базами данных~---
-пулом соединений. Изучите пример из библиотеки
-\footurl{Clj-http}{https://github.com/dakrone/clj-http}[Clj-http][-10mm]:
+Let's go back to the \verb|get-ip-info| function from the worker module. For each call, it makes an HTTP request. At a low level, we open a TCP connection, work with it, and close it. That is not optimal, and the problem is solved as with databases by using a connection pool. Examine the following example from the \footurl{Clj-http}{https://github.com/dakrone/clj-http}[Clj-http][-10mm] library:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1492,82 +1222,50 @@ Mount отреагирует на перезагрузку модуля?
 
 \fi
 
-\index{пул соединений!в HTTP}
+\index{connection pool!in HTTP}
 
-Напишите компонент, который шлёт запросы через пул. Параметры компонента
-(тайминг, число потоков) приходят из конфигурации. На старте компонент открывает
-пул, при остановке закрывает его. Измените воркер так, чтобы он зависел от
-нового компонента.
+Write a component that sends requests through the pool. Component parameters (timing, number of threads) come from the config. At the start, the component opens the pool and closes it upon stopping. Modify the worker to depend on the new component.
 
 \section{Component}
 
-\index{библиотеки!Component}
+\index{libraries!Component}
 
-Библиотека \footurl{Component}{https://github.com/stuartsierra/component}[Compo-\\*nent][1mm] тоже
-описывает систему и компоненты. Это небольшой фреймворк, где главную роль играет
-не объём кода, а идея. Дизайн Component в корне отличается от Mount, который мы
-рассмотрели.
+The \footurl{Component}{https://github.com/stuartsierra/component}[Compo-\\*nent][1mm] library also describes a system and components. It is a small framework where the main thing is the idea, rather than the code amount. The design of the Component library is fundamentally different from Mount, which we have already discussed.
 
-\index{состояние}
-\index{компоненты}
+\index{state}
+\index{components}
 
-Как и в Mount, на компонент действуют операции \verb|start| и
-\verb|stop|. Они возвращают \emph{копию} объекта в новом состоянии; исходный
-компонент остаётся прежним. Можно сказать, компоненты неизменяемы. Это отсекает
-ошибки, связанные с глобальными переменными.
+Here, as in Mount, the \verb|start| and \verb|stop| operations act on a component. They return a \emph{copy} of the object in a new state; the original component remains unchanged. You can say that components are immutable. This cuts off errors related to global variables.
 
-Система~--- это словарь компонентов с зависимостями. Изначально система пребывает в
-покое, компоненты не запущены. Код запуска обходит и включает их. Получается
-рабочая копия системы. Она похожа на исходную, но каждый компонент заменён на
-его рабочую версию. Остановка работает так же: на выходе получится выключенная
-копия системы.
+A system is a map of components with dependencies. Initially, the system is at rest; its components are not running. The startup code walks through and enables them. The result is a working copy of the system. It is similar to the original one, but each component has been replaced with its work version. Stopping works the same way: the output will be a disabled copy of the system.
 
-Component не терпит глобального состояния. В библиотеке нет скрытых атомов для
-учёта компонентов. Один компонент имеет доступ к другому только если они
-зависимы. Как и система, компонент избегает атомов и других изменяемых типов. На
-каждое действие он порождает новую копию себя.
+Global state is illegal in Component. The library has no hidden atoms to account for components. One component can only access another if they are dependent. Like a system, a component avoids atoms and other mutable types. For each action, it generates a new copy of itself.
 
-\subsection{Устройство}
+\subsection{How It Works}
 
 \label{defrecord}
 
-Компонент~--- это объект, который реализует протокол \verb|Lifecycle|. В~протокол
-входят методы \verb|start| и \verb|stop|. На роль компонента подходит
-типизированный словарь, который объявляют формой \verb|defrecord|. По-другому их
-называют <<типизированные записи>> или <<р\'{е}корды>>.
+A component is an object that implements the \verb|Lifecycle| protocol. The protocol includes the \verb|start| and \verb|stop| methods. A typed map that is declared in the \verb|defrecord| form can be a component. They are also called “typed records” or “records”.
 
 \index{clojure.core!defrecord}
-\index{р\'{е}корды}
-\index{протоколы!Lifecycle}
+\index{records}
+\index{protocols!Lifecycle}
 
-Запись отличается от словаря тем, что заранее перечисляет ключи. Их называют
-\emph{слотами} записи. Слоты работают быстрее ключей в~обычном словаре. Они
-нужны компоненту для входных параметров и~состояния.
+A record differs from a dictionary in that it lists keys in advance. These are called \emph{slots} of the record. Slots work faster than the keys of a regular map. The component needs them for input parameters and state.
 
-Запись и протокол сочетаются на уровне языка. При объявлении записи можно сразу
-расширить её протоколом. В методах протокола слоты доступны как локальные
-переменные. Это уменьшает код и~экономит внимание.
+Records and protocol fit together at the language level. When declaring a record, you can immediately expand it with the protocol. In protocol methods, slots are available as local variables. This way, a programmer can reduce the amount of code and save time.
 
-\index{ООП}
+\index{OOP}
 
-Компонент таит состояние, и только он знает, как им управлять. Будет ошибкой
-читать его слоты и передавать их в функции. Пользуйтесь методами, которые входят
-в протокол компонента. Код на Component напоминает ООП: это объект и набор
-операций над ним. Как и класс, компонент инициируют, запускают и останавливают.
+A component hides its state, and only it knows how to control it. It would be a mistake to read its slots and pass them to functions. Use the methods included in the component protocol. In Component, code is somewhat similar to OOP: it is an object and a set of operations. Like a class, you can initiate, start, and stop a component.
 
-\index{ООП!SOLID}
+\index{OOP!SOLID}
 
-Отличие в том, что компоненты неизменяемы. Переход на новую стадию не затронет
-старый компонент, в то время как в классических языках его поля
-перепишут. Принцип \verb|SOLID| и тройка <<инкапсуляция, наследование,
-полиморфизм>> не имеют той же силы в Clojure. Б\'{о}льшая их часть отпадает за
-ненадобностью. Программируя на Clojure, мы не волнуемся о том, что нарушили
-постулаты ООП.
+The difference is that the components are immutable. The transition to a new stage will not affect the old component, while in classical languages, its fields would be rewritten. The \verb|SOLID| principle and the encapsulation, inheritance, polymorphism triple do not have the same power in Clojure. Most of them are unnecessary. When programming in Clojure, we might not adhere to OOP postulates.
 
-\subsection{Первый компонент}
+\subsection{The First Component}
 
-Перепишем систему из прошлого раздела на Component. Начнём с~веб-сервера. В
-файле \verb|server.clj| объявим пространство имён:
+Let's rewrite our system from the previous section with Component. We'll start with a web server. In the \verb|server.clj| file, declare the namespace:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1595,10 +1293,7 @@ Component не терпит глобального состояния. В биб
 
 \fi
 
-Компонент~--- это запись с двумя слотами: \verb|options| и \verb|server|. В
-опциях записаны параметры Jetty-сервера, в \verb|server|~--- его
-экземпляр. Строка \verb|component/Lifecycle| означает протокол, который
-реализует запись. Ниже следует \emph{реализация} протокола.
+A component is a record with two slots~--- \verb|:options| and \verb|:server|. Options contain the Jetty server's parameters, and \verb|server| contains its instance. The \verb|component/Lifecycle| line stands for the protocol that implements the record. Below is the \emph{implementation} of the protocol.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1638,26 +1333,13 @@ Component не терпит глобального состояния. В биб
 \end{english}
 \fi
 
+The \verb|start| method will return the same record, but with the full \verb|:server| slot. It contains the server object. The \verb|stop| method takes a running component. It terminates the server and returns another record in which the \verb|:server| slot is \verb|nil|.
 
-Метод \verb|start| вернёт ту же запись, но с заполненным слотом
-\verb|:server|. В нём находится объект сервера. Метод \verb|stop| принимает
-запущенный компонент. Он выключает сервер и возвращает ещё одну запись, где слот
-\verb|:server| равен \verb|nil|.
+\index{initialization}
 
-\index{инициализация}
+Inside the methods, we refer to slots as local variables. This only works if the methods are declared inside \verb|defrecord|. If you extend the record with a separate step, for example, via \verb|extend|, access to the slots will be lost. In this case, you have to extract them from the \verb|this| variable.
 
-Внутри методов мы обращаемся к слотам как к локальным переменным. Это работает
-только если методы описаны внутри \verb|defrecord|. Если запись расширяют
-отдельным шагом, например через \verb|extend|, доступ к слотам
-теряется. Придётся извлечь их из переменной \verb|this|.
-
-Сущность \verb|Server|~--- это не компонент, а только абстрактное описание. На
-первом шаге его \emph{инициируют}, то есть создают экземпляр. Для этого служит
-функция \verb|map-><Record>|, где \verb|<Record>|~--- это имя записи. Макрос
-\verb|defrecord| автоматически порождает эту функцию. В нашем случае она
-называется \verb|map->Server|. Функция принимает обычный словарь и~возвращает
-его типизированную версию. Ключи словаря совпадают со~слотами записи. Если ключ
-не найден, слот равен \verb|nil|.
+The \verb|Server| entity is not a component but just an abstract description. In the first step, it \emph{is initiated}, that is, an instance of it is created. To do this, use the \verb|map-> <Record>| function, where \verb|<Record>| is the name of the record. The \verb|defrecord| macro automatically creates this function. In our case, it is named \verb|map-> Server|. The function takes a regular map and returns its typed version. The keys of a map correspond to the record slots. If the key does not exist, the slot is \verb|nil|.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1681,9 +1363,7 @@ Component не терпит глобального состояния. В биб
 
 \fi
 
-Переменная \verb|s-created|~--- это экземпляр записи \verb|Server|. Мы указали
-слот \verb|options|, но не \verb|server|, потому что он будет заполнен
-позже.
+The \verb|s-created| variable is an instance of the \verb|Server| record. We specified the \verb|options| slot, but not the \verb|server| one because it will be filled out later.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1705,9 +1385,7 @@ Component не терпит глобального состояния. В биб
 \fi
 
 \mnoindent
-Это выражение вернёт \emph{запущенный} компонент. Откройте браузер по адресу
-\texttt{http://127.0.0.1\-:8080} и проверьте, что сервер работает. У~записи
-\verb|s-started| заполнен слот \verb|:server|:
+This expression will return the \emph{running} component. Open your browser at \texttt{http://127.0.0.1\-:8080} and check if the server is working. The \verb|s-started| record has the \verb|:server| slot filled:
 
 \begin{english}
   \begin{clojure}
@@ -1716,8 +1394,7 @@ Component не терпит глобального состояния. В биб
   \end{clojure}
 \end{english}
 
-Остановите компонент. Проверьте, что страница больше не открывается, а слот
-сервера равен \verb|nil|.
+Stop the component. Make sure that the page no longer opens and the server slot is \verb|nil|.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1740,15 +1417,13 @@ Component не терпит глобального состояния. В биб
 
 \fi
 
-Мы прошли полный цикл компонента: подготовку, запуск и остановку. Переход на
-каждую стадию даёт новый компонент. На практике компонентами не управляют
-вручную~--- это делает система.
+We went through the full life cycle of the component: preparation, start-up, and shutdown. The transition to each stage gives a new component. In practice, the components are not manually controlled; the system controls them.
 
-\subsection{Конструктор}
+\subsection{Constructor}
 
-\index{конструктор}
+\index{constructor}
 
-Вспомним, как мы создали экземпляр \verb|Server|:
+Let's recall how we created the \verb|Server| instance.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1770,15 +1445,11 @@ Component не терпит глобального состояния. В биб
 
 \fi
 
-\index{слоты}
+\index{slots}
 
-У этой записи недостаток: нужно помнить, какие слоты нужны для инициализации, а
-какие~--- для внутреннего состояния. Для простых записей это не критично, но на
-практике бывают компоненты с десятью и более слотами. Чтобы не запутаться,
-объявляют функцию-\emph{конструктор}.
+This entry has a drawback: you need to remember which slots are for initialization and which are for internal state. This is not critical for simple records, but, in practice, there are components with ten or more slots. To avoid confusion, declare a \emph{constructor} function.
 
-Конструктор принимает только те аргументы, которые нужны для инициализации
-компонента. В нашем случае это \verb|options|, поэтому функция выглядит так:
+The constructor takes only arguments needed for the component initialization. In our case, it's \verb|options|, so the function looks like this:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1808,17 +1479,11 @@ Component не терпит глобального состояния. В биб
 
 \fi
 
-С конструктором легче создать компонент: невозможно передать в
-\verb|map->Server| что-то лишнее. Конструктор~--- это функция, поэтому к~нему можно
-добавить документацию и спеку. Продвинутый редактор подскажет сигнатуру в месте
-вызова. Пишите конструктор даже для тривиальных компонентов.
+The constructor makes it easier to create the component: it is impossible to pass something superfluous to \verb|map->Server|. A constructor is a function; so you can add documentation and spec to it. An advanced editor will suggest a signature at the place of a call. I recommend you to write a constructor even for trivial components.
 
-\subsection{Особенность слотов}
+\subsection{Slots feature}
 
-При остановке сервера мы совершаем два действия: вызываем у него метод
-\verb|(.stop)| и заменяем слот на \verb|nil|. Почему бы не заменить
-\verb|assoc| на \verb|dissoc|? Зачем хранить \verb|nil|, когда можно
-отсоединить поле?
+When the server stops, we do two things: we call the method \verb|(.stop)| and replace the slot with \verb|nil|. Why not replace \verb|assoc| with \verb|dissoc|? Why store \verb|nil| when you can detach a field?
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1861,9 +1526,7 @@ Component не терпит глобального состояния. В биб
 
 \fi
 
-Причина в том, как устроены записи и слоты. Запись сохраняет уникальные свойства
-до тех пор, пока её слоты на месте. Если забрать у записи слот через
-\verb|dissoc|, получим обычный словарь. Покажем это на примере:
+The reason is in the way records and slots are arranged. A record retains its unique properties as long as its slots are in place. If we take a slot away from a record via \verb|dissoc|, we get a regular map. Let's show this with an example:
 
 \begin{english}
   \begin{clojure}
@@ -1879,24 +1542,13 @@ Component не терпит глобального состояния. В биб
   \end{clojure}
 \end{english}
 
-Если компонент вызывает \verb|dissoc| на себе, на новой стадии получим не
-компонент, а словарь. Это ведёт к странному поведению: при попытке выключить
-компонент он продолжит работу. Почему так происходит?
+If a component calls \verb|dissoc| on itself~--- we'll get a map instead of the component at a new stage. This leads to a strange behavior: when you try to stop the component, it will continue to work. Why does it happen?
 
-Когда запись расширяют протоколом, образуется связь между классом и
-реализацией. Для \verb|Server| методы \verb|start| и \verb|stop| выполнят
-одно, для \verb|DB| или \verb|Worker|~--- другое.
+When a record is extended by a protocol, it forms a relationship between the class and the implementation. For \verb|Server|, the \verb|start| and \verb|stop| methods do one thing, and for \verb|DB| or \verb|Worker|~--- another.
 
-Поиск метода в Clojure работает с учётом иерархии классов подобно перехвату
-исключений \page{exc-hierarchy}. При загрузке Component расширяет базовый класс
-\verb|Object| методами \verb|start| и \verb|stop|, которые просто
-возвращают \verb|this|. Если забрать у записи слот, она станет
-словарём. Словарь не реализует \verb|Lifecycle| напрямую, поэтому поиск пойдёт
-вверх по дереву наследования. В результате он разрешится в \verb|Object|,
-который молча вернёт \verb|this|.
+Finding a method in Clojure works in a class hierarchy similar to catching exceptions \page{exc-hierarchy}. When loaded, Component extends the base \verb|Object| class with the \verb|start| and \verb|stop| methods, which only return \verb|this|. If you take a slot away from a record, it becomes a map. The map does not directly implement \verb|Lifecycle|; therefore, the search will go up the inheritance tree. As a result, it resolves to \verb|Object|, which will return \verb|this| by default.
 
-Привёдем неудачный компонент. Его метод \verb|start| вернёт словарь с~полем
-\verb|server|:
+Below is an example of a failed component. Its \verb|start| method will return a map with the \verb|server| field:
 
 \begin{english}
   \begin{clojure}
@@ -1910,9 +1562,7 @@ Component не терпит глобального состояния. В биб
   \end{clojure}
 \end{english}
 
-Сервер запустится без ошибок, но дальше нас ждёт проблема. Если передать
-результат \verb|start| в~\verb|stop|, сервер не остановится. Можно сколько
-угодно вызывать \verb|component/stop|, но это ничего не даст.
+The server will start without errors, but then a problem awaits us. If we pass the result of \verb|start| to \verb|stop|, the server will not stop. No matter how many times you call \verb|component/stop|, nothing will happen.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -1951,17 +1601,11 @@ Component не терпит глобального состояния. В биб
 
 \fi
 
-В метод stop тоже закралась ошибка. При остановке компонент выключит сервер, но
-вернёт \verb|nil|. Если передать результат \verb|stop| в \verb|start|,
-последний получит \verb|nil|. Это вызовет исключение, потому что \verb|nil|
-не~реализует протокол \verb|Lifecycle|.
+An error also crept into the stop method. When stopped, the component will terminate the server but return \verb|nil|. If you pass the result of \verb|stop| to \verb|start|, the latter gets \verb|nil|. This will throw an exception because \verb|nil| does not implement the \verb|Lifecycle| protocol.
 
-\index{протоколы!Lifecycle}
+\index{protocols!Lifecycle}
 
-Следите за тем, чтобы компонент менял только значения слотов, но не их
-состав. Как правило, код \verb|start| и \verb|stop| завершается формой
-\verb|assoc|, но не \verb|dissoc|. Не должно быть проблем с пробросом
-(<<чейнингом>>) компонента по его стадиям:
+Make sure that the component changes only the values of the slots rather than their structure. Typically, the \verb|start| and \verb|stop| code ends with the \verb|assoc| form, but not \verb|dissoc|. If the condition meets, there should be no problems with the component forwarding by its stages:
 
 \begin{english}
   \begin{clojure}
@@ -1972,14 +1616,11 @@ Component не терпит глобального состояния. В биб
   \end{clojure}
 \end{english}
 
-\index{чейнинг}
+\index{forwarding}
 
-\subsection{Компонент базы}
+\subsection{Database Component}
 
-Напишем компонент для работы с базой. Он содержит слоты \verb|options|
-и~\verb|db-spec|. Первый~--- это словарь опций будущего пула, а второй~---
-JDBC-спека с открытым пулом. Принцип его работы известен вам из прошлых
-разделов.
+Let's write a component to work with a database. It contains the \verb|options| and \verb|db-spec| slots. The former is a map of future pool options, and the latter is an open-pool JDBC spec. You know how it works from the previous sections.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2018,7 +1659,7 @@ JDBC-спека с открытым пулом. Принцип его работ
 \fi
 
 \noindent
-Добавим конструктор:
+Let's add a constructor:
 
 \begin{english}
   \begin{clojure}
@@ -2027,11 +1668,9 @@ JDBC-спека с открытым пулом. Принцип его работ
   \end{clojure}
 \end{english}
 
-Компонент готов к запуску: его можно прогнать через функции
-\verb|make-db|~\arr{} \texttt{component\-/start}~\arr{} \verb|component/stop|.
+Now the component is ready to start: it can be run through the \verb|make-db|~\arr{} \texttt{component\-/start}~\arr{} \verb|component/stop| functions.
 
-Пока что неясно, как выполнить запрос через компонент. Нас интересует слот
-\verb|db-spec|, который хранит спеку. Можно вычленить его и~передать в функцию:
+It is not yet clear how to execute a request through this component. We are interested in the \verb|db-spec| slot, which stores the spec. You can isolate it and pass it to the function:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2056,16 +1695,11 @@ JDBC-спека с открытым пулом. Принцип его работ
 
 \fi
 
-Это варварский подход: нельзя вторгаться в компонент, даже если язык предлагает
-такую возможность. Мы нарушаем идею, согласно которой компонент неделим для
-потребителя. Мы вправе только дёргать за ручки, которые предлагает
-компонент. Сейчас ручек нет, поэтому добавим их.
+But this is an invalid approach: you must not invade a component, even if the language offers such a possibility. That violates the idea that the component is impartible for the consumer. We can only pull the "controls" that the component offers. Now the controls are not there, so let's add them.
 
-Расширим запись \verb|DB| методами для работы с базой. Поместим их в отдельный
-протокол. Сигнатуры похожи на функции JDBC с той разницей, что первый параметр~---
-это не спека, а \verb|this|, компонент:
+Let's expand the \verb|DB| record with methods for working with the database. Let's put them in a separate protocol. Signatures are similar to JDBC functions, with the difference that the first parameter is the \verb|this| component, not a spec:
 
-\index{протоколы!IDB}
+\index{protocols!IDB}
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2090,10 +1724,7 @@ JDBC-спека с открытым пулом. Принцип его работ
 
 \fi
 
-В теле \verb|defrecord|, сразу после \verb|stop|, реализуем новый
-протокол. Методы сводятся к функциям JDBC, в которые передаём слот
-\verb|db-spec| и~аргументы. Сначала компонент реализует \verb|Lifecycle| как
-обычно:
+In the body of \verb|defrecord|, right after \verb|stop|, we implement the new protocol. Methods boil down to JDBC functions, into which we pass the \verb|db-spec| slot and arguments. At first, the component implements \verb|Lifecycle| as usual:
 
 \begin{english}
   \begin{clojure}
@@ -2103,7 +1734,7 @@ JDBC-спека с открытым пулом. Принцип его работ
 \end{english}
 
 \noindent
-Далее следует частный протокол:
+A private protocol follows:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2135,8 +1766,7 @@ JDBC-спека с открытым пулом. Принцип его работ
 
 \fi
 
-Компонент готов к запросам. Мы вызываем не функции JDBC, а методы
-протокола. Этим мы изолируем зависимость от JDBC и~снижаем связанность кода.
+The component is ready for requests. We are not calling JDBC functions but protocol methods. This will isolate the dependency on JDBC and reduce code coupling.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2171,31 +1801,27 @@ JDBC-спека с открытым пулом. Принцип его работ
 
 \fi
 
-\subsection{Транзакционный компонент}
+\subsection{Transactional Component}
 
-\index{транзакции}
+\index{transactions}
 
-Для согласованных изменений в базе нужны транзакции. Раньше мы пользовались
-макросом \verb|jdbc/with-db-transaction|. Из обычного соединения он получает
-транзакционное и связывает с символом.
+Transactions are needed for consistent changes in a database. So far, we've used the \verb|jdbc/with-db-transaction| macro. It makes a transactional connection out of a regular one and assigns it to a symbol.
 
-В отличие от JDBC, наш макрос работает с компонентом. Он принимает обычный
-компонент и связывает с символом его \emph{транзакционную} версию. Макрос
-сводится к следующим шагам:
+Unlike JDBC, our macro works with a component. It takes a regular component and assigns its \emph{transactional} version to the symbol. The macro performs the following steps:
 
 \begin{itemize}
 
 \item
-  получить спеку из компонента;
+  get a spec from a component;
 
 \item
-  обернуть тело в макрос JDBC, связать транзакционное соединение с переменной;
+  wrap body in JDBC macro, assign the transactional connection to a variable;
 
 \item
-  получить компонент, в котором слот \verb|:db-spec| заменён на эту переменную;
+  get the component in which this variable replaces the \verb|:db-spec| slot;
 
 \item
-  связать новый компонент с символом из макроса.
+  assign a new component to a symbol from a macro.
 
 \end{itemize}
 
@@ -2233,21 +1859,17 @@ JDBC-спека с открытым пулом. Принцип его работ
 
 \fi
 
-\caption{Макрос транзакции для компонента базы}
+\caption{Transaction macro for the database component}
 \label{fig:trx-macro}
 
 \end{listing}
 
-\index{ООП!геттер}
-\index{ООП!сеттер}
+\index{OOP!getter}
+\index{OOP!setter}
 
-Приведём код макроса в отдельном листинге \ref{fig:trx-macro}.
+See the macro code in a separate listing \ref{fig:trx-macro}.
 
-При анализе читатель заметит, что нарушен принцип закрытости компонента. Мы
-вручную читаем и~заменяем слот \verb|db-spec|. Подумайте, как улучшить
-код. Подсказка: доступ к слоту можно вынести в~методы \verb|get-|
-и~\verb|set-spec|, то есть обычные <<геттер>> и <<сеттер>> из мира ООП. Разница
-в~том, что <<сеттер>> вернёт новый компонент. Макрос в~действии:
+When analyzing, you will notice that the principle of component closedness is violated. We read and manually replace the \verb|db-spec| slot. Think about how to improve the code. Hint: You can move access to the slot into the \verb|get-| and \verb|set-spec| methods, that is, the usual "getter" and "setter" from the OOP world. The difference is that the "setter" will return a new component. Here is the macro in action:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2284,7 +1906,7 @@ JDBC-спека с открытым пулом. Принцип его работ
 \fi
 
 \noindent
-В логах PostgreSQL увидим записи:
+In the PostgreSQL logs, we will see the following entries:
 
 \index{SQL!BEGIN}
 \index{SQL!UPDATE}
@@ -2319,11 +1941,11 @@ COMMIT
 \fi
 
 \noindent
-Запросы \verb|SELECT| и \verb|UPDATE| действительно были в транзакции.
+\verb|SELECT| and \verb|UPDATE| queries were indeed in a transaction.
 
-\subsection{Воркер}
+\subsection{Worker}
 
-Напишем компонент воркера. Объявим модуль и зависимости:
+Let's write a worker component. Let's declare the module and dependencies:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2352,15 +1974,10 @@ COMMIT
 
 \fi
 
-\index{протоколы!IWorker}
+\index{protocols!IWorker}
 
 \mnoindent
-Воркер~--- это запись с протоколами \verb|Lifecycle| и \verb|IWorker|. Протокол
-\verb|Lifecycle| уже знаком читателю: это функции \verb|start| и
-\verb|stop|. В \verb|IWorker| поместим логику компонента. В неё входят
-бесконечный цикл и его подготовка. Ожидаем, что \verb|task-fn|~--- это функция,
-которую воркер вызывает на каждом шаге цикла. Метод \verb|make-task|
-оборачивает её в цикл и \verb|try/catch|.
+A worker is a record with \verb|Lifecycle| and \verb|IWorker| protocols. You are already familiar with the \verb|Lifecycle| protocol: it is the \verb|start| and \verb|stop| functions. Let's put the component logic in \verb|IWorker|. The logic includes an infinite loop and its preparation. We expect \verb|task-fn| to be a function that the worker calls at each step of the loop. The \verb|make-task| method wraps the function in the loop and \verb|try/catch|.
 
 \begin{english}
   \begin{clojure}
@@ -2370,9 +1987,7 @@ COMMIT
   \end{clojure}
 \end{english}
 
-Запись хранит четыре слота: входные опции, флаг продолжения, футура с циклом
-(\verb|task|) и база данных. Последний слот~--- это зависимый компонент, экземпляр
-\verb|DB|, который мы только что написали. Реализуем \verb|Lifecycle|:
+The record stores four slots: input options, a continue flag, a future with a loop (\verb|task|), and a database. The fourth slot is the dependent component, the \verb|DB| instance we just wrote. Let's implement \verb|Lifecycle|:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2426,19 +2041,11 @@ COMMIT
 
 \fi
 
-Обратите внимание на строку~8: мы дополняем \verb|this| флагом
-состояния. Метод \verb|make-task| ожидает \verb|this| с заполненным слотом
-\verb|flag|. Если строку убрать, \verb|make-task| получит запись с пустым
-флагом.
+Notice line 8: we're adding a status flag to \verb|this|. The \verb|make-task| method expects \verb|this| with a filled \verb|flag| slot. If we remove this line, the \verb|make-task| will get an entry with an empty flag.
 
-\index{функции!make-task}
+\index{functions!make-task}
 
-Опишем протокол \verb|IWorker|. Код \verb|make-task| и \verb|task-fn| уже
-знаком читателю из раздела про Mount. Разница в том, что теперь мы работаем не с
-функциями, а с методами. У метода прямой доступ к слотам, поэтому не нужно
-передавать их в параметрах. Ниже мы перенесли код \verb|make-task| и
-\verb|task-fn| в компонент. Для краткости опустим перехват ошибок и некоторые
-детали.
+Let's describe the \verb|IWorker| protocol. You are already familiar with the \verb|make-task| and \verb|task-fn| code from the Mount section. The difference is that now we are working with methods instead of functions. The method has direct access to slots, so you don't need to pass them in parameters. Below we moved the \verb|make-task| and \verb|task-fn| code into the component. For the sake of shortness, we will skip error catching and some details.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2489,9 +2096,9 @@ COMMIT
 \fi
 
 \noindent
-Добавим конструктор, и компонент готов:
+Let's add a constructor, and the component will be ready:
 
-\index{конструктор}
+\index{constructor}
 
 \begin{english}
   \begin{clojure}
@@ -2501,19 +2108,13 @@ COMMIT
   \end{clojure}
 \end{english}
 
-\subsection{Ручные зависимости}
+\subsection{Manual dependencies}
 
-\index{зависимости!ручные}
+\index{dependencies!manual}
 
-От других компонентов воркер отличается зависимостями. Пока что не~ясно, как
-он узнаёт о базе данных, потому что конструктор принимает только опции. Эту
-проблему решает система, а не программист. Мы не~должны передавать компоненты
-друг другу при создании.
+The worker differs from other components in dependencies. It is not yet clear how it knows about the database because the constructor accepts only options. The system solves this problem rather than a programmer. We should not pass components to each other when creating.
 
-В учебных целях мы \emph{нарушим} это правило и соберём мини-систему
-вручную. Так мы лучше поймём, как она работает, и проверим код. Проведём
-эксперимент в модуле \verb|core| с двумя компонентами. Добавьте в модуль
-конструкторы:
+But for educational purposes, we \emph{will break} this rule and assemble the mini-system manually. This way helps us better understand how it works and test the code. Let's run an experiment in the \verb|core| module with two components. Add constructors to the module:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2544,11 +2145,8 @@ COMMIT
 
 \fi
 
-Рассмотрите систему ниже. Это функция, которая принимает конфигурацию. Мы
-вручную запускаем базу и воркер и возвращаем словарь компонентов. В десятой
-строке мы задаём воркеру слот с базой. Важен момент, когда это происходит:
-компонент базы \emph{уже включён}, а~воркер ещё нет (\verb|assoc| идёт перед
-\verb|start|).
+Take a look at the system below. It is a function that takes a config. We manually start the database and worker and return the component map. In the tenth line, we set the slot with the database for the worker.
+Pay attention when to do it~--- the database component \emph{has already been enabled}, but the worker hasn't yet (because \verb|assoc| comes before \verb|start|).
 
 \begin{english}
   \begin{clojure/lines}
@@ -2567,8 +2165,7 @@ COMMIT
   \end{clojure/lines}
 \end{english}
 
-Чтобы запустить систему, передайте в функцию параметры пула и~воркера. Сохраните
-систему в переменной, чтобы выключить её позже.
+To start the system, pass the pool and worker parameters to the function. Save the system to a variable for later termination.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2590,8 +2187,7 @@ COMMIT
 
 \fi
 
-Проверьте систему: добавьте записи в таблицу \verb|requests| и убедитесь, что
-воркер дополняет их. Функция выключения остановит компоненты в обратном порядке:
+Test the system: add records to the \verb|requests| table and make sure that the worker adds data to their fields. The stop function will stop the components in reverse order:
 
 \begin{english}
   \begin{clojure}
@@ -2605,36 +2201,21 @@ COMMIT
   \end{clojure}
 \end{english}
 
-\subsection{Промышленная система}
+\subsection{High-performance System}
 
-\index{системы}
+\index{systems}
 
-Рассмотрим, как строят систему на практике. Функция \verb|system-map| принимает
-цепочку значений. Нечётные элементы~--- это имена компонентов, а чётные~--- вызовы
-их конструкторов. Вызов \verb|system-map| строит дерево компонентов с
-заполненными слотами. Получим систему в состоянии покоя.
+Let's consider how a system is built in practice. The \verb|system-map| function takes a chain of values. The odd elements are the component names, and the even ones are the calls of their constructors. The \verb|system-map| call builds a component tree with filled slots. We get the system at rest.
 
-\index{функции!system-map}
+\index{functions!system-map}
 
-При сборке системы не должно быть побочных эффектов. Конструкторы только
-порождают записи. Если конструктор обращается к~диску или меняет состояние, это
-грубая ошибка.
+When building the system, there should be no side effects. Constructors only create records. If a constructor is accessing a disk or changing state, this is a blunder.
 
-Система зависит от конфигурации, поэтому сборку выносят в функцию
-\verb|make-system|. Она принимает словарь конфигурации и делит на~части. Каждый
-конструктор принимает свою часть. Удобно, когда структура конфигурации повторяет
-систему: на верхнем уровне ключи компонентов, а под ними словари опций.
+The system depends on the config, so assembling is moved to the \verb|make-system| function. It takes a config map and divides it into parts. Each constructor takes its part. It is convenient when the config structure repeats the system with the component keys are at the top level, and option maps are below them.
 
-Чтобы сообщить компоненту зависимости, его оборачивают в функцию
-\verb|component/using|. Второй аргумент~--- это ключи компонентов, которые он
-должен получить до старта. Ключи могут быть вектором или словарём. Если имена
-слота и компонента совпадают, это вектор. Если отличаются, передают словарь вида
-\verb|{:slot :component}|.
+To pass dependencies to the component, it is wrapped in the \verb|component/using| function. The second argument is the keys of the components, which it should receive before starting. The key can be a vector or a map. If the slot and component names match, it is a vector. If they differ, pass the map of the form \verb|{:slot :component}|.
 
-Ниже функция \verb|make-system| строит систему, о которой мы договорились в
-начале главы. Компонент \verb|worker| обёрнут в \verb|component/using|. Мы
-передали вектор \verb|[:db]|, потому что так называется и слот воркера, и
-компонент системы.
+Below, the \verb|make-system| function builds the system we agreed on at the beginning of the chapter. The \verb|worker| component is wrapped in \verb|component/using|. We passed the \verb|[:db]| vector because this is the name of both the worker slot and the system component.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2670,10 +2251,10 @@ COMMIT
 
 \fi
 
-\index{зависимости!Component}
+\index{dependencies!Component}
 
 \noindent
-Если бы компонент назывался \verb|:storage|, мы бы задали словарь:
+If the component name were \verb|:storage|, we would define a map:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2702,16 +2283,9 @@ COMMIT
 
 \fi
 
-Словарь полезен для сторонних компонентов. Их создатели не знают, как называются
-сущности в вашем проекте. Предположим, чужой компонент зависит от
-\verb|:database|, а у нас это просто \verb|:db|. Словарь снимает проблему
-расхождения имён.
+Maps are useful for third party components, because their creators don't know what the entities in your project are called. Suppose the third-party component depends on \verb|:database|, but we have \verb|:db|. The map removes the name discrepancy problem.
 
-Чтобы запустить систему, её передают в \verb|component/start|. У системы
-особая реализация \verb|Lifecycle|. При запуске она строит граф зависимостей и
-выводит порядок обхода. Перед тем как запустить компонент с зависимостями,
-система сообщает их компоненту через \verb|assoc|, как мы делали это
-вручную. Аналогично работает выключение системы.
+To start the system, it is passed into \verb|component/start|. The system has a special \verb|Lifecycle| implementation. At startup, it builds a dependency graph and determines the traversal order. Before starting a component with dependencies, the system will pass them to the component through \verb|assoc|, as we did manually. Stopping the system works the same way.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2739,8 +2313,7 @@ COMMIT
 
 \fi
 
-Как и компонент, система свободно скользит по функциям \verb|start|
-и~\verb|stop| в операторе \arr. Если это не так, в системе ошибка.
+Like a component, the system flows freely through the \verb|start| and \verb|stop| functions in the \arr operator. If not, there is an error in the system.
 
 \begin{english}
   \begin{clojure}
@@ -2751,21 +2324,13 @@ COMMIT
   \end{clojure}
 \end{english}
 
-\subsection{Хранение системы}
+\subsection{System Storage}
 
-\index{системы!хранение}
+\index{systems!storage}
 
-Выше мы задали систему через \verb|def|, что не совсем правильно. Система~--- это
-сущность, которую включают по требованию. С ней обращаются как с глобальной
-переменной, которая меняет значение. Для этого подходит \verb|alter-var-root|.
+Above, we set the system using \verb|def|, which is not entirely correct. The system is an entity that we turn on on-demand. Treat it like a global variable that changes its value. \verb|Alter-var-root| is good for that.
 
-В модуле объявляют переменную будущей системы. Для этого служит макрос
-\verb|defonce|, который выполняется строго один раз. Так мы не потеряем старую
-систему при перезагрузке модуля. Как и компонент, система пребывает в одном из
-трёх состояний: покой, запуск и остановка. Функции \verb|system-init|,
-\verb|system-start| и \verb|system-stop| переводят систему в нужное
-состояние. Они работают с помощью служебной \verb|alter-system|, которую для
-краткости задали с помощью \verb|partial|.
+A future system variable is declared in the module. The \verb|defonce| macro, which is executed strictly once, does this. Thanks to this, we will not lose the old system when reloading the module. Like a component, the system is in one of three states: rest, start, and stop. The \verb|system-init|, \verb|system-start|, and \verb|system-stop| functions bring the system to the required state. They work using the service \verb|alter-system|, which we specified using \verb|partial| for shortness.
 
 \index{clojure.core!alter-var-root}
 
@@ -2811,11 +2376,9 @@ COMMIT
 
 \fi
 
-\index{функции!-main}
+\index{functions!-main}
 
-Появились рычаги, чтобы управлять системой. Функция \verb|-main|~--- это точка
-входа в программу. Она сводится к трём шагам: чтению конфигурации, подготовке и
-запуску системы.
+Now there's a way to control the system. The \verb|main| function is the entry point to the program. It boils down to three steps: reading the configuration, preparing and starting the system.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2842,15 +2405,11 @@ COMMIT
 
 \fi
 
-Система глобальна, но к ней нельзя обращаться напрямую. Если один компонент
-что-то ищет в недрах системы, это провал разработчика. Такой подход рушит саму
-идею системы и компонентов. Обращаться к системе можно только в разработке или
-тестах. Для большей надежности систему делают приватной: так мы обезопасим
-её от обращения извне.
+The system is global, but we cannot access it directly. If a component is looking for something in the depths of the system, it means that the developer has failed. This approach destroys the very idea of a system and components. The system can only be accessed during development or testing. It is worth making the system private for higher reliability: this way, we will protect it from external access.
 
 \index{clojure.core!defonce}
-\index{переменные!приватные}
-\index{переменные!единоразовые}
+\index{variables!private}
+\index{variables!one-time}
 
 \begin{english}
   \begin{clojure}
@@ -2858,43 +2417,28 @@ COMMIT
   \end{clojure}
 \end{english}
 
-Конечно, и до приватной системы можно добраться с помощью \verb|resolve| и
-полного символа. Это продвинутая техника, которой не может противиться ни одна
-переменная. Но \verb|resolve| выделяется на общем фоне, и нарушение легче
-заметить.
+Of course, you can also get to the private system with \verb|resolve| and a fully qualified symbol. This is an advanced technique that no variable can resist. But \verb|resolve| stands out, and trouble is easier to spot.
 
-\subsection{Корректное завершение}
+\subsection{Correct Completion}
 
-\index{системы!завершение}
+\index{systems!completion}
 
-Глобальная система идёт вразрез с тем, что пишет автор библиотеки: In
-production, the system map is ephemeral. It is used to start all the components
-running, then it is discarded. (В промышленном запуске система эфемерна. Она
-запускает все компоненты и затем исчезает.)
+The global system goes against what the library author writes: "In production, the system map is ephemeral. It is used to start all the components running, then it is discarded."
 
 \index{graceful shutdown}
 
-Позволим себе не согласиться с автором. Практика показывает, что ссылка на
-систему нужна и в промышленном запуске. Без ссылки нельзя корректно остановить
-приложение (англ.~graceful shutdown). Корректность означает, что все ресурсы
-закрыты.
+Let us disagree with the author. Practice shows that a reference to the system is also useful in production. Without the reference, a graceful application shutdown is impossible. Gracefulness means that all resources are closed.
 
-Во время работы некоторые компоненты не могут остановиться в~произвольный
-момент. Это очереди задач, каналы данных, транзакции. Если аварийно завершить
-очередь, мы потеряем сообщение или обработаем его дважды. Закрывайте ресурсы
-правильно, даже если их приходится ждать.
+During running, some components cannot stop at an arbitrary moment. These include task queues, data channels, and transactions. If a queue ends abnormally, we either lose the message or process it twice. Close resources properly, even if you have to wait for them.
 
 \index{POSIX}
-\index{сигналы!SIGTERM}
+\index{signals!SIGTERM}
 
-В боевом режиме приложение слушает сигналы POSIX и реагирует на них должным
-образом. Если поступил SIGTERM, приложение останавливает систему, дожидается
-остановки и только потом завершается.
+In production mode, the application listens for POSIX signals and responds to them appropriately. If SIGTERM comes, the application should stop the system, wait for the shutdown, and only then exit.
 
-\index{библиотеки!Signal}
+\index{libraries!Signal}
 
-Библиотека \footurl{Signal}{https://github.com/pyr/signal}[Signal][1mm] предлагает макрос,
-чтобы связать сигнал с~реакцией на него. Подключите библиотеку в проект:
+The \footurl{Signal}{https://github.com/pyr/signal}[Signal][1mm] library provides a macro to associate a signal with a reaction to it. Include the library in the project:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2926,9 +2470,7 @@ running, then it is discarded. (В промышленном запуске си�
 
 \fi
 
-Расширьте функцию \verb|-main|. После запуска системы добавьте событие на
-сигналы SIGTERM и SIGHUP. Первый останавливает систему и завершает
-программу. Второй мы расцениваем как перезагрузку системы.
+Extend the \verb|-main| function. After the system starts, add an event to the SIGTERM and SIGHUP signals. The former stops the system and ends the program. We regard the latter as a system reboot.
 
 \begin{english}
   \begin{clojure}
@@ -2940,7 +2482,7 @@ running, then it is discarded. (В промышленном запуске си�
   \end{clojure}
 \end{english}
 
-\index{сигналы!SIGHUP}
+\index{signals!SIGHUP}
 
 \begin{english}
   \begin{clojure}
@@ -2952,9 +2494,7 @@ running, then it is discarded. (В промышленном запуске си�
   \end{clojure}
 \end{english}
 
-Сигналы не работают, когда проект запущен через \verb|lein run| или в
-REPL. Чтобы проверить сигналы, соберите \verb|uberjar| и запустите его как
-Java-приложение.
+The signals do not work when the project is run via \verb|lein run| or in the REPL. To test the signals, build \verb|uberjar|, and run it as a Java application.
 
 \begin{english}
   \begin{bash}
@@ -2963,20 +2503,15 @@ $ java -jar target/book-standalone.jar
   \end{bash}
 \end{english}
 
-Нажмите \verb|Ctrl+C|. Приложение завершится не сразу, и вы увидите сообщение
-об остановке всех компонентов.
+Press \verb|Ctrl+C|. The application will not end immediately, and you will see a message that all components have stopped.
 
-Программы по управлению процессами обычно ждут 30 секунд, пока процесс не
-остановится. В противном случае его завершают принудительно. Ожидание системы
-должно быть разумным. Если оно выходит на рамки 30 секунд, нужно найти и
-улучшить проблемный компонент.
+Process control programs usually wait 30 seconds for a process to stop. Otherwise, it is terminated forcibly. The system wait should be within reasonable limits. If it goes beyond 30 seconds, you need to find and improve the problematic component.
 
-\subsection{Подробнее об ожидании}
+\subsection{More about Waiting}
 
-\index{системы!ожидание}
+\index{systems!waiting}
 
-Вернёмся к функции \verb|-main| приложения. Это входная точка программы на
-Clojure:
+Let's go back to the \verb|-main| function of the app. It is the entry point of the Clojure program:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -3003,30 +2538,19 @@ Clojure:
 
 \fi
 
-У читателя, не знакомого с тонкостями JVM, возникнет вопрос: почему программа не
-завершается после вызова \verb|(system-start)|? За ним нет цикла, хука или
-события, но платформа продолжит работать.
+If you are not familiar with the JVM intricacies, you may be wondering why the program does not terminate after calling \verb|(system-start)|? There is no loop, hook, or event behind it, but the platform continues to work.
 
-\index{JVM!ожидание}
+\index{JVM!waiting}
 
-Это стандартное поведение JVM. Если программа выполнила инструкции без ошибок,
-главный поток ожидает, пока не остановятся дочерние. Запуск системы порождает
-новые потоки (сервер, пул соединений). После \verb|(system-start)| основной
-поток повиснет в ожидании их~завершения. Он будет ждать до тех пор, пока систему
-не выключат в другом потоке или не придёт SIGTERM, на который повесили её
-остановку.
+This is the standard JVM behavior. If the program executed the instructions without error, the main thread waits until the child ones have stopped. System startup generates new threads (server, connection pool). After \verb|(system-start)|, the main thread will be running until they are finished. It will wait until the system is stopped in another thread or a termination signal, SIGTERM, arrives.
 
-Если у компонента нет состояния, не будет и новых потоков. Компонент \verb|DB|
-можно изменить так, что слот \verb|db-spec|~--- это не пул соединений, а~статичный
-словарь. Бывают компоненты, которые выполняют разовую задачу на старте. Если ни
-один компонент не породил поток, программа выполнит \verb|start| для каждого из
-них и завершится.
+If the component is stateless, there will be no new threads. You can modify the \verb|DB| component so that the \verb|db-spec| slot is not a connection pool but a static map. Some components perform a one-time task at the start. If no components have created a thread, the program will execute \verb|start| for each one and exit.
 
-\subsection{Улучшаем зависимости}
+\subsection{Improving Dependencies}
 
-\index{зависимости!Component}
+\index{dependencies!Component}
 
-Мы сообщили компоненту зависимости с помощью \verb|using|:
+We passed dependencies to the component with \verb|using|:
 
 \begin{english}
   \begin{clojure}
@@ -3037,11 +2561,7 @@ Clojure:
   \end{clojure}
 \end{english}
 
-Когда компонентов много, зависимости вносят шум и код трудно читать. В примере
-выше мы сперва получаем компонент из конструктора, а затем вешаем на него
-зависимости. Последний шаг можно сдвинуть в конструктор. Он вернёт
-<<заряженный>> компонент, и \verb|using| уйдёт из~системы. Перепишем конструктор
-воркера:
+When there are many components, dependencies make the code noisy and difficult to read. In the example above, we first get the component from the constructor and then add dependencies to it. The last step can be moved to the constructor. It will return a component with dependencies, and \verb|using| will leave the system. Let's rewrite the worker constructor:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -3066,7 +2586,7 @@ Clojure:
 \fi
 
 \noindent
-Новая система чище и короче:
+The new system is cleaner and shorter:
 
 \begin{english}
   \begin{clojure}
@@ -3077,24 +2597,15 @@ Clojure:
   \end{clojure}
 \end{english}
 
-Подход требует, чтобы имена компонентов совпадали со слотами. Если это ваши
-компоненты, договоритесь с командой об именах. Для сторонних компонентов легко
-написать свой конструктор.
+Such an approach requires the component names to match the slot ones. If these are your components, agree on naming them with the team. It's easy to write your own constructor for third-party components.
 
-\index{метаданные!в Component}
+\index{metadata!in Component}
 
-Теперь рассмотрим, как устроены зависимости. Очевидно, вызов
-\verb|component/using| что-то сообщает компоненту, но последний от этого не
-меняется. В нём нет поля \verb|:deps| или скрытого атома. Компонент хранит
-зависимости в \emph{метаданных}.
+Now let's look at how dependencies work. As you might guess, the \verb|component/using| call passes something to the component, but the latter doesn't change. It has no \verb|:deps| field or hidden atom. The component stores dependencies in \emph{metadata}.
 
-Метаданные~--- это словарь дополнительной информации об объекте. Метаданные работают
-с коллекциями и некоторыми типами Clojure (символ, кейворд, \verb|Var|). К
-метаданным прибегают, чтобы дополнить объект, не изменяя его. Зависимости
-компонента ложатся на эту схему.
+Metadata is a map of additional information about an object. Metadata works with collections and some Clojure types (symbol, keyword, \verb|Var|). Metadata is used to supplement an object without changing it. Component dependencies are in line with this concept.
 
-Функция \verb|meta| вернёт метаданные объекта. Код ниже доказывает, что
-конструктор добавил зависимости:
+The \verb|meta| function returns the object's metadata. The code below proves that the constructor added dependencies:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -3116,11 +2627,10 @@ Clojure:
 
 \fi
 
-Другой способ увидеть их~--- задать переменной \verb|*print-meta*| истину. При
-печати объекта в REPL появятся метаданные:
+Another way to see them is to set the \verb|*print-meta*| variable to true. When the object is printed to the REPL, the metadata will appear:
 
 \index{REPL}
-\index{печать!метаданных}
+\index{ printing!metadata}
 \index{clojure.core!*print-meta*}
 \index{clojure.core!set"!}
 
@@ -3150,12 +2660,11 @@ Clojure:
 
 \fi
 
-\subsection{Группировка слотов}
+\subsection{Grouping slots}
 
-\index{слоты!группировка}
+\index{slots!grouping}
 
-Слоты делятся на три группы: входные параметры, состояние и
-зависимости. Вспомним компонент воркера:
+Slots are divided into three groups: inputs, state, and dependencies. Let's recall the worker component:
 
 \begin{english}
   \begin{clojure}
@@ -3164,10 +2673,7 @@ Clojure:
   \end{clojure}
 \end{english}
 
-В этом примере слот \verb|options| относится к инициализации, \verb|flag|
-и~\verb|task| к состоянию, а \verb|db|~--- зависимость. Чем сложнее компонент,
-тем больше слотов в каждой группе. Когда слоты в случайном порядке, трудно понять
-их семантику. Считается хорошим тоном отделять слоты комментарием:
+In this example, the \verb|options| slot is for initialization, \verb|flag| and \verb|task| are for state, and \verb|db| is for dependency. The more complex the component is, the more slots are in each group. When slots are in random order, it's difficult to understand their semantics. It is considered good practice to separate groups of slots from each other with a comment:
 
 \begin{english}
   \begin{clojure}
@@ -3182,34 +2688,23 @@ Clojure:
   \end{clojure}
 \end{english}
 
-Первой идёт группа \verb|init|, входные параметры. От конструктора ожидают
-такие же аргументы. В \verb|runtime| перечислены слоты, которые компонент
-заполнит при старте. В \verb|deps| указаны зависимости. Они совпадают с
-вектором ключей из функции \verb|using|.
+The first is the \verb|init| group~--- the input parameters. The same arguments are expected from the constructor. The \verb|runtime| group lists the slots that the component will fill at startup. The \verb|deps| group indicates dependencies. They are the same as the key vector from the \verb|using| function.
 
-Группировка слотов улучшает код, делает его понятнее. Договоритесь с командой,
-чтобы внедрить эту практику. Когда слотов слишком много, это говорит о том, что
-компонент переусложнён. Часть логики выносят в дочерний компонент и подключают в
-зависимости первого.
+Grouping slots improves code and makes it more readable. Agree with the whole team to implement this practice. When there are too many slots, that indicates the component is overcomplicated. In this case, you can move some of the logic into a child component and connect it depending on the first one.
 
-На страницах книги мы не группируем слоты, потому что иначе код займёт много
-места. В вашем проекте делайте это обязательно.
+We do not group slots here because, otherwise, the code will take up a lot of space. But be sure to do this in your real project.
 
-\subsection{Условная система}
+\subsection{Conditional System}
 
 \index{feature flags}
 
-В главе про конфигурацию мы писали про \emph{feature flags} \page{feature-flags}.
-Это параметры, которые включают пласты логики. С флагами отпадает нужда в новой сборке
-приложения. Достаточно изменить конфигурацию и~перезагрузить сервис.
+In the chapter on config, I wrote about \emph{feature flags} \page{feature-flags}. They are parameters that enable layers of logic. With flags, there is no need for a new build of the application. It is enough to change the configuration and restart the service.
 
-Иногда систему строят не линейно, а по условиям. Предположим, воркер
-всё ещё в испытательном режиме. Добавим в конфигурацию поле с семантикой
-<<включить воркер>>. Если оно ложь, система запустится без этого компонента.
+Sometimes a system is not built linearly, but according to conditions. Let's say the worker is still in test mode. Let's add a field with the semantics "run worker" to the configuration. If the field is false, the system will start without this component.
 
-\index{фичи}
+\index{features}
 
-Выделим в конфигурации группу \verb|:features| для флагов <<фич>>:
+Let's select the \verb|:features| group in the configuration for the features flags:
 
 \begin{english}
   \begin{clojure}
@@ -3219,13 +2714,9 @@ Clojure:
   \end{clojure}
 \end{english}
 
-Перепишем функцию \verb|make-system| с учётом флагов. Перед тем как попасть в
-\verb|system-map|, компоненты проходят отбор. Выделим базовые компоненты,
-которые работают всегда, и постепенно дополним их.
+Let's rewrite the \verb|make-system| function with flags. Before getting into \verb|system-map|, the components are selected. Let's select the essential components that always work and gradually add them.
 
-Макрос \verb|cond->| пропускает вектор по цепочке условий и форм. Если условие
-\verb|worker?| истина, следующая форма добавит к вектору значения \verb|:worker|
-и \verb|(make-worker {...})|. Ниже могут идти другие флаги и~выражения.
+The \verb|cond->| macro passes the vector through the chain of conditions and forms. If the \verb|worker?| condition is true, the following form will add the \verb|:worker| and \verb| (make-worker {...})| values to the vector. Other flags and expressions may appear below.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -3264,8 +2755,7 @@ Clojure:
 
 \fi
 
-Убедимся, что флаг работает. Система~--- это запись, поэтому функция \verb|keys|
-вернёт её ключи. Слот \verb|:worker| появляется в зависимости от~флага:
+Let's make sure the flag works. Since a system is a record, so the \verb|keys| function will return its keys. The \verb|:worker| slot appears depending on the flag:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -3295,35 +2785,21 @@ Clojure:
 
 \fi
 
-Флаги облегчают работу с проектом. Некоторые компоненты сложны и требуют
-специального окружения. Если можно задать их флагом, это принесёт пользу
-всей команде.
+Flags make it easier to work with the project. Some components are complex and require special environments. If you can set them with a flag, it will benefit the whole team.
 
-\subsection{Спуск системы}
+\subsection{System Descent}
 
-\index{системы!спуск}
+\index{systems!descent}
 
-Внутри системы компоненты свободно общаются друг с другом. Если одному из них
-нужен другой, мы добавим зависимость и слот. Проблема возникает, когда к системе
-обращается не компонент, а другая сущность.
+Within the system, the components communicate freely with each other. If one of them needs the other, we'll add a dependency and a slot. The problem arises when another entity rather than a component accesses the system.
 
-В основном это случается, когда отдельные компоненты нужны обработчику
-HTTP-запроса \page{first-handler}. Функция плохо ложится на идеи компонента:
-последний хранит состояние, а функция избегает его. Запуск и остановка функции
-не имеют смысла. Компонент и функция противоположны друг другу.
+That mainly happens when an HTTP request handler needs individual components \page{first-handler}. A function does not fit well with the component ideas: the latter stores state, and the former avoids it. Starting and stopping the functions is meaningless. Component and function are opposite to each other.
 
-Рассмотрим случай, когда в запросе нужен компонент базы данных. Как спустить
-часть системы в функцию, не нарушив принцип библиотеки? Глобальную переменную мы
-не рассматриваем, потому что в данном случае это капитуляция. Помогут два
-способа: проброс и~замыкание.
+Let's see a case where a database component is required in a query. How can you descend part of the system into a function without violating the principle of the library? We are not considering using a global variable because, in this case, it is surrender. Two methods will help~--- forwarding and closure.
 
-\index{системы!проброс}
+\index{systems!forwarding}
 
-\textbf{Проброс} означает, что отдельные компоненты передают в запросе. Вариант
-имеет право на жизнь, потому что запрос~--- это часть сервера, а сервер~--- это
-компонент. На основании этого последний может добавить поля запросу. Чтобы компонент
-базы стал доступен серверу, подключим его в~зависимости. Изменим слоты сервера и
-конструктор:
+\textbf{Forwarding} means passing individual components into a query. The variant has the right to exist because the request is a part of the server, and the server is a component. Based on this, the latter can add fields to the request. To make the database component available to the server, let's include it in dependencies. Let's change the server slots and the constructor:
 
 \begin{english}
   \begin{clojure}
@@ -3337,10 +2813,7 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
   \end{clojure}
 \end{english}
 
-Расширим метод сервера \verb|start|. Если раньше мы передавали \verb|app|
-напрямую в \verb|run-jetty|, то теперь введём новый шаг. Функция
-\texttt{make\--hand\-ler} оборачивает \verb|app| таким образом, что каждый запрос
-в~\verb|app| дополнен базой.
+Let's extend the server \verb|start| method. If earlier we passed \verb|app| directly to \verb|run-jetty|, now we will add a new step. The \texttt{make\--hand\-ler} function wraps \verb|app| so that every query in \verb|app| is supplemented with a database.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -3379,9 +2852,7 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
 
 \fi
 
-Пусть главная страница выводит данные из базы. Код ниже показывает, как
-прочитать таблицу из HTTP-запроса. Чтобы не усложнять пример вёрсткой HTML,
-вёрнем красиво напечатанные данные.
+Let the home page display data from the database. The code below shows how to read a table from an HTTP request. In order not to complicate the example with HTML layout, let's return pretty printed data.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -3411,32 +2882,19 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
 
 \fi
 
-Со временем понадобятся другие компоненты, например очередь задач или
-кэш. Поступим аналогично: добавим их в зависимости серверу и пробросим в
-\verb|make-handler|.
+Over time, we will need other components, such as a task queue or cache. Let's do the same, add them to server dependencies and forward them to the \verb|make-handler|.
 
-\index{системы!подмножество}
+\index{systems!subset}
 
-Когда компонентов всё больше, хранить их на верхнем уровне запроса неудобно:
-возникает риск конфликта ключей. Поместим их во вложенный словарь
-\verb|:system|. Важно понимать, что в \verb|:system| не вся система, а
-минимальное подмножество, необходимое для веб-части.
+When there are too many components, it is inconvenient to store them at the top level of the request~--- there is a risk of keys conflicting. Let's put them in the nested \verb|:system| map. Note: there is not the entire system in \verb|:system|, but the minimum subset required by the web part.
 
-\index{системы!замыкание}
+\index{systems!closure}
 
-Подход с \textbf{замыканием} меняет дерево маршрутов. Оно уже не статично, а
-приходит из функции-построителя. Функция принимает компоненты, которые нужны
-обработчикам. Внутри мы вызываем их с запросом и зависимостями. Это меняет
-сигнатуру функции: теперь у~обработчика может быть несколько аргументов (запрос,
-база, кэш).
+The \textbf{closure} approach changes the route tree. It is no longer static but comes from a builder function. The function takes the components that the handlers need. Internally, we call them with a request and dependencies. This changes the function's signature: now the handler can have several arguments (request, base, cache).
 
-Чтобы упростить замыкание, в систему вводят группировочный компонент. Он ничего
-не делает при запуске и остановке, а только аккумулирует зависимости. От
-группировочного компонента зависит сервер. На базе него он строит дерево
-маршрутов, где каждый обработчик принимает компонент первым аргументом.
+To simplify the closure, a grouping component is introduced into the system. It does nothing on startup and shutdown but only accumulates dependencies. The server depends on the grouping component. Based on it, the server builds a route tree, where each handler takes a component as its first argument.
 
-Введём группировочный компонент \verb|:web|. Пока что он зависит только от
-базы данных, но в будущем потребует что-то ещё:
+Let's introduce the grouping \verb|:web| component. So far, it only depends on the database, but in the future, it will require something else:
 
 \begin{english}
   \begin{clojure}
@@ -3449,7 +2907,7 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
 \end{english}
 
 \noindent
-Подключим его в систему:
+Let's include it to the system:
 
 \begin{english}
   \begin{clojure}
@@ -3461,10 +2919,9 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
   \end{clojure}
 \end{english}
 
-\index{компоненты!группировочные}
+\index{components!grouping}
 
-Исправим зависимость сервера: теперь это не база данных, а группировочный
-\verb|web|:
+Let's fix the server dependency: now it's not a database, but the grouping \verb|web| component:
 
 \begin{english}
   \begin{clojure}
@@ -3477,11 +2934,10 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
   \end{clojure}
 \end{english}
 
-\index{макросы!defroutes}
-\index{библиотеки!Compojure}
+\index{macros!defroutes}
+\index{libraries!Compojure}
 
-Вспомним, как мы строили маршруты. Макрос \verb|defroutes| вернёт функцию,
-которая принимает запрос и возвращает ответ \page{compojure}.
+Let's remember how we built routes. The \verb|defroutes| macro returns a function that accepts a request and returns a response \page{compojure}.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -3509,11 +2965,7 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
 
 \fi
 
-Новое дерево маршрутов не статично, потому что зависит от компонента. Функция
-\verb|make-routes| принимает группировочный компонент и возвращает маршруты,
-замкнутые на нём. В функции \verb|page-index| и~другие приходят два аргумента:
-компонент и запрос. Компонент будет в том состоянии, в каком его передали в
-\verb|make-routes|:
+The new route tree is not static because it depends on the component. The \verb|make-routes| function takes a grouping component and returns the routes that are enclosed within it. The \verb|page-index| function and others get two arguments: a component and a request. The component will be in the same state as it was passed in \verb|make-routes|:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -3542,7 +2994,7 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
 \fi
 
 \noindent
-Метод \verb|start| сервера строит маршруты и передаёт в \verb|run-jetty|:
+The \verb|start| method of the server builds routes and passes them to \verb|run-jetty|:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -3569,9 +3021,7 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
 
 \fi
 
-Рассмотрим обработчик \verb|page-index|, который обращается к базе
-данных. Первый аргумент~--- это \verb|web|, хранилище компонентов. Распакуем его на
-уровне сигнатуры. Далее обращаемся к компоненту \verb|db|.
+Let's take a look at the \verb|page-index| handler that accesses the database. Its first argument is \verb|web|, a component store. Let's unpack it at the signature level. Next, we turn to the \verb|db| component.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -3603,20 +3053,13 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
 
 \fi
 
-Проброс и замыкание решают одинаковую задачу. Разница в том, как передают
-аргументы в функцию. Проброс удобен тем, что обычно обработчик принимает один
-аргумент, и не придётся менять сигнатуру.
+Forwarding and closure solve the same problem. The difference is in passing arguments to a function. Forwarding is convenient because the handler usually takes one argument, and you don't have to change the signature.
 
-С другой стороны, передача компонентов в запросе не всегда очевидна. Когда в
-запросе много полей, с ним трудно работать в~тестах и разработке. При печати
-запроса или в логах вы получите слишком большой вывод. Вариант с замыканием и
-двумя аргументами очевидней. Сигнатура прямо говорит о том, какие данные ожидают
-на входе. Выбор зависит от соглашений в команде.
+On the other hand, passing components in a request isn't always obvious. When a request has many fields, it can be difficult to work with it in testing and development. When printing a request or in logs, you will get too much output. The variant with closure and two arguments is clearer. The signature directly tells what data is expected at the input. The choice of method depends on team conventions.
 
-\subsection{Идемпотентность}
+\subsection{Idempotence}
 
-До сих пор мы писали компоненты так, что их повторный запуск привёл бы к
-ошибке. Покажем это на примере веб-сервера:
+Until now, we have written components so that re-running them would lead to an error. Let's demonstrate this with the example of a web server:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -3648,20 +3091,11 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
 
 \fi
 
-В теле \verb|start| мы не проверяем, что сервер уже работает. При попытке
-включить его повторно получим ошибку: порт занят. Это правильно: мы бы не
-хотели, чтобы запустилось два сервера. Для других компонентов исключения может
-не быть. Если повторно запустить базу данных, получим новый пул
-соединений. Старый пул останется в памяти и будет работать. Так происходит
-утечка ресурсов.
+In the \verb|start| body, we don't check if the server is already running. If we try to start it again, we'll get an error: the port is busy. That's right: we wouldn't want two servers running. There may not be exceptions for other components. If we restart the database, we'll get a new connection pool. The old one will remain in memory and will work. As a result, resources are wasted.
 
-\index{идемпотентность}
+\index{idempotence}
 
-Свойство, когда повторная операция возвращает тот же результат, называется
-\emph{идемпотентность}. Компонент должен ему следовать, чтобы избежать утечки
-ресурсов. Для этого мы проверяем слот перед тем, как открывать ресурс. Если слот
-\verb|nil|, мы порождаем новый сервер и записываем в слот. В противном случае
-сервер уже запущен и~возвращают \verb|this|.
+\emph{Idempotence} is property when a repeated operation returns the same result. A component has to follow it to avoid resource leaks. To do this, we check the slot before opening the resource. If the slot is \verb|nil|, we create a new server and write to the slot. Otherwise, the server is already running and \verb|this| is returned.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -3691,8 +3125,7 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
 \fi
 
 \noindent
-Аналогично работает \verb|stop|: перед остановкой ресурса слот проверяют на
-пустоту:
+\verb|Stop| works similarly: before stopping the resource, the slot is checked for emptiness:
 
 \begin{english}
   \begin{clojure}
@@ -3703,8 +3136,7 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
   \end{clojure}
 \end{english}
 
-Вариант с макросом \verb|or| немного короче. Мы всегда записываем слот, но
-значение~--- это либо текущий сервер, либо новый.
+The variant with the \verb|or| macros is slightly shorter. We always write the slot, but the value is either the current server or the new one.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -3731,43 +3163,23 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
 
 \fi
 
-\subsection{Альтернативный способ}
+\subsection{Alternative Way}
 
-На протяжении главы мы описывали компоненты р\'{е}кордами (типизированными
-словарями). Р\'{е}корд порождает отдельный класс, который расширяют
-протоколом. При вызове метода из протокола Clojure ищет реализацию по классу.
+Throughout this chapter, we have described components with records (typed maps). The record creates a separate class, which is extended by a protocol. When calling a method from the protocol, Clojure looks for an implementation by class.
 
 \index{clojure.core!defrecord}
-\index{протоколы}
-\index{метаданные}
+\index{protocols}
+\index{metadata}
 
-\verb|Defrecord|~--- это рекомендуемый способ работать с Component. Он не лишён
-недостатков: код с р\'{е}кордами занимает больше места, чем функции. Р\'{е}корд не
-работает с \verb|dissoc|: если отнять у него слот, получится обычный словарь, у
-которого пустая реализация \verb|start| и~\verb|stop|. Существует второй способ
-описать компонент. Он занимает меньше кода, но требует глубокого понимания того,
-как устроены методы в~Clojure.
+\verb|Defrecord| is the recommended way to work with Component. Of course, it has its drawback: the code with records takes up more space than functions. The record does not work with \verb|dissoc|: if you take away a slot from it, you get a regular map with an empty implementation of \verb|start| and \verb|stop|. There is a second way to describe a component. It takes less code but requires a deep understanding of how methods in Clojure work.
 
-Тезис о том, что поиск метода работает по классу, на самом деле неполный. Если
-протоколу задано свойство \verb|:extend-via-metadata|, то вдобавок Clojure ищет
-реализацию в метаданных объекта.
+In fact, the thesis that method lookup works by class is incomplete. If the \verb|:extend-via-metadata| property is set for the protocol, then Clojure looks for the implementation in the object's metadata. 
 
-Предположим, в пространстве \verb|project.api| объявили протокол \verb|API| с
-этим свойством и методом \verb|get-user|. Метод ожидает первым аргументом
-объект, который реализует этот протокол. Однако вместо него можно передать
-другой объект, в метаданных которого символ \verb|project.api/get-user| с
-функцией. В этом случае метод разрешается в~функцию из метаданных.
+Suppose you have declared an \verb|API| protocol in the \verb|project.api| namespace with this property and the \verb|get-user| method. The method expects the first argument to be an object that implements this protocol. However, it is acceptable to pass another one instead, which has the \verb|project.api/get-user| symbol with a function in its metadata. In this case, the method is resolved to the function from the metadata.
 
-У протокола \verb|Lifecycle| искомый флаг установлен в истину. Идея в~том, чтобы
-сфабриковать объект, в метаданных которого реализации методов Component. На роль
-объекта подойдёт словарь, потому что библиотека добавляет зависимости через
-\verb|assoc|.
+The \verb|Lifecycle| protocol has the required flag set to true. The idea is to generate an object that has implementations of Component methods in its metadata. A map is suitable for the role of the object because the library adds dependencies through \verb|assoc|.
 
-Опишем компонент сервера новым способом. Он состоит из трёх функций:
-конструктора, \verb|start| и \verb|stop|. Конструктор принимает параметры
-сервера и оборачивает их словарь. Функция \verb|with-meta| добавляет компоненту
-метаданные. Их ключи — полные символы, которые указывают на методы протокола
-\verb|Lifecycle|. В ключах пока что неизвестные функции запуска и остановки:
+Let's describe the server component in a new way. It consists of three functions: a constructor, \verb|start|, and \verb|stop|. The constructor takes server parameters and wraps them in a map. The \verb|with-meta| function adds metadata to the component. Metadata keys are fully qualified symbols that point at the \verb|Lifecycle| protocol methods. The keys will contain so far unknown start and stop functions:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -3795,9 +3207,7 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
 
 \fi
 
-Напишем запуск компонента. Функция \verb|start| принимает словарь, который мы
-вернули в \verb|init|. Для удобства назовём его \verb|this| и распакуем опции на
-уровне сигнатуры. Запустим сервер и добавим к текущему словарю.
+Let's write the starting of the component. The \verb|start| function takes the map we returned to \verb|init|. For convenience, let's call it \verb|this| and unpack the options at the signature level. Let's start the server and add it to the current map.
 
 \begin{english}
   \begin{clojure}
@@ -3808,10 +3218,7 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
   \end{clojure}
 \end{english}
 
-Остановка устроена аналогично. Обратите внимание, что в конце мы отсоединяем
-ключ с помощью \verb|dissoc|. Потеря ключа ни на что не влияет, потому что поиск
-метода работает не по классу, а по метаданным. Из-за \verb|dissoc| метаданные не
-меняются.
+The stopping is similar. Note that at the end, we detach the key with \verb|dissoc|. The loss of the key does not affect anything, because the method search works by metadata rather than class. \verb|Dissoc| doesn't change the metadata.
 
 \begin{english}
   \begin{clojure}
@@ -3822,14 +3229,9 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
   \end{clojure}
 \end{english}
 
-В системе компонент ведёт себя как обычно. При построении системы вызывают
-функцию \verb|init| с параметрами конфигурации. В~момент запуска библиотека
-вызывает метод \verb|start| у всех сущностей, и~для сервера сработает
-реализация из метаданных.
+In the system, the component behaves as usual. When the system is built, the \verb|init| function is called with configuration parameters. When starting, the library calls the \verb|start| method on all entities, and the implementation from metadata will run for the server.
 
-В зависимостях ничего не меняется: их также указывают через \verb|using| и с~вектором
-или словарём. Работает и второй способ, когда конструктор <<заряжает>>
-компонент зависимостями при создании.
+Nothing changes in the dependencies: they are also specified through \verb|using| and with a vector or dictionary. The second method also works, when the constructor "charges" the component with dependencies upon creation.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -3863,8 +3265,7 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
 \fi
 
 \noindent
-Методам \verb|start| и \verb|stop| нужно только распаковать их на уровне
-сигнатуры:
+The \verb|start| and \verb|stop| methods only need to unpack them at the signature level.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -3889,8 +3290,7 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
 
 \fi
 
-Чтобы убедиться, что компонент обладает всем необходимым, исследуем его
-метаданные после \verb|init|:
+Let's examine the metadata of the component after \verb|init| to make sure it has everything we need:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -3925,60 +3325,38 @@ HTTP-запроса \page{first-handler}. Функция плохо ложитс
 
 \fi
 
-\index{метаданные}
-\index{печать!метаданных}
+\index{metadata}
+\index{printing!metadata}
 \index{clojure.core!*print-meta*}
 
 \noindent
-Для отладки таких компонентов пригодится переменная \verb|*print-meta*|, о
-которой мы говорили в прошлой главе \page{print-meta}.
+For debugging such components, the \verb|*print-meta*| variable, which we talked about in the last chapter \page{print-meta}, is useful.
 
-Альтернативный способ не отменяет сказанного в этой главе. Как и с
-\verb|defrecord|, компонент должен следовать практикам, что мы рассмотрели. Даже
-если новая запись нравится вам больше, не торопитесь переходить на неё. Для
-начала разберитесь с классическими компонентами, как рекомендует библиотека.
+The alternative method does not override what we said earlier in this chapter. As with \verb|defrecord|, the component must follow the practices we've covered. Even if you like the new recording more, do not rush to switch to it. First, understand the classic components as the library recommends.
 
-На этом мы заканчиваем обзор Component и переходим к третьей библиотеке~---
+This concludes the Component overview and moves on to the third library~--- Integrant.
 
 \section{Integrant}
 
-\index{библиотеки!Integrant}
+\index{libraries!Integrant}
 
-Библиотека \footurl{Integrant}{https://github.com/weavejester/integrant}[Integrant][1mm]~--- это
-следующий виток в развитии системы. Мы поместили её в конец обзора по нескольким
-причинам. Integrant отталкивается от идей Component, которые мы только что
-рассмотрели. Библиотека устроена гибче и в целом более продвинута. Перечислим
-основные отличия.
+The \footurl{Integrant}{https://github.com/weavejester/integrant}[Integrant][1mm] library is the next step in the development of the system. It is at the end of the overview for several reasons. Integrant builds on the Component ideas we just discussed. The former is more flexible and generally more advanced. Let's list the main differences.
 
-\index{ООП}
+\index{OOP}
 
-Сущности Component напоминают классы и ООП. В Clojure на~фоне данных и функций
-это выглядит усложнением. Пусть компонент будет функцией. Она проще объекта,
-потому что на функцию действует только одна операция~--- вызов.
+Component entities resemble classes and OOP. In Clojure, in the background of data and functions, this looks like a complication. Let a component be a function. It is simpler than an object because only one operation acts on functions~--- a call.
 
-Component выделяет только два состояния~--- \verb|start| и
-\verb|stop|. Integrant предлагает дополнительные стадии: паузу и
-возобновление, валидацию спекой, подготовку параметров. По умолчанию эти стадии
-пусты, но компонент может дополнить их. С таким подходом у нас больше контроля
-за системой.
+The component has only two states~--- \verb|start| and \verb|stop|. Integrant offers additional stages: pause and resume, spec validation, and parameter preparation. These stages are empty by default, but the component can complement them. With this approach, we have more control over the system.
 
-\index{декларативность}
+\index{declarativeness}
 
-Integrant декларативен: можно описать систему в файле и считать одной
-функцией. Это выгодное отличие от Component, где систему строят вручную.
+Integrant is declarative: you can describe the system in a file and consider it as one function. That compares favorably with the Component library, where you build a system manually.
 
-Integrant лоялен к зависимостям. В Component зависимость требует два шага~---
-добавить слот и метаданные,~--- а в Integrant один. В Component зависимость
-может быть только другим компонентом. Иногда объект оборачивают в компонент
-только чтобы выполнить это требование. В Integrant зависимостью может быть что
-угодно: словарь, футура, функция.
+Integrant is tolerant of dependencies. In Component, a dependency requires two steps: adding a slot and metadata, but in Integrant~--- only one. In Component, a dependency can be only another component. Sometimes an object is wrapped in a component just to fulfill this requirement. In Integrant, a dependency can be anything: a dictionary, a future, or a function.
 
-\subsection{Базовое устройство}
+\subsection{Basic Arrangement}
 
-Работу с Integrant начинают с описания будущей системы. Это словарь, за который
-цепляется дальнейшая логика. Ключ словаря~--- это машинное имя компонента, а
-значение~--- параметры запуска. Система ниже состоит из веб-сервера и базы
-данных.
+Work with Integrant begins with a description of the future system. It is a map on which further logic is based. The map key is the machine name of the component, and the value is the startup parameters. The system below consists of a web server and a database.
 
 \begin{english}
   \begin{clojure}
@@ -3992,23 +3370,17 @@ Integrant лоялен к зависимостям. В Component зависим�
   \end{clojure}
 \end{english}
 
-\index{мультиметоды!в Integrant}
+\index{multimethods!in Integrant}
 
-Система и компоненты связаны через мультиметоды. Чтобы добавить реакцию на
-событие, мы расширяем нужный мультиметод ключом компонента. Например, при старте
-система вызывает метод \verb|init-key| для каждого ключа. Чтобы объяснить
-системе, как запускать сервер, метод расширяют ключом \verb|::server|.
+The system and components are related through multimethods. To add a reaction to an event, we extend the required multimethod with a component key. For example, at startup, the system calls the \verb|init-key| method for each key. To explain to the system how to start the server, the method is needed to extend with the \verb|::server| key.
 
-Integrant ожидает от ключа минимум два метода: запуск и остановку. Это главные
-действия, поэтому для них нет реакции по умолчанию. Другие события не
-обязательны и остаются на ваше усмотрение.
+Integrant expects at least two methods from the key: start and stop. Since these are the main actions, there is no default response for them. Other events are optional and are up to you.
 
-\subsection{Первые компоненты}
+\subsection{First components}
 
-\index{компоненты!в Integrant}
+\index{components!in Integrant}
 
-Напишем компоненты сервера и базы. Они просты и не имеют
-зависимостей. Подготовьте модуль \verb|integrant.clj| с шапкой:
+Let's write server and database components. They are simple and have no dependencies. Prepare the \verb|integrant.clj| module with a header:
 
 \begin{english}
   \begin{clojure}
@@ -4017,13 +3389,9 @@ Integrant ожидает от ключа минимум два метода: з�
   \end{clojure}
 \end{english}
 
-Для краткости опустим импорты \verb|Jetty|, \verb|HikariCP| и других
-библиотек. Они аналогичны примерам из Mount и Component.
+For the sake of brevity, let's skip the imports of \verb|Jetty|, \verb|HikariCP|, and other libraries. They are similar to the examples from Mount and Component.
 
-Начнём с сервера. Метод \verb|init-key| принимает ключ и словарь опций. Это
-значения \verb|::server| и \verb|{:port 8080 :join? false}| из
-конфигурации. Метод должен вернуть состояние компонента. В нашем случае это
-результат \verb|run-jetty|.
+Let's begin with the server. The \verb|init-key| method takes a key and an options map. These are the \verb|::server| and \verb|{:port 8080: join? false}| values from config. This method should return the state of the component. In our case, this is the result of \verb|run-jetty|.
 
 \begin{english}
   \begin{clojure}
@@ -4033,11 +3401,9 @@ Integrant ожидает от ключа минимум два метода: з�
   \end{clojure}
 \end{english}
 
-\index{пул соединений}
+\index{connection pool}
 
-Ключ известен из определения метода, поэтому первый аргумент затеняют
-подчёркиванием. По аналогии опишем базу данных. Её состояние~--- это спека JDBC с
-пулом соединений.
+The key is known from the method definition, so the first argument is shadowed with an underscore. Let's describe the database in a similar way. Its state is a JDBC spec with a connection pool.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -4062,12 +3428,9 @@ Integrant ожидает от ключа минимум два метода: з�
 
 \fi
 
-Функция \verb|init| пробегает по конфигурации и вызывает для каждого ключа
-\verb|init-key|. Получим словарь с теми же ключами, но на месте параметров
-появится состояние компонента. Сохраним запущенную систему в переменную, чтобы
-позже выключить её.
+The \verb|init| function runs through the configuration and calls \verb|init-key| for each key. We should get a dictionary with the same keys, but the component state will appear in place of the parameters. Let's save the running system to a variable to turn it off later.
 
-\index{инициализация}
+\index{initialization}
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -4094,9 +3457,7 @@ Integrant ожидает от ключа минимум два метода: з�
 
 \fi
 
-Остановка системы называется \verb|halt|. Метод \verb|halt-key!| определяет,
-как выключить компонент. Он принимает ключ и состояние, которое получили из
-метода \verb|init-key|. Опишем остановку сервера и базы:
+The shutdown of the system is called a \verb|halt|. The \verb|halt-key!| method determines how to shut down the component. It takes the key and state from the \verb|init-key| method. Let's describe the halt of the server and database:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -4131,8 +3492,7 @@ Integrant ожидает от ключа минимум два метода: з�
 \fi
 
 \noindent
-Функция \verb|halt!| остановит всю систему. Передайте в неё результат
-\verb|ig/init|:
+The \verb|halt!| function will halt the entire system. Pass the result of \verb|ig/init| to it.
 
 \begin{english}
   \begin{clojure}
@@ -4140,18 +3500,14 @@ Integrant ожидает от ключа минимум два метода: з�
   \end{clojure}
 \end{english}
 
-\subsection{Зависимости}
+\subsection{Dependencies}
 
-\index{граф зависимостей}
-\index{зависимости!Integrant}
+\index{dependency graph}
+\index{dependencies!Integrant}
 
-Чтобы указать зависимости, в опции добавляют ссылку. При запуске Integrant ищет
-ссылки в системе и строит граф зависимостей. Ссылку задают функцией
-\verb|ig/ref|. Она принимает ключ, от которого зависит компонент.
+To specify dependencies, a reference is added to the options. At startup, Integrant searches for references in the system and builds a dependency graph. Set the reference with the \verb|ig/ref| function. It takes a key that the component depends on.
 
-Рассмотрим зависимость на примере воркера. Добавьте в конфигурацию ключ, как в
-примере ниже. Чтобы отделить опции компонента от зависимостей, поместим их в
-отдельное поле \verb|:options|.
+Let's consider the dependency on the example of a worker. Add a key to the config, as in the example below. To separate component options from dependencies, put them in the separate \verb|:options| field.
 
 \begin{english}
   \begin{clojure}
@@ -4160,11 +3516,7 @@ Integrant ожидает от ключа минимум два метода: з�
   \end{clojure}
 \end{english}
 
-Когда \verb|init-key| дойдёт до ключа \verb|::worker|, в \verb|:db| будет
-значение, которое \verb|init-key| вернул для \verb|::db|. Привёдем код
-запуска и остановки воркера. Поскольку это уже третья реализация, оставим только
-основную часть. Если вы забыли, как устроен воркер, обратитесь к разделу, где мы
-писали его в первый раз \page{worker}.
+When the \verb|init-key| reaches the \verb|::worker| key, \verb|:db| will contain the value that \verb|init-key| returned for \verb|::db|. Here is the code for starting and stopping the worker. Since this is already the third implementation, we will leave only the main part. If you need to brush up on how a worker works, refer to the section where we wrote it for the first time \page{worker}.
 
 \begin{english}
   \begin{clojure}
@@ -4182,16 +3534,13 @@ Integrant ожидает от ключа минимум два метода: з�
   \end{clojure}
 \end{english}
 
-\subsection{Параллели с Component}
+\subsection{Parallels with Component}
 
-Несколько приёмов, что мы рассмотрели в Component, работают и
-в~Integrant. Вспомним некоторые их них.
+Several techniques we covered in the Component section also work in Integrant. Let's recall some of them.
 
-\index{системы!хранение}
+\index{systems!storage}
 
-\textbf{Глобальное хранилище.} Чтобы управлять системой, нужно где-то её
-хранить. Проще всего добавить глобальную переменную и функции запуска и
-остановки.
+\textbf{Global storage}: To manage the system, you need to store it somewhere. The easiest way to do this is to add a global variable and start and stop functions.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -4229,14 +3578,11 @@ Integrant ожидает от ключа минимум два метода: з�
 
 \fi
 
-Как и в Component, система должна быть приватной. Недопустимо, чтобы потребители
-свободно обращались к ней.
+As with Component, the system must be private. Free access to it is unacceptable for consumers.
 
-\index{системы!ожидание}
+\index{systems!waiting}
 
-\textbf{Ожидание и сигналы.} Перед тем как закончить работу, приложение ожидает,
-пока все компоненты остановятся. Макрос \verb|with-handler| и перехват
-сигналов работают аналогично для Integrant:
+\textbf{Waiting and signals}: An application waits for all components to stop before exiting. The \verb|with-handler| macro and signal interception work in the same way for Integrant:
 
 \begin{english}
   \begin{clojure}
@@ -4248,12 +3594,9 @@ Integrant ожидает от ключа минимум два метода: з�
   \end{clojure}
 \end{english}
 
-\index{системы!спуск}
+\index{systems!descent}
 
-\textbf{Спуск системы и маршруты.} В Integrant легче обратиться к системе из
-HTTP-запроса. Обработчик может быть компонентом, который зависит от базы. Пусть
-страница выводит число записей в~базе. Добавим в систему новый ключ и ссылку на
-базу:
+\textbf{Descent system and routes}: In Integrant, it is easier to access the system from an HTTP request. The handler can be a database-dependent component. Let the page display the number of records in the database. Let's add a new key and a reference to the database to the system:
 
 \begin{english}
   \begin{clojure}
@@ -4262,7 +3605,7 @@ HTTP-запроса. Обработчик может быть компонент
 \end{english}
 
 \noindent
-В запуске ключа вернём обработчик запроса, замкнутый на \verb|db|:
+In the run of the key, we return the request handler closed in \verb|db|:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -4300,7 +3643,7 @@ HTTP-запроса. Обработчик может быть компонент
 \fi
 
 \noindent
-Доработаем сервер, чтобы он зависел от обработчика:
+Let's modify the server so that it depends on the handler:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -4331,15 +3674,11 @@ HTTP-запроса. Обработчик может быть компонент
 
 \fi
 
-Браузер покажет фразу You've got N records, где \verb|N|~--- число записей
-в базе. Как и в Component, \verb|::handler| может вернуть не отдельную
-страницу, а дерево маршрутов с помощью Compojure.
+The browser will show the phrase "You've got N records," where \verb|N| is the number of the database records. As with Clojure, \verb|::handler| can return both a single page and a route tree, using Compojure.
 
-\index{системы!условные}
+\index{systems!conditional}
 
-\textbf{Условное построение.} Перед запуском систему можно изменить по
-условию. Специальная функция определяет, можно ли запустить воркер на этой
-машине. Если можно, добавим в систему ключ компонента и его настройки.
+\textbf{Conditional build}: The system can be changed conditionally before starting. A special function determines if a worker can be run on this machine. If yes, add the component key and its settings to the system.
 
 \begin{english}
   \begin{clojure}
@@ -4350,10 +3689,7 @@ HTTP-запроса. Обработчик может быть компонент
   \end{clojure}
 \end{english}
 
-Другой способ запустить подмножество системы похож на
-Mount \page{mount-selective}. Функция \verb|init| принимает необязательный
-список ключей, которые следует включить. Список готовят заранее по какому-то
-правилу. Ниже мы берём все ключи конфигурации и удаляем некоторые по условию.
+Another way to start a subset of the system is similar to Mount \page{mount-selective}. The \verb|init| function accepts an optional list of keys to include. The list is prepared in advance according to a rule. Below we take all the configuration keys and remove some by the condition.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -4382,28 +3718,16 @@ Mount \page{mount-selective}. Функция \verb|init| принимает не
 
 \fi
 
-\subsection{Потеря ключей}
+\subsection{Loss of Keys}
 
-\index{ключи!потери}
-\index{синтаксис!:: (пространство)}
+\index{keys!losses}
+\index{syntax!:: (namespace)}
 
-Для компонентов указывают полные (квалифицированные) ключи: \verb|::server|,
-\verb|::db|. Двойное двоеточие означает текущее пространство имён, в котором
-объявлен ключ. Запись \verb|::db|~--- это краткий вариант
-\verb|:book.integrant/db|.
+Specify for components fully qualified keys (e.g., \verb|::server|, \verb|::db|). The double colon stands for the current namespace in which the key is declared. The \verb|::db| notation is a shorthand for \verb|:book.integrant/db|.
 
-Когда ключ полный (с пространством), легко понять, в каком модуле он объявлен. В
-системах бывает больше десяти компонентов. Представьте, что возникла проблема с
-ключом \verb|:queue|. Как понять, в каком модуле он находится?  Наоборот, ключ
-\texttt{:my-project.utils.queue\-/queue} содержит эту информацию. Всегда используйте
-полные ключи.
+When a key is fully qualified (with a namespace), it is easy to understand in which module it is declared. There are more than ten components in systems. Let's say there is a problem with the \verb|:queue| key. How to understand which module it is in? Whereas the \texttt{:my-project.utils.queue\-/queue} key contains this information. I recommend you always use fully qualified keys.
 
-Возможна ситуация, что вы забыли импортировать модуль, в котором расширили
-мультиметод. Если модуль не загружен, Integrant не узнает о компоненте. Иногда
-это вгоняет в ступор: вы помните, что писали код, но компонента нет. Похожую
-проблему мы рассмотрели в Mount \page{mount-main}. Чтобы избежать ошибки,
-добавьте все модули с~компонентами в шапку главного модуля, который загружается
-всегда. Пусть это будет модуль системы.
+A situation may arise that you forgot to import the module in which you extended the multimethod. If the module is not loaded, Integrant will not know about the component. Sometimes you are left completely confused: you remember that you wrote the code; however, there is no component. We've discussed a similar problem in Mount \page{mount-main}. To avoid an error, add all modules with components to the header of the main module, which is always loaded. Let it be the system module.
 
 \begin{english}
   \begin{clojure}
@@ -4415,19 +3739,12 @@ Mount \page{mount-selective}. Функция \verb|init| принимает не
   \end{clojure}
 \end{english}
 
-Утилиты для проверки синтаксиса (линтеры) могут выдать предупреждение. С их
-точки зрения вы добавили модуль, но не используете его, потому что в коде нет
-выражения \verb|project.db/<something>|. Чтобы подавить предупреждения,
-исправьте настройки линтера. Добавьте \verb|project.db| в секцию known
-namespaces или аналогичную.
+Syntax checking utilities (linters) may generate a warning. In their terms, you've added a module, but you are not using it because there is no \verb|project.db/<something>| expression in your code. To suppress such warnings, correct linter settings. Add \verb|project.db| into the known namespaces section or similar.
 
-\index{пространства имён}
+\index{namespaces}
 
 \mnoindent
-Integrant предлагает функцию \verb|load-namespaces| для автоматической загрузки
-модулей. На вход подают конфигурацию системы. Для каждого ключа функция ищет его
-пространство и загружает его. Вот как выглядит промышленная система с ключами из
-разных модулей:
+Integrant offers the \verb|load-namespaces| function to load modules automatically. The system configuration is fed to its input. For each key, the function looks for its space and loads it. A high-performance system with keys from different modules looks like this:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -4467,7 +3784,7 @@ Integrant предлагает функцию \verb|load-namespaces| для ав
 \fi
 
 \noindent
-Чтобы загрузить все модули, которые участвуют в системе, выполните:
+To load all modules that participate in the system, execute the following:
 
 \begin{english}
   \begin{clojure}
@@ -4475,24 +3792,17 @@ Integrant предлагает функцию \verb|load-namespaces| для ав
   \end{clojure}
 \end{english}
 
-Новичкам советуем воздержаться от автоматических импортов. Добавляйте их явно в
-\verb|ns|: способ хоть и многословен, но очевиден. Прибегайте к
-\verb|load-namespaces| только если точно знаете, как работают пространства
-имён и их загрузка.
+We recommend beginners to refrain from automatic imports. Add them explicitly to \verb|ns|: the method, although verbose, is obvious. Use \verb|load-namespaces| only if you fully understand how namespaces and their loading work.
 
-\subsection{Система в файле}
+\subsection{System in File}
 
-\index{декларативность}
+\index{declarativeness}
 
-Integrant поощряет декларативный подход. Конфигурация системы~--- это статичный
-словарь. Для экономии места систему выносят в ресурс EDN и читают на старте
-приложения.
+Integrant encourages a declarative approach. System configuration is a static dictionary. For space-saving, the system is taken to the EDN resource and read at the start of the application.
 
-\index{теги!Integrant}
+\index{tags!Integrant}
 
-Читатель заметит, что мы указали ссылки функцией \verb|ig/ref| и~не совсем
-ясно, как выразить их в файле. Тег \verb|#ig/ref| работает как одноимённая
-функция.
+You might notice that we have specified references with the \verb|ig/ref| function, and it is not entirely clear how to express them in the file. The \verb|#ig/ref| tag works like the function of the same name.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -4515,12 +3825,10 @@ Integrant поощряет декларативный подход. Конфиг
 
 \fi
 
-\index{модули!clojure.edn}
+\index{modules!clojure.edn}
 
 \mnoindent
-Integrant предлагает свою версию \verb|read-string| для чтения EDN. Это обёртка
-над обычным \verb|clojure.edn/read-string|, но с тегами семейства
-\verb|#ig/|. Чтобы прочитать систему из файла, выполните:
+Integrant offers its \verb|read-string| version for a reading of EDN. It is a wrapper over the usual \verb|clojure.edn/read-string|, but with tags from the \verb|#ig/| family. To read the system from a file, do the following:
 
 \begin{english}
   \begin{clojure}
@@ -4529,14 +3837,11 @@ Integrant предлагает свою версию \verb|read-string| для �
   \end{clojure}
 \end{english}
 
-\index{переменные!среды}
+\index{variables!environment}
 
-Из главы про конфигурацию мы помним, что нежелательно хранить в файле пароли и
-ключи доступа \page{password-note}. Компонент \verb|:project.db/db| нарушает
-этот принцип: пароль к базе записан открыто. Сделаем так, чтобы парсер читал
-пароль из среды.
+From the configuration chapter, we remember that it is undesirable to store passwords and access keys in a file \page{password-note}. The \verb|project.db/db| component violates this principle: the password for the database is written publicly. Let's make the parser read the password from the environment.
 
-Поместим конфигурацию в файл \texttt{integrant\-.test.edn} (фрагмент):
+We'll put the configuration into the \texttt{integrant\-.test.edn} file (snippet):
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -4562,11 +3867,7 @@ Integrant предлагает свою версию \verb|read-string| для �
 
 \fi
 
-Функция \verb|ig/read-string| принимает дополнительные теги EDN. Integrant
-объединит их со своими при чтении файла. Обернём чтение конфигурации в
-функцию. Первым аргументом в \verb|ig/read-string| укажем словарь с тегом
-\verb|#env| из прошлой главы. Integrant дополнит наш словарь собственным,
-поэтому оба \verb|#ig/ref| и \verb|#env| будут работать.
+The \verb|ig/read-string| function takes additional EDN tags. Integrant will combine them with its ones when reading the file. Let's wrap the read configuration in the function. The first argument of \verb|ig/read-string| is the map with the \verb|#env| tag from the previous chapter. Integrant supplements our map with its own one, so both \verb|#ig/ref| and \verb|#env| will work.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -4596,7 +3897,7 @@ Integrant предлагает свою версию \verb|read-string| для �
 \fi
 
 \noindent
-Результат:
+Here is the result:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -4625,13 +3926,12 @@ Integrant предлагает свою версию \verb|read-string| для �
 
 \fi
 
-\subsection{Наследование ключей}
+\subsection{Key Inheritance}
 
-\index{ключи!наследование}
-\index{наследование}
+\index{keys!inheritance}
+\index{inheritance}
 
-В Clojure ключи могут строиться в иерархию. Функция \verb|derive| принимает
-два ключа и задаёт превосходство первого над вторым.
+In Clojure, keys can be hierarchical. The \verb|derive| function takes two keys and sets the superiority of the first over the second.
 
 \index{clojure.core!derive}
 
@@ -4642,19 +3942,11 @@ Integrant предлагает свою версию \verb|read-string| для �
 \end{english}
 
 \mnoindent
-Когда мультиметод ищет действие по ключу, он учитывает наследование. Если метод
-задан для \verb|::database|, вызов с \verb|::postgresql| не приведёт к ошибке:
-сработает версия \verb|::database|.
+When the multimethod looks for an action by a key, it takes inheritance into account. If the method is specified for \verb|::database|, calling from \verb|::postgresql| will not result in an error: the \verb|::database| version will work.
 
-Integrant работает на мультиметодах, поэтому из наследования можно извлечь
-пользу. Представим проект с двумя базами данных: мастер для записи и реплика для
-чтения. Компоненты \verb|::db-master| и~\verb|::db-replica| отличаются только
-входными параметрами.
+Integrant runs on multimethods, so inheritance is useful. Suppose we have a project with two databases: a master for writing and a replica for reading. The \verb|::db-master| and \verb|::db-replica| components differ only in their input parameters.
 
-Если бы мы не знали про наследование, то писали бы \verb|ig/init-key|
-и~\verb|ig/halt-key!| для каждого ключа. Это повторяет код и считается плохой
-практикой. Мы уже описали компонент \verb|::db| для общего доступа к
-базе. Унаследуем от него два новых:
+If we didn't know about inheritance, we would write \verb|ig/init-key| and \verb|ig/halt-key!| for each key. It is considered bad practice to repeat code. We have described the \verb|::db| component for database sharing. Let's inherit two new ones from it:
 
 \begin{english}
   \begin{clojure}
@@ -4663,12 +3955,7 @@ Integrant работает на мультиметодах, поэтому из 
   \end{clojure}
 \end{english}
 
-Обновим конфигурацию. Для реплики выставим флаг \verb|:read-only|, чтобы
-обезопасить себя от записи не в тот источник. Обратите внимание на
-зависимости. Воркер \emph{пишет} данные в базу и поэтому ссылается на
-\verb|::db-master|. Компонент \verb|::hander| только \emph{читает} данные,
-поэтому зависит от \verb|::db-replica|. Пример конфигурации см. в~листинге
-\ref{fig:config-refset}.
+Let's update the configuration. For the replica, set the \verb|:read-only| flag to protect ourselves from writing to the wrong source. Pay attention to the dependencies. The worker \emph{writes} data to the database and therefore refers to \verb|::db-master|. The \verb|::hander| component only \emph{reads} data, so it depends on \verb|::db-replica|. See Listing \ref{fig:config-refset} for a config example.
 
 \begin{listing}[ht!]
 
@@ -4710,20 +3997,14 @@ Integrant работает на мультиметодах, поэтому из 
 
 \fi
 
-\caption{Конфигурация с двумя базами и ссылками на них}
+\caption{Configuration with two databases and references to them}
 \label{fig:config-refset}
 
 \end{listing}
 
-Функция и тег \verb|ig/refset| вернут множество ссылок с учётом
-иерархии. Предположим, один из компонентов ожидает все базы данных, чтобы
-выполнить на них служебный запрос. Чтобы не ссылаться на каждую базу вручную,
-укажем корневой ключ \verb|::db|.
+The function and the \verb|ig/refset| tag will return many references based on the hierarchy. Let one of the components is waiting for all databases to make a service request to them. In order not to refer to each database manually, specify the root key \verb|::db|.
 
-Для этого добавим компонент \texttt{::db-main\-te\-nance}. Он зависит от всех баз
-через \verb|refset|. Метод \verb|init-key| вернёт фоновую задачу, которая
-пробегает по базам и выполняет запрос. Её запуск и остановка аналогичны
-воркеру. Пример ниже показывает, как добраться до обеих баз из параметров.
+To do this, add the \texttt{::db-main\-te\-nance} component. It depends on all databases through \verb|refset|. The \verb|init-key| method will return a background task that runs through the databases and executes the request. Its starting and stopping are similar to the worker. The example below shows how to get to both databases from the parameters.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -4758,22 +4039,15 @@ Integrant работает на мультиметодах, поэтому из 
 
 \fi
 
-\subsection{Другие стадии компонента}
+\subsection{Other Component Stages}
 
-\index{компоненты!стадии}
+\index{components!stages}
 
-Кроме запуска и остановки, Integrant выделяет другие стадии компонента. В
-отличие от \verb|init| и \verb|halt!|, их мультиметодам задано пустое действие
-по умолчанию (вернуть \verb|nil| или исходный объект). Чтобы подписать компонент
-на событие, расширьте мультиметод его ключом. Рассмотрим несколько полезных
-стадий.
+In addition to starting and stopping, Integrant offers other stages of a component. Unlike \verb|init| and \verb|halt!|, their multimethods will return \verb|nil| or the original object by default (i.e., an empty action). To subscribe a component to an event, extend the multimethod with its key. Let's take a look at a few useful stages.
 
-\subsection{Подготовка}
+\subsection{Preparation}
 
-Метод \verb|ig/prep-key| служит для подготовки параметров. В основном это их
-объединение с набором по умолчанию. Предположим, методом проб и ошибок мы нашли
-идеальные метрики пула БД. Чтобы не указывать в конфигурации все поля, вынесем
-их в словарь по~умолчанию.
+The \verb|ig/prep-key| method prepares parameters. It basically combines them with the default set. Suppose, through trial and error, we have found the ideal database pool metrics. To avoid specifying all fields in the configuration, we will move them to the default map.
 
 \begin{english}
   \begin{clojure}
@@ -4791,9 +4065,7 @@ Integrant работает на мультиметодах, поэтому из 
   \end{clojure}
 \end{english}
 
-Метод \verb|prep-key| объединяет его с параметрами. В конфигурации достаточно
-указать только поля доступа и, если требуется, переопределения для частных
-случаев:
+The \verb|prep-key| method combines it with parameters. In the config, it is enough to specify only the access fields and, if required, overrides for special cases:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -4824,16 +4096,13 @@ Integrant работает на мультиметодах, поэтому из 
 
 \fi
 
-Функция \verb|ig/prep| принимает конфигурацию и готовит каждый ключ. Чтобы не
-забыть этот шаг, добавьте его в \verb|load-config|.
+The \verb|ig/prep| function takes the configuration and prepares each key. To remember this step, add it to \verb|load-config|.
 
-\subsection{Спека}
+\subsection{Spec}
 
-\index{spec!в Integrant}
+\index{spec!in Integrant}
 
-Метод \verb|ig/pre-init-spec| связывает компонент со спекой. Если метод вернул
-спеку, она проверит параметры компонента. Убедимся, что задали все поля в
-подключении к базе данных:
+The \verb|ig/pre-init-spec| method binds a component to a spec. If the method returns a spec, it will check the parameters of the component. Make sure we set all the fields in the database connection:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -4871,42 +4140,27 @@ Integrant работает на мультиметодах, поэтому из 
 \fi
 
 \noindent
-Если передать неверные параметры, получим ошибку Spec. Её сообщение и
-отчёт \verb|explain| знакомы вам из прошлых глав \page{spec-explain}.
+If we pass invalid parameters, we'll get a Spec error. Its message and \verb|explain| report are familiar to you from previous chapters \page{spec-explain}.
 
-\subsection{Приостановка}
+\subsection{Suspending}
 
-\index{системы!остановка}
+\index{systems!stopping}
 
-Кроме запуска и остановки, Integrant выделяет третье состояние системы~---
-\verb|suspended| \eng{приостановленный}. В нём компонент не теряет состояние, а
-только ставит на паузу внутренние процессы. Если это потребитель сообщений из
-очереди, он перестаёт читать источник, но не закрывает соединение. Обратная
-операция называется \verb|resume| \eng{возобновить}. При возобновлении
-компонент, не порождая новых соединений, продолжает работу.
+In addition to starting and stopping, Integrant offers the third state of the system~--- \verb|suspended|. In it, the component does not lose its state but only pauses internal processes. If this component is a consumer of messages from a queue, it stops reading the source but does not close the connection. The inverse operation to suspending is \verb|resume|. When resuming, the component continues to work without creating new connections.
 
 \mnoindent
-По умолчанию эти события работают как \verb|halt| и \verb|init|. Чтобы
-задать особую реакцию на \verb|suspend| и \verb|resume|, расширьте методы
-\texttt{ig/sus\-pend\--key!} и \verb|ig/resume-key|. Это потребует углублённого
-чтения документации. Оставим тему читателю на самостоятельное изучение.
+By default, these events work like \verb|halt| and \verb|init|. Extend the \texttt{ig/sus\-pend\--key!} and \verb|ig/resume-key| methods to specify a custom response to \verb|suspend| and \verb|resume|. This will require an in-depth reading of the documentation. Good luck with your independent study on the topic!
 
-\section{Заключение}
+\section{Summary}
 
-Как машина складывается из деталей, так программа состоит из компонентов. Ими
-управляет система~--- соглашение о том, как устроены и~связаны компоненты друг с
-другом.
+Just as a machine is made up of parts, a program consists of components. They are governed by a system~--- an agreement on how components are arranged and related to each other.
 
-Каждый проект нуждается в системе, и чем дольше он развивается, тем сильнее
-потребность. Если в проекте нет соглашения о том, как писать составные части, он
-начинает буксовать. Со временем проект станет слишком затратным в поддержке.
+Every project needs a system, and the longer it develops, the stronger the need. If there is no agreement in the project on how to write the constituent parts, it starts to slow down. Over time, the project will become too expensive to maintain.
 
-Clojure предлагает несколько способов построить систему. Наиболее популярны
-библиотеки Mount, Component и Integrant. Они исповедуют разные подходы, так что
-каждый разработчик найдёт то, что ему по душе.
+Clojure offers several ways to build a system. The most popular libraries are Mount, Component, and Integrant. They have different approaches so that every developer will find what he likes.
 
-Mount отталкивается от глобальных переменных. Если проект написан, как в примере
-ниже:
+Mount relies on global variables. If the project is written as in the example 
+below
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -4928,27 +4182,15 @@ Mount отталкивается от глобальных переменных.
 \fi
 
 \noindent
-то портировать его на Mount будет легко. Переменная \verb|server| станет
-сущностью, которая меняет значение по команде. Mount подойдёт тем, кто недавно
-познакомился с Clojure.
+then porting it to Mount will be easy.
+The \verb|server| variable will become an entity that changes its value on command. Mount is fine for those new to Clojure.
 
-Component делает шаг в сторону настоящих компонентов. Мы задаём сущности, которые
-изолируют состояние. Доступ к компоненту определяют методы, которые он
-реализует. Компоненты и протоколы напоминают объекты из современных языков. По
-этой причине Component обвиняют в раздутости, <<энтерпрайзности>>.
+Component takes a step towards real components. We define entities that isolate the state. Access to a component is determined by the methods that it implements. Components and protocols are similar to objects from modern languages. For this reason, some people accuse the Component of being bloated and too enterprise-like.
 
-Иногда решение на компонентах занимает больше места, чем на~атомах и функциях. С
-другой стороны, именно Component даёт понимание того, как строить устойчивые
-системы. Заметим, что б\'{о}льшую часть вопросов мы обсудили в разделе именно
-про Component.
+Sometimes the solution using components takes up more space than with atoms and functions. On the other hand, it is Component that gives an understanding of how to build sustainable systems. Note, that we discussed most of the questions in the section about Component.
 
-Проект Integrant идёт дальше: он лишён тяжести ООП и в целом более
-<<кложурный>>. Integrant опирается на идиомы и техники, принятые в Clojure, и
-этим подкупает опытных разработчиков.
+The Integrant project goes further: it is free of the OOP cumbersomeness and is generally more Clojure-friendly. Integrant draws on Clojure idioms and techniques to win over experienced developers.
 
-Мы не ставим цель выяснить, какая из библиотек лучше. Не бросайтесь переписывать
-проект с условного Mount на Component или наоборот. Это изнуряющий труд, и вы не
-поймёте, каких преимуществ достигли, пока не ощутите в них потребность.
+Our goal is not to find out which library is better. Don't rush to rewrite your project from conditional Mount to Component or vice versa. This is exhausting work, and you will not understand what benefits you have achieved until you feel the need for them.
 
-Вместо споров о том, \emph{какая} система лучше, подумайте, \emph{зачем} система
-нужна проекту. Когда ответ очевиден, технические решения найдутся сами.
+Instead of arguing about \emph{which} system is better, think about \emph{why} the project needs it. When the answer is clear, technical solutions will come up by themselves.
