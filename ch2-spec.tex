@@ -2732,13 +2732,16 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 
 \begin{english}
   \begin{clojure}
+(defn last-kw [coll]
+  (->> coll
+       reverse
+       (filter keyword?)
+       first))
+
 (defn get-common-message
   [problem]
   (let [{:keys [in val]} problem
-        field (->> in
-                   reverse
-                   (filter keyword?)
-                   first)]
+        field (last-kw in)]
     (format
       "The field '%s' has
                 an incorrect value '%s'."
@@ -2750,13 +2753,16 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 
 \begin{english}
   \begin{clojure}
+(defn last-kw [coll]
+  (->> coll
+       reverse
+       (filter keyword?)
+       first))
+
 (defn get-common-message
   [problem]
   (let [{:keys [in val]} problem
-        field (->> in
-                   reverse
-                   (filter keyword?)
-                   first)]
+        field (last-kw in)]
     (format "The field '%s' has an incorrect value '%s'."
             (name field) val)))
   \end{clojure}
@@ -2790,8 +2796,9 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 \fi
 
 Если поле множественное, одного имени недостаточно. Сообщение станет лучше, если
-добавить индекс значения с~ошибкой, например \verb|'tags[1]'|. Подумайте, как
-найти последовательность \tuple{кейворд, число}, и~доработайте алгоритм.
+добавить индекс значения с~ошибкой, например \verb|'tags[1]'|. Другой подход~---
+вписать номер поля естественным образом, например <<the second tags
+field...>>. Подумайте, как ещё улучшить текст и доработайте алгоритм.
 
 \subsection{Открытые вопросы}
 
