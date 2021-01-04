@@ -3863,7 +3863,7 @@ Selenium IDE. Если код нарушает правила, мы должны
 
   \begin{clojure}
 (defn my-inc
-  "Increase the number."
+  "Increase a number."
   [x]
   {:pre [(int? x)]
    :post [(int? %)]}
@@ -3898,7 +3898,7 @@ Selenium IDE. Если код нарушает правила, мы должны
 
   \begin{clojure}
 (defn my-inc
-  "Increase the number."
+  "Increase a number."
   [x]
   {:pre [(int? x)]
    :post [(int? %)]}
@@ -4734,10 +4734,11 @@ Spec-tools закрывает эту проблему. Добавьте библ
   \end{clojure}
 \end{english}
 
+\noindent
 Результат:
 
 \begin{english}
-  \begin{json}
+  \begin{clojure}
 {:type "object"
  :properties
  {"name" {:type "string"}
@@ -4746,7 +4747,7 @@ Spec-tools закрывает эту проблему. Добавьте библ
          :minimum 1}}
  :required ["name" "age"]
  :title "user/user"}
-  \end{json}
+  \end{clojure}
 \end{english}
 
 Обратите внимание, что предикату \verb|pos-int?| соответствует минимальное
@@ -4801,12 +4802,20 @@ Spec-tools закрывает эту проблему. Добавьте библ
 \begin{itemize}
 
 \item
-  Ключи словаря могут быть любыми типами, например строками, числами или датами.
+  Ключи словаря могут быть любого типа, например строкой, числом или датой:
+
+\begin{english}
+  \begin{clojure}
+(s/def ::data (dict {"name" string?}))
+
+(s/valid? ::data {"name" "Test"})
+;; true
+  \end{clojure}
+\end{english}
 
 \item
-  В \verb|dict| можно передать несколько словарей, и они будут совмещены в
-  один. Если предварить словарь синтаксисом \verb|^:opt|, его ключи станут
-  необязательными:
+  В \verb|dict| можно передать несколько словарей, и они сольются в один. Если
+  предварить словарь синтаксисом \verb|^:opt|, его ключи станут необязательными:
 
 \begin{english}
   \begin{clojure}
