@@ -354,10 +354,11 @@ Divide by zero
 
 \index{исключения!ex-message}
 
-Мы вывели на экран текст, что вычисления прошли неудачно. Это слишком
-поверхностное объяснение. Метод \verb|.getMessage| вернёт сообщение, которое
-назначили исключению при создании. С версии 1.10 Clojure предлагает функцию
-\verb|ex-message|, которая делает то же самое:
+Мы вывели на экран текст, что вычисления прошли неудачно без объяснения
+причин. Внесём ясность: метод \verb|.getMessage| вернёт сообщение, которое
+получило исключение при создании. С версии 1.10 Clojure предлагает функцию
+\verb|ex-message|, которая делает то же самое. Для деления на ноль получим более
+точную фразу:
 
 \begin{english}
   \begin{clojure}
@@ -369,9 +370,9 @@ Divide by zero
   \end{clojure}
 \end{english}
 
-Класс \verb|ArithmeticException| ловит не все ошибки вычислений. Что случится,
-если сложить 1 и \verb|nil|? Даже если поместить расчёты в~\verb|try/catch|,
-мы не поймаем исключение:
+Новичков удивит тот факт, что класс \texttt{ArithmeticException} ловит не все
+ошибки вычислений. Что случится, если сложить 1 и \verb|nil|? Даже если
+поместить расчёты в~\verb|try/catch|, мы не поймаем исключение:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -401,11 +402,10 @@ Divide by zero
 
 \index{NPE}
 
-\noindent
-Дело в том, что классы \verb|ArithmeticException| и
-\verb|NullPointerException| не пересекаются. У них разные пути в дереве
+Дело в том, что классы \texttt{ArithmeticException} и
+\texttt{NullPointerException} не пересекаются. У них разные пути в дереве
 наследования, поэтому перехват одного не влияет на другое. Это правильно, потому
-что у~классов разная семантика. Ошибка в арифметике~--- это не то же самое, что
+что у~классов разная семантика. Ошибка в арифметике~--- не то же самое, что
 \verb|Null| вместо значения.
 
 \index{исключения!ветки}
@@ -424,10 +424,10 @@ Divide by zero
 \end{english}
 
 Макрос перебирает классы из каждого \verb|catch| и остановится на первом
-подходящем варианте. Результатом \verb|try| станет последнее выражение из
-блока \verb|catch|, который подошёл. В примере выше результат будет
-\verb|nil|, потому что его вернёт \verb|println|. Если ни одна ветка не
-подошла, исключение продолжит путь вверх по стеку вызовов.
+подходящем варианте. Результатом \verb|try| станет последнее выражение из блока
+\verb|catch|, который подошёл. В примере выше результат будет \verb|nil|, потому
+что его вернёт функция \verb|println|. Если ни одна ветка не подошла, исключение
+продолжит путь вверх по стеку вызовов.
 
 \index{наследование}
 
@@ -450,10 +450,10 @@ Divide by zero
 перехват \verb|Throwable| опасен: возникает ложное ощущение, что код работает
 без ошибок.
 
-В случае с \verb|ArithmeticException| проблема в расчётах, но для \verb|NPE|
-это не так. \verb|Nil| вместо числа говорит о том, что проблема в источнике,
-который сообщил \verb|nil|, а не в арифметике. Вот почему перехват
-\verb|NPE| вреден. Мы подробно изучим эту проблему в главе про
+В случае с \verb|ArithmeticException| проблема в расчётах, но для \verb|NPE| это
+не так. \verb|Nil| вместо числа говорит о том, что причина в источнике, который
+сообщил \verb|nil|, а не в арифметике. Вот почему перехват \verb|NPE| вреден: он
+может пустить вас по ложному следу. Мы подробно изучим эту проблему в главе про
 тесты \page{illegal-arg}.
 
 Форму \verb|try/catch| с широким охватом ставят на верхний уровень кода. Это
@@ -531,6 +531,9 @@ Divide by zero
 
 \begin{english}
   \begin{clojure}
+(add 1 2) ;; 3
+
+(add 1 nil)
 ;; Execution error at book.exceptions/add
 ;; Value error, a: 1, b: null
   \end{clojure}
@@ -540,8 +543,11 @@ Divide by zero
 
 \begin{english}
   \begin{clojure}
-Execution error at book.exceptions/add (exceptions.clj:86).
-Value error, a: 1, b: null
+(add 1 2) ;; 3
+
+(add 1 nil)
+;; Execution error at book.exceptions/add
+;; Value error, a: 1, b: null
   \end{clojure}
 \end{english}
 
@@ -559,8 +565,8 @@ Value error, a: 1, b: null
 \end{english}
 
 \noindent
-Текст вводит в заблуждение: \verb|b|~--- это \verb|nil| или пустая строка? В~случае
-с~\verb|format| ошибки быть не может.
+Текст вводит в заблуждение: \verb|b|~--- это \verb|nil| или пустая строка?
+В~случае с~\verb|format| ошибки быть не может: получим \verb|b: null| на конце.
 
 \section{Подробнее о контексте}
 
@@ -569,8 +575,8 @@ Value error, a: 1, b: null
 
 Данные в тексте приводят к риску. Сообщение может оказаться слишком большим или
 выдать лишние сведения. Проблему решает класс \verb|ExceptionInfo|~---
-исключение из поставки Clojure. Оно устроено так, чтобы хранить данные. Clojure
-предлагает ряд функций для работы с~ним.
+исключение из поставки Clojure. Оно устроено так, чтобы хранить дополнительные
+данные. Clojure предлагает ряд функций для работы с этим классом.
 
 Ключевая функция \verb|ex-info| создаёт экземпляр \verb|ExceptionInfo|. Она
 принимает сообщение и словарь данных. Это контекст, в котором возникло
@@ -586,11 +592,11 @@ Value error, a: 1, b: null
   \begin{clojure}
 (throw (ex-info
         "Cannot fetch user."
-        {:user-id 42
+        {:user-id 5
          :http-status 404
          :http-method "GET"
          :http-url
-         "https://host.com/users/42"}))
+         "https://host.com/users/5"}))
   \end{clojure}
 \end{english}
 
@@ -600,10 +606,10 @@ Value error, a: 1, b: null
   \begin{clojure}
 (throw (ex-info
         "Cannot fetch user."
-        {:user-id 42
+        {:user-id 5
          :http-status 404
          :http-method "GET"
-         :http-url "https://host.com/users/42"}))
+         :http-url "https://host.com/users/5"}))
   \end{clojure}
 \end{english}
 
@@ -620,8 +626,8 @@ Value error, a: 1, b: null
 формате JSON. Позже мы рассмотрим, что делать с контекстом.
 
 Функция \verb|ex-data| вернёт словарь данных, который передали в \verb|ex-info|
-или конструктор класса \verb|ExceptionInfo|. Для исключений других классов
-результат функции будет \verb|nil|.
+или конструктор класса \verb|ExceptionInfo|. Для других классов результат
+функции будет \verb|nil|.
 
 \index{исключения!ex-data}
 
@@ -634,7 +640,7 @@ Value error, a: 1, b: null
 \begin{english}
   \begin{clojure}
 (try
-  (get-user 42)
+  (get-user 5)
   (catch clojure.lang.ExceptionInfo e
     (let [{:keys [http-method http-url]}
           (ex-data e)]
@@ -649,11 +655,11 @@ Value error, a: 1, b: null
 \begin{english}
   \begin{clojure}
 (try
-  (get-user 42)
+  (get-user 5)
   (catch clojure.lang.ExceptionInfo e
     (let [{:keys [http-method http-url]} (ex-data e)]
       (format "HTTP error: %s %s" http-method http-url))))
-;; HTTP error: GET https://host.com/users/42
+;; HTTP error: GET https://host.com/users/5
   \end{clojure}
 \end{english}
 
@@ -665,7 +671,7 @@ Value error, a: 1, b: null
 проверкой. Рассмотрим типичные ситуации и решения.
 
 При обходе коллекций нет смысла бросать исключения. \verb|Nil| ведёт себя как
-пустая коллекция того типа, который имеет в виду функция. Выражения
+пустая коллекция того типа, который имеет в виду функция. Выражения:
 
 \begin{english}
   \begin{clojure}
