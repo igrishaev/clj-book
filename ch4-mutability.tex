@@ -2665,7 +2665,7 @@ Clojure намеренно скрывает от нас стадию перем�
 
 \begin{english}
   \begin{clojure}
-(def ^:dynaimc *data* nil)
+(def ^:dynamic *data* nil)
 
 (set! *data* {:user 1})
 ;; Unhandled IllegalStateException
@@ -2676,7 +2676,7 @@ Clojure намеренно скрывает от нас стадию перем�
 
 \begin{english}
   \begin{clojure}
-(def ^:dynaimc *data* nil)
+(def ^:dynamic *data* nil)
 
 (set! *data* {:user 1})
 ;; Unhandled java.lang.IllegalStateException
