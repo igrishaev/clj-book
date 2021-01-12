@@ -2033,14 +2033,14 @@ middleware.
 \fi
 
 Если \verb|(condition)| в четвёртой строке вернёт истину, мы пропустим третий
-шаг. В~литературе трюк называют <<исключение как способ управления
-исполнением>>. Это противоречивая практика; применяйте её осторожно. Код
-становится неочевидным и трудным в поддержке.
+шаг, потому что окажемся в \verb|catch|. В~литературе трюк называют <<исключение
+как способ управления исполнением>>. Это противоречивая практика; применяйте её
+осторожно. Код становится неочевидным и трудным в поддержке.
 
 \index{императивный стиль}
 
-Всё же бывают моменты, когда нужно прервать исполнение. Например, мы
-выяснили, что у пользователя нет прав к ресурсу. Усложним задачу: пусть проверок
+Всё же бывают моменты, когда подобные переходы полезны. Например, мы выяснили,
+что у пользователя нет прав к ресурсу. Усложним задачу: пусть проверок
 несколько, и на каждой нужно пресечь запрос. В императивных языках это решается
 просто. Код на Python выглядел бы так:
 
@@ -2051,14 +2051,19 @@ middleware.
 \begin{english}
   \begin{python}
 class AccountHandler(RequestHandler):
+
   def on_get(self, request):
+
     if not self.check_params(request):
       return BadRequest("Wrong input")
+
     if not self.check_account(request):
       return NotFound("No such an acc")
+
     if not self.check_quotas(request):
       return QuotasReached("Request " + \
              "rate is limited")
+
     return JSONResponse(self.get_data())
   \end{python}
 \end{english}
@@ -2068,13 +2073,18 @@ class AccountHandler(RequestHandler):
 \begin{english}
   \begin{python}
 class AccountHandler(RequestHandler):
+
   def on_get(self, request):
+
     if not self.check_params(request):
       return BadRequest("Wrong input data")
+
     if not self.check_account(request):
       return NotFound("No such an account")
+
     if not self.check_quotas(request):
       return QuotasReached("Request rate is limited")
+
     return JSONResponse(self.get_data_from_db())
   \end{python}
 \end{english}
@@ -2090,8 +2100,8 @@ class AccountHandler(RequestHandler):
 
 Вариант с каскадом \verb|if/else| работает, но выглядит громоздко. По-другому
 его называют Pyramid of Doom. Чем ниже вложенность, тем больше проблем у
-разработчика. Ради интереса добавьте условие в~середину кода на Clojure
-\lis{fig:clj-pyramid}.
+разработчика. Ради интереса добавьте условие в~середину подобного кода на
+Clojure \lis{fig:clj-pyramid}.
 
 \begin{listing}[ht!]
 
@@ -2149,7 +2159,7 @@ middleware добавляют декоратор, который ловит та
   \end{clojure}
 \end{english}
 
-Напишем \verb|account-handler| по-другому:
+Напишем другую версию \verb|account-handler| с исключениями:
 
 \index{модули!ring.util.http-response}
 
@@ -2163,13 +2173,17 @@ middleware добавляют декоратор, который ловит та
                    enhance-your-calm!]])
 
 (defn account-handler [request]
+
   (when-not (check-params request)
     (bad-request! "Wrong input data"))
+
   (when-not (check-account request)
     (not-found! "No such an account"))
+
   (when-not (check-quotas request)
     (enhance-your-calm!
       "Request rate is limited"))
+
   {:status 200
    :body (get-data-from-db)})
   \end{clojure}
@@ -2185,12 +2199,16 @@ middleware добавляют декоратор, который ловит та
                    enhance-your-calm!]])
 
 (defn account-handler [request]
+
   (when-not (check-params request)
     (bad-request! "Wrong input data"))
+
   (when-not (check-account request)
     (not-found! "No such an account"))
+
   (when-not (check-quotas request)
     (enhance-your-calm! "Request rate is limited"))
+
   {:status 200
    :body (get-data-from-db)})
   \end{clojure}
@@ -2198,9 +2216,10 @@ middleware добавляют декоратор, который ловит та
 
 \fi
 
-Новый код похож на императивный. Некоторых уязвляет факт, что в Clojure
-пользуются императивным подходом. Всё в порядке: наша задача сделать так, чтобы
-код был удобным в поддержке. Вопрос парадигмы при этом не важен.
+Новый код похож на императивную версию на Python. Некоторых уязвляет факт, что в
+Clojure пользуются императивным подходом. Всё в порядке: наша задача сделать
+так, чтобы код был простым и удобным в поддержке. Вопрос парадигмы при этом не
+важен.
 
 Функции из модуля \texttt{ring.util.http\--res\-ponse} бывают с восклицательным
 знаком и без него. Это сигнал о том, что функция бросает исключение. Например,
