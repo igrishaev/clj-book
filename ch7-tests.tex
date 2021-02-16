@@ -2701,19 +2701,19 @@ $ lein test :special
 
 Селектор может быть полноценной функцией. Предположим, часть программы
 полагается на новые функции базы данных. Для каждого теста укажем минимальную
-версию базы, поле \verb|:db/version| с числом. Тест считают экспериментальным,
-если версия базы выше 11:
+версию базы, поле \verb|:db/version| с числом:
 
 \begin{english}
   \begin{clojure}
 (deftest ^{:db/version 11}
-  test-db-experimental-feature
-  (is true))
+  test-some-feature
+  ...)
   \end{clojure}
 \end{english}
 
-Ниже селектор, который вернёт подобные тесты. Запустите их командой
-\spverb|lein test :db-experimental|:
+Отнесём функциональность, которая требует версию базы выше 11, к
+экспериментальному классу. Для этого напишем отдельный селектор. Запустите его
+командой \spverb|lein test :db-experimental|:
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2732,17 +2732,18 @@ $ lein test :special
 
 \begin{english}
   \begin{clojure}
-:test-selectors {:db-experimental
-                 (fn [test-meta]
-                   (some-> test-meta :db/version (>= 11)))}
+:test-selectors
+  {:db-experimental
+    (fn [test-meta]
+      (some-> test-meta :db/version (>= 11)))}
   \end{clojure}
 \end{english}
 
 \fi
 
-Можно выбрать тесты по частичному совпадению пространства и~имени. По умолчанию
-\verb|lein| не предлагает \verb|regex|-селекторов: команда \verb|test| запускает
-конкретный тест, пространство или всё целиком. Это легко исправить селектором:
+По умолчанию \verb|lein| не предлагает \verb|regex|-селекторов. Нельзя выбрать
+тесты по частичному совпадению пространства или имени. Это легко исправить
+селектором, который передаёт имя теста в \verb|re-find|.
 
 \ifx\DEVICETYPE\MOBILE
 
@@ -2751,7 +2752,7 @@ $ lein test :special
 :test-selectors
   {:test-api
    (fn [m]
-     (->> m :name name
+     (->> m :name str
           (re-find #"^test-api")))}
   \end{clojure}
 \end{english}
@@ -2760,19 +2761,22 @@ $ lein test :special
 
 \begin{english}
   \begin{clojure}
-:test-selectors {:test-api
-                 (fn [m] (->> m :name name
-                              (re-find #"^test-api")))}
+:test-selectors
+  {:test-api
+    (fn [m] (->> m :name str
+                 (re-find #"^test-api")))}
   \end{clojure}
 \end{english}
 
 \fi
 
-Он вернёт все тесты, чьи имена начинаются с \verb|test-api|. Имя переменной~--- это
-символ, поэтому приводим его к строке. Заметим, что имя не содержит
-пространство; последнее находится в поле \verb|:ns| и~представляет собой не
-символ, а объект \verb|Namespace|. Добраться до его имени поможет функция
-\verb|ns-name|. Поиск по пространству выглядит так:
+Он вернёт все тесты, чьи имена начинаются с \verb|test-api|. Имя переменной~---
+это символ, поэтому приводим его к строке. Обратите внимание: в ключе
+\verb|:name| метаданных содержится символ, а не строка. Следующая за ним
+\verb|str| приводит имя к строке. Кроме того, имя не содержит пространство;
+последнее находится в поле \verb|:ns| и~представляет собой не символ, а объект
+\verb|Namespace|. Добраться до имени пространства поможет функция
+\verb|ns-name|. Поиск по нему выглядит так:
 
 \index{clojure.core!ns-name}
 \index{классы!Namespace}
@@ -2793,9 +2797,10 @@ $ lein test :special
 
 \begin{english}
   \begin{clojure}
-:test-selectors {:test-ns-api
-                 (fn [m] (->> m :ns ns-name name
-                              (re-find #"^project.api")))}
+:test-selectors
+  {:test-ns-api
+    (fn [m] (->> m :ns ns-name str
+                 (re-find #"^project.api")))}
   \end{clojure}
 \end{english}
 
@@ -2821,9 +2826,10 @@ $ lein test :special
   \end{clojure}
 \end{english}
 
-Не нужно указывать \verb|^:integration| каждому тесту, поскольку мы сделали
-это на уровне модуля. Селектор интеграционных тестов не изменится: его метка и
-функция равны \verb|:integration|. Тесты запускаются как обычно:
+Теперь не нужно указывать \verb|^:integration| каждому тесту, поскольку мы
+сделали это на уровне модуля. Селектор интеграционных тестов не изменится: его
+метка и функция по-прежнему равны \verb|:integration|. Тесты запускаются как
+обычно:
 
 \begin{english}
   \begin{bash}
@@ -2837,8 +2843,9 @@ $ lein test :integration
 \index{утилиты!Deps}
 
 Не все проекты на Clojure используют Lein; некоторые перешли
-на~\footurl{Deps}{https://clojure.org/guides/deps\_and\_cli}[Deps][-3mm], утилиту для
-управления зависимостями. С версии 1.9 Deps идёт в поставке Clojure.
+на~\footurl{Deps}{https://clojure.org/guides/deps\_and\_cli}[Deps][-3mm],
+утилиту для управления зависимостями от Cognitect. С версии 1.9 Deps идёт в
+поставке Clojure.
 
 \index{библиотеки!Test-runner}
 
