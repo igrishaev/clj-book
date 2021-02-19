@@ -83,7 +83,7 @@ docker-build-prepare:
 
 IMAGE := clj-book
 
-.PHONY: docker-build
+.PHONY: docker-build-images
 docker-build-images:
 	docker build -t ${IMAGE}:ubuntu -f Dockerfile.ubuntu .
 	docker build -t ${IMAGE}:build .
@@ -98,7 +98,7 @@ DOCKER_BUILD_POST = -v $(CURDIR)/:/book -w /book ${IMAGE}:build
 DOCKER_BUILD_POST_BUILD = ${DOCKER_BUILD_POST} make build
 DOCKER_BUILD_POST_MOBILE_BUILD = ${DOCKER_BUILD_POST} make mobile-build
 
-.PHONY: docker-build-draft
+.PHONY: docker-build-print-draft
 docker-build-print-draft:
 	${DOCKER_BUILD_PRE}	\
 	--env-file=ENV_PRINT \
@@ -107,7 +107,6 @@ docker-build-print-draft:
 .PHONY: docker-build-ridero
 docker-build-ridero:
 	${DOCKER_BUILD_PRE}	\
-	--env-file=ENV_PRINT \
 	--env-file=ENV_RIDERO \
 	${DOCKER_BUILD_POST_BUILD}
 

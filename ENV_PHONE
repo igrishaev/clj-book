@@ -1,8 +1,8 @@
-PUBLISHER=
-MODE=ebook
+COVER=media/cover_phone.pdf
 DEVICE=phone
 DEVICE_TYPE=mobile
 DOCUMENT=report
 GEOMETRY=geom-phone
-COVER=media/cover_phone.pdf
 JOB=clojure_phone
+MODE=ebook
+PUBLISHER=

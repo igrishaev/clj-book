@@ -1,3 +1,8 @@
-PUBLISHER=ridero
+COVER=
+DEVICE=
+DEVICE_TYPE=
+DOCUMENT=book
 GEOMETRY=geom-ridero
 JOB=clojure_ridero
+MODE=print
+PUBLISHER=ridero

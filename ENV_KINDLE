@@ -1,8 +1,8 @@
-PUBLISHER=
-MODE=ebook
+COVER=media/cover_kindle.pdf
 DEVICE=kindle
 DEVICE_TYPE=mobile
 DOCUMENT=report
 GEOMETRY=geom-kindle
-COVER=media/cover_kindle.pdf
 JOB=clojure_kindle
+MODE=ebook
+PUBLISHER=

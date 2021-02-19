@@ -1,8 +1,8 @@
-PUBLISHER=
-MODE=ebook
+COVER=media/cover_tablet.pdf
 DEVICE=tablet
 DEVICE_TYPE=
 DOCUMENT=report
 GEOMETRY=geom-tablet
-COVER=media/cover_tablet.pdf
 JOB=clojure_tablet
+MODE=ebook
+PUBLISHER=
