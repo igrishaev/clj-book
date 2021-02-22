@@ -102,6 +102,7 @@ DOCKER_BUILD_POST_MOBILE_BUILD = ${DOCKER_BUILD_POST} make mobile-build
 docker-build-print-draft:
 	${DOCKER_BUILD_PRE}	\
 	--env-file=ENV_PRINT \
+	--env-file=ENV_DRAFT \
 	${DOCKER_BUILD_POST} make draft
 
 .PHONY: docker-build-ridero
