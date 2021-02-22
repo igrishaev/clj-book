@@ -5,19 +5,32 @@
 %% Capture ENV vars from envsubst
 %%
 
-\def\QR{$QR}
-\def\DEVICETYPE{$DEVICE_TYPE}
-\def\DEVICE{$DEVICE}
-\def\DOMAIN{$DOMAIN}
-\def\EMAIL{$EMAIL}
-\def\PUBLISHER{$PUBLISHER}
 \def\COMMITHASH{$COMMIT_HASH}
 \def\COMMITTS{$COMMIT_TS}
-\def\MODE{$MODE}
 \def\COVER{$COVER}
+\def\DOMAIN{$DOMAIN}
+\def\EBOOK{$EBOOK}
+\def\EMAIL{$EMAIL}
+\def\KINDLE{$KINDLE}
+\def\NARROW{$NARROW}
+\def\PHONE{$PHONE}
+\def\PRINT{$PRINT}
+\def\QR{$QR}
+\def\RIDERO{$RIDERO}
+\def\TABLET{TABLET$}
 
-%% globals & if selectors
-\input{globals}
+%%
+%% Constants
+%%
+
+\def\NIL{}
+\def\TRUE{true}
+
+%%
+%% if selectors
+%%
+
+\input{ifs}
 
 
 \usepackage[T2A]{fontenc}

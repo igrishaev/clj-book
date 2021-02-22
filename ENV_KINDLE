@@ -1,8 +1,7 @@
 COVER=media/cover_kindle.pdf
-DEVICE=kindle
-DEVICE_TYPE=mobile
+NARROW=true
 DOCUMENT=report
 GEOMETRY=geom-kindle
 JOB=clojure_kindle
-MODE=ebook
-PUBLISHER=
+EBOOK=true
+KINDLE=true

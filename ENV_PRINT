@@ -1,8 +1,5 @@
 COVER=media/cover_print.pdf
-DEVICE=
-DEVICE_TYPE=
 DOCUMENT=book
 GEOMETRY=geom-print
 JOB=clojure_print
-MODE=print
-PUBLISHER=
+PRINT=true

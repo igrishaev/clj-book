@@ -1,44 +1,21 @@
 
 %% http://handyfloss.net/2007.08/latex-programming-how-to-implement-conditionals/
 
-%% TODO: Drop \DEVICE var and env
-%% refactor \DEVICETYPE
-
-
-%%
-%% Constants
-%%
-
-\def\NIL{}
-\def\PRINT{print}
-\def\EBOOK{ebook}
-\def\TABLET{tablet}
-\def\KINDLE{kindle}
-\def\PHONE{phone}
-\def\MOBILE{mobile}
-\def\RIDERO{ridero}
-
-
-%%
-%% if selectors
-%%
-
 %% QR
 
 \newif\ifqr
 
-\ifx\QR\NIL
-  \qrfalse
-\else
+\ifx\QR\TRUE
   \qrtrue
+\else
+  \qrfalse
 \fi
-
 
 %% NARROW
 
 \newif\ifnarrow
 
-\ifx\DEVICETYPE\MOBILE
+\ifx\NARROW\TRUE
   \narrowtrue
 \else
   \narrowfalse
@@ -48,7 +25,7 @@
 
 \newif\ifkindle
 
-\ifx\DEVICETYPE\KINDLE
+\ifx\KINDLE\TRUE
   \kindletrue
 \else
   \kindlefalse
@@ -58,7 +35,7 @@
 
 \newif\iftablet
 
-\ifx\DEVICETYPE\TABLET
+\ifx\TABLET\TRUE
   \tablettrue
 \else
   \tabletfalse
@@ -69,7 +46,7 @@
 
 \newif\ifphone
 
-\ifx\DEVICETYPE\PHONE
+\ifx\PHONE\TRUE
   \phonetrue
 \else
   \phonefalse
@@ -79,29 +56,27 @@
 
 \newif\ifridero
 
-\ifx\PUBLISHER\RIDERO
+\ifx\RIDERO\TRUE
   \riderotrue
 \else
   \riderofalse
 \fi
 
-
 %% PRINT
 
 \newif\ifprint
 
-\ifx\MODE\PRINT
+\ifx\PRINT\TRUE
   \printtrue
 \else
   \printfalse
 \fi
 
-
 %% EBOOK
 
 \newif\ifebook
 
-\ifx\MODE\EBOOK
+\ifx\EBOOK\TRUE
   \ebooktrue
 \else
   \ebookfalse

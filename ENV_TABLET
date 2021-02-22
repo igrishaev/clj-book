@@ -1,8 +1,7 @@
 COVER=media/cover_tablet.pdf
-DEVICE=tablet
-DEVICE_TYPE=
 DOCUMENT=report
+EBOOK=true
 GEOMETRY=geom-tablet
 JOB=clojure_tablet
-MODE=ebook
-PUBLISHER=
+NARROW=true
+TABLET=true

@@ -1,8 +1,7 @@
 COVER=media/cover_phone.pdf
-DEVICE=phone
-DEVICE_TYPE=mobile
 DOCUMENT=report
+EBOOK=true
 GEOMETRY=geom-phone
 JOB=clojure_phone
-MODE=ebook
-PUBLISHER=
+NARROW=true
+PHONE=true
