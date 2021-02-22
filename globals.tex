@@ -1,0 +1,108 @@
+
+%% http://handyfloss.net/2007.08/latex-programming-how-to-implement-conditionals/
+
+%% TODO: Drop \DEVICE var and env
+%% refactor \DEVICETYPE
+
+
+%%
+%% Constants
+%%
+
+\def\NIL{}
+\def\PRINT{print}
+\def\EBOOK{ebook}
+\def\TABLET{tablet}
+\def\KINDLE{kindle}
+\def\PHONE{phone}
+\def\MOBILE{mobile}
+\def\RIDERO{ridero}
+
+
+%%
+%% if selectors
+%%
+
+%% QR
+
+\newif\ifqr
+
+\ifx\QR\NIL
+  \qrfalse
+\else
+  \qrtrue
+\fi
+
+
+%% NARROW
+
+\newif\ifnarrow
+
+\ifx\DEVICETYPE\MOBILE
+  \narrowtrue
+\else
+  \narrowfalse
+\fi
+
+%% KINDLE
+
+\newif\ifkindle
+
+\ifx\DEVICETYPE\KINDLE
+  \kindletrue
+\else
+  \kindlefalse
+\fi
+
+%% TABLET
+
+\newif\iftablet
+
+\ifx\DEVICETYPE\TABLET
+  \tablettrue
+\else
+  \tabletfalse
+\fi
+
+
+%% PHONE
+
+\newif\ifphone
+
+\ifx\DEVICETYPE\PHONE
+  \phonetrue
+\else
+  \phonefalse
+\fi
+
+%% RIDERO
+
+\newif\ifridero
+
+\ifx\PUBLISHER\RIDERO
+  \riderotrue
+\else
+  \riderofalse
+\fi
+
+
+%% PRINT
+
+\newif\ifprint
+
+\ifx\MODE\PRINT
+  \printtrue
+\else
+  \printfalse
+\fi
+
+
+%% EBOOK
+
+\newif\ifebook
+
+\ifx\MODE\EBOOK
+  \ebooktrue
+\else
+  \ebookfalse
+\fi
