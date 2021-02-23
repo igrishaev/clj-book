@@ -708,7 +708,7 @@ Divide by zero
 
 \begin{english}
 \noindent
-\begin{tabular}{ @{}p{6cm} @{}p{5cm} }
+\begin{tabular}{ @{}p{5.5cm} @{}p{4cm} }
 
   \begin{clojure}
 (let [{:keys [a b c]} nil]
@@ -1363,6 +1363,8 @@ INFO: A message from my module
 \verb|resources| положить XML-файл для бэкенда, он прочтёт его на
 старте. Запишите туда следующий файл \verb|logback.xml|:
 
+%% --------
+
 \ifnarrow
 
 \begin{english}
@@ -1394,7 +1396,8 @@ INFO: A message from my module
   <appender name="STDOUT" class="...ConsoleAppender">
     <encoder>
       <charset>UTF-8</charset>
-      <pattern>%date %-5level %logger{36} - %msg %n</pattern>
+      <pattern>%date %-5level %logger{36} -
+                                    %msg %n</pattern>
     </encoder>
   </appender>
   <root level="INFO">
@@ -1430,7 +1433,7 @@ REPL). Вывод изменится:
 \begin{english}
   \begin{clojure}
 (log/info "Hello Logback!")
-;; 2019-05-03 17:36:04,001 INFO book.exceptions - Hello Logback!
+;; 2019-05-03 ... INFO book.exceptions - Hello Logback!
   \end{clojure}
 \end{english}
 
@@ -1464,14 +1467,14 @@ REPL). Вывод изменится:
   \begin{clojure}
 (log/error e "HTTP Error")
 
-2019-05-03 17:41:03,913 ERROR book.exceptions - HTTP Error
+2019-05-03 ... ERROR book.exceptions - HTTP Error
 clojure.lang.ExceptionInfo: Get user info error
     at java.lang.Thread.run(Thread.java:745)
 Caused by: clojure.lang.ExceptionInfo: Auth error
-    at clojure.lang.Compiler$InvokeExpr.eval(Compiler.java:3701)
+    at ...$InvokeExpr.eval(Compiler.java:3701)
     ... 30 common frames omitted
 Caused by: clojure.lang.ExceptionInfo: HTTP error
-    at clojure.lang.Compiler$InvokeExpr.eval(Compiler.java:3701)
+    at ...$InvokeExpr.eval(Compiler.java:3701)
     ... 31 common frames omitted
   \end{clojure}
 \end{english}
@@ -1634,7 +1637,7 @@ clojure.lang.ExceptionInfo
 
 \begin{english}
   \begin{text}
-2019-05-03 19:00:05,590 ERROR book.exceptions - HTTP Error 500
+2019-05-03 ... ERROR book.exceptions - HTTP Error 500
 clojure.lang.ExceptionInfo
   Get user info error
   ...
@@ -1848,14 +1851,14 @@ HTTP-запроса, стек-трейс и другие.
   "data": {
     "user-id": 42
   },
-  "at": ["clojure.lang.AFn", "applyToHelper", "AFn.java", 160]
+  "at": ["clojure.lang.AFn", "...", "AFn.java", 160]
 }, {
   "type": "clojure.lang.ExceptionInfo",
   "message": "Auth error",
   "data": {
     "token": "........."
   },
-  "at": ["clojure.lang.AFn", "applyToHelper", "AFn.java", 160]
+  "at": ["clojure.lang.AFn", "...", "AFn.java", 160]
 } ]
   \end{json}
 \end{english}
@@ -2229,7 +2232,7 @@ Clojure пользуются императивным подходом. Всё �
 
 \index{HTTP!404}
 
-Чтобы схема работала, добавим декоратор \verb|wrap-http-response|. Он ловит
+Чтобы схема работала, добавим декоратор \texttt{wrap\--http\--res\-pon\-se}. Он ловит
 ошибки от функций с восклицательным знаком, достаёт из них ответ и возвращает
 клиенту. Таким образом, вызов \verb|(not-found! "...")| приведёт к ожидаемому
 ответу 404, а не ошибке сервера 500.
@@ -2422,7 +2425,7 @@ finally
 \end{english}
 
 Такой порядок говорит о том, что сначала Clojure выполнит код из \verb|catch|
-(печать <<catch>>) и запомнит результат (\verb|:result-catch|). Потом выполнит
+(печать <<catch>>) и запомнит результат (кейворд \verb|:result-catch|). Потом выполнит
 \verb|finally| (печать <<finally>>) и отбросит результат
 (\verb|:result-finally|). Кейворд \verb|:result-catch| станет итогом \verb|try|.
 
@@ -2618,7 +2621,7 @@ Slingshot содержит макросы \verb|throw+| и \verb|try+|. Они �
   (and (instance? AmazonS3Exception e)
        (some?
         (re-find
-         #"(?i)The Content-Md5 you specified did not match"
+         #"(?i)The Content-Md5 ... did not match"
          (ex-message e)))))
   \end{clojure}
 \end{english}
