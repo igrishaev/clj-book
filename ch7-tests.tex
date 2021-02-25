@@ -51,7 +51,7 @@
 
 Примечание: в тесте мы сравниваем результат \verb|->fahr| с целым числом. Без
 обёртки в \verb|(int ...)| функция вернёт число с плавающей запятой, которое
-\footurl{не всегда равно}{https://en.wikipedia.org/wiki/Floating-point\_arithmetic}[Floating point][-6mm]
+\footurl{не всегда равно}{https://en.wikipedia.org/wiki/Floating-point\_arithmetic}[Floating point][-7mm]
 другому такому же числу. Для удобства значение приводят к целому.
 
 Макрос \verb|assert| бросит исключение, если тело вычисляется в ложь. Пока что
@@ -1632,7 +1632,7 @@ Emacs предлагает навигацию по коду командой \ve
 \index{библиотеки!JUnit}
 
 Правило уходит корнями в прошлое. Фреймворк JUnit утвердил именно такой порядок
-\footurl{в~методах сравнения}{https://junit.org/junit5/docs/current/user-guide/}[JUnit].
+\footurl{в~методах сравнения}{https://junit.org/junit5/docs/current/user-guide/}[JUnit][2mm].
 Хорошо это или плохо, судить поздно~--- принцип <<expected слева>> стал
 стандартом. Аналогично работают тесты в Python, Ruby и других языках. Отдельные
 фреймворки предлагают модули, чтобы <<перестать говорить как Йода>>, то~есть
@@ -2404,7 +2404,7 @@ Did you forget to use ‘is’ in your tests?
 CIDER считает подозрительным, что не было ни одного \verb|is|. Чтобы обмануть
 CIDER, улучшим фикстуру. Добавим в неё \verb|is|, который всегда истинен. Даже
 если в тесте ошибки, его тело не выполнится, а в отчёте будет один
-assertion. Назовём фикстуру \footurl{\texttt{fix-this-is-fine}}{https://knowyourmeme.com/memes/this-is-fine}[This\\*is fine][-11mm]:
+assertion. Назовём фикстуру \footurl{\texttt{fix-this-is-fine}}{https://knowyourmeme.com/memes/this-is-fine}[This\\*is fine][-16mm]:
 
 \begin{english}
   \begin{clojure}
@@ -2812,7 +2812,7 @@ $ lein test :integration
 
 Если проект работает на Deps, мы теряем возможности Lein, в том числе прогон
 тестов. Чтобы компенсировать потери, в Deps подключают сторонние
-библиотеки. Проект \footurl{Test-runner}{https://github.com/cognitect-labs/test-runner}[Test runner][4mm]
+библиотеки. Проект \footurl{Test-runner}{https://github.com/cognitect-labs/test-runner}[Test runner][1mm]
 делает то же, что и~\verb|lein test|: находит тесты, запускает их и выводит
 отчёт.
 
@@ -5478,7 +5478,7 @@ HMAC~SHA256. Если вы забыли, как работает подпись 
 
 Не протяжении главы мы постепенно усложняли тесты. С каждым шагом они всё меньше
 зависят от технических деталей и делают упор на бизнес-логику. Принцип называют
-\footurl{пирамидой тестов}{https://martinfowler.com/bliki/TestPyramid.html}[Test Pyramid].
+\footurl{пирамидой тестов}{https://martinfowler.com/bliki/TestPyramid.html}[Test Pyramid][0mm].
 В её основании юнит-тесты~--- множество отдельных проверок. Поднимаясь к
 вершине, мы абстрагируемся от технических деталей. В какой-то момент тестируют
 уже не функции, а всё приложение.
@@ -5687,8 +5687,8 @@ Login. Браузер обновляет страницу, появляется 
 страницы>>, где видно исходный HTML до начала работы скриптов. Далее вы парсите
 разметку средствами Clojure или Java и выполняете свои проверки. Для парсинга
 подойдут библиотеки
-\footurl{Hickory}{https://github.com/davidsantiago/hickory}[Hickory][-12mm] и
-\footurl{JSoup}{https://jsoup.org}[JSoup][12mm].
+\footurl{Hickory}{https://github.com/davidsantiago/hickory}[Hickory][-20mm] и
+\footurl{JSoup}{https://jsoup.org}[JSoup][2mm].
 
 \index{HTML}
 
@@ -5835,7 +5835,7 @@ Safari, добавьте его ключ в вектор \verb|driver-type|.
 \verb|with-redefs|. Макрос слишком многословен, чтобы работать с ним
 напрямую. Появились библиотеки, которые описывают мокинг короче и
 выразительнее. Одна из них называется
-\footurl{Mockery}{https://github.com/igrishaev/mockery}[Mockery][-3mm].
+\footurl{Mockery}{https://github.com/igrishaev/mockery}[Mockery][-7mm].
 Библиотека предлагает макрос \verb|with-mock|:
 
 \begin{english}

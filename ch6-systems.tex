@@ -504,31 +504,18 @@ EDN. Замените \texttt{edn/read\--string} на Yummy, Aero или сво�
 \index{библиотеки!HikariCP}
 
 Подготовим компонент базы данных. Для этого понадобятся библиотеки
-\footurl{JDBC}{https://github.com/clojure/java.jdbc}[JDBC][1mm] и
-\footurl{HikariCP}{https://github.com/tomekw/hikari-cp}[HikariCP][20mm]. Первая предлагает доступ
-к реляционным базам данных. Это набор функций, которые работают одинаково для
-разных баз. Выражения:
-
-\ifnarrow
+\footurl{JDBC}{https://github.com/clojure/java.jdbc}[JDBC][-22mm] и
+\footurl{HikariCP}{https://github.com/tomekw/hikari-cp}[HikariCP][-1mm].
+Первая предлагает доступ к реляционным базам данных. Это набор функций, которые
+работают одинаково для разных баз. Выражения:
 
 \begin{english}
   \begin{clojure}
 (jdbc/get-by-id db :users 42)
 (jdbc/insert! db :users
-  {:name "Ivan" :email "ivan@test.com"})
+   {:name "Ivan" :email "ivan@test.com"})
   \end{clojure}
 \end{english}
-
-\else
-
-\begin{english}
-  \begin{clojure}
-(jdbc/get-by-id db :users 42)
-(jdbc/insert! db :users {:name "Ivan" :email "ivan@test.com"})
-  \end{clojure}
-\end{english}
-
-\fi
 
 \noindent
 прочитают и запишут пользователя в Postgre\-SQL, MySQL или Oracle. Для каждого
