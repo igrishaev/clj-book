@@ -33,7 +33,7 @@
 
 Протокол HTTP работает поверх стека TCP/IP. В широком смысле протоколы~--- это
 соглашения о том, как обмениваться данными. Они записаны в официальных
-документах. Документ HTTP называется \footurl{RFC~2616}{https://tools.ietf.org/html/rfc2616}[RFC~2616][-5mm].
+документах. Документ HTTP называется \footurl{RFC~2616}{https://tools.ietf.org/html/rfc2616}[RFC~2616].
 С~ним сверяются разработчики фреймворков и браузеров, чтобы код работал
 на разных языках и платформах.
 
@@ -452,7 +452,7 @@ Rails. Имена и состав классов отличаются, но см
 полей, запрос содержит порт и адрес сервера, строку параметров, тип протокола,
 заголовки и тело. Всё вместе~--- это неизменяемый словарь с ключами типа
 \verb|keyword|. Полное описание запроса и~ответа смотрите в репозитории на
-\footurl{GitHub}{https://github.com/ring-clojure/ring/blob/master/SPEC}[Ring spec][-9mm].
+\footurl{GitHub}{https://github.com/ring-clojure/ring/blob/master/SPEC}[Ring spec][-11mm].
 
 Здесь и далее будем писать слово \verb|keyword| по-русски:
 <<кейворд>>. В~других языках тип называют токеном или тегом.
@@ -1953,7 +1953,7 @@ middleware, которое дополняет запрос словарём \ver
 использует память. Чтобы подружить сессию с Redis или другой системой, расширьте
 протокол \verb|SessionStore|. Работа с протоколами выходит за рамки этой главы,
 поэтому ограничимся ссылкой на
-\footurl{документацию Ring}{https://github.com/ring-clojure/ring/wiki/Sessions}[Ring\\*Sessions][-8mm]
+\footurl{документацию Ring}{https://github.com/ring-clojure/ring/wiki/Sessions}[Ring\\*Sessions][-13mm]
 с примером.
 
 Рассмотрим пример со счётчиком посещений. Будем считать, сколько раз
@@ -3068,7 +3068,7 @@ HTML. Поля \verb|status| и \verb|body| ответа Яндекса пере
 \index{веб-разработка!Swagger}
 
 \item
-  \footurl{Compojure API}{https://github.com/metosin/compojure-api}[Compo-\\*jure API]~---
+  \footurl{Compojure API}{https://github.com/metosin/compojure-api}[Compo-\\*jure API][-5mm]~---
   убернадстройка над обычным Compojure. Набор макросов, чтобы декларативно описать REST
   API. Библиотека тесно связана с JSON-схемой и Swagger.
 
@@ -3103,7 +3103,7 @@ HTML. Поля \verb|status| и \verb|body| ответа Яндекса пере
 \index{библиотеки!Duct}
 
 \item
-  \footurl{Duct}{https://github.com/duct-framework/duct}[Duct]~--- новый
+  \footurl{Duct}{https://github.com/duct-framework/duct}[Duct][7mm]~--- новый
   фреймворк от создателя Ring. Проект на ранней стадии, и документации ещё
   мало. Делает упор на модульность и~систему компонентов \page{chapter-systems}.
 
@@ -3112,7 +3112,7 @@ HTML. Поля \verb|status| и \verb|body| ответа Яндекса пере
 \index{мультиметоды}
 
 \item
-  \footurl{Liberator}{https://clojure-liberator.github.io/liberator}[Liberator]~---
+  \footurl{Liberator}{https://clojure-liberator.github.io/liberator}[Liberator][13mm]~---
   аналог проекта Webmachine для Erlang. Запрос и~ответ проходят стадии, на
   каждую из которых можно задать реакцию. Предлагает систему правил на базе
   мультиметодов.
