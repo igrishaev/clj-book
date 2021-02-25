@@ -111,6 +111,15 @@ docker-build-ridero:
 	--env-file=ENV_RIDERO \
 	${DOCKER_BUILD_POST_BUILD}
 
+
+.PHONY: docker-build-ridero-large
+docker-build-ridero-large:
+	${DOCKER_BUILD_PRE}	\
+	--env-file=ENV_RIDERO_large \
+	--env-file=ENV_DRAFT \
+	${DOCKER_BUILD_POST_BUILD}
+
+
 .PHONY: docker-build-print
 docker-build-print:
 	${DOCKER_BUILD_PRE}	\
