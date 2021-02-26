@@ -75,6 +75,9 @@
 \captionsetup[figure]{name=Рис.}
 
 
+% underline
+\usepackage[normalem]{ulem}
+
 % for QR codes in
 \usepackage{qrcode}
 
@@ -94,7 +97,7 @@
 % code highlight
 \usepackage[newfloat=true]{minted}
 \usemintedstyle{print}
-%% \setminted{fontsize=\small} %% to reduce minted font
+%% \setminted{fontsize=\small} %% reduce minted font
 \SetupFloatingEnvironment{listing}{placement=H}
 
 \ifnarrow
@@ -195,9 +198,6 @@
 \setlength{\cftbeforetoctitleskip}{0pt}
 \setlength{\cftaftertoctitleskip}{2em}
 \fi
-
-%% globally reduce size of the main font
-%% \let\normalsize\small
 
 \begin{document}
 

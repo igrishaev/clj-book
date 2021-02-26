@@ -3,5 +3,5 @@ DOCUMENT=report
 EBOOK=true
 GEOMETRY=geom-tablet
 JOB=clojure_tablet
-NARROW=true
+NARROW=
 TABLET=true
