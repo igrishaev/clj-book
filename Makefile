@@ -145,7 +145,7 @@ docker-build-kindle-draft:
 
 
 lines-kindle:
-	! grep -A 0 -B 0 -i 'Overflow in paragraph at lines' clojure_kindle.log
+	grep -A 0 -B 0 -i 'Overfull' clojure_kindle.log
 
 
 docker-build-phone:
