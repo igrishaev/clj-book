@@ -130,17 +130,27 @@ docker-build-tablet:
 	--env-file=ENV_TABLET \
 	${DOCKER_BUILD_POST_BUILD}
 
-.PHONY: docker-build-kindle
+
 docker-build-kindle:
 	${DOCKER_BUILD_PRE}	\
 	--env-file=ENV_KINDLE \
 	${DOCKER_BUILD_POST_MOBILE_BUILD}
 
-.PHONY: docker-build-phone
+
+docker-build-kindle-draft:
+	${DOCKER_BUILD_PRE}	\
+	--env-file=ENV_KINDLE \
+	--env-file=ENV_DRAFT \
+	${DOCKER_BUILD_POST} make draft
+
+
+lines-kindle:
+	! grep -A 0 -B 0 -i 'Overflow in paragraph at lines' clojure_kindle.log
+
+
 docker-build-phone:
 	${DOCKER_BUILD_PRE}	\
 	--env-file=ENV_PHONE \
 	${DOCKER_BUILD_POST_MOBILE_BUILD}
 
-.PHONY: docker-build-gumroad
 docker-build-gumroad: docker-build-print docker-build-tablet docker-build-phone docker-build-kindle
