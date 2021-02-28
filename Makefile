@@ -94,6 +94,7 @@ DOCKER_BUILD_PRE = \
 	-e COMMIT_TS=${COMMIT_TS} \
 	--env-file=ENV
 
+# TODO refactor this mess
 DOCKER_BUILD_POST = -v $(CURDIR)/:/book -w /book ${IMAGE}:build
 DOCKER_BUILD_POST_BUILD = ${DOCKER_BUILD_POST} make build
 DOCKER_BUILD_POST_MOBILE_BUILD = ${DOCKER_BUILD_POST} make mobile-build
