@@ -99,33 +99,33 @@ DOCKER_BUILD_POST = -v $(CURDIR)/:/book -w /book ${IMAGE}:build
 DOCKER_BUILD_POST_BUILD = ${DOCKER_BUILD_POST} make build
 DOCKER_BUILD_POST_MOBILE_BUILD = ${DOCKER_BUILD_POST} make mobile-build
 
-.PHONY: docker-build-print-draft
+
 docker-build-print-draft:
 	${DOCKER_BUILD_PRE}	\
 	--env-file=ENV_PRINT \
 	--env-file=ENV_DRAFT \
 	${DOCKER_BUILD_POST} make draft
 
-.PHONY: docker-build-ridero
+
 docker-build-ridero:
 	${DOCKER_BUILD_PRE}	\
 	--env-file=ENV_RIDERO \
 	${DOCKER_BUILD_POST_BUILD}
 
-.PHONY: docker-build-ridero-large
+
 docker-build-ridero-large:
 	${DOCKER_BUILD_PRE}	\
 	--env-file=ENV_RIDERO_large \
 	--env-file=ENV_DRAFT \
 	${DOCKER_BUILD_POST_BUILD}
 
-.PHONY: docker-build-print
+
 docker-build-print:
 	${DOCKER_BUILD_PRE}	\
 	--env-file=ENV_PRINT \
 	${DOCKER_BUILD_POST_BUILD}
 
-.PHONY: docker-build-tablet
+
 docker-build-tablet:
 	${DOCKER_BUILD_PRE}	\
 	--env-file=ENV_TABLET \
@@ -146,12 +146,24 @@ docker-build-kindle-draft:
 
 
 lines-kindle:
-	grep -A 0 -B 0 -i 'Overfull' clojure_kindle.log
+	! grep -A 0 -B 0 -i 'Overfull' clojure_kindle.log
 
 
 docker-build-phone:
 	${DOCKER_BUILD_PRE}	\
 	--env-file=ENV_PHONE \
 	${DOCKER_BUILD_POST_MOBILE_BUILD}
+
+
+docker-build-phone-draft:
+	${DOCKER_BUILD_PRE}	\
+	--env-file=ENV_PHONE \
+	--env-file=ENV_DRAFT \
+	${DOCKER_BUILD_POST} make draft
+
+
+lines-phone:
+	! grep -A 0 -B 0 -i 'Overfull' clojure_phone.log
+
 
 docker-build-gumroad: docker-build-print docker-build-tablet docker-build-phone docker-build-kindle
