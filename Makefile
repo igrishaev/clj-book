@@ -29,7 +29,7 @@ endif
 
 
 draft: \
-	pdf-build1 make-index
+	pdf-build1
 
 
 build: \
