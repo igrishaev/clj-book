@@ -4,12 +4,10 @@ PWD = $(shell pwd)
 COMMIT_HASH = $(shell git log -1 --format='%h')
 COMMIT_TS = $(shell git log -1 --format='%at')
 
-# default draft build
-.PHONY: draft
-draft: pdf-build1
 
-
-.PHONY: add-cover
+#
+# Adds a cover to the final PDF file
+#
 add-cover:
 ifdef COVER
 	mv ${JOB}.pdf ${JOB}.tmp.pdf
@@ -18,26 +16,44 @@ ifdef COVER
 endif
 
 
-.PHONY: pre-build
-pre-build: clear pdf-build1 index pdf-build2 pdf-build3 add-cover refs
+#
+# Checks the log for underfull/overfull warnings.
+# For narrow displays, only check overfull.
+#
+check-lines:
+ifdef NARROW
+	! grep -i 'Overfull' ${JOB}.log
+else
+	! grep -i 'in paragraph at lines' ${JOB}.log
+endif
 
-# release build
-.PHONY: build
-build:  pre-build lines tag-job
 
-.PHONY: mobile-build
-mobile-build: pre-build tag-job
+draft: \
+	pdf-build1 make-index
 
-.PHONY: tag-job
+
+build: \
+	clear-files pdf-build1 make-index pdf-build2 pdf-build3 \
+	add-cover tag-job check-refs check-lines
+
+
+#
+# Make a copy of a PDF file with its commit hash
+# and timestamp being included in the name.
+#
 tag-job:
 	cp ${JOB}.pdf ${JOB}_${COMMIT_HASH}_${COMMIT_TS}.pdf
 
-.PHONY: index
-index:
-	cd makeindex && bb --classpath src --main makeindex.core ${PWD}/${JOB}.idx ${PWD}/${JOB}.ind
 
-.PHONY: clear
-clear:
+## Build an index file with Clojure.
+make-index:
+	cd makeindex && bb --classpath src \
+		--main makeindex.core \
+		${PWD}/${JOB}.idx ${PWD}/${JOB}.ind
+
+
+# Drop unused files.
+clear-files:
 	rm -f *.aux
 	rm -f *.ilg
 	rm -f *.idx
@@ -49,121 +65,150 @@ clear:
 	rm -rf _minted-*
 	rm -f *.out
 
-pyg-print-install:
-	cd ./pyg_print && python setup.py install
 
+#
+# A common LaTeX build command with three aliases
+#
 pdf-build1 pdf-build2 pdf-build3:
 	COMMIT_HASH=${COMMIT_HASH} \
 	COMMIT_TS=${COMMIT_TS} \
 	envsubst < main.tex | pdflatex -shell-escape -halt-on-error -jobname=${JOB}
 
-stats:
-	find . -name '*.tex' | xargs wc -ml
 
-.PHONY: lines
-lines:
-	! grep -A 0 -B 0 -i 'in paragraph at lines' ${JOB}.log
+#
+# Check if there are any missing references inside the doc.
+#
+check-refs:
+	! grep -i 'LaTeX Warning: Reference' ${JOB}.log
 
-.PHONY: warn
-warn:
-	! grep -A 0 -B 0 -i 'Warning' ${JOB}.log
 
-.PHONY: refs
-refs:
-	! grep -A 0 -B 0 -i 'LaTeX Warning: Reference' ${JOB}.log
+IMG = clj-book
+IMG_SYS = ${IMG}:ubuntu
+IMG_RUN = ${IMG}:build
 
-.PHONY: check-urls
-check-urls:
-	./check-urls.sh
 
-.PHONY: docker-build-prepare
-docker-build-prepare:
-	make pyg-print-install
-	./install-fonts.sh
-
-IMAGE := clj-book
-
-.PHONY: docker-build-images
 docker-build-images:
-	docker build -t ${IMAGE}:ubuntu -f Dockerfile.ubuntu .
-	docker build -t ${IMAGE}:build .
+	docker build -t ${IMG_SYS} -f Dockerfile.ubuntu .
+	docker build -t ${IMG_RUN} .
 
-DOCKER_BUILD_PRE = \
+
+DOCKER_RUN = \
 	docker run -it --rm \
+	-v $(CURDIR)/:/book \
+	-w /book \
 	-e COMMIT_HASH=${COMMIT_HASH} \
 	-e COMMIT_TS=${COMMIT_TS} \
 	--env-file=ENV
 
-# TODO refactor this mess
-DOCKER_BUILD_POST = -v $(CURDIR)/:/book -w /book ${IMAGE}:build
-DOCKER_BUILD_POST_BUILD = ${DOCKER_BUILD_POST} make build
-DOCKER_BUILD_POST_MOBILE_BUILD = ${DOCKER_BUILD_POST} make mobile-build
+DOCKER_DRAFT = ${DOCKER_RUN} --env-file=ENV_DRAFT
+
+MAKE_BUILD = ${IMG_RUN} make build
+MAKE_DRAFT = ${IMG_RUN} make draft
+
+
+#
+# Print
+#
+
+docker-build-print:
+	${DOCKER_RUN} --env-file=ENV_PRINT ${MAKE_BUILD}
 
 
 docker-build-print-draft:
-	${DOCKER_BUILD_PRE}	\
-	--env-file=ENV_PRINT \
-	--env-file=ENV_DRAFT \
-	${DOCKER_BUILD_POST} make draft
+	${DOCKER_DRAFT} --env-file=ENV_PRINT ${MAKE_DRAFT}
 
+
+#
+# Ridero
+#
 
 docker-build-ridero:
-	${DOCKER_BUILD_PRE}	\
-	--env-file=ENV_RIDERO \
-	${DOCKER_BUILD_POST_BUILD}
+	${DOCKER_RUN} --env-file=ENV_RIDERO ${MAKE_BUILD}
 
+docker-build-ridero-draft:
+	${DOCKER_DRAFT} --env-file=ENV_RIDERO ${MAKE_DRAFT}
+
+
+#
+# Ridero large
+#
 
 docker-build-ridero-large:
-	${DOCKER_BUILD_PRE}	\
-	--env-file=ENV_RIDERO_large \
-	--env-file=ENV_DRAFT \
-	${DOCKER_BUILD_POST_BUILD}
+	${DOCKER_RUN} --env-file=ENV_RIDERO_LARGE ${MAKE_BUILD}
+
+docker-build-ridero-large-draft:
+	${DOCKER_DRAFT} --env-file=ENV_RIDERO_LARGE ${MAKE_DRAFT}
 
 
-docker-build-print:
-	${DOCKER_BUILD_PRE}	\
-	--env-file=ENV_PRINT \
-	${DOCKER_BUILD_POST_BUILD}
-
-
-docker-build-tablet:
-	${DOCKER_BUILD_PRE}	\
-	--env-file=ENV_TABLET \
-	${DOCKER_BUILD_POST_BUILD}
-
+#
+# Kindle
+#
 
 docker-build-kindle:
-	${DOCKER_BUILD_PRE}	\
-	--env-file=ENV_KINDLE \
-	${DOCKER_BUILD_POST_MOBILE_BUILD}
-
+	${DOCKER_RUN} --env-file=ENV_KINDLE ${MAKE_BUILD}
 
 docker-build-kindle-draft:
-	${DOCKER_BUILD_PRE}	\
-	--env-file=ENV_KINDLE \
-	--env-file=ENV_DRAFT \
-	${DOCKER_BUILD_POST} make draft
+	${DOCKER_DRAFT} --env-file=ENV_KINDLE ${MAKE_DRAFT}
+
+
+#
+# Phone
+#
+
+docker-build-phone:
+	${DOCKER_RUN} --env-file=ENV_PHONE ${MAKE_BUILD}
+
+docker-build-phone-draft:
+	${DOCKER_DRAFT} --env-file=ENV_PHONE ${MAKE_DRAFT}
+
+
+#
+# Tablet
+#
+
+docker-build-tablet:
+	${DOCKER_RUN} --env-file=ENV_TABLET ${MAKE_BUILD}
+
+docker-build-tablet-draft:
+	${DOCKER_DRAFT} --env-file=ENV_TABLET ${MAKE_DRAFT}
+
+
+docker-build-gumroad: \
+	docker-build-print \
+	docker-build-tablet \
+	docker-build-phone \
+	docker-build-kindle
+
+
+#
+# Image build duties
+#
+
+pyg-print-install:
+	cd ./pyg_print && python setup.py install
+
+
+docker-build-prepare:
+	make pyg-print-install
+	./install-fonts.sh
+
+
+#
+# Local debug
+#
+
+
+show-stats:
+	find . -name '*.tex' | xargs wc -ml
+
+
+check-urls:
+	./check-urls.sh
 
 
 lines-kindle:
-	! grep -A 0 -B 0 -i 'Overfull' clojure_kindle.log
-
-
-docker-build-phone:
-	${DOCKER_BUILD_PRE}	\
-	--env-file=ENV_PHONE \
-	${DOCKER_BUILD_POST_MOBILE_BUILD}
-
-
-docker-build-phone-draft:
-	${DOCKER_BUILD_PRE}	\
-	--env-file=ENV_PHONE \
-	--env-file=ENV_DRAFT \
-	${DOCKER_BUILD_POST} make draft
+	! grep -i 'Overfull' clojure_kindle.log
 
 
 lines-phone:
-	! grep -A 0 -B 0 -i 'Overfull' clojure_phone.log
-
-
-docker-build-gumroad: docker-build-print docker-build-tablet docker-build-phone docker-build-kindle
+	! grep -i 'Overfull' clojure_phone.log
