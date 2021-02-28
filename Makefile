@@ -212,3 +212,7 @@ lines-kindle:
 
 lines-phone:
 	! grep -i 'Overfull' clojure_phone.log
+
+
+lines-ridero-large:
+	! grep -i 'in paragraph at lines' clojure_ridero_large.log
