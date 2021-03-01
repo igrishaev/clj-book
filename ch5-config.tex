@@ -1685,9 +1685,9 @@ $ <manager> install gettext
 \index{шаблоны}
 
 Текст шаблона приходит из \verb|stdin| (стандартного потока), а роль контекста
-играют переменные среды. Утилита заменяет выражения \verb|$VAR_NAME| на значения
-одноимённой переменной. Поместим шаблон в файл \verb|config.tpl.json|. Частичка
-tpl означает template.
+играют переменные среды. Утилита заменяет в файле выражения \verb|$VAR_NAME| на
+значения одноимённой переменной. Поместим шаблон в файл
+\verb|config.tpl.json|. Частичка tpl означает template.
 
 \begin{english}
   \begin{json/lines}
@@ -2908,7 +2908,7 @@ states:
 \fi
 
 Тег \verb|!uuid| аналогичен \verb|#uuid| в EDN: он возвращает объект
-\verb|java.util.UUID| из строки:
+\code{java.\-util.\-UUID} из строки:
 
 \ifnarrow
 
