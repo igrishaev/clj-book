@@ -39,14 +39,15 @@
 
 \def\blank{\clearpage{\pagestyle{empty}\cleardoublepage}}
 
-%% footnote text,
-%% QR URL
-%% QR label
-%% QR offset
+%% #1 text
+%% #2 URL
+%% #3 QR label
+%% #4 offset
 \ifprint
-\NewDocumentCommand{\footurl}{ m m O{} O{1mm} }{%
-  #1\footnote{\StrSubstitute{#2}{https://}{}}%
-  \marginnote{\setstretch{0.5}\ifqr\qrcode[height=10mm]{#2}\else\input{qr-frame}\fi\\\vspace{1mm}{\tiny #3}}[#4]}%
+\NewDocumentCommand{\footurl}{ m m O{} O{} }{%
+#1\footnote{\StrSubstitute{#2}{https://}{}}%
+\marginpar{\hbox{\ifqr\qrcode[height=10mm]{#2}\else\input{qr-frame}\fi}\vspace{1mm}\raggedright\tiny{#3}\vspace{7mm}}%
+}%
 \fi
 
 \ifebook

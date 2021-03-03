@@ -10,10 +10,12 @@
 \index{организации!Cognitect}
 \index{организации!StackOverflow}
 
-Каждый год компания Cognitect \footurl{опрашива\-ет}{https://cognitect.com/blog/2017/1/31/clojure-2018-results}[Cognitect 2018]
+Каждый год компания Cognitect
+\footurl{опрашива\-ет}{https://cognitect.com/blog/2017/1/31/clojure-2018-results}[Cognitect 2018]
 разработчиков на~Clojure. Один из вопросов уточняет, в какой области вы
 работаете. В~2010 году под веб писала половина опрошенных. К~2018 году эта цифра
-выросла до 80\%, что уже четыре человека из пяти. Похожую динамику показывают \footurl{опросы StackOverflow}{https://insights.stackoverflow.com/survey/2018}[Stack\-Overflow 2018][10mm].
+выросла до 80\%, что уже четыре человека из пяти. Похожую динамику показывают опросы
+\footurl{StackOverflow}{https://insights.stackoverflow.com/survey/2018}[Stack\-Overflow 2018].
 Согласно им, всё больше инженеров переходят в веб из смежных областей.
 
 Если вы найдёте работу на Clojure, скорее всего это будет веб-при\-ло\-же\-ние. Мы
@@ -451,7 +453,7 @@ Rails. Имена и состав классов отличаются, но см
 полей, запрос содержит порт и адрес сервера, строку параметров, тип протокола,
 заголовки и тело. Всё вместе~--- это неизменяемый словарь с ключами типа
 \verb|keyword|. Полное описание запроса и~ответа смотрите в репозитории на
-\footurl{GitHub}{https://github.com/ring-clojure/ring/blob/master/SPEC}[Ring spec][-11mm].
+\footurl{GitHub}{https://github.com/ring-clojure/ring/blob/master/SPEC}[Ring spec].
 
 Здесь и далее будем писать слово \verb|keyword| по-русски:
 <<кейворд>>. В~других языках тип называют токеном или тегом.
@@ -1949,7 +1951,7 @@ middleware, которое дополняет запрос словарём \ver
 использует память. Чтобы подружить сессию с Redis или другой системой, расширьте
 протокол \verb|SessionStore|. Работа с протоколами выходит за рамки этой главы,
 поэтому ограничимся ссылкой на
-\footurl{документацию Ring}{https://github.com/ring-clojure/ring/wiki/Sessions}[Ring\\*Sessions][-13mm]
+\footurl{документацию Ring}{https://github.com/ring-clojure/ring/wiki/Sessions}[Ring\\*Sessions]
 с примером.
 
 Рассмотрим пример со счётчиком посещений. Будем считать, сколько раз
@@ -2160,7 +2162,7 @@ malformed>>.
 
 Чтобы отправить JSON серверу, нужна специальная программа. Подойдёт консольная
 утилита \verb|cURL| или графическое приложение
-\footurl{Postman}{https://www.postman.com}[Post\-man][-8mm]. Пример с
+\footurl{Postman}{https://www.postman.com}[Post\-man]. Пример с
 \verb|cURL| (для чистоты отбросим обратные слеши в переносах строк):
 
 \begin{english}
@@ -2937,7 +2939,7 @@ middleware \verb|wrap-content-type|:
 \fi
 
 Параметр \verb|:mime-types| принимает словарь
-\footurl{MIME-типов}{https://en.wikipedia.org/wiki/MIME}[MIME types][-5mm] и
+\footurl{MIME-типов}{https://en.wikipedia.org/wiki/MIME}[MIME types] и
 расширений. Добавьте нужные типы и проверьте, что браузер показывает файлы
 правильно.
 
@@ -3063,7 +3065,7 @@ HTML. Поля \verb|status| и \verb|body| ответа Яндекса пере
 \index{веб-разработка!Swagger}
 
 \item
-  \footurl{Compojure API}{https://github.com/metosin/compojure-api}[Compo-\\*jure API][-5mm]~---
+  \footurl{Compojure API}{https://github.com/metosin/compojure-api}[Compo-\\*jure API]~---
   убернадстройка над обычным Compojure. Набор макросов, чтобы декларативно описать REST
   API. Библиотека тесно связана с JSON-схемой и Swagger.
 
@@ -3098,7 +3100,7 @@ HTML. Поля \verb|status| и \verb|body| ответа Яндекса пере
 \index{библиотеки!Duct}
 
 \item
-  \footurl{Duct}{https://github.com/duct-framework/duct}[Duct][7mm]~--- новый
+  \footurl{Duct}{https://github.com/duct-framework/duct}[Duct]~--- новый
   фреймворк от создателя Ring. Проект на ранней стадии, и документации ещё
   мало. Делает упор на модульность и~систему компонентов \page{chapter-systems}.
 
@@ -3107,7 +3109,7 @@ HTML. Поля \verb|status| и \verb|body| ответа Яндекса пере
 \index{мультиметоды}
 
 \item
-  \footurl{Liberator}{https://clojure-liberator.github.io/liberator}[Liberator][13mm]~---
+  \footurl{Liberator}{https://clojure-liberator.github.io/liberator}[Liberator]~---
   аналог проекта Webmachine для Erlang. Запрос и~ответ проходят стадии, на
   каждую из которых можно задать реакцию. Предлагает систему правил на базе
   мультиметодов.
