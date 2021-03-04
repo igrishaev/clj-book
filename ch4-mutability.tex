@@ -1728,15 +1728,14 @@ Current: 1, timeout: 5000 ;; 2
 Но для словаря объёмом более восьми ключей вы потеряете данные: в результате не
 будет ключа \verb|:extra|:
 
-%% todo mobile
-
 \begin{english}
   \begin{clojure}
 (fast-merge
  {:a 1 :b 2 :c 3 :d 4 :e 5 :f 6 :g 7 :h 8}
  {:extra 9})
 
-{:a 1 :b 2 :c 3 :d 4 :e 5 :f 6 :g 7 :h 8}
+;; {:a 1 :b 2 :c 3 :d 4
+;;  :e 5 :f 6 :g 7 :h 8}
   \end{clojure}
 \end{english}
 
@@ -1759,15 +1758,14 @@ Current: 1, timeout: 5000 ;; 2
 
 Новая функция не теряет ключи, хотя их порядок отличается от исходного:
 
-%% todo mobile
-
 \begin{english}
   \begin{clojure}
 (fast-merge
  {:a 1 :b 2 :c 3 :d 4 :e 5 :f 6 :g 7 :h 8}
  {:extra 9})
 
-{:extra 9 :e 5 :g 7 :c 3 :h 8 :b 2 :d 4 :f 6 :a 1}
+;; {:extra 9 :e 5 :g 7 :c 3
+;;  :h 8 :b 2 :d 4 :f 6 :a 1}
   \end{clojure}
 \end{english}
 
@@ -2387,18 +2385,18 @@ Clojure намеренно скрывает от нас стадию перем�
 
 \ifnarrow
 
-%% TODO narrow
-
 \begin{english}
   \begin{clojure/lines}
 (defn make-better-logger
   [log*] ;; origin function
-  (fn [logger level throwable message]
-    (if throwable
-      (let [ex-out (with-out-str (ex-print throwable))
-            message* (str message \newline ex-out)]
-        (log* logger level nil message*))
-      (log* logger level throwable message))))
+  (fn [logger lvl e msg]
+    (if e
+      (let [msg*
+            (str msg \newline
+                 (with-out-str
+                   (ex-print e)))]
+        (log* logger lvl nil msg*))
+      (log* logger lvl e msg))))
   \end{clojure/lines}
 \end{english}
 
@@ -3072,13 +3070,25 @@ Clojure предлагает несколько форм, чтобы выпол�
 \verb|user|. Регистр поля меняют на нижний фильтром \verb|lower|. На Clojure
 это выглядело бы так:
 
-%% todo mobile
+\ifnarrow
+
+\begin{english}
+  \begin{clojure}
+(str "<p>"
+     (str/lower-case (:name user))
+     "</p>")
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
 (str "<p>" (str/lower-case (:name user)) "</p>")
   \end{clojure}
 \end{english}
+
+\fi
 
 Хотелось бы, чтобы шаблон выглядел как можно проще: в фигурных скобках идёт тег
 фразы, а за ним~--- фильтр перевода.
@@ -3417,12 +3427,11 @@ Clojure предлагает несколько форм, чтобы выпол�
 \verb|println| внутри макроса, увидим на экране fake print независимо от того,
 какие аргументы передали в функцию.
 
-%% todo mobile
-
 \begin{english}
   \begin{clojure}
-(with-redefs [println (fn [& _]
-                        (print "fake print\n"))]
+(with-redefs [println
+              (fn [& _]
+                (print "fake print\n"))]
   (println {:some "data"}))
 ;; fake print
   \end{clojure}
@@ -3537,14 +3546,14 @@ Clojure предлагает несколько форм, чтобы выпол�
 словарь с ключами \verb|:title|, \verb|:country|, \verb|:image_url| и
 другими. Условный код:
 
-%% todo mobile
-
 \begin{english}
   \begin{clojure}
 (defn place-info
   [{:keys [lat lon]}]
-  (let [http-opt {:headers {:token "..."}
-                  :query-params {:lat lat :lon lat}}]
+  (let [http-opt
+        {:headers {:token "..."}
+         :query-params {:lat lat
+                        :lon lat}}]
     (-> "https://api.maps.com/search"
         (client/get http-opt)
         :body)))

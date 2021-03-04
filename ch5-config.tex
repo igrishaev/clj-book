@@ -687,21 +687,14 @@ Clojure и у DevOps уже написаны скрипты на Python для �
 подмены \verb|exit| на функцию, которая только бросит исключение, но не завершит
 JVM. Назовём её \verb|fake-exit|:
 
-
-
-
-
-
 \ifnarrow
-
-%% todo mobile
 
 \begin{english}
   \begin{clojure}
 (defn fake-exit
   [_ template & args]
-  (let [message (apply format template args)]
-    (throw (new Exception ^String message))))
+  (let [msg (apply format template args)]
+    (throw (new Exception msg))))
 
 (defn load-config-repl! []
   (with-redefs [exit fake-exit]

@@ -679,7 +679,7 @@ HTTP-клиент:
    [clojure.tools.logging :as log]
    [book.systems.mount.db :refer [db]]
    [book.systems.mount.config
-    :refer [config]]))
+     :refer [config]]))
   \end{clojure}
 \end{english}
 
@@ -1060,14 +1060,13 @@ IP и возвращает сведения о нём в JSON. В нашем с�
 \verb|ns| ссылки на другие модули и загружает их первыми. Вспомним, как выглядит
 шапка воркера:
 
-%% TODO narrow
-
 \begin{english}
   \begin{clojure}
 (ns book.systems.mount.worker
   (:require
    [book.systems.mount.db :refer [db]]
-   [book.systems.mount.config :refer [config]]))
+   [book.systems.mount.config
+     :refer [config]]))
   \end{clojure}
 \end{english}
 
