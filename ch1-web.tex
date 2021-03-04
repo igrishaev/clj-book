@@ -68,7 +68,7 @@ JSON-документ? Программа сверяет заголовок и~�
 GET /search?q=clojure HTTP/1.1
 Host: google.com
 Accept-Language: en-us
-User-Agent: Mozilla/4.0 (compatible; MSIE 6.0)
+User-Agent: Mozilla/4.0 (compatible; MSIE)
   \end{http}
 \end{english}
 
@@ -97,7 +97,7 @@ Content-Type: application/json
 
 {
   "code": "CREATED",
-  "message": "User has been created successfully."
+  "message": "User has been created."
 }
   \end{http}
 \end{english}
@@ -335,12 +335,14 @@ Rails. Имена и состав классов отличаются, но см
   \begin{clojure}
 (app {:request-method :get
       :uri "/index.html"})
+
 {:status 200
  :headers {"Content-Type" "text/plain"}
  :body "You requested GET /index.html"}
 
 (app {:request-method :post
       :uri "/users"})
+
 {:status 200
  :headers {"Content-Type" "text/plain"}
  :body "You requested POST /users"}
@@ -560,32 +562,15 @@ Clojure) регистр имеет значение. Ring приводит за�
 
 Легче всего прочитать тело в строку функцией \verb|slurp|:
 
-\ifnarrow
-
 \begin{english}
   \begin{clojure}
 (defn handler [request]
  (let [content (-> request :body slurp)]
   {:status 200
    :headers {"content-type" "text/plain"}
-   :body (format "The content was %s"
-                 content)}))
+   :body (format "Content: %s" content)}))
   \end{clojure}
 \end{english}
-
-\else
-
-\begin{english}
-  \begin{clojure}
-(defn handler [request]
-  (let [content (-> request :body slurp)]
-    {:status 200
-     :headers {"content-type" "text/plain"}
-     :body (format "The content was %s" content)}))
-  \end{clojure}
-\end{english}
-
-\fi
 
 В современном вебе всё меньше работают с текстом: на его место приходят данные в
 виде JSON. Позже мы рассмотрим, как подружить Ring с этим форматом.
