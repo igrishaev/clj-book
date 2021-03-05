@@ -1692,9 +1692,9 @@ clojure.lang.ExceptionInfo
 тысячи одинаковых сообщений. Это расточительно в плане ресурсов и затрудняет
 поиск.
 
-Сборщик определяет схожесть ошибок по особым правилам. Сообщения user~1 not
-found и~user~2 not found отличаются, но сборщик свернёт их в одну
-запись и по запросу покажет остальные.
+Сборщик определяет схожесть ошибок по особым правилам. Сообщения <<user~1 not
+found>> и <<user~2 not found>> отличаются, но сборщик свернёт их в одну запись и
+по запросу покажет остальные.
 
 \textbf{Поиск.} Нельзя построить эффективный поиск без структуры. Когда ошибки
 хранятся в виде текста, можно искать только по вхождению слова или регулярному
@@ -1724,8 +1724,7 @@ HTTP-запроса, стек-трейс и другие.
 
 Как правило, приложение не собирает эти данные вручную, а~пользуется
 библиотеками. Часто они называются Raven или похожим образом. Семантика в том,
-что \emph{сторожевой ворон} (англ.~raven) несёт вести \emph{дозорному}
-(англ.~sentry).
+что сторожевой ворон (англ.~raven) несёт вести дозорному (англ.~sentry).
 
 Для Clojure написаны библиотеки
 \footurl{Sentry-clj}{https://github.com/getsentry/sentry-clj}[Sentry-clj] и
@@ -2060,8 +2059,8 @@ class AccountHandler(RequestHandler):
       return NotFound("No such an acc")
 
     if not self.check_quotas(request):
-      return QuotasReached("Request " + \
-             "rate is limited")
+      return QuotasReached(
+             "Request rate is limited")
 
     return JSONResponse(self.get_data())
   \end{python}
@@ -2409,6 +2408,7 @@ with open("/path/to/file.txt", "w") as f:
   \end{clojure}
 \end{english}
 
+\noindentnarrow
 Если выполнить форму в REPL, увидим вывод:
 
 \begin{english}
