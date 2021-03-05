@@ -2158,6 +2158,30 @@ expected: 200
 \verb|*db*| с текущей сессией. Установка сессии~--- дорогая операция, поэтому
 фикстура будет разовой (once).
 
+\ifnarrow
+
+\begin{english}
+  \begin{clojure}
+(require '[qbits.alia :as alia])
+
+(defonce ^:dynamic *db* nil)
+
+(defn fix-with-db [t]
+  (let [opt {:contact-points
+               ["localhost"]}
+        cluster (alia/cluster opt)
+        session (alia/connect cluster)]
+    (binding [*db* session]
+      (t))
+    (.close session)
+    (.close cluster)))
+
+(use-fixture :once fix-with-db)
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (require '[qbits.alia :as alia])
@@ -2176,6 +2200,8 @@ expected: 200
 (use-fixture :once fix-with-db)
   \end{clojure}
 \end{english}
+
+\fi
 
 Вторая фикстура готовит данные для каждого теста. Поскольку фикстуры
 \verb|:once| запускаются раньше, чем \verb|:each|, подготовка данных сработает
@@ -2278,8 +2304,9 @@ book.util-test: Ran 6 assertions, in 3 test functions.
   \begin{clojure}
 (def db-pg
   {:dbtype "postgresql" :host "..."})
+
 (def db-mysql
-  {:dbtype "mysql"      :host "..."})
+  {:dbtype "mysql" :host "..."})
   \end{clojure}
 \end{english}
 
@@ -3486,6 +3513,23 @@ Ring. Мы подробно рассмотрели их в главе про в�
 краткости представим, что переменная \verb|config|~--- словарь
 параметров. Полный URL для карт построим так:
 
+\ifnarrow
+
+\begin{english}
+  \begin{clojure}
+(def config
+  {:maps-base-url
+     "http://127.0.0.1:8088"})
+
+(let [{:keys [maps-base-url]} config
+      url (str maps-base-url
+               "/search/v1")]
+  (client/get url {...}))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (def config
@@ -3497,6 +3541,8 @@ Ring. Мы подробно рассмотрели их в главе про в�
   \end{clojure}
 \end{english}
 
+\fi
+
 Вернёмся к тесту главного экрана. Нам не нужны моки, поэтому уберём макросы
 \verb|with-mock|. Однако сейчас тест не пройдёт, потому что мы решили проблему
 только с поиском заведений. Для событий код по-прежнему обращается к чужому
@@ -3507,8 +3553,11 @@ Ring. Мы подробно рассмотрели их в главе про в�
   \begin{clojure}
 (defn view-main-page [request]
   (let [...
-        sites (get-sites-by-location location)
-        ;; events (get-events-by-location location)
+        sites
+        (get-sites-by-location location)
+
+        ;; events
+        ;; (get-events-by-location location)
        ]
     {:status 200
      :body {:sites sites :events nil}}))
@@ -3590,6 +3639,7 @@ Ring. Мы подробно рассмотрели их в главе про в�
   \end{clojure/lines*}
 \end{english}
 
+\noindentnarrow
 Комбинация \tuple{66, 66} означает ошибку доступа:
 
 \begin{english}
@@ -5910,7 +5960,7 @@ Spy полезен, когда функцию передают в парамет
 
 (deftest test-config-error-die-fn-called
   (let [spy-die-fn (spy/spy)]
-    (load-config {:file "/missing/file.json"
+    (load-config {:file "/wrong/file.json"
                   :spec ::config
                   :die-fn spy-die-fn})
     (assert/called? spy-die-fn)))
