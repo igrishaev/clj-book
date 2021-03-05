@@ -1004,32 +1004,14 @@ for (env, fn) in env_mapping.iteritems():
 \index{вложенность}
 \index{коллекции!вложенность}
 
-\ifnarrow
-
-\begin{english}
-  \begin{clojure}
-;; so-so
-{:db-name "book"
- :db-user "ivan"
- :db-pass "****"}
-  \end{clojure}
-
-\splitter
-
-  \begin{clojure}
-;; better
-{:db {:name "book"
-      :user "ivan"
-      :pass "****"}}
-  \end{clojure}
-\end{english}
-
-\else
-
 \begin{english}
 
 \noindent
-\begin{tabular}{ @{}p{5cm} @{}p{5cm} }
+\ifnarrow
+  \begin{tabular}{ @{}p{3.9cm} @{}p{3.7cm} }
+\else
+  \begin{tabular}{ @{}p{5cm} @{}p{5cm} }
+\fi
 
   \begin{clojure}
 ;; so-so
@@ -1050,41 +1032,19 @@ for (env, fn) in env_mapping.iteritems():
 \end{tabular}
 
 \end{english}
-
-\fi
 
 В разных системах вложенные переменные читают по-разному. Например, одинарное
 подчёркивание разделяет лексемы, но не меняет структуру. Двойное подчёркивание
 означает вложенность:
 
-\ifnarrow
-
-\begin{english}
-  \begin{clojure}
-DB_NAME=book
-DB_PASS=pass
-
-{:db-name "book"
- :db-pass "pass"}
-  \end{clojure}
-
-\splitter
-
-  \begin{clojure}
-DB__NAME=book
-DB__PASS=pass
-
-{:db {:name "book"
-      :pass "pass"}}
-  \end{clojure}
-\end{english}
-
-\else
-
 \begin{english}
 
 \noindent
-\begin{tabular}{ @{}p{5cm} @{}p{5cm} }
+\ifnarrow
+  \begin{tabular}{ @{}p{3.9cm} @{}p{3.7cm} }
+\else
+  \begin{tabular}{ @{}p{5cm} @{}p{5cm} }
+\fi
 
   \begin{clojure}
 DB_NAME=book
@@ -1107,8 +1067,6 @@ DB__PASS=pass
 \end{tabular}
 
 \end{english}
-
-\fi
 
 \index{коллекции!массив}
 
@@ -1651,7 +1609,7 @@ $ lein repl
 
 К этому моменту читатель решит, что конфигурация в файле~--- плохая идея. Однако
 не бросайтесь переписывать код на переменные среды. На практике работают с
-\emph{гибридными} моделями, которые сочетают оба подхода. Приложение читает
+гибридными моделями, которые сочетают оба подхода. Приложение читает
 основные параметры из файла, а пароли и ключи доступа~--- из среды.
 
 \index{утилиты!gettext}
@@ -2560,7 +2518,7 @@ db.pool.connections=8
  [{:datomic {:url "datomic:mem://test"}}
   (from-file "/path/file.edn")
   (from-resource "/path/resource.edn")
-  (from-props-file "/path/file.properties")
+  (from-props-file "/path/cfg.properties")
   (from-system-props)
   (from-env)])
   \end{clojure}
