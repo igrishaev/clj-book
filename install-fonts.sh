@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# 10 pt
 mktextfm larm0900
 mktextfm larm1000
 mktextfm larm2488
@@ -33,3 +34,8 @@ mktextfm larm1095
 mktextfm labx1095
 mktextfm lasl0800
 mktextfm lati0800
+
+# 11pt
+mktextfm latt1095
+mktextfm lasl1095
+mktextfm lati1095

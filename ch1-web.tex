@@ -74,6 +74,8 @@ User-Agent: Mozilla/4.0 (compatible; MSIE)
 
 А это POST-запрос с JSON:
 
+\pagebreaklarge
+
 \begin{english}
   \begin{http}
 POST /api/users/ HTTP/1.1
@@ -357,7 +359,11 @@ Rails. Имена и состав классов отличаются, но см
 {:status 200
  :headers {"Content-Type" "text/plain"}
  :body "You requested GET /index.html"}
+  \end{clojure}
+\end{english}
 
+\begin{english}
+  \begin{clojure}
 (app {:request-method :post :uri "/users"})
 {:status 200
  :headers {"Content-Type" "text/plain"}
@@ -366,7 +372,6 @@ Rails. Имена и состав классов отличаются, но см
 \end{english}
 
 \fi
-
 
 Кругом словари, и не ясно, что будет в браузере. Запустим приложение в виде
 сервера. Он принимает приложение, параметры и~включает сложный процесс. Сервер
@@ -2072,7 +2077,11 @@ Middleware \verb|wrap-json-response| упрощает возврат JSON-дан
   \begin{clojure}
 (require '[ring.middleware.json
            :refer [wrap-json-response]])
+  \end{clojure}
+\end{english}
 
+\begin{english}
+  \begin{clojure}
 (def app (-> page-data
              wrap-params+
              wrap-json-response))
@@ -2148,6 +2157,8 @@ malformed>>.
 \footurl{Postman}{https://www.postman.com}[Post\-man]. Пример с
 \verb|cURL| (для чистоты отбросим обратные слеши в переносах строк):
 
+\ifnarrow
+
 \begin{english}
   \begin{bash}
 curl --request POST
@@ -2158,6 +2169,19 @@ curl --request POST
      http://localhost:8080/
   \end{bash}
 \end{english}
+
+\else
+
+\begin{english}
+  \begin{bash}
+curl --request POST
+     --header "Content-Type: application/json"
+     --data '{"username":"John", "city":"NY"}'
+     http://localhost:8080/
+  \end{bash}
+\end{english}
+
+\fi
 
 \verb|Wrap-json-params| работает с небольшим отличием~--- оно пишет
 данные в поле \verb|:json-params|. Далее, если в теле был словарь, он дополняет
@@ -2634,7 +2658,6 @@ middleware под названием \verb|wrap-routes|. Оно принимае
   \end{clojure}
 \end{english}
 
-\noindent
 Смонтируем их на префикс \verb|/account| и обернём проверкой доступа.
 
 \ifnarrow
@@ -2999,6 +3022,8 @@ HTML. Поля \verb|status| и \verb|body| ответа Яндекса пере
 хотя адрес по-прежнему \verb|localhost|. Код \verb|app-proxy| можно выразить
 короче с помощью стрелочного оператора:
 
+\pagebreaklarge
+
 \ifnarrow
 
 \begin{english}
@@ -3070,7 +3095,7 @@ HTML. Поля \verb|status| и \verb|body| ответа Яндекса пере
   (англ.~\emph{interceptors}), с помощью которых вложенную логику описывают
   линейно.
 
-\ifnotlarge\pagebreak[4]\fi
+\pagebreaklarge
 
 \index{библиотеки!Vase}
 \index{организации!Cognitect}
@@ -3081,8 +3106,6 @@ HTML. Поля \verb|status| и \verb|body| ответа Яндекса пере
   \footurl{Vase}{https://github.com/cognitect-labs/vase}[Vase]~---
   экспериментальная обёртка над Pedestal. Хранит логику приложения в файле
   EDN. Тесно связана с Datomic, базой данных Cognitect.
-
-\iflarge\pagebreak[4]\fi
 
 \index{библиотеки!Duct}
 

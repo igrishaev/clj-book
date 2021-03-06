@@ -2,8 +2,6 @@
 
 FROM clj-book:ubuntu
 
-
-
 RUN mkdir /workdir
 WORKDIR /workdir
 

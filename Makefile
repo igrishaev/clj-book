@@ -88,8 +88,8 @@ IMG_RUN = ${IMG}:build
 
 
 docker-build-images:
-	docker build -t ${IMG_SYS} -f Dockerfile.ubuntu .
-	docker build -t ${IMG_RUN} .
+	docker build --no-cache -t ${IMG_SYS} -f Dockerfile.ubuntu .
+	docker build --no-cache -t ${IMG_RUN} .
 
 
 DOCKER_RUN = \
