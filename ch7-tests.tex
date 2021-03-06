@@ -982,6 +982,8 @@ expected: 999
 Если вызвать тест \verb|(test-fahr-nil)|, который всё ещё неисправен,
 увидим исключение:
 
+\pagebreaklarge
+
 \ifnarrow
 
 \begin{english}
@@ -1245,8 +1247,11 @@ Emacs упрощает работу с тестами. CIDER предлагае�
 \begin{english}
 
 \noindent
+\iflarge
+\begin{tabular}{ @{}p{5.5cm} @{}p{5cm} }
+\else
 \begin{tabular}{ @{}p{5cm} @{}p{5cm} }
-
+\fi
 
   \begin{clojure}
 ;; before
@@ -1293,6 +1298,8 @@ Emacs упрощает работу с тестами. CIDER предлагае�
 \verb|(->fahr nil)| на \verb|(->fahr 1)|, исключения не будет и тело
 \verb|(catch...)| не получит управление. Когда исключение ожидают, но его нет,
 это тоже ошибка.
+
+\pagebreaklarge
 
 \index{классы!NullPointerException}
 
@@ -3027,7 +3034,13 @@ API. Такой код трудно тестировать по двум при�
   \begin{clojure}
 (ns book.views
   (:require [clj-http.client :as client]))
+  \end{clojure}
+\end{english}
 
+\pagebreaklarge
+
+\begin{english}
+  \begin{clojure}
 (defn get-sites-by-location
   [{:keys [lat lon]}]
   (-> {:method :get
@@ -3422,6 +3435,8 @@ Ring. Мы подробно рассмотрели их в главе про в�
 
 \label{sites-handler}
 
+\iflarge\vspace{15mm}\pagebreak[4]\fi
+
 \ifnarrow
 
 \begin{english}
@@ -3446,9 +3461,11 @@ Ring. Мы подробно рассмотрели их в главе про в�
 (defn sites-handler* [{:keys [uri]}]
   (case uri
     "/search/v1"
-    {:status 200 :body [{:name "Cafe1" :address "..."}
-                        {:name "Cafe2" :address "..."}]}
-    {:status 404 :body "page not found"}))
+    {:status 200
+     :body [{:name "Cafe1" :address "..."}
+            {:name "Cafe2" :address "..."}]}
+    {:status 404
+     :body "page not found"}))
   \end{clojure}
 \end{english}
 
@@ -3805,6 +3822,8 @@ $ mv resources/data/events.json \
 \noindent
 Получилась структура:
 
+\iflarge\vspace{15mm}\pagebreak[4]\fi
+
 \begin{english}
   \begin{bash}
 $ tree env
@@ -3896,7 +3915,8 @@ $ tree env
 
 \begin{english}
   \begin{clojure}
-:profiles {:uberjar {:resource-paths ["env/test/resources"]}
+:profiles {:uberjar {:resource-paths
+                     ["env/test/resources"]}
   \end{clojure}
 \end{english}
 
@@ -3995,6 +4015,8 @@ $ lein test
 
 В простом случае данные для тестов хранят в виде коллекции. Обычно это вектор с
 именем таблицы и словарём полей:
+
+\pagebreaklarge
 
 \ifnarrow
 
@@ -4139,6 +4161,8 @@ PostgreSQL. Укажем таблицу, путь к CSV-файлу и его с
 понимают разделитель, формат файла и~признак заголовка. Разделителем могут быть
 не только запятая, но и точка с~запятой или табуляция. Если заголовка нет,
 считается, что поля идут в том же порядке, что и в таблице.
+
+\pagebreaklarge
 
 \begin{english}
   \begin{clojure}
@@ -4469,7 +4493,13 @@ DETAIL: Key (id)=(3) already exists
 ;; users
 ^{:db/alias :users/admin}
  {:name "Ivan" :email "ivan@test.com"}
+  \end{clojure}
+\end{english}
 
+\pagebreaklarge
+
+\begin{english}
+  \begin{clojure}
 ;; posts
 {:user_id :users/admin :title "New book"}
 {:user_id :users/admin :title "Some post"}
@@ -4790,6 +4820,8 @@ ROLLBACK;
 соединили в маршруты с помощью Compojure. Получилось <<голое>> приложение. Оно
 многого не умеет, в том числе читать параметры, работать с JSON, сессиями и так
 далее.
+
+\pagebreaklarge
 
 \index{middleware}
 
@@ -5245,6 +5277,8 @@ JSON-схемой. Преимущества спеки в том, что она 
 напрямую. Важно, чтобы в \verb|use-fixtures| они шли в~правильном порядке
 (левее~--- раньше), иначе получим \verb|NPE| и другие странности. Фикстура ниже
 готовит данные в базе для каждого теста:
+
+\pagebreaklarge
 
 \index{NPE}
 
@@ -6122,6 +6156,8 @@ $ CI_ARTEFACTS=/some/custom/path lein test2junit
 передать в конструктор \verb|->User|. Модуль предлагает всевозможные генераторы
 и их комбинации. Нас устроит кортеж из непустой строки, натурального числа и
 булева:
+
+\pagebreaklarge
 
 \ifnarrow
 
