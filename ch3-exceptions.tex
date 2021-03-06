@@ -1394,8 +1394,9 @@ INFO: A message from my module
   <appender name="STDOUT" class="...ConsoleAppender">
     <encoder>
       <charset>UTF-8</charset>
-      <pattern>%date %-5level %logger{36} -
-                                    %msg %n</pattern>
+      <pattern>
+        %date %-5level %logger{36} - %msg %n
+      </pattern>
     </encoder>
   </appender>
   <root level="INFO">
@@ -1841,6 +1842,26 @@ HTTP-запроса, стек-трейс и другие.
 
 \else
 
+\iflarge
+
+\begin{english}
+  \begin{json}
+[ {
+  "type": "clojure.lang.ExceptionInfo",
+  "message": "Get user info error",
+  "data": {"user-id": 42},
+  "at": ["clojure.lang.AFn", "...", "AFn.java", 160]
+}, {
+  "type": "clojure.lang.ExceptionInfo",
+  "message": "Auth error",
+  "data": {"token": "........."},
+  "at": ["clojure.lang.AFn", "...", "AFn.java", 160]
+} ]
+  \end{json}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{json}
 [ {
@@ -1860,6 +1881,8 @@ HTTP-запроса, стек-трейс и другие.
 } ]
   \end{json}
 \end{english}
+
+\fi
 
 \fi
 
@@ -2071,7 +2094,6 @@ class AccountHandler(RequestHandler):
 \begin{english}
   \begin{python}
 class AccountHandler(RequestHandler):
-
   def on_get(self, request):
 
     if not self.check_params(request):
@@ -2846,6 +2868,8 @@ protected call, <<защищённый вызов>>. Иногда приём п�
 \end{english}
 
 \fi
+
+\pagebreaklarge[3]
 
 Вот как получить пользователя по номеру за три попытки:
 

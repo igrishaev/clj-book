@@ -35,7 +35,10 @@
 \newcommand{\chart}[1]{\input{#1}}
 \fi
 
-\newcommand{\pagebreaklarge}{\iflarge\pagebreak[4]\fi}
+
+%% \newcommand{\pagebreaklarge}{\iflarge\pagebreak[4]\fi}
+\NewDocumentCommand{\pagebreaklarge}{O{4}}{\iflarge\pagebreak[#1]\fi}
+
 
 \newcommand{\noindentnarrow}{\ifnarrow\noindent\fi}
 

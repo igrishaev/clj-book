@@ -38,6 +38,8 @@ Clojure, наоборот, данные не меняются, а мутабел
   добавить его к результату.
 \end{itemize}
 
+\pagebreaklarge
+
 Выразим алгоритм в коде на Python:
 
 \begin{english}
@@ -106,7 +108,13 @@ DEFAULT_PARAMS = {
     "headers": {"Content-Type": "application/json"},
     "auth": ("username", "password"),
 }
+  \end{python/lines}
+\end{english}
 
+\pagebreaklarge
+
+\begin{english}
+  \begin{python/lines*}{firstnumber=7}
 def api_call(**params):
     api_params = DEFAULT_PARAMS
     api_params.update(params)
@@ -114,7 +122,7 @@ def api_call(**params):
         "https://api.host.com", **api_params
     )
     return resp.json()
-  \end{python/lines}
+  \end{python/lines*}
 \end{english}
 
 \fi
@@ -708,12 +716,15 @@ Clojure предлагает несколько способов менять д
 
 \begin{english}
   \begin{clojure}
-(def sample (atom {:number 0}))
+(def sample
+  (atom {:number 0}))
   \end{clojure}
 \end{english}
 
 Понадобится функция медленного сложения. Она принимает два числа и время
 простоя. Для ясности добавим вывод в консоль.
+
+\pagebreaklarge
 
 \ifnarrow
 
@@ -899,9 +910,8 @@ Current: 1, timeout: 5000 ;; 2
   [_key _atom _old value]
   (let [{:keys [store]} value]
     (when (> store STORE_LIMIT)
-      (log/errorf
-        "Disk usage %s has reached the limit %s"
-        store STORE_LIMIT))))
+      (log/errorf "Disk usage %s has reached the limit %s"
+                  store STORE_LIMIT))))
   \end{clojure}
 \end{english}
 
@@ -1969,12 +1979,11 @@ Clojure намеренно скрывает от нас стадию перем�
 \begin{english}
   \begin{clojure}
 (defn start! []
-  (alter-var-root
-   (var server)
-   (fn [server]
-     (if-not server
-       (run-jetty app {:port 8080 :join? false})
-       server))))
+  (alter-var-root (var server)
+    (fn [server]
+      (if-not server
+        (run-jetty app {:port 8080 :join? false})
+        server))))
   \end{clojure}
 \end{english}
 
@@ -1988,11 +1997,11 @@ Clojure намеренно скрывает от нас стадию перем�
   \begin{clojure}
 (defn stop! []
   (alter-var-root
-   (var server)
-   (fn [server]
-     (when server
-       (.stop server))
-     nil)))
+    (var server)
+    (fn [server]
+      (when server
+        (.stop server))
+      nil)))
   \end{clojure}
 \end{english}
 
@@ -2924,6 +2933,8 @@ Clojure предлагает несколько форм, чтобы выпол�
 связывает вывод с открытым файлом и печатает данные. Чтобы увидеть все элементы,
 повысим длину и~глубину печати.
 
+\pagebreaklarge
+
 \begin{english}
   \begin{clojure}
 (defn dump-data
@@ -3348,8 +3359,7 @@ Clojure предлагает несколько форм, чтобы выпол�
 \begin{english}
   \begin{clojure}
 (defn calc-billing [data]
-  (with-local-vars
-    [a 0 b 0]
+  (with-local-vars [a 0 b 0]
 
     ;; find a
     (when-let [usage ...]
@@ -3361,8 +3371,7 @@ Clojure предлагает несколько форм, чтобы выпол�
       (when-let [limits ...]
         (var-set b (* limits vms))))
 
-    ;; result
-    (* @a @b)))
+    (* @a @b))) ;; result
   \end{clojure}
 \end{english}
 
