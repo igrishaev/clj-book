@@ -269,7 +269,8 @@ Clojure и у DevOps уже написаны скрипты на Python для �
 
 \begin{english}
   \begin{clojure}
-(defn load-config! []
+(defn load-config!
+  []
   (-> (get-config-path)
       (read-config-file)
       (coerce-config)
@@ -282,6 +283,8 @@ Clojure и у DevOps уже написаны скрипты на Python для �
 вернёт путь к файлу, а иначе вызовет \verb|exit|:
 
 \index{файлы}
+
+\pagebreaklarge
 
 \ifnarrow
 
@@ -410,7 +413,13 @@ Clojure и у DevOps уже написаны скрипты на Python для �
   \begin{clojure}
 (require '[clojure.spec.alpha :as s])
 (require '[expound.alpha :as expound])
+  \end{clojure}
+\end{english}
 
+\pagebreaklarge
+
+\begin{english}
+  \begin{clojure}
 (defn coerce-config [config]
   (let [[e result] (pcall s/conform ::config config)]
     (cond
@@ -1417,8 +1426,7 @@ Clojure. Заодно исправим ключи: сейчас это стро�
         params (apply hash-map (rest form))
         {:keys [req opt req-un opt-un]} params
         ->unqualify (comp keyword name)]
-    (concat req
-            opt
+    (concat req opt
             (map ->unqualify opt-un)
             (map ->unqualify req-un))))
   \end{clojure}
@@ -1620,6 +1628,7 @@ $ lein repl
 пакета GNU Gettext предлагает простую шаблонную систему. Чтобы установить
 \verb|gettext|, выполните в терминале команду:
 
+\pagebreaklarge
 
 \begin{english}
   \begin{bash}
@@ -1674,6 +1683,8 @@ EVENT_END='2019-07-12T23:59:59'
 
 \noindent
 Прочитаем их и сделаем рендер шаблона:
+
+\pagebreaklarge
 
 \begin{english}
   \begin{bash}
@@ -2042,8 +2053,11 @@ Nginx~--- больше половины файла занимают коммен
 \begin{english}
   \begin{json}
 {
-    "server_port": "A port for the HTTP server.",
-    "server_port": 8080
+  "cache_type": "Caching backend (memcache or redis)",
+  "cache_type": "memcache",
+
+  "server_port": "A port for the HTTP server",
+  "server_port": 8080
 }
   \end{json}
 \end{english}
@@ -2074,7 +2088,8 @@ JSON выгодно отличается от многословного XML, к
 ошибкой. Ключи словаря не могут быть числами. Нельзя записать текст в несколько
 строк.
 
-Сравните данные в JSON и YAML. Вторая запись короче и визуально спокойнее:
+Сравните данные в JSON и YAML. Вторая запись короче и визуально
+спокойнее\iflarge\lis{fig:json-vs-yaml}\fi.
 
 \ifnarrow
 
@@ -2112,10 +2127,18 @@ event:
 
 \else
 
+\iflarge
+\begin{listing}[ht!]
+\fi
+
 \begin{english}
 
 \noindent
+\iflarge
+\begin{tabular}{ @{}p{6.5cm} @{}p{4cm} }
+\else
 \begin{tabular}{ @{}p{6cm} @{}p{4cm} }
+\fi
 
   \begin{json}
 {
@@ -2152,6 +2175,12 @@ event:
 \end{tabular}
 
 \end{english}
+
+\iflarge
+\caption{Одна и та же структура данных в разных форматах}
+\label{fig:json-vs-yaml}
+\end{listing}
+\fi
 
 \fi
 

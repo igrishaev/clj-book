@@ -1529,7 +1529,12 @@ HTTP предусматривает данные в адресной строк�
 \begin{english}
 
 \noindent
+\iflarge
+\begin{tabular}{ @{}p{5.5cm} @{}p{5cm} }
+\else
 \begin{tabular}{ @{}p{5cm} @{}p{5cm} }
+\fi
+
 
   \begin{clojure}
 (-> request :params :who)
