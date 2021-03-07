@@ -2121,9 +2121,11 @@ class AccountHandler(RequestHandler):
 Вариант с каскадом \verb|if/else| работает, но выглядит громоздко. По-другому
 его называют Pyramid of Doom. Чем ниже вложенность, тем больше проблем у
 разработчика. Ради интереса добавьте условие в~середину подобного кода на
-Clojure\iflarge\lis{fig:clj-pyramid}\fi.
+Clojure\iflarge\else\lis{fig:clj-pyramid}\fi.
 
+\iflarge\else
 \begin{listing}[ht!]
+\fi
 
 \ifnarrow
 
@@ -2143,10 +2145,6 @@ Clojure\iflarge\lis{fig:clj-pyramid}\fi.
 \end{english}
 
 \else
-
-\iflarge\else
-\begin{listing}[ht!]
-\fi
 
 \begin{english}
   \begin{clojure}
