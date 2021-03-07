@@ -5,3 +5,4 @@ GEOMETRY=geom-tablet
 JOB=clojure_tablet
 NARROW=
 TABLET=true
+AFIVE=true

@@ -1204,7 +1204,7 @@ Unix. Добейтесь следующего результата:
   \end{clojure}
 \end{english}
 
-\noindent
+\pagebreakafive
 
 Вывод числа:
 
@@ -1880,8 +1880,15 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 
 \begin{english}
   \begin{clojure}
-(s/explain-data ::sample {:username "test" :email ""})
+(s/explain-data ::sample
+   {:username "test" :email ""})
+  \end{clojure}
+\end{english}
 
+\pagebreakafive
+
+\begin{english}
+  \begin{clojure}
 {:path [:email]
  :pred clojure.core/not-empty
  :val ""
@@ -2817,6 +2824,8 @@ field...>>. Подумайте, как ещё улучшить текст и д�
 уровня: на первом~--- код локали (\verb|ru|, \verb|en|), а на втором~---
 переводы спек.
 
+\pagebreakafive
+
 \ifnarrow
 
 %% \begin{english}
@@ -2886,6 +2895,7 @@ field...>>. Подумайте, как ещё улучшить текст и д�
           :widget :textfield
           :value "Ivan"
           :error nil}
+
    :email {:title "Email address"
            :widget :textfield
            :value "test@"
@@ -3632,6 +3642,8 @@ regex-функциональность.
   \end{clojure}
 \end{english}
 
+\pagebreakafive
+
 Исследуйте отчёт \verb|s/explain| для этих команд и подумайте, как составить
 текст ошибки.
 
@@ -3682,6 +3694,8 @@ regex-функциональность.
 \end{english}
 
 Результат разбора:
+
+\pagebreakafive
 
 \ifnarrow
 
@@ -3777,7 +3791,7 @@ Selenium IDE. Если код нарушает правила, мы должны
 Иногда один и тот же макрос допускает разные записи. Хорошим примером служит
 \verb|defn|~--- определение функции. Кроме обязательных параметров он принимает
 дополнительные: строку документации, пре- и постпроверки. У функции может быть
-несколько тел:
+несколько тел\ifafive\lis{fig:fn-poly}\fi.
 
 \ifnarrow
 
@@ -3812,10 +3826,14 @@ Selenium IDE. Если код нарушает правила, мы должны
 
 \else
 
+\ifafive
+\begin{listing}[ht!]
+\fi
+
 \begin{english}
 
 \noindent
-\begin{tabular}{ @{}p{2.5cm} @{}p{4.5cm} @{}p{3cm} }
+\begin{tabular}{ @{}p{2.7cm} @{}p{4.5cm} @{}p{3cm} }
 
   \begin{clojure}
 (defn my-inc
@@ -3847,6 +3865,12 @@ Selenium IDE. Если код нарушает правила, мы должны
 \end{tabular}
 
 \end{english}
+
+\ifafive
+\caption{Варианты синтаксиса \code{defn}}
+\label{fig:fn-poly}
+\end{listing}
+\fi
 
 \fi
 
@@ -4096,6 +4120,8 @@ Clojure~--- программу, которая читает список и вы
 Опишем параметры функции. Это \verb|s/cat|, которая принимает список аргументов
 и возвращает словарь. Назначим аргументам функции метки \verb|:start| и
 \verb|:end|:
+
+\pagebreakafive
 
 \ifnarrow
 
@@ -4369,6 +4395,8 @@ Spec
 
 \else
 
+\iflarge
+
 \begin{english}
   \begin{clojure}
 (clojure.repl/doc date-range-sec)
@@ -4387,6 +4415,22 @@ Spec
   ret: int?
   \end{clojure}
 \end{english}
+
+\else
+
+\begin{english}
+  \begin{clojure}
+(clojure.repl/doc date-range-sec)
+-------------------------
+([date1 date2])
+  Return the difference between two dates in seconds.
+Spec
+  args: (cat :start inst? :end inst?)
+  ret: int?
+  \end{clojure}
+\end{english}
+
+\fi
 
 \fi
 
@@ -4672,6 +4716,8 @@ Spec-tools закрывает эту проблему. Добавьте библ
 \end{english}
 
 В результате получим словарь:
+
+\ifafive\vspace{15mm}\pagebreak[4]\fi
 
 \begin{english}
   \begin{clojure/lines}

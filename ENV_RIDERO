@@ -3,3 +3,4 @@ GEOMETRY=geom-ridero
 JOB=clojure_ridero
 PRINT=true
 RIDERO=true
+AFIVE=true
