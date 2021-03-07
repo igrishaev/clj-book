@@ -1164,6 +1164,17 @@ Unix. Добейтесь следующего результата:
 получили из списка аргументов. Мы создали его один раз, чтобы не делать это
 постоянно при вызове предиката. Новое перечисление выглядит коротко и ясно:
 
+\ifafive
+
+\begin{english}
+  \begin{clojure}
+(s/def ::status
+  (enum "todo" "in_progres" "done"))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (s/def ::status
@@ -1172,6 +1183,8 @@ Unix. Добейтесь следующего результата:
         "done"))
   \end{clojure}
 \end{english}
+
+\fi
 
 \subsection{With-conformer}
 
@@ -1203,8 +1216,6 @@ Unix. Добейтесь следующего результата:
           ::s/invalid)))))
   \end{clojure}
 \end{english}
-
-\pagebreakafive
 
 Вывод числа:
 
@@ -1775,6 +1786,8 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 
 \index{функции!get-message}
 
+\pagebreakafive
+
 \ifnarrow
 
 %% \begin{english}
@@ -1878,6 +1891,8 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 
 \else
 
+\ifafive
+
 \begin{english}
   \begin{clojure}
 (s/explain-data ::sample
@@ -1889,6 +1904,21 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 
 \begin{english}
   \begin{clojure}
+{:path [:email]
+ :pred clojure.core/not-empty
+ :val ""
+ :via [::sample ::email ::ne-string]
+ :in [:email]}
+  \end{clojure}
+\end{english}
+
+\else
+
+\begin{english}
+  \begin{clojure}
+(s/explain-data ::sample
+   {:username "test" :email ""})
+
 {:path [:email]
  :pred clojure.core/not-empty
  :val ""
