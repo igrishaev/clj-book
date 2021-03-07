@@ -1347,6 +1347,8 @@ INFO: A message from my module
 назначения, куда писать сообщения. Это может быть файл, удалённый syslog,
 почтовый сервер.
 
+\pagebreaklarge
+
 Добавьте Logback к проекту:
 
 \begin{english}
@@ -1360,8 +1362,6 @@ INFO: A message from my module
 Библиотеки логирования ищут настройки в стандартных местах. Если в папку
 \verb|resources| положить XML-файл для бэкенда, он прочтёт его на
 старте. Запишите туда следующий файл \verb|logback.xml|:
-
-%% --------
 
 \ifnarrow
 
@@ -1809,7 +1809,7 @@ HTTP-запроса, стек-трейс и другие.
 \end{english}
 
 Откройте событие в Sentry и промотайте вниз. В секции \verb|extra| появится ключ
-\verb|:via| с детальной информацией. Привёдем её фрагмент \lis{fig:ex-json-data}.
+\verb|:via| с детальной информацией. Привёдем её фрагмент\lis{fig:ex-json-data}.
 Каждый словарь состоит из класса исключения, сообщения и данных. В поле
 \verb|:at| вектор четырёх элементов: класс, метод, имя файла и строка, на
 которой возникло исключение. С таким отчётом найти причину будет проще.
@@ -2121,7 +2121,7 @@ class AccountHandler(RequestHandler):
 Вариант с каскадом \verb|if/else| работает, но выглядит громоздко. По-другому
 его называют Pyramid of Doom. Чем ниже вложенность, тем больше проблем у
 разработчика. Ради интереса добавьте условие в~середину подобного кода на
-Clojure \lis{fig:clj-pyramid}.
+Clojure\iflarge\lis{fig:clj-pyramid}\fi.
 
 \begin{listing}[ht!]
 
@@ -2144,6 +2144,10 @@ Clojure \lis{fig:clj-pyramid}.
 
 \else
 
+\iflarge\else
+\begin{listing}[ht!]
+\fi
+
 \begin{english}
   \begin{clojure}
 (defn account-handler [request]
@@ -2158,12 +2162,13 @@ Clojure \lis{fig:clj-pyramid}.
   \end{clojure}
 \end{english}
 
-\fi
-
+\iflarge\else
 \caption{Пример пирамиды на Clojure}
 \label{fig:clj-pyramid}
-
 \end{listing}
+\fi
+
+\fi
 
 \index{библиотеки!Ring HTTP Response}
 \index{организации!Metosin}
