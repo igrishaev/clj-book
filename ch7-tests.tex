@@ -197,6 +197,32 @@ $a$, $b$, $c$. Особенность задачи в том, что её лог
 
 \else
 
+\ifafive
+
+\begin{english}
+  \begin{clojure}
+(defn test-square-roots-two-roots []
+  (let [[x1 x2] (square-roots 1 -5 6)]
+    (assert (= [3 2] [(int x1) (int x2)]))))
+  \end{clojure}
+\end{english}
+
+\pagebreakafive
+
+\begin{english}
+  \begin{clojure}
+(defn test-square-roots-one-root []
+  (let [[x1 x2] (square-roots 1 6 9)]
+    (assert (= [-3] [(int x1)]))
+    (assert (nil? x2))))
+
+(defn test-square-roots-no-roots []
+  (assert (nil? (square-roots 2 4 7))))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn test-square-roots-two-roots []
@@ -212,6 +238,8 @@ $a$, $b$, $c$. Особенность задачи в том, что её лог
   (assert (nil? (square-roots 2 4 7))))
   \end{clojure}
 \end{english}
+
+\fi
 
 \fi
 
@@ -333,6 +361,8 @@ Clojure более простой подход: тест~--- это функци
 Так работает авторизация в популярных сервисах. Напишем тест для функции
 подписи. Проверим, что входные параметры дополнены сигнатурой, которую посчитали
 заранее.
+
+\ifafive\vspace{15mm}\pagebreak[4]\fi
 
 \label{hmac-sha256}
 
@@ -1204,6 +1234,8 @@ Emacs упрощает работу с тестами. CIDER предлагае�
 зашифрован. Если отбросить основной код, получим скелет из форм \verb|testing|,
 из которых понятны наши намерения.
 
+\pagebreakafive
+
 \begin{english}
   \begin{clojure}
 (deftest test-some-api
@@ -1298,6 +1330,8 @@ Emacs упрощает работу с тестами. CIDER предлагае�
 \verb|(->fahr nil)| на \verb|(->fahr 1)|, исключения не будет и тело
 \verb|(catch...)| не получит управление. Когда исключение ожидают, но его нет,
 это тоже ошибка.
+
+\pagebreakafive
 
 \pagebreaklarge
 
@@ -1447,6 +1481,20 @@ Emacs упрощает работу с тестами. CIDER предлагае�
 
 В переменную \verb|params-ok| запишем правильные параметры API:
 
+\ifafive
+
+\begin{english}
+  \begin{clojure}
+(def params-ok
+  {:name "John Smith"
+   :email "john@test.com"
+   :age 40
+   ...})
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (def params-ok {:name "John Smith"
@@ -1454,6 +1502,8 @@ Emacs упрощает работу с тестами. CIDER предлагае�
                 ...})
   \end{clojure}
 \end{english}
+
+\fi
 
 Объявим вектор негативных случаев \verb|params-variations|. Он состоит из пар
 \tuple{словарь, текст}. Словарь~--- это изменения, которые добавим к
@@ -1474,6 +1524,8 @@ Emacs упрощает работу с тестами. CIDER предлагае�
 \verb|api-create-user| с испорченными параметрами. Обратите внимание, что вызов
 обёрнут в \verb|testing| с сообщением. Если на одном из шагов не сработает
 \verb|is|, мы узнаем причину из отчёта.
+
+\pagebreakafive
 
 \ifnarrow
 
@@ -1787,6 +1839,29 @@ expected: 200
 
 \else
 
+\ifafive
+
+\begin{english}
+  \begin{clojure}
+(def db {...}) ;; JDBC spec
+
+(defn fix-db-data [t]
+
+  ;; purge tables
+  (jdbc/execute! db "truncate users cascade;")
+  (jdbc/execute! db "truncate orders cascade;")
+
+  ;; add data
+  (jdbc/insert! db :users user-data)
+  (jdbc/insert! db :profile profile-data)
+
+  ;; execute the test
+  (t))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (def db {...}) ;; JDBC spec
@@ -1805,9 +1880,13 @@ expected: 200
 
 \fi
 
+\fi
+
 Бывает и наоборот: тест нуждается в финальных действиях. Предположим, мы пишем
 промежуточные файлы на диск. Чтобы очистить папку при выходе из теста, напишем
 фикстуру:
+
+\pagebreakafive
 
 \ifnarrow
 
@@ -2043,6 +2122,8 @@ expected: 200
 картинку. Объявим фикстуру, которая на время теста свяжет переменную
 \verb|*tmp-file*| со временным файлом, экземпляром \verb|java.util.File|. При
 выходе из теста удалим файл, а~переменная вернётся в \verb|nil|.
+
+\pagebreakafive
 
 \index{классы!File}
 \index{файлы!временные}
@@ -3003,6 +3084,8 @@ API. Такой код трудно тестировать по двум при�
 \texttt{get\--sites\--by\--location} для поиска кафе и ресторанов в радиусе 300
 метров:
 
+\pagebreakafive
+
 \index{HTTP!API}
 
 \ifnarrow
@@ -3030,6 +3113,8 @@ API. Такой код трудно тестировать по двум при�
 
 \else
 
+\iflarge
+
 \begin{english}
   \begin{clojure}
 (ns book.views
@@ -3055,6 +3140,30 @@ API. Такой код трудно тестировать по двум при�
       :body))
   \end{clojure}
 \end{english}
+
+\else
+
+\begin{english}
+  \begin{clojure}
+(ns book.views
+  (:require [clj-http.client :as client]))
+
+(defn get-sites-by-location
+  [{:keys [lat lon]}]
+  (-> {:method :get
+       :url "https://maps.yandex.ru/search/v1"
+       :as :json
+       :query-params {:apikey "****"
+                      :lat lat
+                      :lon lon
+                      :distance 300
+                      :type "cafe,restaurant"}}
+      client/request
+      :body))
+  \end{clojure}
+\end{english}
+
+\fi
 
 \fi
 
@@ -3105,6 +3214,35 @@ API. Такой код трудно тестировать по двум при�
 
 \else
 
+\ifafive
+
+\begin{english}
+  \begin{clojure}
+(deftest test-main-page
+  (let [sites [{:name "Cafe1"} {:name "Cafe2"}]
+        events [{:name "Event1"} {:name "Event2"}]]
+  \end{clojure}
+\end{english}
+
+\pagebreakafive
+
+\begin{english}
+  \begin{clojure}
+    (with-redefs
+      [book.views/get-sites-by-location
+         (constantly sites)
+       book.views/get-events-by-location
+         (constantly events)]
+      (let [request {:params {:lat 55.751244
+                              :lon 37.618423}}
+            result (view-main-page request)]
+        (is (= {:sites sites :events events}
+               (:body result)))))))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (deftest test-main-page
@@ -3122,6 +3260,8 @@ API. Такой код трудно тестировать по двум при�
                (:body result)))))))
   \end{clojure}
 \end{english}
+
+\fi
 
 \fi
 
@@ -5020,11 +5160,24 @@ URL-кодирование. Функция \verb|json-body| подготовит
 
 \else
 
+\ifafive
+
+\begin{english}
+  \begin{clojure}
+(mock/request :get "/movies"
+              {:search "batman" :page 1})
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (mock/request :get "/movies" {:search "batman" :page 1})
   \end{clojure}
 \end{english}
+
+\fi
 
 \fi
 
@@ -5104,6 +5257,8 @@ URL-кодирование. Функция \verb|json-body| подготовит
 которое мы написали в качестве заглушки для поиска кафе \page{sites-handler}.
 Выполним к нему запрос:
 
+\pagebreakafive
+
 \ifnarrow
 
 \begin{english}
@@ -5122,6 +5277,23 @@ URL-кодирование. Функция \verb|json-body| подготовит
 
 \else
 
+\ifafive
+
+\begin{english}
+  \begin{clojure}
+(let [request (mock/request
+                :get "/search/v1"
+                {:lat 11 :lon 22})
+      response (sites-handler request)
+      body (-> response
+               :body
+               (json/parse-string true))]
+  (is (= {...} body)))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (let [request (mock/request :get "/search/v1"
@@ -5133,6 +5305,8 @@ URL-кодирование. Функция \verb|json-body| подготовит
   (is (= {...} body)))
   \end{clojure}
 \end{english}
+
+\fi
 
 \fi
 
@@ -5262,6 +5436,8 @@ JSON-схемой. Преимущества спеки в том, что она 
 подходит фикстура. Предположим, система и функции \verb|start!| и \verb|stop!|
 находятся в модуле \verb|system.clj|. Напишем фикстуру \verb|fix-system|:
 
+\pagebreakafive
+
 \begin{english}
   \begin{clojure}
 (defn fix-system
@@ -5389,6 +5565,8 @@ HMAC~SHA256. Если вы забыли, как работает подпись 
 момент происходит настоящий сетевой запрос. Сервер вычисляет сигнатуру и
 сравнивает с той, что прислал клиент. Если они равны, получим статус 200 и JSON
 с заказами в~теле ответа.
+
+\ifafive\vspace{15mm}\pagebreak[4]\fi
 
 \ifnarrow
 
@@ -5655,6 +5833,39 @@ Login. Браузер обновляет страницу, появляется 
 
 \else
 
+\ifafive
+
+\begin{english}
+  \begin{clojure}
+(ns project.integration-tests
+  (:require [etaoin.api :as e]))
+
+(deftest test-ui-login-ok
+  (e/with-chrome {} driver
+    (e/go driver "http://127.0.0.1:8080/login")
+    (e/wait-visible driver {:fn/has-text "Login"})
+  \end{clojure}
+\end{english}
+
+\pagebreakafive
+
+\begin{english}
+  \begin{clojure}
+    (e/fill driver
+       {:tag :input :name :email} "test@test.com")
+    (e/fill driver
+       {:tag :input :name :password} "password")
+    (e/click driver {:tag :button :fn/text "Login"})
+    (e/wait-visible driver {:fn/has-text "Welcome"})
+    (is (e/visible? driver
+           {:tag :a :fn/text "My profile"}))
+    (is (e/visible? driver
+           {:tag :button :fn/text "Logout"}))))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (ns project.integration-tests
@@ -5676,6 +5887,8 @@ Login. Браузер обновляет страницу, появляется 
            {:tag :button :fn/text "Logout"}))))
   \end{clojure}
 \end{english}
+
+\fi
 
 \fi
 
@@ -5987,6 +6200,8 @@ Spy полезен, когда функцию передают в парамет
 в~конфигурации ошибка, должен быть вызов с~исключением и~меткой. Чтобы написать
 тест, в~\verb|load-config| передают шпиона. Он не вызывает исключение, но
 фиксирует факт вызова, что позже проверяют в~утверждении.
+
+\pagebreakafive
 
 \begin{english}
   \begin{clojure}
