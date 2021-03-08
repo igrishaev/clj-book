@@ -1510,6 +1510,8 @@ Clojure, нужен отдельный модуль с директивой \ver
 выводим его класс, сообщение и контекст. Чтобы визуально отделить части,
 используем отступы и функцию красивой печати с форматированием.
 
+\iflarge\vspace{15mm}\pagebreak[4]\fi
+
 \index{печать!исключений}
 \index{функции!ex-print}
 
@@ -1814,16 +1816,17 @@ HTTP-запроса, стек-трейс и другие.
   \end{clojure}
 \end{english}
 
-Откройте событие в Sentry и промотайте вниз. В секции \verb|extra| появится ключ
-\verb|:via| с детальной информацией. Привёдем её фрагмент
-\ifafive{ниже}\else\lis{fig:ex-json-data}\fi.
-Каждый словарь состоит из класса исключения, сообщения и данных. В поле
-\verb|:at| вектор четырёх элементов: класс, метод, имя файла и строка, на
-которой возникло исключение. С таким отчётом найти причину будет проще.
+%% \ifafive{}\else\lis{fig:ex-json-data}\fi
 
-\ifafive\else
-\begin{listing}[ht!]
-\fi
+Откройте событие в Sentry и промотайте вниз. В секции \verb|extra| появится ключ
+\verb|:via| с детальной информацией. Привёдем её фрагмент ниже. Каждый словарь
+состоит из класса исключения, сообщения и данных. В поле \verb|:at| вектор
+четырёх элементов: класс, метод, имя файла и строка, на которой возникло
+исключение. С таким отчётом найти причину будет проще.
+
+%% \ifafive\else
+%% \begin{listing}[ht!]
+%% \fi
 
 \ifnarrow
 
@@ -1895,11 +1898,11 @@ HTTP-запроса, стек-трейс и другие.
 
 \fi
 
-\ifafive\else
-\caption{Пример JSON-данных исключения}
-\label{fig:ex-json-data}
-\end{listing}
-\fi
+%% \ifafive\else
+%% \caption{Пример JSON-данных исключения}
+%% \label{fig:ex-json-data}
+%% \end{listing}
+%% \fi
 
 \index{clojure.core!Throwable\arr{}map}
 
@@ -2225,6 +2228,37 @@ middleware добавляют декоратор, который ловит та
 
 \else
 
+\iflarge
+
+\begin{english}
+  \begin{clojure}
+(require '[ring.util.http-response
+           :refer [not-found!
+                   bad-request!
+                   enhance-your-calm!]])
+
+(defn account-handler [request]
+
+  (when-not (check-params request)
+    (bad-request! "Wrong input data"))
+
+  (when-not (check-account request)
+    (not-found! "No such an account"))
+  \end{clojure}
+\end{english}
+
+\begin{english}
+  \begin{clojure}
+  (when-not (check-quotas request)
+    (enhance-your-calm! "Request rate is limited"))
+
+  {:status 200
+   :body (get-data-from-db)})
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (require '[ring.util.http-response
@@ -2247,6 +2281,8 @@ middleware добавляют декоратор, который ловит та
    :body (get-data-from-db)})
   \end{clojure}
 \end{english}
+
+\fi
 
 \fi
 
