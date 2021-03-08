@@ -2061,7 +2061,6 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 
 \fi
 
-\noindent
 Для любой незнакомой спеки получим нейтральное сообщение. В~комментарии показан
 лог, который возникнет в консоли при вызове:
 
@@ -3319,6 +3318,8 @@ JSON. Получается сценарий, который можно запу�
 командами, и задача готова. Ниже~--- реализация команды \verb|open|, которая
 открывает веб-страницу.
 
+\iflarge\vspace{15mm}\pagebreak[4]\fi
+
 \begin{english}
   \begin{clojure}
 (defmulti do-cmd
@@ -3998,8 +3999,6 @@ Selenium IDE. Если код нарушает правила, мы должны
 отдельные символы, а выражение \verb|defn| целиком. Так мы сохраним оригинальный
 синтаксис:
 
-\pagebreaklarge
-
 \begin{english}
   \begin{clojure/lines}
 (def defn-expr
@@ -4028,6 +4027,8 @@ Selenium IDE. Если код нарушает правила, мы должны
 
 \noindent
 Результат:
+
+\iflarge\vspace{15mm}\pagebreak[4]\fi
 
 \ifnarrow
 
@@ -4427,29 +4428,6 @@ Spec
 
 \else
 
-\iflarge
-
-\begin{english}
-  \begin{clojure}
-(clojure.repl/doc date-range-sec)
--------------------------
-([date1 date2])
-  Return the difference between two dates in seconds.
-  \end{clojure}
-\end{english}
-
-\pagebreaklarge
-
-\begin{english}
-  \begin{clojure}
-Spec
-  args: (cat :start inst? :end inst?)
-  ret: int?
-  \end{clojure}
-\end{english}
-
-\else
-
 \begin{english}
   \begin{clojure}
 (clojure.repl/doc date-range-sec)
@@ -4461,8 +4439,6 @@ Spec
   ret: int?
   \end{clojure}
 \end{english}
-
-\fi
 
 \fi
 
@@ -4513,6 +4489,8 @@ Spec
 
 \noindent
 То же самое после оснащения:
+
+\pagebreaklarge
 
 \ifnarrow
 
@@ -4725,6 +4703,8 @@ Spec-tools закрывает эту проблему. Добавьте библ
 \end{english}
 
 Объявим простую спеку пользователя:
+
+\iflarge\vspace{15mm}\pagebreak[4]\fi
 
 \begin{english}
   \begin{clojure}

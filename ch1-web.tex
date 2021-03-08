@@ -1507,50 +1507,16 @@ HTTP предусматривает данные в адресной строк�
 \index{макросы!\arr}
 
 Поскольку кейворд~--- это функция, до параметра можно добраться стрелочным
-оператором как в примере слева. Некоторым этот способ нравится больше, чем
-\verb|get-in| (справа).
-
-\ifnarrow
+оператором как в первой строке. Некоторым этот способ нравится больше, чем
+\verb|get-in|.
 
 \begin{english}
   \begin{clojure}
 (-> request :params :who)
-  \end{clojure}
-
-\splitter
-
-  \begin{clojure}
+;; or
 (get-in request [:params :who])
   \end{clojure}
 \end{english}
-
-\else
-
-\begin{english}
-
-\noindent
-\iflarge
-\begin{tabular}{ @{}p{5.5cm} @{}p{5cm} }
-\else
-\begin{tabular}{ @{}p{5cm} @{}p{5cm} }
-\fi
-
-
-  \begin{clojure}
-(-> request :params :who)
-  \end{clojure}
-
-&
-
-  \begin{clojure}
-(get-in request [:params :who])
-  \end{clojure}
-
-\end{tabular}
-
-\end{english}
-
-\fi
 
 \subsection{Стек middleware}
 
@@ -1687,8 +1653,13 @@ middleware зависят друг от друга, их можно <<схлоп
 \else
 
 \begin{english}
+
 \noindent
+\iflarge
+\begin{tabular}{ @{}p{3.4cm} @{}p{3.7cm} @{}p{3.5cm} }
+\else
 \begin{tabular}{ @{}p{3.2cm} @{}p{3.5cm} @{}p{3.5cm} }
+\fi
 
   \begin{clojure}
 (comp foo bar)
@@ -1727,6 +1698,8 @@ middleware, то всё станет ясно. Во время запроса о
 плюсом. Цепочка станет короче, а логика параметров поселилась в~отдельном месте.
 
 Перечислим другие полезные middleware: куки, сессии и JSON.
+
+\iflarge\vspace{20mm}\pagebreak[4]\fi
 
 \subsection{Cookie}
 
@@ -2306,6 +2279,30 @@ Middleware не случайно выделяет поле \texttt{:json\--pa\-r
 
 \else
 
+\iflarge
+
+\begin{english}
+  \begin{clojure}
+(defn app* [request]
+  (let [{:keys [headers]} request
+        {:keys [host]} headers]
+  \end{clojure}
+\end{english}
+
+\pagebreaklarge
+
+\begin{english}
+  \begin{clojure}
+    {:status 200
+     :headers {:content-type "text/html"}
+     :body (format "<h1>Host header: %s</h1>" host)}))
+
+(def app (wrap-headers-kw app*))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defn app* [request]
@@ -2318,6 +2315,8 @@ Middleware не случайно выделяет поле \texttt{:json\--pa\-r
 (def app (wrap-headers-kw app*))
   \end{clojure}
 \end{english}
+
+\fi
 
 \fi
 
@@ -2985,6 +2984,8 @@ HTML. Поля \verb|status| и \verb|body| ответа Яндекса пере
 касается и заголовков, но мы возвращаем их не все, а подмножество (в нашем
 случае только \verb|Content-Type|).
 
+\iflarge\vspace{15mm}\pagebreak[4]\fi
+
 \ifnarrow
 
 \begin{english}
@@ -3026,8 +3027,6 @@ HTML. Поля \verb|status| и \verb|body| ответа Яндекса пере
 Запустите \verb|app-proxy| в браузере. Вы увидите главную страницу Яндекса,
 хотя адрес по-прежнему \verb|localhost|. Код \verb|app-proxy| можно выразить
 короче с помощью стрелочного оператора:
-
-\pagebreaklarge
 
 \ifnarrow
 
@@ -3101,8 +3100,6 @@ HTML. Поля \verb|status| и \verb|body| ответа Яндекса пере
   линейно.
 
 \pagebreakafive
-
-\pagebreaklarge
 
 \index{библиотеки!Vase}
 \index{организации!Cognitect}
