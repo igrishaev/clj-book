@@ -1333,7 +1333,7 @@ Emacs упрощает работу с тестами. CIDER предлагае�
 
 \pagebreakafive
 
-\pagebreaklarge
+\iflarge\vspace{15mm}\pagebreak[4]\fi
 
 \index{классы!NullPointerException}
 
@@ -1667,7 +1667,11 @@ Emacs предлагает навигацию по коду командой \ve
 \begin{english}
 
 \noindent
+\iflarge
+\begin{tabular}{ @{}p{5.7cm} @{}p{5cm} }
+\else
 \begin{tabular}{ @{}p{5cm} @{}p{5cm} }
+\fi
 
   \begin{clojure}
 ;; wrong
@@ -1740,7 +1744,11 @@ expected: 200
 \begin{english}
 
 \noindent
+\iflarge
+\begin{tabular}{ @{}p{5.8cm} @{}p{4.5cm} }
+\else
 \begin{tabular}{ @{}p{5.5cm} @{}p{4.5cm} }
+\fi
 
   \begin{clojure}
 ;; wrong
@@ -3534,6 +3542,8 @@ c~исключением. Следующий код:
 
 Эти проблемы решают стабы, о которых речь в следующем разделе.
 
+\iflarge\vspace{15mm}\pagebreak[4]\fi
+
 \subsection{Стабы}
 
 \index{стабы}
@@ -3669,6 +3679,8 @@ Ring. Мы подробно рассмотрели их в главе про в�
 знаете, как устроена конфигурация, поэтому не будем приводить весь код. Для
 краткости представим, что переменная \verb|config|~--- словарь
 параметров. Полный URL для карт построим так:
+
+\pagebreaklarge
 
 \ifnarrow
 
@@ -4628,6 +4640,8 @@ DETAIL: Key (id)=(3) already exists
 
 \else
 
+\iflarge
+
 \begin{english}
   \begin{clojure}
 ;; users
@@ -4645,6 +4659,22 @@ DETAIL: Key (id)=(3) already exists
 {:user_id :users/admin :title "Some post"}
   \end{clojure}
 \end{english}
+
+\else
+
+\begin{english}
+  \begin{clojure}
+;; users
+^{:db/alias :users/admin}
+ {:name "Ivan" :email "ivan@test.com"}
+
+;; posts
+{:user_id :users/admin :title "New book"}
+{:user_id :users/admin :title "Some post"}
+  \end{clojure}
+\end{english}
+
+\fi
 
 \fi
 
@@ -6468,7 +6498,25 @@ Spec, которой мы посвятили главу \page{chapter-spec}, и�
 Функция \verb|s/gen| строит по спеке генератор. Последний передают в функцию
 \verb|generate|. Вот как получить случайного пользователя по спеке:
 
-\pagebreaklarge
+\iflarge
+
+\begin{english}
+  \begin{clojure}
+(gen/generate (s/gen ::user))
+  \end{clojure}
+\end{english}
+
+\pagebreak
+
+\begin{english}
+  \begin{clojure}
+{:id 88546920
+ :name "Z4MO7GH80k3mRD"
+ :active? true}
+  \end{clojure}
+\end{english}
+
+\else
 
 \begin{english}
   \begin{clojure}
@@ -6479,6 +6527,8 @@ Spec, которой мы посвятили главу \page{chapter-spec}, и�
  :active? true}
   \end{clojure}
 \end{english}
+
+\fi
 
 Если нужно получить много записей, сохраните генератор в переменную, потому что
 его подготовка (вызов \verb|s/gen|) занимает время.
