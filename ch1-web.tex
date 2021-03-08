@@ -488,6 +488,8 @@ Rails. Имена и состав классов отличаются, но см
 
 Чтобы извлечь заголовки правильно, используйте \verb|:strs|:
 
+\ifafive\vspace{15mm}\pagebreak[4]\fi
+
 \ifnarrow
 
 \begin{english}
@@ -1949,6 +1951,35 @@ middleware, которое дополняет запрос словарём \ver
 
 \else
 
+\ifafive
+
+\begin{english}
+  \begin{clojure}
+(require '[ring.middleware.session
+           :refer [wrap-session]])
+
+(defn page-counter [request]
+  (let [{:keys [session]} request
+        session* (update session :counter (fnil inc 0))
+        counter (:counter session*)]
+  \end{clojure}
+\end{english}
+
+\pagebreak
+
+\begin{english}
+  \begin{clojure}
+    {:status 200
+     :session session*
+     :body (format "Seen %s time(s)" counter)}))
+
+(def app (-> page-counter
+             wrap-session))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (require '[ring.middleware.session
@@ -1966,6 +1997,8 @@ middleware, которое дополняет запрос словарём \ver
              wrap-session))
   \end{clojure}
 \end{english}
+
+\fi
 
 \fi
 
