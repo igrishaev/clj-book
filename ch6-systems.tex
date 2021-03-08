@@ -1540,6 +1540,8 @@ Mount помещает ссылки на эти функции в атом \verb
 пул, при остановке закрывает его. Измените воркер так, чтобы он зависел от
 нового компонента.
 
+\ifafive\vspace{10mm}\pagebreak[4]\fi
+
 \section{Component}
 
 \index{библиотеки!Component}
@@ -2473,6 +2475,38 @@ COMMIT
 
 \else
 
+\ifafive
+
+\begin{english}
+  \begin{clojure/lines}
+(defrecord Worker
+  [options flag task db]
+
+  component/Lifecycle
+
+  (start [this]
+    (let [flag (atom true)
+          this (assoc this :flag flag)
+          task (make-task this)]
+      (assoc this :task task)))
+  \end{clojure/lines}
+\end{english}
+
+\pagebreak
+
+\begin{english}
+  \begin{clojure/lines}
+  (stop [this]
+    (reset! flag false)
+    (while (not (realized? task))
+      (log/info "Waiting for the task to complete")
+      (Thread/sleep 300))
+    (assoc this :flag nil :task nil)))
+  \end{clojure/lines}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure/lines}
 (defrecord Worker
@@ -2494,6 +2528,8 @@ COMMIT
     (assoc this :flag nil :task nil)))
   \end{clojure/lines}
 \end{english}
+
+\fi
 
 \fi
 
@@ -4840,7 +4876,7 @@ Integrant работает на мультиметодах, поэтому из 
 идеальные метрики пула БД. Чтобы не указывать в конфигурации все поля, вынесем
 их в словарь по~умолчанию.
 
-\pagebreakafive
+\ifafive\vspace{10mm}\pagebreak[4]\fi
 
 \begin{english}
   \begin{clojure}
@@ -4921,6 +4957,30 @@ Integrant работает на мультиметодах, поэтому из 
 
 \else
 
+\ifafive
+
+\begin{english}
+  \begin{clojure}
+(require '[clojure.spec.alpha :as s])
+
+(s/def :db/username string?)
+(s/def :db/database-name string?)
+;; host, password, etc...
+  \end{clojure}
+\end{english}
+
+\pagebreak[4]
+
+\begin{english}
+  \begin{clojure}
+(defmethod ig/pre-init-spec ::db [_]
+  (s/keys :req-un [:db/username
+                   :db/database-name])) ;; etc
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (require '[clojure.spec.alpha :as s])
@@ -4934,6 +4994,8 @@ Integrant работает на мультиметодах, поэтому из 
                    :db/database-name])) ;; etc
   \end{clojure}
 \end{english}
+
+\fi
 
 \fi
 
