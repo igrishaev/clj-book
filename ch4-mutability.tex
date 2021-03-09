@@ -100,6 +100,8 @@ def api_call(**params):
 
 \else
 
+\iflarge
+
 \begin{english}
   \begin{python/lines}
 DEFAULT_PARAMS = {
@@ -111,7 +113,7 @@ DEFAULT_PARAMS = {
   \end{python/lines}
 \end{english}
 
-\pagebreaklarge
+\pagebreak[4]
 
 \begin{english}
   \begin{python/lines*}{firstnumber=7}
@@ -124,6 +126,29 @@ def api_call(**params):
     return resp.json()
   \end{python/lines*}
 \end{english}
+
+\else
+
+\begin{english}
+  \begin{python/lines}
+DEFAULT_PARAMS = {
+    "allow_redirects": True,
+    "timeout": 5,
+    "headers": {"Content-Type": "application/json"},
+    "auth": ("username", "password"),
+}
+
+def api_call(**params):
+    api_params = DEFAULT_PARAMS
+    api_params.update(params)
+    resp = requests.post(
+        "https://api.host.com", **api_params
+    )
+    return resp.json()
+  \end{python/lines*}
+\end{english}
+
+\fi
 
 \fi
 

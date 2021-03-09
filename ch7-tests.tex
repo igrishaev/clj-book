@@ -4401,7 +4401,7 @@ CSV. Поток получим из ресурса \verb|data/users.csv.gz|, п�
                    FileInputStream.
                    GZIPInputStream.)]
     (.copyIn copy "COPY users(name, age, email)
-                   FROM STDIN (FORMAT CSV, HEADER true)"
+             FROM STDIN (FORMAT CSV, HEADER true)"
              stream)
     (.close conn)))
   \end{clojure/lines}
