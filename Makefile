@@ -173,12 +173,25 @@ docker-build-tablet-draft:
 	${DOCKER_DRAFT} --env-file=ENV_TABLET ${MAKE_DRAFT}
 
 
+#
+# Gumroad bundle
+#
+
 docker-build-gumroad: \
 	docker-build-print \
 	docker-build-tablet \
 	docker-build-phone \
 	docker-build-kindle
 
+
+#
+# ALL bundle
+#
+
+docker-build-all: \
+	docker-build-ridero-large \
+	docker-build-ridero \
+	docker-build-gumroad
 
 #
 # Image build duties
