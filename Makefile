@@ -36,9 +36,8 @@ tag-job:
 
 ## Build an index file with Clojure.
 make-index:
-	cd makeindex && bb --classpath src \
-		--main makeindex.core \
-		${PWD}/${JOB}.idx ${PWD}/${JOB}.ind
+	cd makeindex && \
+	clojure -m makeindex.core ${PWD}/${JOB}.idx ${PWD}/${JOB}.ind
 
 
 # Drop unused files.
@@ -76,9 +75,15 @@ IMG_SYS = ${IMG}:ubuntu
 IMG_RUN = ${IMG}:build
 
 
-docker-build-images:
+docker-build-ubuntu:
 	docker build --no-cache -t ${IMG_SYS} -f Dockerfile.ubuntu .
+
+
+docker-build-image:
 	docker build --no-cache -t ${IMG_RUN} .
+
+
+docker-build-images: docker-build-ubuntu docker-build-image
 
 
 DOCKER_RUN = \
