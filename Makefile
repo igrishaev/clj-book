@@ -187,23 +187,10 @@ docker-build-all: \
 	docker-build-ridero \
 	docker-build-gumroad
 
-#
-# Image build duties
-#
-
-pyg-print-install:
-	cd ./pyg_print && python setup.py install
-
-
-docker-build-prepare:
-	make pyg-print-install
-	./install-fonts.sh
-
 
 #
 # Local debug
 #
-
 
 show-stats:
 	find . -name '*.tex' | xargs wc -ml
