@@ -1,4 +1,4 @@
-COVER=media/cover_kindle.pdf
+COVER=media/cover_kindle.jpg
 NARROW=true
 DOCUMENT=report
 GEOMETRY=geom-kindle

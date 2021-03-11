@@ -1,4 +1,4 @@
-COVER=media/cover_print.pdf
+COVER=media/cover_print.jpg
 DOCUMENT=book
 GEOMETRY=geom-print
 JOB=clojure_print

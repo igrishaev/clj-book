@@ -6,17 +6,6 @@ COMMIT_TS = $(shell git log -1 --format='%at')
 
 
 #
-# Adds a cover to the final PDF file
-#
-add-cover:
-ifdef COVER
-	mv ${JOB}.pdf ${JOB}.tmp.pdf
-	pdftk A=${JOB}.tmp.pdf B=${COVER} cat B A output ${JOB}.pdf
-	rm ${JOB}.tmp.pdf
-endif
-
-
-#
 # Checks the log for underfull/overfull warnings.
 # For narrow displays, only check overfull.
 #
@@ -34,7 +23,7 @@ draft: \
 
 build: \
 	clear-files pdf-build1 make-index pdf-build2 pdf-build3 \
-	add-cover tag-job check-refs check-lines
+	tag-job check-refs check-lines
 
 
 #

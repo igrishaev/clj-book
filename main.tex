@@ -205,6 +205,15 @@
 
 \input{hyphenation}
 
+
+% add cover when set
+\ifx\COVER\NIL
+\else
+\includepdf{\COVER}
+\setcounter{page}{1}
+\fi
+
+
 % always add title page
 \input{title}
 
