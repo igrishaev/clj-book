@@ -53,6 +53,8 @@ clear-files:
 	rm -rf _minted-*
 	rm -f *.out
 
+clear-pdf:
+	rm -f *.pdf
 
 #
 # A common LaTeX build command with three aliases
