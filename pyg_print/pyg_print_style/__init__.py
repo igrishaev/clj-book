@@ -6,8 +6,10 @@ from pygments.style import Style
 from pygments.token import Keyword, Name, Comment, String, Error, \
      Number, Operator, Generic
 
-GRAY = "#555555"
-LIGHTGRAY = "#707070"
+
+GRAY       = "#555555"
+GRAY_LIGHT = "#cccccc"
+
 
 class PrintStyle(Style):
     default_style = "bw"
@@ -21,7 +23,7 @@ class PrintStyle(Style):
         Name.Tag:               GRAY,
 
         # diff
-        Generic.Deleted:        "bg:" + LIGHTGRAY,
+        Generic.Deleted:        "bg:" + GRAY_LIGHT,
         Generic.Inserted:       "bg:",
 
         # Clojure
