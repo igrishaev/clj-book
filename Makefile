@@ -23,15 +23,7 @@ draft: \
 
 build: \
 	clear-files pdf-build1 make-index pdf-build2 pdf-build3 \
-	tag-job check-refs check-lines
-
-
-#
-# Make a copy of a PDF file with its commit hash
-# and timestamp being included in the name.
-#
-tag-job:
-	cp ${JOB}.pdf ${JOB}_${COMMIT_HASH}_${COMMIT_TS}.pdf
+	check-refs check-lines
 
 
 ## Build an index file with Clojure.
