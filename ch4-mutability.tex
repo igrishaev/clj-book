@@ -28,14 +28,19 @@ Clojure, наоборот, данные не меняются, а мутабел
 \index{итерация}
 
 \begin{itemize}
+
 \item
   создать пустой список~--- будущий результат;
+
 \item
   пройти по элементам исходного списка;
+
 \item
   на каждом шаге вычислить новый элемент;
+
 \item
   добавить его к результату.
+
 \end{itemize}
 
 \pagebreaklarge
@@ -100,8 +105,6 @@ def api_call(**params):
 
 \else
 
-\iflarge
-
 \begin{english}
   \begin{python/lines}
 DEFAULT_PARAMS = {
@@ -113,7 +116,8 @@ DEFAULT_PARAMS = {
   \end{python/lines}
 \end{english}
 
-\pagebreak[4]
+\iflarge\pagebreak[4]\fi
+\ifafive\pagebreak[4]\fi
 
 \begin{english}
   \begin{python/lines*}{firstnumber=7}
@@ -126,29 +130,6 @@ def api_call(**params):
     return resp.json()
   \end{python/lines*}
 \end{english}
-
-\else
-
-\begin{english}
-  \begin{python/lines}
-DEFAULT_PARAMS = {
-    "allow_redirects": True,
-    "timeout": 5,
-    "headers": {"Content-Type": "application/json"},
-    "auth": ("username", "password"),
-}
-
-def api_call(**params):
-    api_params = DEFAULT_PARAMS
-    api_params.update(params)
-    resp = requests.post(
-        "https://api.host.com", **api_params
-    )
-    return resp.json()
-  \end{python/lines}
-\end{english}
-
-\fi
 
 \fi
 

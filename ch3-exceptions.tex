@@ -2137,11 +2137,7 @@ class AccountHandler(RequestHandler):
 Вариант с каскадом \verb|if/else| работает, но выглядит громоздко. По-другому
 его называют Pyramid of Doom. Чем ниже вложенность, тем больше проблем у
 разработчика. Ради интереса добавьте условие в~середину подобного кода на
-Clojure\iflarge\else\lis{fig:clj-pyramid}\fi.
-
-\iflarge\else
-\begin{listing}[ht!]
-\fi
+Clojure:
 
 \ifnarrow
 
@@ -2176,12 +2172,6 @@ Clojure\iflarge\else\lis{fig:clj-pyramid}\fi.
   \end{clojure}
 \end{english}
 
-\fi
-
-\iflarge\else
-\caption{Пример пирамиды на Clojure}
-\label{fig:clj-pyramid}
-\end{listing}
 \fi
 
 \index{библиотеки!Ring HTTP Response}
@@ -2261,6 +2251,39 @@ middleware добавляют декоратор, который ловит та
 
 \else
 
+\ifafive
+
+\begin{english}
+  \begin{clojure}
+(require '[ring.util.http-response
+           :refer [not-found!
+                   bad-request!
+                   enhance-your-calm!]])
+
+(defn account-handler [request]
+
+  (when-not (check-params request)
+    (bad-request! "Wrong input data"))
+
+  (when-not (check-account request)
+    (not-found! "No such an account"))
+  \end{clojure}
+\end{english}
+
+\vspace{10mm}\pagebreak
+
+\begin{english}
+  \begin{clojure}
+  (when-not (check-quotas request)
+    (enhance-your-calm! "Request rate is limited"))
+
+  {:status 200
+   :body (get-data-from-db)})
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (require '[ring.util.http-response
@@ -2283,6 +2306,8 @@ middleware добавляют декоратор, который ловит та
    :body (get-data-from-db)})
   \end{clojure}
 \end{english}
+
+\fi
 
 \fi
 
