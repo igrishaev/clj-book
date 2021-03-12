@@ -7,8 +7,8 @@ from pygments.token import Keyword, Name, Comment, String, Error, \
      Number, Operator, Generic
 
 
-GRAY       = "#555555"
-GRAY_LIGHT = "#cccccc"
+GRAY       = "#545454"
+GRAY_LIGHT = "#eeeeee"
 
 
 class PrintStyle(Style):
