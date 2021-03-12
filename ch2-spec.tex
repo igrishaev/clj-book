@@ -1367,6 +1367,27 @@ Unix. Добейтесь следующего результата:
 вектор. Покажем это на вложенных данных. Пусть порт~--- одно из полей
 подключения к базе:
 
+\ifafive
+
+\begin{english}
+  \begin{clojure}
+(s/def :conn/port ::smart-port)
+(s/def ::conn
+  (s/keys :req-un [:conn/port]))
+  \end{clojure}
+\end{english}
+
+\pagebreak
+
+\begin{english}
+  \begin{clojure}
+(s/conform ::conn {:port "9090"})
+{:port [:string 9090]}
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (s/def :conn/port ::smart-port)
@@ -1377,6 +1398,8 @@ Unix. Добейтесь следующего результата:
 {:port [:string 9090]}
   \end{clojure}
 \end{english}
+
+\fi
 
 Топология результата изменилась, и это нужно учесть. Если передать поле
 \verb|:port| в функцию подключения, получим ошибку типов.
