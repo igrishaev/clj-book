@@ -51,11 +51,11 @@
 %% #3 QR label
 %% #4 offset
 \ifprint
-\NewDocumentCommand{\footurl}{ m m O{} O{0mm} }{%
+\NewDocumentCommand{\footurl}{ m m O{} o }{%
 #1%
 \footnote{\StrSubstitute{#2}{https://}{}}%
 \marginpar{%
-\vspace{#4}%
+\IfNoValueTF{#4}{}{\vspace{#4}}%
 \vspace{-5.5mm}%
 \ifthispageodd{\raggedright}{\raggedleft}%
 \ifqr\qrcode[height=10mm]{#2}\else\input{qr-frame}\fi%
