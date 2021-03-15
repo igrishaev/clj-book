@@ -230,6 +230,11 @@
 \input{abstract}
 \fi
 
+% fix a widow line in TOC for A5
+\ifafive
+\setlength{\cftbeforetoctitleskip}{12mm}
+\fi
+
 %%
 %% ToC https://tex.stackexchange.com/questions/41555/
 %%
