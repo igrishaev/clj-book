@@ -501,8 +501,12 @@ EDN. Замените \texttt{edn/read\-/string} на Yummy, Aero или сво�
 \index{библиотеки!JDBC}
 \index{библиотеки!HikariCP}
 
+\ifafive
+\setlength{\marginparoffset}{-20mm}
+\fi
+
 Подготовим компонент базы данных. Для этого понадобятся библиотеки
-\footurl{JDBC}{https://github.com/clojure/java.jdbc}[JDBC] и
+\footurl{JDBC}{https://github.com/clojure/java.jdbc}[JDBC][\marginparoffset] и
 \footurl{HikariCP}{https://github.com/tomekw/hikari-cp}[HikariCP].
 Первая предлагает доступ к реляционным базам данных. Это набор функций, которые
 работают одинаково для разных баз. Выражения:
