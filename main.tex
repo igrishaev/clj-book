@@ -224,11 +224,18 @@
 % always add title page
 \input{title}
 
+
+% opening page (UDK & BBK) / annotation
 \ifridero
-\includepdf[pages={1}]{media/ridero_opening.pdf}
+  \iflarge
+    \includepdf[pages={1}]{media/ridero_opening_large.pdf.pdf}
+  \else
+    \includepdf[pages={1}]{media/ridero_opening_normal.pdf}
+  \fi
 \else
-\input{abstract}
+ \input{abstract}
 \fi
+
 
 % fix a widow line in TOC for A5
 \ifafive
