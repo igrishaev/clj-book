@@ -1683,8 +1683,8 @@ Component не терпит глобального состояния. В биб
     (assoc this :server nil)))
   \end{clojure}
 \end{english}
-\fi
 
+\fi
 
 Метод \verb|start| вернёт ту же запись, но с заполненным слотом
 \verb|:server|. В нём находится объект сервера. Метод \verb|stop| принимает
@@ -3414,11 +3414,11 @@ Clojure:
   \begin{clojure}
 (keys (make-system
         {:features {:worker? false}}))
-(:server :db)
+;; (:server :db)
 
 (keys (make-system
         {:features {:worker? true}}))
-(:server :db :worker)
+;; (:server :db :worker)
   \end{clojure}
 \end{english}
 
@@ -3427,10 +3427,10 @@ Clojure:
 \begin{english}
   \begin{clojure}
 (keys (make-system {:features {:worker? false}}))
-(:server :db)
+;; (:server :db)
 
 (keys (make-system {:features {:worker? true}}))
-(:server :db :worker)
+;; (:server :db :worker)
   \end{clojure}
 \end{english}
 
@@ -4511,7 +4511,7 @@ Mount \page{mount-selective}. Функция \verb|init| принимает не
 Когда ключ полный (с пространством), легко понять, в каком именно модуле он
 объявлен. В системах бывает более десяти компонентов. Представьте, что возникла
 проблема с ключом \verb|:queue|. Как понять, в каком модуле он находится?
-Наоборот, ключ \verb|:my-project.processing/queue| содержит эту
+Наоборот, ключ \verb|:my-project.queue/task| содержит эту
 информацию. Всегда используйте полные ключи.
 
 Возможна ситуация, что вы забыли импортировать модуль, в котором расширили
@@ -4527,7 +4527,7 @@ Mount \page{mount-selective}. Функция \verb|init| принимает не
   (:require project.db
             project.server
             project.worker
-            project.utils.queue))
+            project.queue))
   \end{clojure}
 \end{english}
 
@@ -4873,7 +4873,7 @@ Integrant работает на мультиметодах, поэтому из 
 на событие, расширьте мультиметод его ключом. Рассмотрим несколько полезных
 стадий.
 
-\subsection{Подготовка}
+\subsubsection{Подготовка}
 
 Метод \verb|ig/prep-key| служит для подготовки параметров. Чаще всего их
 объединяют с набором по умолчанию. Предположим, методом проб и ошибок мы нашли
@@ -4934,7 +4934,7 @@ Integrant работает на мультиметодах, поэтому из 
 Функция \verb|ig/prep| принимает конфигурацию и готовит каждый ключ. Чтобы не
 забыть этот шаг, добавьте его в \verb|load-config|.
 
-\subsection{Спека}
+\subsubsection{Спека}
 
 \index{spec!в Integrant}
 
@@ -5006,7 +5006,7 @@ Integrant работает на мультиметодах, поэтому из 
 Если передать неверные параметры, получим ошибку Spec. Её сообщение и контекст
 знакомы вам из прошлых глав \page{spec-explain}.
 
-\subsection{Приостановка}
+\subsubsection{Приостановка}
 
 \index{системы!остановка}
 
