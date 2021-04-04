@@ -218,9 +218,10 @@ wide catch expression, слишком широкий охват. Класс \ver
 номеру. Снаружи это чёрный ящик: мы не знаем, откуда приходят
 данные. Предположим, функция обращается в~сеть. Выразим это на Python:
 
+\index{языки!Python}
+
 \ifnarrow
 
-\index{языки!Python}
 \begin{english}
   \begin{python}
 def get_user(id):
@@ -232,7 +233,6 @@ def get_user(id):
 
 \else
 
-\index{языки!Python}
 \begin{english}
   \begin{python}
 def get_user(id):
@@ -276,7 +276,7 @@ def get_user(id):
 \else
 
 \begin{english}
-  \begin{js}
+  \begin{python}
 def get_user(id):
   try:
     url = "http://api.company.com/user/" + str(id)
@@ -1059,8 +1059,8 @@ Divide by zero
 \begin{english}
   \begin{clojure}
 (map ex-message (ex-chain e))
-("Get user info error"
- "Auth error" "HTTP error")
+;; ("Get user info error"
+;;  "Auth error" "HTTP error")
   \end{clojure}
 \end{english}
 
@@ -1069,7 +1069,7 @@ Divide by zero
 \begin{english}
   \begin{clojure}
 (map ex-message (ex-chain e))
-("Get user info error" "Auth error" "HTTP error")
+;; ("Get user info error" "Auth error" "HTTP error")
   \end{clojure}
 \end{english}
 
@@ -1096,7 +1096,7 @@ Divide by zero
 
 \begin{english}
   \begin{clojure}
-(defn ex-chain [^Exception e]
+(defn ex-chain [e]
   (take-while some?
     (iterate ex-cause e)))
   \end{clojure}
@@ -1106,7 +1106,7 @@ Divide by zero
 
 \begin{english}
   \begin{clojure}
-(defn ex-chain [^Exception e]
+(defn ex-chain [e]
   (take-while some? (iterate ex-cause e)))
   \end{clojure}
 \end{english}
