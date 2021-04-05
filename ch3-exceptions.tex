@@ -678,10 +678,10 @@ Divide by zero
 
 \begin{english}
   \begin{clojure}
-(assoc nil :test 42)
+(assoc nil :test 5)
 (update nil :test (fnil inc 0))
 (into nil [1 2 3])
-(merge nil {:test 42})
+(merge nil {:test 5})
   \end{clojure}
 \end{english}
 
@@ -1019,7 +1019,7 @@ Divide by zero
 (def e
   (ex-info
    "Get user info error"
-   {:user-id 42}
+   {:user-id 5}
    (ex-info
      "Auth error"
      {:token "........."}
@@ -1037,7 +1037,7 @@ Divide by zero
 (def e
   (ex-info
    "Get user info error"
-   {:user-id 42}
+   {:user-id 5}
    (ex-info "Auth error"
             {:token "........."}
             (ex-info "HTTP error"
@@ -1140,7 +1140,7 @@ Divide by zero
  :via
  [{:type clojure.lang.ExceptionInfo
    :message Get user info error
-   :data {:user-id 42}}
+   :data {:user-id 5}}
   {:type clojure.lang.ExceptionInfo
    :message Auth error
    :data {:token .........}}
@@ -1166,7 +1166,7 @@ Divide by zero
  :via
  [{:type clojure.lang.ExceptionInfo
    :message Get user info error
-   :data {:user-id 42}}
+   :data {:user-id 5}}
   {:type clojure.lang.ExceptionInfo
    :message Auth error
    :data {:token .........}}
@@ -1211,7 +1211,7 @@ Divide by zero
 (trace/print-throwable e)
 ;; clojure.lang.ExceptionInfo:
 ;; Get user info error
-;; {:user-id 42}
+;; {:user-id 5}
   \end{clojure}
 \end{english}
 
@@ -1223,7 +1223,7 @@ Divide by zero
 
 (trace/print-throwable e)
 ;; clojure.lang.ExceptionInfo: Get user info error
-;; {:user-id 42}
+;; {:user-id 5}
   \end{clojure}
 \end{english}
 
@@ -1566,7 +1566,7 @@ Clojure, нужен отдельный модуль с директивой \ver
 
 clojure.lang.ExceptionInfo
   Get user info error
-  {:user-id 42}
+  {:user-id 5}
 clojure.lang.ExceptionInfo
   Auth error
   {:token "........."}
@@ -1585,7 +1585,7 @@ clojure.lang.ExceptionInfo
 
 clojure.lang.ExceptionInfo
   Get user info error
-  {:user-id 42}
+  {:user-id 5}
 clojure.lang.ExceptionInfo
   Auth error
   {:token "........."}
@@ -1664,7 +1664,7 @@ clojure.lang.ExceptionInfo
   \begin{clojure}
 (log-error e
   "Cannot find user %s, status %s"
-  42 404)
+  5 404)
   \end{clojure}
 \end{english}
 
@@ -1672,7 +1672,7 @@ clojure.lang.ExceptionInfo
 
 \begin{english}
   \begin{clojure}
-(log-error e "Cannot find user %s, status %s" 42 404)
+(log-error e "Cannot find user %s, status %s" 5 404)
   \end{clojure}
 \end{english}
 
@@ -1795,7 +1795,7 @@ HTTP-запроса, стек-трейс и другие.
 мы передали экземпляр \verb|e|, цепочку из трёх исключений, которую задали
 выше \page{e-sample}. В интерфейсе Sentry мы увидим информацию о каждом звене. В
 поле \verb|:extra| окажутся данные верхнего исключения, словарь
-\verb|{:user-id 42}|.
+\verb|{:user-id 5}|.
 
 Недостаток \verb|sentry-clj| в том, что она передаёт не весь
 контекст. Хотелось бы видеть данные всех уровней, а не только верхнего. Иначе мы
@@ -1838,7 +1838,7 @@ HTTP-запроса, стек-трейс и другие.
   "type": "clojure.lang.ExceptionInfo",
   "message": "Get user info error",
   "data": {
-    "user-id": 42
+    "user-id": 5
   },
   "at": ["clojure.lang.AFn",
          "applyToHelper", "AFn.java"...]
@@ -1863,7 +1863,7 @@ HTTP-запроса, стек-трейс и другие.
 [ {
   "type": "clojure.lang.ExceptionInfo",
   "message": "Get user info error",
-  "data": {"user-id": 42},
+  "data": {"user-id": 5},
   "at": ["clojure.lang.AFn", "...", "AFn.java", 160]
 }, {
   "type": "clojure.lang.ExceptionInfo",
@@ -1882,7 +1882,7 @@ HTTP-запроса, стек-трейс и другие.
   "type": "clojure.lang.ExceptionInfo",
   "message": "Get user info error",
   "data": {
-    "user-id": 42
+    "user-id": 5
   },
   "at": ["clojure.lang.AFn", "...", "AFn.java", 160]
 }, {
@@ -2592,7 +2592,7 @@ Slingshot содержит макросы \verb|throw+| и \verb|try+|. Они �
   '[slingshot.slingshot
     :refer [try+ throw+]])
 
-(throw+ {:user-id 42 :action :create})
+(throw+ {:user-id 5 :action :create})
   \end{clojure}
 \end{english}
 
@@ -2602,7 +2602,7 @@ Slingshot содержит макросы \verb|throw+| и \verb|try+|. Они �
   \begin{clojure}
 (require '[slingshot.slingshot :refer [try+ throw+]])
 
-(throw+ {:user-id 42 :action :create})
+(throw+ {:user-id 5 :action :create})
   \end{clojure}
 \end{english}
 
@@ -2658,7 +2658,7 @@ Slingshot содержит макросы \verb|throw+| и \verb|try+|. Они �
   \begin{clojure/lines}
 (try+
  (throw+ {:type ::user-error
-          :user 42
+          :user 5
           :action :update
           :data {:name "Ivan"}})
  (catch [:type ::user-error] e
@@ -2968,7 +2968,7 @@ protected call, <<защищённый вызов>>. Иногда приём п�
 
 \begin{english}
   \begin{clojure}
-(pcall call-retry get-user-by-id 42)
+(pcall call-retry get-user-by-id 5)
   \end{clojure}
 \end{english}
 
@@ -3053,7 +3053,7 @@ from tail position>>. Чтобы исправить ошибку, нужно в�
              ^String message))))
 
 (errorf! "Error, user: %s, action: %s"
-  42 :delete)
+  5 :delete)
   \end{clojure}
 \end{english}
 
@@ -3065,7 +3065,7 @@ from tail position>>. Чтобы исправить ошибку, нужно в�
   (let [message (apply format template args)]
     (throw (new Exception ^String message))))
 
-(errorf! "Error, user: %s, action: %s" 42 :delete)
+(errorf! "Error, user: %s, action: %s" 5 :delete)
   \end{clojure}
 \end{english}
 
