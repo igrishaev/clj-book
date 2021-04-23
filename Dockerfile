@@ -8,7 +8,8 @@ WORKDIR /workdir
 COPY ./pyg_print ./pyg_print
 COPY ./install-fonts.sh ./
 
-RUN cd ./pyg_print && python setup.py install
+RUN cd ./pyg_print && python3 setup.py install
+
 RUN ./install-fonts.sh
 
 WORKDIR /
