@@ -428,8 +428,8 @@ Clojure и у DevOps уже написаны скрипты на Python для �
 
       (s/invalid? result)
       (let [report (expound/expound-str ::config config)]
-    (exit 1 "Invalid config values: %s %s"
-            \newline report))
+        (exit 1 "Invalid config values: %s %s"
+              \newline report))
 
       :else result)))
   \end{clojure}
