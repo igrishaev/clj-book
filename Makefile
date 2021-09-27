@@ -129,6 +129,15 @@ docker-build-ridero-large-draft:
 
 
 #
+# DMK
+#
+
+docker-build-dmk:
+	${DOCKER_RUN} --env-file=ENV_DMK ${MAKE_BUILD}
+
+
+
+#
 # Kindle
 #
 

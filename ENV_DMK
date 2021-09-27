@@ -1,0 +1,8 @@
+DOCUMENT=book
+GEOMETRY=geom-dmk
+JOB=clojure_dmk
+PRINT=true
+RIDERO=false
+DMK=true
+LARGE=true
+FONT=11
