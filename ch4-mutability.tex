@@ -1866,24 +1866,12 @@ Clojure не поощряет императивный стиль, когда п
 \verb|conn| в модуле базы. Возникает проблема, как объявить
 переменную. Начинающие делают это в лоб:
 
-\ifnarrow
-
 \begin{english}
   \begin{clojure}
 (def server
   (jetty/run-jetty app {:port 8080}))
   \end{clojure}
 \end{english}
-
-\else
-
-\begin{english}
-  \begin{clojure}
-(def server (jetty/run-jetty app {:port 8080}))
-  \end{clojure}
-\end{english}
-
-\fi
 
 Выражение запустит сервер при загрузке модуля. Это плохая практика, потому что в
 загрузке не должно быть побочных эффектов. С таким кодом невозможно работать в
