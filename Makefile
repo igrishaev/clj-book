@@ -135,6 +135,8 @@ docker-build-ridero-large-draft:
 docker-build-dmk:
 	${DOCKER_RUN} --env-file=ENV_DMK ${MAKE_BUILD}
 
+docker-build-dmk-draft:
+	${DOCKER_DRAFT} --env-file=ENV_DMK ${MAKE_DRAFT}
 
 
 #
