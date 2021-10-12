@@ -592,6 +592,22 @@ JDBC игнорирует другие ключи и работает напря
 внутри которого пул. При выключении функция \texttt{close\-/datasource} закрывает
 его и открытые соединения. Добавим в конфигурацию настройки пула:
 
+\ifafive
+
+\begin{english}
+  \begin{clojure}
+{:pool {:minimum-idle       10
+        :maximum-pool-size  10
+        :adapter            "postgresql"
+        :username           "book"
+        :database-name      "book"
+        :server-name        "127.0.0.1"
+        :port-number        5432}}
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 {:pool {:minimum-idle       10
@@ -604,6 +620,8 @@ JDBC игнорирует другие ключи и работает напря
         :port-number        5432}}
   \end{clojure}
 \end{english}
+
+\fi
 
 Для экономии укажем только основные параметры. Это свойства подключения (хост,
 порт, пользователь, пароль) и размерность пула. При желании можно настроить
@@ -733,6 +751,34 @@ HTTP-клиент:
 
 \else
 
+\ifafive
+
+\begin{english}
+  \begin{clojure}
+(defstate worker
+  :start
+  (let [{task-opt :worker} config
+        flag (atom true)
+        task (make-task flag task-opt)]
+    {:flag flag :task task})
+  \end{clojure}
+\end{english}
+
+\pagebreak
+
+\begin{english}
+  \begin{clojure}
+  :stop
+  (let [{:keys [flag task]} worker]
+    (reset! flag false)
+    (while (not (realized? task))
+      (log/info "Waiting for the task to complete")
+      (Thread/sleep 300))))
+  \end{clojure}
+\end{english}
+
+\else
+
 \begin{english}
   \begin{clojure}
 (defstate worker
@@ -750,6 +796,8 @@ HTTP-клиент:
       (Thread/sleep 300))))
   \end{clojure}
 \end{english}
+
+\fi
 
 \fi
 
