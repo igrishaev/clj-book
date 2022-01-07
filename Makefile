@@ -95,6 +95,14 @@ MAKE_DRAFT = ${IMG_RUN} make draft
 
 
 #
+# Desktop
+#
+
+docker-build-desktop:
+	${DOCKER_RUN} --env-file=ENV_DESKTOP ${MAKE_BUILD}
+
+
+#
 # Print
 #
 
@@ -177,7 +185,7 @@ docker-build-tablet-draft:
 #
 
 docker-build-gumroad: \
-	docker-build-print \
+	docker-build-desktop \
 	docker-build-tablet \
 	docker-build-phone \
 	docker-build-kindle

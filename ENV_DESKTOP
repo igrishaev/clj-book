@@ -1,0 +1,6 @@
+COVER=media/cover_print.jpg
+DOCUMENT=book
+EBOOK=true
+GEOMETRY=geom-print
+JOB=clojure_desktop
+AFIVE=true
