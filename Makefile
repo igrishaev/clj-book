@@ -181,10 +181,11 @@ docker-build-tablet-draft:
 
 
 #
-# Gumroad bundle
+# Digital bundle (for selling)
 #
 
-docker-build-gumroad: \
+docker-build-digital: \
+	docker-build-print \
 	docker-build-desktop \
 	docker-build-tablet \
 	docker-build-phone \
@@ -196,9 +197,10 @@ docker-build-gumroad: \
 #
 
 docker-build-all: \
+	docker-build-digital \
 	docker-build-ridero-large \
-	docker-build-ridero \
-	docker-build-gumroad
+	docker-build-ridero
+
 
 
 #
@@ -223,3 +225,20 @@ lines-phone:
 
 lines-ridero-large:
 	! grep -i 'in paragraph at lines' clojure_ridero_large.log
+
+
+#
+# Zip
+#
+
+ZIPDIR = ./clojure-in-production
+
+zip-digital:
+	mkdir ${ZIPDIR}
+	cp clojure_desktop.pdf ${ZIPDIR}
+	cp clojure_kindle.pdf  ${ZIPDIR}
+	cp clojure_phone.pdf   ${ZIPDIR}
+	cp clojure_tablet.pdf  ${ZIPDIR}
+	cp clojure_print.pdf   ${ZIPDIR}
+	zip -r clojure-in-production.zip ${ZIPDIR}
+	rm -rf ${ZIPDIR}
