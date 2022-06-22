@@ -189,7 +189,8 @@ docker-build-digital: \
 	docker-build-desktop \
 	docker-build-tablet \
 	docker-build-phone \
-	docker-build-kindle
+	docker-build-kindle \
+	zip-digital
 
 
 #
@@ -240,5 +241,6 @@ zip-digital:
 	cp clojure_phone.pdf   ${ZIPDIR}
 	cp clojure_tablet.pdf  ${ZIPDIR}
 	cp clojure_print.pdf   ${ZIPDIR}
-	zip -r clojure-in-production.zip ${ZIPDIR}
+	rm -f ${ZIPDIR}.zip
+	zip -r ${ZIPDIR}.zip ${ZIPDIR}
 	rm -rf ${ZIPDIR}
