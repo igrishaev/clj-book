@@ -2915,15 +2915,15 @@ protected call, <<защищённый вызов>>. Иногда приём п�
 \begin{english}
   \begin{clojure}
 (defn call-retry [n f & args]
-  (loop [attempt n]
+  (loop [attempt 0]
     (let [[ok? res] (apply pcall f args)]
       (cond
         ok? res
 
         (< attempt n)
         (do (Thread/sleep
-              (* attempt 1000))
-            (recur (inc n)))
+             (* (inc attempt) 1000))
+            (recur (inc attempt)))
 
         :else (throw res)))))
   \end{clojure}
@@ -2934,14 +2934,14 @@ protected call, <<защищённый вызов>>. Иногда приём п�
 \begin{english}
   \begin{clojure}
 (defn call-retry [n f & args]
-  (loop [attempt n]
+  (loop [attempt 0]
     (let [[ok? res] (apply pcall f args)]
       (cond
         ok? res
 
         (< attempt n)
-        (do (Thread/sleep (* attempt 1000))
-            (recur (inc n)))
+        (do (Thread/sleep (* (inc attempt) 1000))
+            (recur (inc attempt)))
 
         :else (throw res)))))
   \end{clojure}
@@ -2982,7 +2982,7 @@ protected call, <<защищённый вызов>>. Иногда приём п�
 \begin{english}
   \begin{clojure}
 (defn call-retry [n f & args]
-  (loop [attempt n]
+  (loop [attempt 0]
     ...
     (try
       (apply f args)
