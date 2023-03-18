@@ -1,1 +1,3 @@
 - drop bold-extra font (lmodern, encoding)
+
+- config secrets
