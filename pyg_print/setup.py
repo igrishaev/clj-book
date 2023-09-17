@@ -13,7 +13,7 @@ setup(
     url='https://github.com/igrishaev/clj-book/pyg-print',
 
     packages=find_packages(),
-    install_requires=['pygments == 2.7.4'],
+    install_requires=['pygments == 2.15.0'],
 
     entry_points='''[pygments.styles]
                     print=pyg_print_style:PrintStyle''',
