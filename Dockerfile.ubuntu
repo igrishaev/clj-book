@@ -1,7 +1,7 @@
 # Base image which includes common settings
 # and software installation *only*.
 
-FROM ubuntu:20.04
+FROM --platform=linux/x86_64 ubuntu:20.04
 
 ENV TZ=Europe/Moscow
 
