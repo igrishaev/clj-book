@@ -1,7 +1,7 @@
 # Base image which includes common settings
 # and software installation *only*.
 
-FROM --platform=linux/x86_64 ubuntu:20.04
+FROM ubuntu:20.04
 
 ENV TZ=Europe/Moscow
 
@@ -16,27 +16,30 @@ RUN apt-get update -q
 RUN apt-get install -y -q \
     wget curl rlwrap make gettext git
 
+# jdk
+RUN apt-get install -y -q openjdk-11-jre-headless
+
+# Install Lein
+RUN curl -L -O https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein
+RUN chmod +x lein
+RUN ./lein
+
+# Install deps
+ADD makeindex /makeindex
+WORKDIR makeindex
+RUN /lein deps
+WORKDIR /
+RUN rm -rf makeindex
+
 # python
 RUN apt-get install -y -q \
     python3 python3-setuptools python-pygments
 
 # latex
 RUN apt-get install -y -q \
+    texlive-font-utils \
     texlive-latex-extra \
     texlive-lang-cyrillic \
     texlive-fonts-extra \
+    inkscape \
     cm-super
-
-# java & clojure
-RUN apt-get install -y -q openjdk-11-jre-headless
-
-# Install Clojure CLI
-ARG CLJ_SCRIPT=linux-install-1.10.2.774.sh
-
-RUN wget -q https://download.clojure.org/install/${CLJ_SCRIPT}
-RUN chmod +x ${CLJ_SCRIPT}
-RUN ./${CLJ_SCRIPT}
-RUN rm ./${CLJ_SCRIPT}
-
-# Trigger loading deps
-RUN clojure -e "1"

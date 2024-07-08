@@ -1,6 +1,6 @@
 # Book-related stuff
 
-FROM clj-book:ubuntu
+FROM clj-book1:ubuntu
 
 RUN mkdir /workdir
 WORKDIR /workdir

@@ -28,8 +28,9 @@ build: \
 
 ## Build an index file with Clojure.
 make-index:
+	echo 'make-index'
 	cd makeindex && \
-	clojure -m makeindex.core ${PWD}/${JOB}.idx ${PWD}/${JOB}.ind
+	/lein run ${PWD}/${JOB}.idx ${PWD}/${JOB}.ind
 
 
 # Drop unused files.
@@ -64,7 +65,7 @@ check-refs:
 	! grep -i 'LaTeX Warning: Reference' ${JOB}.log
 
 
-IMG = clj-book
+IMG = clj-book1
 IMG_SYS = ${IMG}:ubuntu
 IMG_RUN = ${IMG}:build
 
