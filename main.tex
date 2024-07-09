@@ -32,13 +32,11 @@
 %%
 %% if selectors
 %%
-
 \input{ifs}
 
 % globals
 \newlength{\marginparoffset}
 \setlength{\marginparoffset}{0mm}
-
 
 \usepackage[T2A]{fontenc}
 \usepackage{tikz}
@@ -46,10 +44,6 @@
 \usepackage{geometry}
 \usepackage[utf8]{inputenc}
 \usepackage[english,russian]{babel}
-
-
-%% hyphenation in tt
-\usepackage[shortcuts]{extdash}
 
 % for proper ' and `
 \usepackage{textcomp}
@@ -60,9 +54,6 @@
 
 % extra space at the end of macros
 \usepackage{xspace}
-
-% linebreaks in verbatim for mobile
-\usepackage{spverbatim}
 
 % http://www.khirevich.com/latex/microtype/
 \usepackage[
@@ -94,8 +85,8 @@
 % for QR codes in
 \usepackage{qrcode}
 
-% to have bold tt fonts in code listings
-\usepackage{bold-extra}
+% good Russian fonts
+\usepackage{paratype}
 
 % better macro args
 \usepackage{xparse}
@@ -137,14 +128,10 @@
 \idxlayout{columns=2}
 \fi
 
-\usepackage{setspace}
-
-
 % href ursl for ebooks
 \ifebook
 \usepackage[hidelinks, hyperindex=false]{hyperref}
 \fi
-
 
 % no indent for items in lists (in mobile)
 \ifnarrow
@@ -211,6 +198,8 @@
 
 \begin{document}
 
+\selectlanguage{russian}
+
 \input{hyphenation}
 
 
@@ -256,16 +245,16 @@
 \cleardoublepage
 \tableofcontents
 
-\clearpage
+%% \clearpage
 \input{about}
 
 \blank\include{ch1-web}
 \blank\include{ch2-spec}
-\blank\include{ch3-exceptions}
-\blank\include{ch4-mutability}
-\blank\include{ch5-config}
-\blank\include{ch6-systems}
-\blank\include{ch7-tests}
+%% \blank\include{ch3-exceptions}
+%% \blank\include{ch4-mutability}
+%% \blank\include{ch5-config}
+%% \blank\include{ch6-systems}
+%% \blank\include{ch7-tests}
 
 % works only in book class
 \ifprint

@@ -14,9 +14,6 @@
 
 \newcommand{\eng}[1]{(англ.~#1)}
 
-% https://tex.stackexchange.com/questions/44361/
-\DeclareTextFontCommand{\code}{\ttfamily\hyphenchar\font=45\relax}
-
 \ifprint
 \newcommand{\page}[1]{(с.~\pageref{#1})}
 \newcommand{\fig}[1]{(рис.~\ref{#1})}
@@ -84,8 +81,6 @@
 %% https://tex.stackexchange.com/questions/76132/
 \newcommand{\tuple}[1]{\textlangle\,#1\,\textrangle}
 
-\newminted[clojure]{clojure}{}
-
 \ifprint
 \def\codeindent{0mm}
 \fi
@@ -94,34 +89,44 @@
 \def\codeindent{\parindent}
 \fi
 
-\newminted[clojure/lines]{clojure}{linenos, xleftmargin=\codeindent}
+\def\mintedsize{\footnotesize}
 
-\newminted[python/lines]{python}{linenos, xleftmargin=\codeindent}
+\newminted[clojure]{clojure}{fontsize=\mintedsize}
 
-\newminted[json/lines]{json}{linenos, xleftmargin=\codeindent}
+\newminted[clojure/lines]{clojure}{linenos, xleftmargin=\codeindent, fontsize=\mintedsize}
 
-\newminted[json]{json}{}
+\newminted[python/lines]{python}{linenos, xleftmargin=\codeindent, fontsize=\mintedsize}
 
-\newminted[yaml]{yaml}{}
+\newminted[json/lines]{json}{linenos, xleftmargin=\codeindent, fontsize=\mintedsize}
 
-\newminted[bash]{console}{}
+\newminted[json]{json}{fontsize=\mintedsize}
 
-\newminted[python]{python}{}
+\newminted[yaml]{yaml}{fontsize=\mintedsize}
 
-\newminted[htmldjango]{htmldjango}{}
+\newminted[bash]{console}{fontsize=\mintedsize}
 
-\newminted[js]{js}{}
+\newminted[python]{python}{fontsize=\mintedsize}
 
-\newminted[xml]{xml}{}
+\newminted[htmldjango]{htmldjango}{fontsize=\mintedsize}
 
-\newminted[diff]{diff}{}
+\newminted[js]{js}{fontsize=\mintedsize}
 
-\newminted[sql]{sql}{}
+\newminted[xml]{xml}{fontsize=\mintedsize}
 
-\newminted[http]{http}{}
+\newminted[diff]{diff}{fontsize=\mintedsize}
 
-\newminted[text]{text}{}
+\newminted[sql]{sql}{fontsize=\mintedsize}
 
-\newminted[ini]{ini}{}
+\newminted[http]{http}{fontsize=\mintedsize}
+
+\newminted[text]{text}{fontsize=\mintedsize}
+
+\newminted[ini]{ini}{fontsize=\mintedsize}
 
 \newenvironment{english}{\begin{otherlanguage}{english}}{\end{otherlanguage}}
+
+\newenvironment{russian}{\begin{otherlanguage}{russian}}{\end{otherlanguage}}
+
+\newcommand{\code}[1]{\texttt{#1}}
+
+\newcommand{\angles}[1]{\textlangle{}#1\textrangle{}}
