@@ -91,39 +91,37 @@
 \def\codeindent{\parindent}
 \fi
 
-\def\mintedsize{\footnotesize}
+\newminted[clojure]{clojure}{}
 
-\newminted[clojure]{clojure}{fontsize=\mintedsize}
+\newminted[clojure/lines]{clojure}{linenos, xleftmargin=\codeindent}
 
-\newminted[clojure/lines]{clojure}{linenos, xleftmargin=\codeindent, fontsize=\mintedsize}
+\newminted[python/lines]{python}{linenos, xleftmargin=\codeindent}
 
-\newminted[python/lines]{python}{linenos, xleftmargin=\codeindent, fontsize=\mintedsize}
+\newminted[json/lines]{json}{linenos, xleftmargin=\codeindent}
 
-\newminted[json/lines]{json}{linenos, xleftmargin=\codeindent, fontsize=\mintedsize}
+\newminted[json]{json}{}
 
-\newminted[json]{json}{fontsize=\mintedsize}
+\newminted[yaml]{yaml}{}
 
-\newminted[yaml]{yaml}{fontsize=\mintedsize}
+\newminted[bash]{console}{}
 
-\newminted[bash]{console}{fontsize=\mintedsize}
+\newminted[python]{python}{}
 
-\newminted[python]{python}{fontsize=\mintedsize}
+\newminted[htmldjango]{htmldjango}{}
 
-\newminted[htmldjango]{htmldjango}{fontsize=\mintedsize}
+\newminted[js]{js}{}
 
-\newminted[js]{js}{fontsize=\mintedsize}
+\newminted[xml]{xml}{}
 
-\newminted[xml]{xml}{fontsize=\mintedsize}
+\newminted[diff]{diff}{}
 
-\newminted[diff]{diff}{fontsize=\mintedsize}
+\newminted[sql]{sql}{}
 
-\newminted[sql]{sql}{fontsize=\mintedsize}
+\newminted[http]{http}{}
 
-\newminted[http]{http}{fontsize=\mintedsize}
+\newminted[text]{text}{}
 
-\newminted[text]{text}{fontsize=\mintedsize}
-
-\newminted[ini]{ini}{fontsize=\mintedsize}
+\newminted[ini]{ini}{}
 
 \newenvironment{english}{\begin{otherlanguage}{english}}{\end{otherlanguage}}
 

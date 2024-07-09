@@ -38,7 +38,7 @@
 \newlength{\marginparoffset}
 \setlength{\marginparoffset}{0mm}
 
-\usepackage[T2A]{fontenc}
+\usepackage[T1]{fontenc}
 \usepackage{tikz}
 \usepackage{tocloft}
 \usepackage{geometry}
@@ -98,7 +98,7 @@
 % code highlight
 \usepackage[newfloat=true]{minted}
 \usemintedstyle{print}
-%% \setminted{fontsize=\small} %% reduce minted font
+\setminted{fontsize=\small} %% reduce minted font
 \SetupFloatingEnvironment{listing}{placement=H}
 
 \ifnarrow
@@ -210,10 +210,8 @@
 \setcounter{page}{1}
 \fi
 
-
 % always add title page
 \input{title}
-
 
 % opening page (UDK & BBK) / annotation
 \ifridero
@@ -225,7 +223,6 @@
 \else
  \input{abstract}
 \fi
-
 
 % fix a widow line in TOC for A5
 \ifafive
@@ -244,6 +241,8 @@
 \renewcommand\contentsline[3]{\thispagestyle{empty}\Contentsline{#1}{#2}{#3}}
 \cleardoublepage
 \tableofcontents
+
+\clearpage
 
 %% \clearpage
 \input{about}
