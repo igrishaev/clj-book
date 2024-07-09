@@ -189,7 +189,6 @@
 \let\oldfootnote\footnote
 \renewcommand\footnote[1]{\oldfootnote{\hspace{1mm}#1}}
 
-
 %% for ebook, remove top margin for ToC
 \ifebook
 \setlength{\cftbeforetoctitleskip}{0pt}
@@ -201,7 +200,6 @@
 \selectlanguage{russian}
 
 \input{hyphenation}
-
 
 % add cover when set
 \ifx\COVER\NIL
@@ -248,12 +246,12 @@
 \input{about}
 
 \blank\include{ch1-web}
-\blank\include{ch2-spec}
-\blank\include{ch3-exceptions}
-\blank\include{ch4-mutability}
-\blank\include{ch5-config}
-\blank\include{ch6-systems}
-\blank\include{ch7-tests}
+%% \blank\include{ch2-spec}
+%% \blank\include{ch3-exceptions}
+%% \blank\include{ch4-mutability}
+%% \blank\include{ch5-config}
+%% \blank\include{ch6-systems}
+%% \blank\include{ch7-tests}
 
 % works only in book class
 \ifprint
