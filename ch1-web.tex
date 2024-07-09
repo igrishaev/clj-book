@@ -63,34 +63,34 @@ JSON-документ? Программа сверяет заголовок и~�
 Рассмотрим примеры трафика HTTP. Именно в таком виде его передают по сети. Ниже
 запрос к главной странице Google по слову clojure:
 
-\begin{english}
-  \begin{http}
+
+\begin{http}
 GET /search?q=clojure HTTP/1.1
 Host: google.com
 Accept-Language: en-us
 User-Agent: Mozilla/4.0 (compatible; MSIE)
-  \end{http}
-\end{english}
+\end{http}
+
 
 А это POST-запрос с JSON:
 
 \pagebreaklarge
 
-\begin{english}
-  \begin{http}
+
+\begin{http}
 POST /api/users/ HTTP/1.1
 Host: example.com
 Content-Type: application/json
 
 {"username": "John", "city": "NY"}
-  \end{http}
-\end{english}
+\end{http}
+
 
 Обратите внимание на пустую строку выше: она отделяет тело от заголовков. Ответ
 на этот запрос:
 
-\begin{english}
-  \begin{http}
+
+\begin{http}
 HTTP/1.1 200 OK
 Date: Tue, 19 Mar 2019 15:57:11 GMT
 Server: Nginx
@@ -101,8 +101,8 @@ Content-Type: application/json
   "code": "CREATED",
   "message": "User has been created."
 }
-  \end{http}
-\end{english}
+\end{http}
+
 
 Видно, как изящно устроен протокол: данные идут по убыванию важности. Прочитав
 только первую строку, клиент и~сервер готовы принять решение о~том, что делать
@@ -295,8 +295,8 @@ Rails. Имена и состав классов отличаются, но см
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn app [request]
  (let [{:keys [uri request-method]}
        request]
@@ -307,13 +307,13 @@ Rails. Имена и состав классов отличаются, но см
                name
                .toUpperCase)
            uri)}))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn app [request]
   (let [{:keys [uri request-method]} request]
     {:status 200
@@ -321,8 +321,8 @@ Rails. Имена и состав классов отличаются, но см
      :body (format "You requested %s %s"
                    (-> request-method name .toUpperCase)
                    uri)}))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -333,8 +333,8 @@ Rails. Имена и состав классов отличаются, но см
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (app {:request-method :get
       :uri "/index.html"})
 
@@ -348,30 +348,30 @@ Rails. Имена и состав классов отличаются, но см
 {:status 200
  :headers {"Content-Type" "text/plain"}
  :body "You requested POST /users"}
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (app {:request-method :get :uri "/index.html"})
 
 {:status 200
  :headers {"Content-Type" "text/plain"}
  :body "You requested GET /index.html"}
-  \end{clojure}
-\end{english}
+\end{clojure}
 
-\begin{english}
-  \begin{clojure}
+
+
+\begin{clojure}
 (app {:request-method :post :uri "/users"})
 
 {:status 200
  :headers {"Content-Type" "text/plain"}
  :body "You requested POST /users"}
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -387,33 +387,33 @@ Rails. Имена и состав классов отличаются, но см
 
 Добавим в проект зависимости:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 [ring/ring-core "1.7.1"]
 [ring/ring-jetty-adapter "1.7.1"]
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Запустим сервер:
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (require '[ring.adapter.jetty
            :refer [run-jetty]])
 (run-jetty app {:port 8080 :join? true})
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (require '[ring.adapter.jetty :refer [run-jetty]])
 (run-jetty app {:port 8080 :join? true})
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -425,28 +425,28 @@ Rails. Имена и состав классов отличаются, но см
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (def server
   (run-jetty app {:port 8080
                   :join? false}))
 
 ;; after a while
 (.stop server)
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (def server
   (run-jetty app {:port 8080 :join? false}))
 
 ;; after a while
 (.stop server)
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -476,15 +476,15 @@ Rails. Имена и состав классов отличаются, но см
 
 \index{синтаксис!:keys (разбиение)}
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn some-handler
   [request]
   (let [{:keys [headers]} request
         {:keys [host]} headers]
     ...))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \index{синтаксис!:strs (разбиение)}
 
@@ -494,37 +494,37 @@ Rails. Имена и состав классов отличаются, но см
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn some-handler
   [{:keys [headers]}]
   (let [{:strs [host
                 user-agent]} headers]
     ...))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn some-handler
   [{:keys [headers]}]
   (let [{:strs [host user-agent]} headers]
     ...))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
 \noindent
 или функцию \code{get} со строкой:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (get headers "host") ;; "127.0.0.1"
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \index{заголовки!Content-Type}
 
@@ -542,11 +542,11 @@ Clojure) регистр имеет значение. Ring приводит за�
 Новички забывают, что ключи заголовков~--- это строки. Так появляется ошибка, когда
 вместо правильного значения приходит \code{nil}:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (get headers :host) ;; nil
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Можно обработать заголовки, сменив тип ключей. Для одного случая это нормально,
 но если это делает каждый обработчик, получается лишняя работа. Приложение
@@ -571,15 +571,15 @@ Clojure) регистр имеет значение. Ring приводит за�
 
 Легче всего прочитать тело в строку функцией \code{slurp}:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn handler [request]
  (let [content (-> request :body slurp)]
   {:status 200
    :headers {"content-type" "text/plain"}
    :body (format "Content: %s" content)}))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 В современном вебе всё меньше работают с текстом: на его место приходят данные в
 виде JSON. Позже мы рассмотрим, как подружить Ring с этим форматом.
@@ -602,24 +602,24 @@ Clojure) регистр имеет значение. Ring приводит за�
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 {:status 302
  :headers
    {"content-length" 0
     "location" "/new/page.html"}}
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 {:status 302
  :headers {"content-length" 0
            "location" "/new/page.html"}}
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -649,8 +649,8 @@ Clojure) регистр имеет значение. Ring приводит за�
 по~\code{/hello}~--- приветствие. Другие адреса вернут
 \code{404 Page not found}. Напишем обработчики:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn page-index [request]
   {:status 200
    :headers {"content-type" "text/plain"}
@@ -665,8 +665,8 @@ Clojure) регистр имеет значение. Ring приводит за�
   {:status 404
    :headers {"content-type" "text/plain"}
    :body "Page not found."})
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Каждый обработчик можно запустить в виде сервера и открыть в~браузере. Осталось
 связать их в единое целое.
@@ -676,16 +676,16 @@ Clojure) регистр имеет значение. Ring приводит за�
 Сделаем самое простое, что приходит в голову. Напишем обработчик, который
 находит маршрут вручную. Для этого проверим путь оператором \code{case}:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn app [request]
   (let [{:keys [uri]} request]
     (case uri
       "/"      (page-index request)
       "/hello" (page-hello request)
       (page-404 request))))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Ответ функции зависит от поля запроса \code{:uri}. Запустите приложение в
 браузере и проверьте разные адреса. Это наивный подход, но он работает.
@@ -709,19 +709,19 @@ Clojure) регистр имеет значение. Ring приводит за�
 предлагает макросы для описания маршрутов. Макросы похожи на таблицу правил.
 Добавим зависимость в проект:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 [compojure "1.6.1"]
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Так выглядит приложение на Compojure. Оно чище и короче того, что мы написали
 вначале.
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (require '[compojure.core
            :refer [GET defroutes]])
 
@@ -731,21 +731,21 @@ Clojure) регистр имеет значение. Ring приводит за�
   (GET "/hello" request
     (page-hello request))
   page-404)
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (require '[compojure.core :refer [GET defroutes]])
 
 (defroutes app
   (GET "/"      request (page-index request))
   (GET "/hello" request (page-hello request))
   page-404)
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -787,20 +787,20 @@ Clojure) регистр имеет значение. Ring приводит за�
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (GET "/users/:id" [id :as request]
     (page-user request))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (GET "/users/:id" [id :as request] (page-user request))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -814,8 +814,8 @@ Clojure) регистр имеет значение. Ring приводит за�
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn page-user [request]
    (let [user (-> request
                   :params
@@ -825,20 +825,20 @@ Clojure) регистр имеет значение. Ring приводит за�
      {:status 200
       :body (format "User is %s %s"
                     fname lname)}))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn page-user [request]
   (let [user (-> request :params :id get-user-by-id)
         {:keys [fname lname]} user]
     {:status 200
      :body (format "User is %s %s" fname lname)}))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -855,8 +855,8 @@ Compojure решает проблему вложенных адресов. Ра�
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (context "/content/order/:id" [order-id]
   (GET  "/view" request
         (order-view request))
@@ -865,20 +865,20 @@ Compojure решает проблему вложенных адресов. Ра�
           (order-form request))
     (POST "/" request
           (order-save request))))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (context "/content/order/:id" [order-id]
   (GET  "/view" request (order-view request))
   (context "/edit" []
     (GET  "/" request (order-form request))
     (POST "/" request (order-save request))))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -905,31 +905,31 @@ Compojure решает проблему вложенных адресов. Ра�
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (ANY "/health" _
      {:status 200 :body "ok"})
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (ANY "/health" _ {:status 200 :body "ok"})
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
 Можно сделать проще: в Compojure предусмотрен случай, когда выражение~---
 строка. Она становится телом положительного ответа:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (ANY "/health" _ "ok")
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \subsection{Роутинг с Bidi}
 
@@ -946,11 +946,11 @@ Compojure решает проблему вложенных адресов. Ра�
 подходят метод и путь запроса. Если ветка нашлась, результатом будут её тег и
 параметры пути, например:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 {:route :show-user :route-params: {:id 1}}
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \index{middleware}
 
@@ -972,53 +972,53 @@ Compojure решает проблему вложенных адресов. Ра�
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 ;; project.clj
 [bidi "2.1.5"]
 
 ;; namespace
 (:require [bidi.bidi :as bidi])
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 [bidi "2.1.5"]                  ;; project.clj
 (:require [bidi.bidi :as bidi]) ;; namespace
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
 Начнём с дерева маршрутов. Вариант со страницами \code{page\-/index},
 \code{page\-/hello} и~\code{page\-/404} выглядит так:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (def routes
   ["/" {""      :page-index
         "hello" :page-hello
         true    :not-found}])
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \index{функции!match-route}
 
 Проверим поиск пути по этому дереву. Функция \code{match-route} принимает
 маршруты, путь и возвращает словарь с тегом:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (bidi/match-route routes "/hello")
 {:handler :page-hello}
 
 (bidi/match-route routes "/test")
 {:handler :not-found}
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \index{функции!match-route}
 
@@ -1029,8 +1029,8 @@ Compojure решает проблему вложенных адресов. Ра�
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (let [request {:request-method :get
                :uri "/test"}]
   (bidi/match-route*
@@ -1039,13 +1039,13 @@ Compojure решает проблему вложенных адресов. Ра�
 {:request-method :get
  :uri "/test"
  :handler :not-found}
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (let [request {:request-method :get
                :uri "/test"}]
   (bidi/match-route* routes (:uri request) request))
@@ -1053,8 +1053,8 @@ Compojure решает проблему вложенных адресов. Ра�
 {:request-method :get
  :uri "/test"
  :handler :not-found}
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -1065,28 +1065,28 @@ Compojure решает проблему вложенных адресов. Ра�
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn wrap-handler [handler]
   (fn [req]
     (let [{:keys [uri]} req
            req* (bidi/match-route*
                   routes uri req)]
       (handler req*))))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn wrap-handler [handler]
   (fn [request]
     (let [{:keys [uri]} request
           request* (bidi/match-route* routes uri request)]
       (handler request*))))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -1096,8 +1096,8 @@ Compojure решает проблему вложенных адресов. Ра�
 Проверим \code{wrap-handler} на скорую руку. Для удобства обернём функцию
 \code{identity}, которая вернёт переданный в неё аргумент:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (def wrapped (wrap-handler identity))
 
 (wrapped {:request-method :get
@@ -1106,16 +1106,16 @@ Compojure решает проблему вложенных адресов. Ра�
 {:request-method :get
  :uri "/hello?foo=42"
  :handler :page-hello}
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \index{мультиметоды!multi-handler}
 
 Новый обработчик запроса будет мультиметодом. Его функ\-ция-дис\-пет\-чер~---
 просто ключ \code{:handler}.
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defmulti multi-handler
   :handler)
 
@@ -1130,43 +1130,43 @@ Compojure решает проблему вложенных адресов. Ра�
   {:status 404
    :headers {"content-type" "text/plain"}
    :body "Page not found."})
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Обернув \code{multi-handler} с помощью \code{wrap\-/handler}, получим
 финальное приложение. Запустите сервер и проверьте результат в браузере.
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (def app (wrap-handler multi-handler))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Это был простой роутинг на Bidi. Теперь рассмотрим товары, их
 просмотр и изменение. Новое дерево выглядит так:
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (def routes
   [["/content/order/" :id]
    {"/view" {:get  :page-view}
     "/edit" {:get  :page-form
              :post :page-save}}])
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (def routes
   [["/content/order/" :id] {"/view" {:get  :page-view}
                             "/edit" {:get  :page-form
                                      :post :page-save}}])
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -1186,8 +1186,8 @@ Compojure решает проблему вложенных адресов. Ра�
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defmethod multi-handler :page-view
   [request]
   (if-let [order (some->
@@ -1202,13 +1202,13 @@ Compojure решает проблему вложенных адресов. Ра�
      :body (render-order-page
              {:order order})}
     page-404))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defmethod multi-handler :page-view
   [request]
   (if-let [order (some-> request
@@ -1220,8 +1220,8 @@ Compojure решает проблему вложенных адресов. Ра�
      :headers {"content-type" "text/html"}
      :body (render-order-page {:order order})}
     page-404))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -1233,8 +1233,8 @@ Compojure решает проблему вложенных адресов. Ра�
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defmethod multi-handler :page-save
   [req]
   (let [{:keys [params route-params]} req
@@ -1248,13 +1248,13 @@ Compojure решает проблему вложенных адресов. Ра�
       params ["id = ?" order-id])
     {:status 302
      :headers {"Location" location}}))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defmethod multi-handler :page-save
   [request]
   (let [{:keys [params route-params]} request
@@ -1265,8 +1265,8 @@ Compojure решает проблему вложенных адресов. Ра�
     (jdbc/update! *db* :orders params ["id = ?" order-id])
     {:status 302
      :headers {"Location" location}}))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -1318,28 +1318,28 @@ Compojure решает проблему вложенных адресов. Ра�
 Рассмотрим простые декораторы. \code{Wrap-echo} добавляет к функции побочный
 эффект: печатает аргументы и результат.
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn wrap-echo [func]
   (fn [& args]
     (apply println "The args are" args)
     (let [result (apply func args)]
       (println "The result is" result)
       result)))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Вот как им пользоваться:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (def +echo (wrap-echo +))
 (+echo 1 2 3)
 ;; The args are 1 2 3
 ;; The result is 6
 6
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \index{исключения!try}
 \index{исключения!catch}
@@ -1348,8 +1348,8 @@ Compojure решает проблему вложенных адресов. Ра�
 \code{Wrap-catch} оборачивает функцию в \code{try} и \code{catch}. Если
 произошло исключение, результатом будет его объект.
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn wrap-catch [func]
   (fn [& args]
     (try
@@ -1361,8 +1361,8 @@ Compojure решает проблему вложенных адресов. Ра�
 
 (type (div-safe 0 0))
 ;; java.lang.ArithmeticException
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \index{языки!Python}
 \index{фреймворки!Django}
@@ -1433,22 +1433,22 @@ HTTP предусматривает данные в адресной строк�
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (require '[ring.middleware.params
            :refer [wrap-params]])
 (def final-app (wrap-params app))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (require '[ring.middleware.params :refer [wrap-params]])
 (def final-app (wrap-params app))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -1456,11 +1456,11 @@ HTTP предусматривает данные в адресной строк�
 называйте \code{app-naked} или \code{app-raw} (голое, сырое), а~финальное~---
 просто \code{app}.
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (def app (wrap-params app-naked))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Доработайте приложение так, чтобы оно учитывало параметры. Например, пусть
 параметр \code{who} задаёт имя, кого приветствовать:
@@ -1468,23 +1468,23 @@ HTTP предусматривает данные в адресной строк�
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn page-hello [req]
   (let [who (get-in req [:params "who"])]
     ...))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn page-hello [request]
   (let [who (get-in request [:params "who"])]
     ...))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -1498,15 +1498,15 @@ HTTP предусматривает данные в адресной строк�
 
 \index{middleware!wrap-keyword-params}
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (require '[ring.middleware.keyword-params
            :refer [wrap-keyword-params]])
 
 (def app (wrap-keyword-params
            (wrap-params app-naked)))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \index{макросы!\arr}
 
@@ -1514,29 +1514,29 @@ HTTP предусматривает данные в адресной строк�
 оператором как в первой строке. Некоторым этот способ нравится больше, чем
 \code{get-in}.
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (-> request :params :who)
 ;; or
 (get-in request [:params :who])
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \subsection{Стек middleware}
 
 Типичный проект на Clojure включает около десяти middleware. Как только мы
 начнём нанизывать их на приложение, появится лесенка:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (def app
   (wrap-something-else
     (wrap-current-user
       (wrap-session
         (wrap-keyword-params
           (wrap-params app-naked))))))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \index{вложенность}
 
@@ -1545,8 +1545,8 @@ HTTP предусматривает данные в адресной строк�
 
 \index{clojure.core!\arr (стрелочный оператор)}
 
-\begin{english}
-  \begin{clojure/lines}
+
+\begin{clojure/lines}
 (def app
   (-> app-naked
       wrap-params
@@ -1554,8 +1554,8 @@ HTTP предусматривает данные в адресной строк�
       wrap-session
       wrap-current-user
       wrap-something-else))
-  \end{clojure/lines}
-\end{english}
+\end{clojure/lines}
+
 
 \index{middleware!стек}
 
@@ -1620,12 +1620,12 @@ middleware зависят друг от друга, их можно <<схлоп
 \index{clojure.core!comp}
 \index{функции!композиция}
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (def wrap-params+
   (comp wrap-params wrap-keyword-params))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Разберёмся, почему аргументы \code{comp} идут в таком порядке. Обозначим
 их \code{foo} и \code{bar} и перепишем выражение несколько раз. В каждом
@@ -1633,29 +1633,29 @@ middleware зависят друг от друга, их можно <<схлоп
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (comp foo bar)
-  \end{clojure}
+\end{clojure}
 
 \splitter
 
-  \begin{clojure}
+\begin{clojure}
 (fn [x]
   (foo (bar x)))
-  \end{clojure}
+\end{clojure}
 
 \splitter
 
-  \begin{clojure}
+\begin{clojure}
 (fn [x]
   (-> x bar foo))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
+
 
 \noindent
 \iflarge
@@ -1664,27 +1664,27 @@ middleware зависят друг от друга, их можно <<схлоп
 \begin{tabular}{ @{}p{3.2cm} @{}p{3.5cm} @{}p{3.5cm} }
 \fi
 
-  \begin{clojure}
+\begin{clojure}
 (comp foo bar)
-  \end{clojure}
+\end{clojure}
 
 &
 
-  \begin{clojure}
+\begin{clojure}
 (fn [x]
   (foo (bar x)))
-  \end{clojure}
+\end{clojure}
 
 &
 
-  \begin{clojure}
+\begin{clojure}
 (fn [x]
   (-> x bar foo))
-  \end{clojure}
+\end{clojure}
 
 \end{tabular}
 
-\end{english}
+
 
 \fi
 
@@ -1715,11 +1715,11 @@ middleware, то всё станет ясно. Во время запроса о
 сайте. В первый раз приложение ищет в запросе куки с именем
 \code{seen}. Если их нет, сервер выставит заголовок:
 
-\begin{english}
-  \begin{http}
+
+\begin{http}
 Set-Cookie: seen=true;
-  \end{http}
-\end{english}
+\end{http}
+
 
 Получив куки, браузер добавит их ко всем запросам к серверу. Исходящий заголовок
 выглядит так же, но без частички \code{Set-} в имени. Приложение проверяет: если
@@ -1738,8 +1738,8 @@ Set-Cookie: seen=true;
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure/lines}
+
+\begin{clojure/lines}
 (require '[ring.middleware.cookies
            :refer [wrap-cookies]])
 
@@ -1759,13 +1759,13 @@ Set-Cookie: seen=true;
 
 (def app (-> page-seen
              wrap-cookies))
-  \end{clojure/lines}
-\end{english}
+\end{clojure/lines}
+
 
 \else
 
-\begin{english}
-  \begin{clojure/lines}
+
+\begin{clojure/lines}
 (require '[ring.middleware.cookies
            :refer [wrap-cookies]])
 
@@ -1782,8 +1782,8 @@ Set-Cookie: seen=true;
 
 (def app (-> page-seen
              wrap-cookies))
-  \end{clojure/lines}
-\end{english}
+\end{clojure/lines}
+
 
 \fi
 
@@ -1815,48 +1815,48 @@ see it. Для полноты эксперимента откройте прив
 защититесь от вредоносных скриптов, которые читают куки и отправляют на чужой
 сервер. Откройте консоль разработчика в браузере и~выполните выражение:
 
-\begin{english}
-  \begin{js}
+
+\begin{js}
 > document.cookie
 // ring-session=...; seen=true
-  \end{js}
-\end{english}
+\end{js}
+
 
 \noindent
 Измените переменную \code{cookies*} так, чтобы у~\code{seen} был атрибут:
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (let [cookies*
       (assoc cookies "seen"
         {:value true
          :http-only true})]
   ...)
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (let [cookies* (assoc cookies "seen"
                       {:value true :http-only true})]
   ...)
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
 Теперь JavaScript не увидит значение \code{seen}:
 
-\begin{english}
-  \begin{js}
+
+\begin{js}
 > document.cookie
 // ring-session=...
-  \end{js}
-\end{english}
+\end{js}
+
 
 Атрибут \code{:secure} означает, что куки передаются только в безопасном
 соединении по SSL. На время разработки им можно пренебречь, но в боевом запуске
@@ -1926,8 +1926,8 @@ middleware, которое дополняет запрос словарём \cod
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (require '[ring.middleware.session
            :refer [wrap-session]])
 
@@ -1943,15 +1943,15 @@ middleware, которое дополняет запрос словарём \cod
 
 (def app (-> page-counter
              wrap-session))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
 \ifafive
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (require '[ring.middleware.session
            :refer [wrap-session]])
 
@@ -1959,26 +1959,26 @@ middleware, которое дополняет запрос словарём \cod
   (let [{:keys [session]} request
         session* (update session :counter (fnil inc 0))
         counter (:counter session*)]
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \pagebreak
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
     {:status 200
      :session session*
      :body (format "Seen %s time(s)" counter)}))
 
 (def app (-> page-counter
              wrap-session))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (require '[ring.middleware.session
            :refer [wrap-session]])
 
@@ -1992,8 +1992,8 @@ middleware, которое дополняет запрос словарём \cod
 
 (def app (-> page-counter
              wrap-session))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -2028,11 +2028,11 @@ middleware, которое дополняет запрос словарём \cod
 Ring предлагает несколько middleware для JSON. Для удобства их~поместили
 в~отдельную библиотеку. Добавьте зависимость:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 [ring/ring-json "0.4.0"]
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \index{middleware!wrap-json-response}
 \index{HTTP!JSON}
@@ -2047,8 +2047,8 @@ Middleware \code{wrap-json-response} упрощает возврат JSON-дан
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn page-data [request]
   (let [user-id (-> request :params :id)
         user (get-user-by-id user-id)]
@@ -2058,13 +2058,13 @@ Middleware \code{wrap-json-response} упрощает возврат JSON-дан
        :body
        {:error_code "MISSING_USER"
         :error_msg "No such user"}})))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn page-data [request]
   (let [user-id (-> request :params :id)]
     (if-let [user (get-user-by-id user-id)]
@@ -2072,8 +2072,8 @@ Middleware \code{wrap-json-response} упрощает возврат JSON-дан
       {:status 404
        :body {:error_code "MISSING_USER"
               :error_message "No such user"}})))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -2081,20 +2081,20 @@ Middleware \code{wrap-json-response} упрощает возврат JSON-дан
 В обоих случаях не нужно кодировать данные вручную~--- это делает
 \code{wrap-json-response}.
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (require '[ring.middleware.json
            :refer [wrap-json-response]])
-  \end{clojure}
-\end{english}
+\end{clojure}
 
-\begin{english}
-  \begin{clojure}
+
+
+\begin{clojure}
 (def app (-> page-data
              wrap-params+
              wrap-json-response))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Запустите \code{app} и переключитесь в браузер. Откройте вкладку Network в
 панели разработчика. Изучите запрос к серверу, в особенности заголовки ответа и
@@ -2115,8 +2115,8 @@ malformed>>.
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (require '[ring.middleware.json
            :refer [wrap-json-body]])
 
@@ -2132,13 +2132,13 @@ malformed>>.
   (->
     page-body
     (wrap-json-body {:keywords? true})))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (require '[ring.middleware.json
            :refer [wrap-json-body]])
 
@@ -2152,8 +2152,8 @@ malformed>>.
 
 (def app (-> page-body
              (wrap-json-body {:keywords? true})))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -2167,27 +2167,27 @@ malformed>>.
 
 \ifnarrow
 
-\begin{english}
-  \begin{bash}
+
+\begin{bash}
 curl --request POST
      --header "Content-Type:
                  application/json"
      --data '{"username":"John",
                       "city":"NY"}'
      http://localhost:8080/
-  \end{bash}
-\end{english}
+\end{bash}
+
 
 \else
 
-\begin{english}
-  \begin{bash}
+
+\begin{bash}
 curl --request POST
      --header "Content-Type: application/json"
      --data '{"username":"John", "city":"NY"}'
      http://localhost:8080/
-  \end{bash}
-\end{english}
+\end{bash}
+
 
 \fi
 
@@ -2252,8 +2252,8 @@ Middleware не случайно выделяет поле \code{:json\-/params}
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (require
  '[clojure.walk :refer [keywordize-keys
                         stringify-keys]])
@@ -2265,13 +2265,13 @@ Middleware не случайно выделяет поле \code{:json\-/params}
         handler
         (update :headers
                 stringify-keys))))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (require '[clojure.walk :refer
            [keywordize-keys stringify-keys]])
 
@@ -2281,8 +2281,8 @@ Middleware не случайно выделяет поле \code{:json\-/params}
         (update :headers keywordize-keys)
         handler
         (update :headers stringify-keys))))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -2293,8 +2293,8 @@ Middleware не случайно выделяет поле \code{:json\-/params}
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn app* [request]
   (let [{:keys [headers]} request
         {:keys [host]} headers]
@@ -2304,37 +2304,37 @@ Middleware не случайно выделяет поле \code{:json\-/params}
                 "</h1>")}))
 
 (def app (wrap-headers-kw app*))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
 \iflarge
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn app* [request]
   (let [{:keys [headers]} request
         {:keys [host]} headers]
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \pagebreaklarge
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
     {:status 200
      :headers {:content-type "text/html"}
      :body (format "<h1>Host header: %s</h1>" host)}))
 
 (def app (wrap-headers-kw app*))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn app* [request]
   (let [{:keys [headers]} request
         {:keys [host]} headers]
@@ -2343,8 +2343,8 @@ Middleware не случайно выделяет поле \code{:json\-/params}
      :body (format "<h1>Host header: %s</h1>" host)}))
 
 (def app (wrap-headers-kw app*))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -2378,8 +2378,8 @@ Middleware не случайно выделяет поле \code{:json\-/params}
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (import 'java.util.UUID)
 
 (defn wrap-request-id [handler]
@@ -2395,13 +2395,13 @@ Middleware не случайно выделяет поле \code{:json\-/params}
           handler
           (assoc :request-id uuid)
           (assoc-in path uuid)))))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (import 'java.util.UUID)
 
 (defn wrap-request-id [handler]
@@ -2415,8 +2415,8 @@ Middleware не случайно выделяет поле \code{:json\-/params}
           handler
           (assoc :request-id uuid)
           (assoc-in path uuid)))))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -2432,24 +2432,24 @@ Middleware не случайно выделяет поле \code{:json\-/params}
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn some-handler [req]
   (let [{:keys [params request-id]} req]
     (log/info "Request id: %s"
               request-id)))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn some-handler [request]
   (let [{:keys [params request-id]} request]
     (log/info "Request id: %s" request-id)))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -2468,8 +2468,8 @@ Middleware не случайно выделяет поле \code{:json\-/params}
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn wrap-current-user [handler]
   (fn [request]
     (let [user-id (-> request
@@ -2481,13 +2481,13 @@ Middleware не случайно выделяет поле \code{:json\-/params}
       (-> request
           (assoc :user user)
           handler))))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn wrap-current-user [handler]
   (fn [request]
     (let [user-id (-> request :session :user-id)
@@ -2496,8 +2496,8 @@ Middleware не случайно выделяет поле \code{:json\-/params}
       (-> request
           (assoc :user user)
           handler))))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -2540,8 +2540,8 @@ Middleware часто содержат условия. Например, \code{w
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn wrap-auth-user-only [handler]
   (fn [request]
     (if (:user request)
@@ -2550,13 +2550,13 @@ Middleware часто содержат условия. Например, \code{w
        :headers
        {"content-type" "text/plain"}
        :body "Sign in to get access."})))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn wrap-auth-user-only [handler]
   (fn [request]
     (if (:user request)
@@ -2564,8 +2564,8 @@ Middleware часто содержат условия. Например, \code{w
       {:status 403
        :headers {"content-type" "text/plain"}
        :body "Please sign in to access this page."})))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -2598,8 +2598,8 @@ Middleware часто содержат условия. Например, \code{w
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn wrap-exception [handler]
   (fn [{:keys [uri request-method]
         :as request}]
@@ -2613,13 +2613,13 @@ Middleware часто содержат условия. Например, \code{w
            :headers
            {"content-type" "text/plain"}
            :body "Sorry, try later."}))))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn wrap-exception [handler]
   (fn [request]
     (try
@@ -2631,8 +2631,8 @@ Middleware часто содержат условия. Например, \code{w
           {:status 500
            :headers {"content-type" "text/plain"}
            :body "Sorry, please try later."})))))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -2683,41 +2683,41 @@ middleware под названием \code{wrap-routes}. Оно принимае
 
 Построим отдельные маршруты с личной информацией:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defroutes app-account
   (GET "/cart"    _ "cart")
   (GET "/orders"  _ "orders")
   (GET "/profile" _ "profile"))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Смонтируем их на префикс \code{/account} и обернём проверкой доступа.
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defroutes app
   (GET "/"     _ "index")
   (GET "/help" _ "help")
   (context "/account" []
     (wrap-routes app-account
                  wrap-auth-user-only)))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defroutes app
   (GET "/"     _ "index")
   (GET "/help" _ "help")
   (context "/account" []
     (wrap-routes app-account wrap-auth-user-only)))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -2750,26 +2750,26 @@ Middleware, которое принимает middleware,~--- довольно �
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn page-terminals [request]
   {:status 200
    :headers
    {"content-type" "application/json"}
    :body (slurp "terminals.json")})
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn page-terminals [request]
   {:status 200
    :headers {"content-type" "application/json"}
    :body (slurp "terminals.json")})
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -2779,14 +2779,14 @@ Middleware, которое принимает middleware,~--- довольно �
 \code{slurp} читает из файла строку, что не подходит для двоичных файлов
 (картинок, PDF). В примере ниже браузер получит повреждённое содержимое.
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn app [request]
   {:status 200
    :headers {"content-type" "image/png"}
    :body (slurp "/path/to/image.png")})
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \index{форматы!PDF}
 \index{модули!clojure.java.io}
@@ -2797,8 +2797,8 @@ Ring допускает, чтобы телом ответа был файл, э�
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (require '[clojure.java.io :as io])
 
 (defn page-terminals
@@ -2807,13 +2807,13 @@ Ring допускает, чтобы телом ответа был файл, э�
    :headers
    {"content-type" "application/json"}
    :body (io/file "terminals.json")})
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (require '[clojure.java.io :as io])
 
 (defn page-terminals
@@ -2821,8 +2821,8 @@ Ring допускает, чтобы телом ответа был файл, э�
   {:status 200
    :headers {"content-type" "application/json"}
    :body (io/file "terminals.json")})
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -2836,25 +2836,25 @@ Ring допускает, чтобы телом ответа был файл, э�
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defroutes app
   (GET "/terminals.json"
        req (page-terminals req))
   (GET "/departments.json"
        req (page-departments req)))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defroutes app
   (GET "/terminals.json"   req (page-terminals req))
   (GET "/departments.json" req (page-departments req)))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -2866,27 +2866,27 @@ Ring допускает, чтобы телом ответа был файл, э�
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (require '[ring.middleware.file
            :refer [wrap-file]])
 
 (def app
   (-> app-naked
       (wrap-file "/var/www/public")))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (require '[ring.middleware.file :refer [wrap-file]])
 
 (def app (-> app-naked
              (wrap-file "/var/www/public")))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -2913,15 +2913,15 @@ Ring допускает, чтобы телом ответа был файл, э�
 
 \index{middleware!wrap-resource}
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (require '[ring.middleware.resource
            :refer [wrap-resource]])
 
 (def app (-> app-naked
              (wrap-resource "public")))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 По аналогии с \code{wrap-files} оно принимает путь, относительно которого нужно
 искать ресурсы. Всё, что мы говорили о префиксах, справедливо и для
@@ -2942,8 +2942,8 @@ middleware \code{wrap-content-type}:
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (require '[ring.middleware.content-type
            :refer [wrap-content-type]])
 
@@ -2956,13 +2956,13 @@ middleware \code{wrap-content-type}:
   (-> app-naked
       (wrap-content-type
         {:mime-types mime-types})))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (require '[ring.middleware.content-type
            :refer [wrap-content-type]])
 
@@ -2973,8 +2973,8 @@ middleware \code{wrap-content-type}:
          {"json" "application/json"
           "png" "image/png"
           "xls" "application/vnd.ms-excel"}})))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -3017,8 +3017,8 @@ HTML. Поля \code{status} и \code{body} ответа Яндекса пере
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (require '[clj-http.client :as client])
 
 (defn app-proxy [req]
@@ -3031,13 +3031,13 @@ HTML. Поля \code{status} и \code{body} ответа Яндекса пере
      :headers (select-keys
                 headers ["Content-Type"])
      :body body}))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (require '[clj-http.client :as client])
 
 (defn app-proxy [request]
@@ -3048,8 +3048,8 @@ HTML. Поля \code{status} и \code{body} ответа Яндекса пере
     {:status status
      :headers headers*
      :body body}))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -3059,8 +3059,8 @@ HTML. Поля \code{status} и \code{body} ответа Яндекса пере
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn app-proxy [request]
   (-> "https://ya.ru"
       (client/get {:stream? true})
@@ -3068,20 +3068,20 @@ HTML. Поля \code{status} и \code{body} ответа Яндекса пере
                     :body :headers])
       (update :headers
         select-keys ["Content-Type"])))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn app-proxy [request]
   (-> "https://ya.ru"
       (client/get {:stream? true})
       (select-keys [:status :body :headers])
       (update :headers select-keys ["Content-Type"])))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 

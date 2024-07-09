@@ -119,11 +119,11 @@ Clojure переиспользует их. С версии 1.10 компилят
 С багажом рассуждений мы подходим к Spec. Подключим модуль в~текущее
 пространство:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (require '[clojure.spec.alpha :as s])
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Синоним \code{s} нужен, чтобы избежать конфликтов имён с модулем
 \code{clo\-ju\-re.\-co\-re}. Spec несёт макросы \code{s/and}, \code{s/or} и другие, у
@@ -135,11 +135,11 @@ Clojure переиспользует их. С версии 1.10 компилят
 
 Главная операция в Spec~--- создать новую \emph{спеку}:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::string string?)
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \index{clojure.core!string?}
 
@@ -163,21 +163,21 @@ Clojure переиспользует их. С версии 1.10 компилят
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/get-spec ::string)
 ;;#object[clojure.spec.alpha$reify 0x...]
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/get-spec ::string)
 ;; #object[clojure.spec.alpha$reify 0x3e9dde1d]
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -201,12 +201,12 @@ Spec не работает с ключами без пространства, н
 значение. Функция \code{s/valid?} принимает ключ спеки, значение и~возвращает
 \code{true} или \code{false}.
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/valid? ::string 1)      ;; false
 (s/valid? ::string "test") ;; true
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Пустая строка пройдёт валидацию, но чаще всего в этом нет смысла. Пустые имя или
 заголовок означают ошибку. Объявим спеку, которая дополнительно проверит, что
@@ -214,24 +214,24 @@ Spec не работает с ключами без пространства, н
 
 \index{spec!::ne-string}
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::ne-string
   (fn [val]
     (and (string? val)
          (not (empty? val)))))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \noindent
 Быстрая проверка:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/valid? ::ne-string "test") ;; true
 (s/valid? ::ne-string "")     ;; false
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \label{ne-string}
 
@@ -242,12 +242,12 @@ string>>. Спека встречается часто, поэтому логи�
 \code{every-pred}. Функция принимает предикаты и возвращает супер-предикат. Он
 вернёт истину только если истинны все предикаты.
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::ne-string
   (every-pred string? not-empty))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \index{spec!and}
 \index{clojure.core!every-pred}
@@ -257,12 +257,12 @@ string>>. Спека встречается часто, поэтому логи�
 стилю. Но ещё лучше комбинировать не предикаты, а спеки. Макрос \code{s/and}
 объединяет несколько предикатов и спек в новую спеку:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::ne-string
   (s/and string? not-empty))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Так в Clojure строят сложные спеки: объявляют примитивы и~наращивают их
 комбинации.
@@ -282,28 +282,28 @@ string>>. Спека встречается часто, поэтому логи�
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::url
   (partial
     re-matches #"(?i)^http(s?)://.*"))
 
 (s/valid? ::url "test") ;;false
 (s/valid? ::url "http://test.com") ;;true
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::url
   (partial re-matches #"(?i)^http(s?)://.*"))
 
 (s/valid? ::url "test")            ;; false
 (s/valid? ::url "http://test.com") ;; true
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -312,13 +312,13 @@ string>>. Спека встречается часто, поэтому логи�
 \index{исключения}
 \index{классы!NullPointerException}
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/valid? ::url nil)
 ;; Execution error (NullPointerException)
 ;; at java.util.regex.Matcher...
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \index{NPE}
 
@@ -332,28 +332,28 @@ string>>. Спека встречается часто, поэтому логи�
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::url
   (s/and ::ne-string
          (partial re-matches
            #"(?i)^http(s?)://.*")))
 
 (s/valid? ::url nil) ;; false
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::url
   (s/and ::ne-string
          (partial re-matches #"(?i)^http(s?)://.*")))
 
 (s/valid? ::url nil) ;; false
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -364,16 +364,16 @@ string>>. Спека встречается часто, поэтому логи�
 
 По аналогии проверим возраст пользователя. Это предикаты на~число и~диапазон.
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::age
   (s/and int? #(<= 0 % 150)))
 
 (s/valid? ::age nil) ;; false
 (s/valid? ::age -1)  ;; false
 (s/valid? ::age 42)  ;; true
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \section{Спеки-коллекции}
 
@@ -391,19 +391,19 @@ string>>. Спека встречается часто, поэтому логи�
 спеку-коллекцию. Она проверяет, что каждый элемент проходит валидацию. Вот так
 мы определим список URL:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::url-list (s/coll-of ::url))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \noindent
 Быстрая проверка:
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/valid? ::url-list
   ["http://test.com" "http://ya.ru"])
 ;; true
@@ -411,20 +411,20 @@ string>>. Спека встречается часто, поэтому логи�
 (s/valid? ::url-list
   ["http://test.com" "dunno.com"])
 ;; false
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/valid? ::url-list ["http://test.com" "http://ya.ru"])
 ;; true
 
 (s/valid? ::url-list ["http://test.com" "dunno.com"])
 ;; false
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -434,15 +434,15 @@ string>>. Спека встречается часто, поэтому логи�
 пустой, потому что иначе нет смысла его обрабатывать. Если задать
 \code{:min-count} единицу, мы отсечём пустоту:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::ne-url-list
   (s/coll-of ::url :min-count 1))
 
 (s/valid? ::ne-url-list [])
 ;; false
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \index{spec!map-of}
 \index{HTTP!параметры}
@@ -453,8 +453,8 @@ string>>. Спека встречается часто, поэтому логи�
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::params
   (s/map-of keyword? string?))
 
@@ -462,20 +462,20 @@ string>>. Спека встречается часто, поэтому логи�
   {:foo "test"})  ;; true
 (s/valid? ::params
   {"foo" "test"}) ;; false
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::params
   (s/map-of keyword? string?))
 
 (s/valid? ::params {:foo "test"})  ;; true
 (s/valid? ::params {"foo" "test"}) ;; false
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -494,12 +494,12 @@ string>>. Спека встречается часто, поэтому логи�
 Представим веб-страницу с адресом и описанием. Объявим спеки этих полей по
 отдельности:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def :page/address ::url)
 (s/def :page/description ::ne-string)
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \index{пространства имён}
 
@@ -510,13 +510,13 @@ string>>. Спека встречается часто, поэтому логи�
 
 Составим спеку страницы:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::page
   (s/keys :req-un [:page/address
                    :page/description]))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \index{spec!:req-un}
 
@@ -571,8 +571,8 @@ string>>. Спека встречается часто, поэтому логи�
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 {:address "clojure.org" ;; not a URL
  :description "Clojure Language"}
 
@@ -586,13 +586,13 @@ string>>. Спека встречается часто, поэтому логи�
  ;; full keys
 {:page/address "https://clojure.org/"
  :page/description "Clojure Language"}
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 {:address "clojure.org" ;; not a URL
  :description "Clojure Language"}
 
@@ -603,8 +603,8 @@ string>>. Спека встречается часто, поэтому логи�
 
 {:page/address "https://clojure.org/" ;; full keys
  :page/description "Clojure Language"}
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -619,8 +619,8 @@ string>>. Спека встречается часто, поэтому логи�
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::page-fq
   (s/keys :req [:page/address
                 :page/description]))
@@ -629,13 +629,13 @@ string>>. Спека встречается часто, поэтому логи�
   {:page/address "https://clojure.org/"
    :page/description "Clojure Language"})
 ;; true
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::page-fq
   (s/keys :req [:page/address
                 :page/description]))
@@ -644,8 +644,8 @@ string>>. Спека встречается часто, поэтому логи�
           {:page/address "https://clojure.org/"
            :page/description "Clojure Language"})
 ;; true
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -653,23 +653,23 @@ string>>. Спека встречается часто, поэтому логи�
 последнем обращении к ней. Поле опционально, потому что если к странице ещё не
 обращались, в него нечего записать. Новая спека:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def :page/status int?)
 
 (s/def ::page-status
   (s/keys :req-un [:page/address
                    :page/description]
           :opt-un [:page/status]))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Словари с правильным статусом и без него пройдут валидацию:
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/valid? ::page-status
   {:address "https://clojure.org/"
    :description "Clojure Language"})
@@ -678,13 +678,13 @@ string>>. Спека встречается часто, поэтому логи�
   {:address "https://clojure.org/"
    :description "Clojure Language"
    :status 200})
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/valid? ::page-status
           {:address "https://clojure.org/"
            :description "Clojure Language"})
@@ -693,8 +693,8 @@ string>>. Спека встречается часто, поэтому логи�
           {:address "https://clojure.org/"
            :description "Clojure Language"
            :status 200})
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -707,27 +707,27 @@ string>>. Спека встречается часто, поэтому логи�
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/valid? ::page-status
   {:address "https://clojure.org/"
    :description "Clojure Language"
    :status nil})
 ;; false
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/valid? ::page-status
           {:address "https://clojure.org/"
            :description "Clojure Language"
            :status nil})
 ;; false
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -767,8 +767,8 @@ Spec предлагает такие возможности. Это две фу�
 Рассмотрим вывод числа из строки. Чтобы отличить вывод данных от валидации, к
 имени добавляют стрелку, что означает приведение типа.
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::->int
   (s/conformer
    (fn [value]
@@ -776,20 +776,20 @@ Spec предлагает такие возможности. Это две фу�
        (Integer/parseInt value)
        (catch Exception e
          ::s/invalid)))))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \noindent
 Эту спеку передают в \code{s/conform} с данными:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/conform ::->int "42") ;; 42
 
 (s/conform ::->int "dunno")
 :clojure.spec.alpha/invalid
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \index{исключения}
 
@@ -802,15 +802,15 @@ Spec предлагает такие возможности. Это две фу�
 строка. Так мы не допустим, чтобы в \code{parseInt} попал \code{nil} или
 что-то другое:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::->int
   (s/and ::ne-string ::->int))
 
 (s/conform ::->int nil)
 :clojure.spec.alpha/invalid
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \index{веб-разработка!даты}
 
@@ -830,33 +830,33 @@ ISO или числом секунд. Возникает вопрос, как п
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (require '[clojure.instant
            :refer [read-instant-date]])
 
 (read-instant-date "2019")
 #inst "2019-01-01T00:00:00.000-00:00"
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (require '[clojure.instant :refer [read-instant-date]])
 
 (read-instant-date "2019")
 #inst "2019-01-01T00:00:00.000-00:00"
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
 Обернём функцию в спеку:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::->date
   (s/and
    ::ne-string
@@ -866,52 +866,52 @@ ISO или числом секунд. Возникает вопрос, как п
         (read-instant-date value)
         (catch Exception e
           ::s/invalid))))))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Перед разбором мы делаем минимальные проверки. Убеждаемся, что это не пустая
 строка, чтобы отсечь \code{nil} и прочий мусор. Вывод даты:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/conform ::->date "2019-12-31")
 #inst "2019-12-31T00:00:00.000-00:00"
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \noindent
 Дата и время:
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/conform ::->date
            "2019-12-31T23:59:59")
 #inst "2019-12-31T23:59:59.000-00:00"
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/conform ::->date "2019-12-31T23:59:59")
 #inst "2019-12-31T23:59:59.000-00:00"
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
 По аналогии напишите спеку \code{::ts->date}, которая выводит дату из эпохи
 Unix. Добейтесь следующего результата:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/conform ::ts->date 1609230152)
 ;; #inst "2020-12-29T08:22:32.000-00:00"
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \section{Спеки-перечисления}
 
@@ -929,8 +929,8 @@ Unix. Добейтесь следующего результата:
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::->bits
   (s/conformer
    (fn [value]
@@ -942,13 +942,13 @@ Unix. Добейтесь следующего результата:
 
 (s/conform ::->bits "42")
 :clojure.spec.alpha/invalid
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::->bits
   (s/conformer
    (fn [value]
@@ -958,8 +958,8 @@ Unix. Добейтесь следующего результата:
 
 (s/conform ::->bits "32") ;; 32
 (s/conform ::->bits "42") :clojure.spec.alpha/invalid
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -969,15 +969,15 @@ Unix. Добейтесь следующего результата:
 живёт в отдельной переменной. Его легко дополнить или вынести в~конфигурацию,
 при этом логика валидации не изменится.
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (def bits-map {"32" 32 "64" 64})
 
 (s/def ::->bits
   (s/conformer
    #(get bits-map % ::s/invalid)))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Похожим образом читают логические значения из строк. Нет единого соглашения о
 том, как передать истину и ложь в тексте. Это могут быть \code{True},
@@ -1004,8 +1004,8 @@ Unix. Добейтесь следующего результата:
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::->bool
   (s/and
    ::ne-string
@@ -1022,13 +1022,13 @@ Unix. Добейтесь следующего результата:
 
         ::s/invalid)))))
 
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::->bool
   (s/and
    ::ne-string
@@ -1040,22 +1040,22 @@ Unix. Добейтесь следующего результата:
         ("false" "0" "off" "no") false
         ::s/invalid)))))
 
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
 \noindent
 Вывод в действии:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/conform ::->bool "True")  ;; true
 (s/conform ::->bool "yes")   ;; true
 (s/conform ::->bool "0")     ;; false
 (s/conform ::->bool "FALSE") ;; false
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \section{Продвинутые техники}
 
@@ -1075,22 +1075,22 @@ Unix. Добейтесь следующего результата:
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::status
   #{"todo" "in_progres" "done"})
 (s/valid? ::status "todo") ;; true
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::status #{"todo" "in_progres" "done"})
 (s/valid? ::status "todo") ;; true
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -1100,31 +1100,31 @@ Unix. Добейтесь следующего результата:
 пользователя. Пока что мы поддерживаем только тип \code{daily}, поэтому
 запишем спеку так:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::notification #{"daily"})
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \noindent
 Это же выражение можно переписать на \code{partial} от равенства:
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::notification
   (partial = "daily"))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::notification (partial = "daily"))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -1141,24 +1141,24 @@ Unix. Добейтесь следующего результата:
 значениями. \code{S/valid?} трактует их как неудачу. Если \code{nil} или
 \code{false} допустимы, такие случаи проверяют функцией \code{contains?}:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (contains? #{1 :a nil} nil) ;; true
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Чтобы не повторяться, напишем функцию \code{enum}. Она принимает значения и
 возвращает предикат. В свою очередь, предикат принимает аргумент и проверяет,
 есть ли такой среди исходных значений.
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn enum [& args]
   (let [arg-set (set args)]
     (fn [value]
       (contains? arg-set value))))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Функция внутри замкнута на переменной \code{arg-set}. Это множество, которое
 получили из списка аргументов. Мы создали его один раз, чтобы не делать это
@@ -1166,23 +1166,23 @@ Unix. Добейтесь следующего результата:
 
 \ifafive
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::status
   (enum "todo" "in_progres" "done"))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::status
   (enum "todo"
         "in_progres"
         "done"))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -1204,8 +1204,8 @@ Unix. Добейтесь следующего результата:
 поместили символ переменой в квадратные скобки, чтобы синтаксис напоминал
 функцию (\code{defn}).
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defmacro with-conformer
   [[bind] & body]
   `(s/conformer
@@ -1214,13 +1214,13 @@ Unix. Добейтесь следующего результата:
         ~@body
         (catch Exception e#
           ::s/invalid)))))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Вывод числа:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::->int
   (s/and
     ::ne-string
@@ -1229,16 +1229,16 @@ Unix. Добейтесь следующего результата:
 
 (s/conform ::->int "123")
 ;; 123
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \noindent
 и булева типа:
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::->bool
   (s/and
    ->lower
@@ -1252,13 +1252,13 @@ Unix. Добейтесь следующего результата:
 
 (s/conform ::->bool "no")
 ;; false
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::->bool
   (s/and
    ->lower
@@ -1269,8 +1269,8 @@ Unix. Добейтесь следующего результата:
 
 (s/conform ::->bool "no")
 ;; false
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -1280,25 +1280,25 @@ Unix. Добейтесь следующего результата:
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (def ->lower
   (s/and
     string?
     (s/conformer
       clojure.string/lower-case)))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (def ->lower
   (s/and
     string?
     (s/conformer clojure.string/lower-case)))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -1339,25 +1339,25 @@ Unix. Добейтесь следующего результата:
 случае спека выводит число. Это полезно, если значение приходит из переменной
 среды или INI-файла.
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::smart-port
   (s/or :string ::->int :num int?))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \noindent
 Теперь \code{s/conform} вернёт не просто значение, а пару с тегом:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/conform ::smart-port 8080)
 [:num 8080]
 
 (s/conform ::smart-port "8080")
 [:string 8080]
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \index{скаляры}
 \index{spec!развилки}
@@ -1369,35 +1369,35 @@ Unix. Добейтесь следующего результата:
 
 \ifafive
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def :conn/port ::smart-port)
 (s/def ::conn
   (s/keys :req-un [:conn/port]))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \pagebreak
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/conform ::conn {:port "9090"})
 {:port [:string 9090]}
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def :conn/port ::smart-port)
 (s/def ::conn
   (s/keys :req-un [:conn/port]))
 
 (s/conform ::conn {:port "9090"})
 {:port [:string 9090]}
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -1412,35 +1412,35 @@ Unix. Добейтесь следующего результата:
 вернёт исходное значение. Выше мы получили словарь, где поле \code{:port}~---
 вектор. Чтобы вернуться к исходным данным, выполните:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/unform ::conn {:port [:num 9090]})
 {:port 9090}
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \noindent
 Но если передать пару со строкой, получим ошибку:
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/unform ::conn {:port [:string 9090]})
 ;;Execution error (IllegalStateException)
 ;;no unform fn for conformer
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/unform ::conn {:port [:string 9090]})
 ;; Execution error (IllegalStateException)
 ;; no unform fn for conformer
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -1462,8 +1462,8 @@ Unix. Добейтесь следующего результата:
 Изменим \code{::->int} так, чтобы он поддерживал \code{unform}. Вторая функция
 переведёт число обратно в строку:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::->int
   (s/and
    ::ne-string
@@ -1472,18 +1472,18 @@ Unix. Добейтесь следующего результата:
       (Integer/parseInt string))
     (fn [integer] ;; unform func
       (str integer)))))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \noindent
 Теперь порт со строкой не вызовет ошибки:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/unform ::conn {:port [:string 9090]})
 {:port "9090"}
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \code{Unform} полезен, если вы утратили исходные данные, но сохранили их
 \code{conform}-вариант.
@@ -1502,8 +1502,8 @@ Unix. Добейтесь следующего результата:
 строку. Если вернуть число без изменений, оно встанет на место \code{:port} в
 итоговом словаре:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::->int
   (s/and
    ::ne-string
@@ -1515,8 +1515,8 @@ Unix. Добейтесь следующего результата:
 
 (s/unform ::conn {:port [:string 9090]})
 {:port 9090}
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \index{clojure.core!identity}
 
@@ -1524,20 +1524,20 @@ Unix. Добейтесь следующего результата:
 возвращает переданный аргумент. С таким подходом \code{unform} всегда вернёт то,
 что получили на этапе \code{conform}. Полный цикл этих функций:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (->> {:port "9090"}
      (s/conform ::conn)
      (s/unform ::conn))
 {:port 9090}
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Чтобы не забыть \code{unform} в спеке, сделайте его частью макроса
 \code{with-conformer} (последняя строка):
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defmacro with-conformer
   [[bind] & body]
   `(s/conformer
@@ -1547,8 +1547,8 @@ Unix. Добейтесь следующего результата:
         (catch Exception e#
           ::s/invalid)))
     identity))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \section{Анализ ошибок}
 
@@ -1588,22 +1588,22 @@ Unix. Добейтесь следующего результата:
 
 Попробуем функции в действии. Подготовим для них простую спеку:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def :sample/username ::ne-string)
 
 (s/def ::sample
   (s/keys :req-un [:sample/username]))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \noindent
 На корректных данных функции не проявляют себя:
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/explain ::sample
   {:username "some user"})
 Success!
@@ -1612,34 +1612,34 @@ nil
 (s/explain-data ::sample
   {:username "some user"})
 nil
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/explain ::sample {:username "some user"})
 Success!
 nil
 
 (s/explain-data ::sample {:username "some user"})
 nil
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
 \noindent
 Попробуем число вместо имени:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/explain ::sample {:username 42})
 ;; 42 - failed: string? in: [:username]
 ;; at: [:username] spec: ::string
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Вывод читается так: значение \code{42} не прошло проверку предикатом
 \code{string?}. Путь к значению внутри словаря~--- \code{[:username]}. Ключ
@@ -1653,13 +1653,13 @@ nil
 Для пустой строки вывод будет другим, потому что на этот раз причиной станет
 \code{not-empty}. Проверим это:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/explain ::sample {:username ""})
 ;; "" - failed: not-empty in: [:username]
 ;; at: [:username] spec: ::ne-string
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \code{Explain}~--- это быстрый способ сообщить о проблеме в конфигурации или
 JSON-файле. Со временем вы научитесь читать его. Но чем сложнее данные, тем
@@ -1695,8 +1695,8 @@ JSON-файле. Со временем вы научитесь читать ег
 Чтобы составить сообщение, вернёмся к функции \texttt{s/explain\-/data}. Она
 возвращает словарь с полной информацией о неудаче. Пример такого отчёта:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/explain-data ::sample {:username ""})
 
 #:clojure.spec.alpha
@@ -1708,8 +1708,8 @@ JSON-файле. Со временем вы научитесь читать ег
    :in [:username]})
  :spec ::sample
  :value {:username ""}}
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \index{языки!Python}
 \index{языки!JavaScript}
@@ -1785,22 +1785,22 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 
 \ifnarrow
 
-%% \begin{english}
-  \begin{clojure}
+%%
+\begin{clojure}
 (def spec-errors
   {::ne-string
    "Строка не должна быть пустой"})
-  \end{clojure}
-%% \end{english}
+\end{clojure}
+%%
 
 \else
 
-%% \begin{english}
-%%   \begin{clojure}
+%%
+%% \begin{clojure}
 %% (def spec-errors
 %%   {::ne-string "Строка не должна быть пустой"})
-%%   \end{clojure}
-%% \end{english}
+%% \end{clojure}
+%%
 
 
 \begin{clojure}
@@ -1818,8 +1818,8 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 
 \ifnarrow
 
-%% \begin{english}
-  \begin{clojure}
+%%
+\begin{clojure}
 (defn get-message [problem]
   (let [{:keys [via]} problem
         spec (peek via)]
@@ -1828,13 +1828,13 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 (get-message {:via [::sample
                     ::ne-string]})
 "Строка не должна быть пустой"
-  \end{clojure}
-%% \end{english}
+\end{clojure}
+%%
 
 \else
 
-%% \begin{english}
-  \begin{clojure}
+%%
+\begin{clojure}
 (defn get-message [problem]
   (let [{:keys [via]} problem
         spec (peek via)]
@@ -1842,8 +1842,8 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 
 (get-message {:via [::sample ::ne-string]})
 "Строка не должна быть пустой"
-  \end{clojure}
-%% \end{english}
+\end{clojure}
+%%
 
 \fi
 
@@ -1859,8 +1859,8 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::email
   (s/and
     ::ne-string
@@ -1872,13 +1872,13 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 (s/def ::sample
   (s/keys :req-un [:sample/username
                    :sample/email]))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::email
   (s/and
    ::ne-string
@@ -1889,8 +1889,8 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 (s/def ::sample
   (s/keys :req-un [:sample/username
                    :sample/email]))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -1904,8 +1904,8 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/explain-data ::sample
   {:username "test" :email ""})
 
@@ -1914,36 +1914,36 @@ Python и JavaScript. Они скучны, не гибки и без конце�
  :val ""
  :via [::sample ::email ::ne-string]
  :in [:email]}
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
 \ifafive
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/explain-data ::sample
    {:username "test" :email ""})
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \pagebreakafive
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 {:path [:email]
  :pred clojure.core/not-empty
  :val ""
  :via [::sample ::email ::ne-string]
  :in [:email]}
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/explain-data ::sample
    {:username "test" :email ""})
 
@@ -1952,8 +1952,8 @@ Python и JavaScript. Они скучны, не гибки и без конце�
  :val ""
  :via [::sample ::email ::ne-string]
  :in [:email]}
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -1965,8 +1965,8 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/explain-data ::sample
   {:username "test" :email "test"})
 
@@ -1978,13 +1978,13 @@ Python и JavaScript. Они скучны, не гибки и без конце�
  :val "test"
  :via [::sample ::email]
  :in [:email]}
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/explain-data ::sample {:username "test" :email "test"})
 
 {:path [:email]
@@ -1995,8 +1995,8 @@ Python и JavaScript. Они скучны, не гибки и без конце�
  :val "test"
  :via [::sample ::email]
  :in [:email]}
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -2006,25 +2006,25 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 
 \ifnarrow
 
-%% \begin{english}
-  \begin{clojure}
+%%
+\begin{clojure}
 (def spec-errors
   {::ne-string
    "Строка не должна быть пустой"
    ::email
    "Введите правильный почтовый адрес"})
-  \end{clojure}
-%% \end{english}
+\end{clojure}
+%%
 
 \else
 
-%% \begin{english}
-  \begin{clojure}
+%%
+\begin{clojure}
 (def spec-errors
   {::ne-string "Строка не должна быть пустой"
    ::email "Введите правильный почтовый адрес"})
-  \end{clojure}
-%% \end{english}
+\end{clojure}
+%%
 
 \fi
 
@@ -2046,12 +2046,12 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 устроен так, что сообщения из модуля переводов оседают в отдельном файле. Позже
 локализаторы прочтут его и~добавят перевод.
 
-%% \begin{english}
-  \begin{clojure}
+%%
+\begin{clojure}
 (def default-message
   "Исправьте ошибку в данных")
-  \end{clojure}
-%% \end{english}
+\end{clojure}
+%%
 
 \pagebreaklarge
 
@@ -2060,8 +2060,8 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn get-better-message [problem]
   (let [{:keys [via]} problem
         spec (peek via)]
@@ -2071,21 +2071,21 @@ Python и JavaScript. Они скучны, не гибки и без конце�
             "Missing message for spec %s"
             spec)
           default-message))))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn get-better-message [problem]
   (let [{:keys [via]} problem
         spec (peek via)]
     (or (get spec-errors spec)
         (do (log/warnf "Missing message for spec %s" spec)
             default-message))))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -2094,25 +2094,25 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 
 \ifnarrow
 
-%% \begin{english}
-  \begin{clojure}
+%%
+\begin{clojure}
 (get-better-message
     {:via [::unknown :unknown/field]})
 ;; WARN book.spec - Missing message for
 ;; spec :unknown/field
 "Исправьте ошибку в данных"
-  \end{clojure}
-%% \end{english}
+\end{clojure}
+%%
 
 \else
 
-%% \begin{english}
-  \begin{clojure}
+%%
+\begin{clojure}
 (get-better-message {:via [::unknown :unknown/field]})
 ;; WARN book.spec - Missing message for spec :unknown/field
 "Исправьте ошибку в данных"
-  \end{clojure}
-%% \end{english}
+\end{clojure}
+%%
 
 \fi
 
@@ -2124,24 +2124,24 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/explain-data ::sample
   {:username "test" :email ""})
 
 ;; :via field
 [::sample ::email ::ne-string]
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/explain-data ::sample {:username "test" :email ""})
 [::sample ::email ::ne-string] ;; :via field
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -2159,8 +2159,8 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 поэтому вычислений не происходит, пока мы не обратимся к ним. В качестве
 результата вернём первый не пустой элемент.
 
-\begin{english}
-  \begin{clojure/lines}
+
+\begin{clojure/lines}
 (defn get-message
   [problem]
   (let [{:keys [via]} problem]
@@ -2168,8 +2168,8 @@ Python и JavaScript. Они скучны, не гибки и без конце�
          reverse
          (keep spec-errors)
          first)))
-  \end{clojure/lines}
-\end{english}
+\end{clojure/lines}
+
 
 Переменная \code{spec-errors} в четвёртой строке указывает на словарь сообщений,
 который определили выше \page{spec-errors}. Словарь ведёт себя как функция,
@@ -2182,8 +2182,8 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 
 \ifnarrow
 
-%% \begin{english}
-  \begin{clojure}
+%%
+\begin{clojure}
 (def spec-errors
   {::email
    "Введите правильный почтовый адрес"})
@@ -2191,20 +2191,20 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 (get-message
   {:via [::sample ::email ::ne-string]})
 "Введите правильный почтовый адрес"
-  \end{clojure}
-%% \end{english}
+\end{clojure}
+%%
 
 \else
 
-%% \begin{english}
-  \begin{clojure}
+%%
+\begin{clojure}
 (def spec-errors
   {::email "Введите правильный почтовый адрес"})
 
 (get-message {:via [::sample ::email ::ne-string]})
 "Введите правильный почтовый адрес"
-  \end{clojure}
-%% \end{english}
+\end{clojure}
+%%
 
 \fi
 
@@ -2220,8 +2220,8 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def :book/description ::ne-string)
 (s/def ::book
   (s/keys :req-un [:book/description]))
@@ -2229,20 +2229,20 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 (s/def :movie/description ::ne-string)
 (s/def ::movie
   (s/keys :req-un [:movie/description]))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def :book/description ::ne-string)
 (s/def ::book (s/keys :req-un [:book/description]))
 
 (s/def :movie/description ::ne-string)
 (s/def ::movie (s/keys :req-un [:movie/description]))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -2250,22 +2250,22 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/explain-data ::book
   {:description ""})
 [::book ::ne-string]
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/explain-data ::book {:description ""})
 [::book ::ne-string]
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -2288,22 +2288,22 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (def ne-string
   (every-pred string? not-empty))
 (s/def :book/description ne-string)
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (def ne-string (every-pred string? not-empty))
 (s/def :book/description ne-string)
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -2313,22 +2313,22 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/explain-data ::book
   {:description ""})
 {:via [::book :book/description]}
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/explain-data ::book {:description ""})
 {:via [::book :book/description]}
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -2340,8 +2340,8 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 
 \ifnarrow
 
-%% \begin{english}
-  \begin{clojure}
+%%
+\begin{clojure}
 (def spec-errors
   {:book/description
    "Введите описание книги"
@@ -2351,21 +2351,21 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 (get-message
   {:via [::book :book/description]})
 "Введите описание книги"
-  \end{clojure}
-%% \end{english}
+\end{clojure}
+%%
 
 \else
 
-%% \begin{english}
-  \begin{clojure}
+%%
+\begin{clojure}
 (def spec-errors
   {:book/description "Введите описание книги"
    :movie/description "Введите описание фильма"})
 
 (get-message {:via [::book :book/description]})
 "Введите описание книги"
-  \end{clojure}
-%% \end{english}
+\end{clojure}
+%%
 
 \fi
 
@@ -2374,20 +2374,20 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def :book/description
   (s/spec ::ne-string))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def :book/description (s/spec ::ne-string))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -2396,22 +2396,22 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/explain-data ::book
   {:description ""})
 [:book.spec/book :book/description]
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/explain-data ::book {:description ""})
 [:book.spec/book :book/description]
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -2434,25 +2434,25 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 
 \ifnarrow
 
-%% \begin{english}
-  \begin{clojure}
+%%
+\begin{clojure}
 (def spec-errors
   {:description
    "Неверное описание"
    :book/description
    "Введите описание книги"})
-  \end{clojure}
-%% \end{english}
+\end{clojure}
+%%
 
 \else
 
-%% \begin{english}
-  \begin{clojure}
+%%
+\begin{clojure}
 (def spec-errors
   {:description "Неверное описание"
    :book/description "Введите описание книги"})
-  \end{clojure}
-%% \end{english}
+\end{clojure}
+%%
 
 \fi
 
@@ -2460,8 +2460,8 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn get-message
   [problem]
   (let [{:keys [via]} problem
@@ -2470,13 +2470,13 @@ Python и JavaScript. Они скучны, не гибки и без конце�
         (get spec-errors
           (-> spec name keyword))
         default-message)))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn get-message
   [problem]
   (let [{:keys [via]} problem
@@ -2484,8 +2484,8 @@ Python и JavaScript. Они скучны, не гибки и без конце�
     (or (get spec-errors spec)
         (get spec-errors (-> spec name keyword))
         default-message)))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -2494,8 +2494,8 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 
 \ifnarrow
 
-%% \begin{english}
-  \begin{clojure}
+%%
+\begin{clojure}
 (get-message
   {:via [::movie :movie/description]})
 "Неверное описание"
@@ -2503,20 +2503,20 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 (get-message
   {:via [::movie :book/description]})
 "Введите описание книги"
-  \end{clojure}
-%% \end{english}
+\end{clojure}
+%%
 
 \else
 
-%% \begin{english}
-  \begin{clojure}
+%%
+\begin{clojure}
 (get-message {:via [::movie :movie/description]})
 "Неверное описание"
 
 (get-message {:via [::movie :book/description]})
 "Введите описание книги"
-  \end{clojure}
-%% \end{english}
+\end{clojure}
+%%
 
 \fi
 
@@ -2539,50 +2539,50 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 
 \index{мультиметоды!problem\arr{}text}
 
-%% \begin{english}
-  \begin{clojure}
+%%
+\begin{clojure}
 (defmulti problem->text
   (fn [{:keys [via]}]
     (peek via)))
 
 (defmethod problem->text ::ne-string [_]
   "Строка не должна быть пустой")
-  \end{clojure}
-%% \end{english}
+\end{clojure}
+%%
 
 \noindent
 Пример его работы:
 
 \ifnarrow
 
-%% \begin{english}
-  \begin{clojure}
+%%
+\begin{clojure}
 (problem->text
   {:val "" :via [::email ::ne-string]})
 "Строка не должна быть пустой"
-  \end{clojure}
-%% \end{english}
+\end{clojure}
+%%
 
 \else
 
-%% \begin{english}
-  \begin{clojure}
+%%
+\begin{clojure}
 (problem->text {:val "" :via [::email ::ne-string]})
 "Строка не должна быть пустой"
-  \end{clojure}
-%% \end{english}
+\end{clojure}
+%%
 
 \fi
 
 Ключ \code{:default} отвечает за действие по умолчанию. Если перевод не
 найден, вернём стандартную фразу:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defmethod problem->text :default [_]
   default-message)
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \index{наследование}
 
@@ -2600,8 +2600,8 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 
 \ifnarrow
 
-%% \begin{english}
-  \begin{clojure}
+%%
+\begin{clojure}
 (defmethod problem->text
   ::description [_] "Введите описание")
 
@@ -2610,13 +2610,13 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 (problem->text
   {:val "" :via [:book/description]})
 "Введите описание"
-  \end{clojure}
-%% \end{english}
+\end{clojure}
+%%
 
 \else
 
-%% \begin{english}
-  \begin{clojure}
+%%
+\begin{clojure}
 (defmethod problem->text ::description [_]
   "Введите описание")
 
@@ -2624,8 +2624,8 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 
 (problem->text {:val "" :via [:book/description]})
 "Введите описание"
-  \end{clojure}
-%% \end{english}
+\end{clojure}
+%%
 
 \fi
 
@@ -2634,8 +2634,8 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 
 \ifnarrow
 
-%% \begin{english}
-  \begin{clojure}
+%%
+\begin{clojure}
 (defmethod problem->text
   :book/description [_]
   "Введите описание книги")
@@ -2643,20 +2643,20 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 (problem->text
   {:val "" :via [:book/description]})
 "Введите описание книги"
-  \end{clojure}
-%% \end{english}
+\end{clojure}
+%%
 
 \else
 
-%% \begin{english}
-  \begin{clojure}
+%%
+\begin{clojure}
 (defmethod problem->text :book/description [_]
   "Введите описание книги")
 
 (problem->text {:val "" :via [:book/description]})
 "Введите описание книги"
-  \end{clojure}
-%% \end{english}
+\end{clojure}
+%%
 
 \fi
 
@@ -2669,8 +2669,8 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 
 \ifnarrow
 
-%% \begin{english}
-  \begin{clojure}
+%%
+\begin{clojure}
 (defmethod problem->text
   :book/description
   [{:keys [val]}]
@@ -2680,21 +2680,21 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 (problem->text
   {:val "abc" :via [:book/description]})
 "Ошибка в описании книги: abc"
-  \end{clojure}
-%% \end{english}
+\end{clojure}
+%%
 
 \else
 
-%% \begin{english}
-  \begin{clojure}
+%%
+\begin{clojure}
 (defmethod problem->text :book/description
   [{:keys [val]}]
   (format "Ошибка в описании книги: %s" val))
 
 (problem->text {:val "abc" :via [:book/description]})
 "Ошибка в описании книги: abc"
-  \end{clojure}
-%% \end{english}
+\end{clojure}
+%%
 
 \fi
 
@@ -2725,8 +2725,8 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def :post/title ::ne-string)
 (s/def :post/tags
   (s/coll-of ::ne-string))
@@ -2734,20 +2734,20 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 (s/def ::post
   (s/keys :req-un [:post/title]
           :opt-un [:post/tags]))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def :post/title ::ne-string)
 (s/def :post/tags (s/coll-of ::ne-string))
 
 (s/def ::post (s/keys :req-un [:post/title]
                       :opt-un [:post/tags]))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -2756,8 +2756,8 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/explain-data ::post
   {:title "On Clojure"
    :tags ["clojure" ""]})
@@ -2770,13 +2770,13 @@ Python и JavaScript. Они скучны, не гибки и без конце�
        :book.spec/ne-string
        :book.spec/not-empty]
  :in [:tags 1]}
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/explain-data ::post {:title "On Clojure"
                         :tags ["clojure" ""]})
 
@@ -2788,8 +2788,8 @@ Python и JavaScript. Они скучны, не гибки и без конце�
        :book.spec/ne-string
        :book.spec/not-empty]
  :in [:tags 1]}
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -2800,8 +2800,8 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn last-kw [coll]
   (->> coll
        reverse
@@ -2816,13 +2816,13 @@ Python и JavaScript. Они скучны, не гибки и без конце�
       "The field '%s' has
                 an incorrect value '%s'."
       (name field) val)))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn last-kw [coll]
   (->> coll
        reverse
@@ -2835,8 +2835,8 @@ Python и JavaScript. Они скучны, не гибки и без конце�
         field (last-kw in)]
     (format "The field '%s' has an incorrect value '%s'."
             (name field) val)))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -2845,25 +2845,25 @@ Python и JavaScript. Они скучны, не гибки и без конце�
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (get-common-message
   {:val "" :in [:tags 1]})
 
 "The field 'tags' has
           an incorrect value ''."
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (get-common-message {:val "" :in [:tags 1]})
 
 "The field 'tags' has an incorrect value ''."
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -2887,8 +2887,8 @@ field...>>. Подумайте, как ещё улучшить текст и д�
 
 \ifnarrow
 
-%% \begin{english}
-  \begin{clojure}
+%%
+\begin{clojure}
 (def spec-errors
  {:ru
   {::ne-string
@@ -2903,20 +2903,20 @@ field...>>. Подумайте, как ещё улучшить текст и д�
 
    ::email
    "The email address is invalid"}})
-  \end{clojure}
-%% \end{english}
+\end{clojure}
+%%
 
 \else
 
-%% \begin{english}
-  \begin{clojure}
+%%
+\begin{clojure}
 (def spec-errors
   {:ru {::ne-string "Строка не должна быть пустой"
         ::email "Введите правильный почтовый адрес"}
    :en {::ne-string "The field must not be blank"
         ::email "The email address is invalid"}})
-  \end{clojure}
-%% \end{english}
+\end{clojure}
+%%
 
 \fi
 
@@ -2947,8 +2947,8 @@ field...>>. Подумайте, как ещё улучшить текст и д�
 текущим значением. Если ошибка не \code{nil}, как во втором поле, над ним
 появится красное сообщение.
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (def form
   {:name {:title "Your name"
           :widget :textfield
@@ -2959,19 +2959,19 @@ field...>>. Подумайте, как ещё улучшить текст и д�
            :widget :textfield
            :value "test@"
            :error "Email is incorrect"}})
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Валидация принимает форму и строит дерево значений. У него такая же топология, но
 на месте виджетов значения полей ввода:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (def values
   {:name "Ivan"
    :email "test@"})
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 С~помощью спеки мы проверяем значения и выводим типы из строк. В~случае ошибки
 получим отчёт \code{explain}. Для каждого элемента из поля \code{problems}
@@ -3006,11 +3006,11 @@ field...>>. Подумайте, как ещё улучшить текст и д�
 \index{парсинг}
 \index{регулярные выражения}
 
-\begin{english}
-  \begin{text}
+
+\begin{text}
 \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}
-  \end{text}
-\end{english}
+\end{text}
+
 
 В шаблоне мы ставим косую черту перед точкой, потому что без слеша точка
 означает любой символ. Чтобы сослаться именно на символ точки, её экранируют.
@@ -3035,13 +3035,13 @@ field...>>. Подумайте, как ещё улучшить текст и д�
 Предположим, нужно разобрать массив пользователей. Каждый из них~--- это кортеж
 вида \tuple{номер, почта, статус}. Все значения~--- строки:
 
-\begin{english}
-  \begin{text}
+
+\begin{text}
 1,test@test.com,active
 2,ivan@test.com,pending
 3,user@test.com,active
-  \end{text}
-\end{english}
+\end{text}
+
 
 Для каждого пользователя требуется:
 
@@ -3079,54 +3079,54 @@ field...>>. Подумайте, как ещё улучшить текст и д�
 строки \code{active} и \code{pending} к особым кейвордам. Другие значения
 спровоцируют ошибку.
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def :user/status
   (s/and ->lower
          (with-conformer [val]
            (case val
              "active"  :USER_ACTIVE
              "pending" :USER_PENDING))))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Спеки вывода числа \code{::->int} и проверки почты \code{::email} мы описали
 ранее, поэтому используем их повторно. Готовая спека пользователя:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::user
   (s/cat :id ::->int
          :email ::email
          :status :user/status))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \noindent
 Положительный случай даёт на выходе словарь:
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/conform ::user
   ["1" "test@test.com" "active"])
 {:id 1
  :email "test@test.com"
  :status :USER_ACTIVE}
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/conform ::user ["1" "test@test.com" "active"])
 {:id 1
  :email "test@test.com"
  :status :USER_ACTIVE}
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -3135,26 +3135,26 @@ field...>>. Подумайте, как ещё улучшить текст и д�
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/conform ::user
   ["" "test@test.com" "active"])
 (s/conform ::user
   ["1" "@test.com" "active"])
 (s/conform ::user
   ["1" "test@test.com" "unknown"])
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/conform ::user ["" "test@test.com" "active"])
 (s/conform ::user ["1" "@test.com" "active"])
 (s/conform ::user ["1" "test@test.com" "unknown"])
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -3166,11 +3166,11 @@ field...>>. Подумайте, как ещё улучшить текст и д�
 Представим, что работаем с устаревшим форматом данных. В нём условие: если
 перед номером стоит метка blocked, пользователь заблокирован. Например:
 
-\begin{english}
-  \begin{text}
+
+\begin{text}
 blocked;1;test@test.com;active
-  \end{text}
-\end{english}
+\end{text}
+
 
 Это усложняет задачу, ведь теперь кортеж состоит из трёх \emph{или} четырёх
 элементов. Сдвигается семантика полей: первый элемент уже не только номер, но и
@@ -3180,14 +3180,14 @@ blocked;1;test@test.com;active
 В императивных языках они порождают каскад \code{if/else}. В Clojure проблему
 решают декларативно. Объявим спеку блокировки, которая выводит флаг из строки:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::blocked
   (s/and
    ->lower
    (s/conformer (partial = "blocked"))))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \index{spec!?}
 
@@ -3196,15 +3196,15 @@ blocked;1;test@test.com;active
 регулярных выражениях знак вопроса делает то же самое для шаблона. Дополним
 спеку новым полем:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::user
   (s/cat :blocked (s/? ::blocked)
          :id ::->int
          :email ::email
          :status :user/status))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Теперь оба кортежа совпадают со спекой \code{::user}. Если метки нет, получим
 словарь, как в начале. Если пользователь заблокирован, в~словаре будет поле
@@ -3212,8 +3212,8 @@ blocked;1;test@test.com;active
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/conform ::user
   ["1" "test@test.com" "active"])
 {:id 1
@@ -3227,20 +3227,20 @@ blocked;1;test@test.com;active
  :id 1
  :email "test@test.com"
  :status ...}
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/conform ::user ["1" "test@test.com" "active"])
 {:id 1 :email "test@test.com" :status :USER_ACTIVE}
 
 (s/conform ::user ["BLOCKED" "1" "test@test.com" "active"])
 {:blocked true :id 1 :email "test@test.com" :status ...}
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -3249,8 +3249,8 @@ blocked;1;test@test.com;active
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::users (s/coll-of ::user))
 
 (def user-data
@@ -3266,13 +3266,13 @@ blocked;1;test@test.com;active
   :id 2
   :email "joe@doe.com"
   :status ...}]
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::users (s/coll-of ::user))
 
 (def user-data
@@ -3282,8 +3282,8 @@ blocked;1;test@test.com;active
 (s/conform ::users user-data)
 [{:id 1 :email "test@test.com" :status :USER_ACTIVE}
  {:blocked true :id 2 :email "joe@doe.com" :status ...}]
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -3316,8 +3316,8 @@ JSON. Получается сценарий, который можно запу�
 другими. Наиболее важно для нас поле \code{command}, в котором находится имя
 команды: open, click, assert и другие. Приведём отрывок из файла:
 
-\begin{english}
-  \begin{json}
+
+\begin{json}
 "commands": [{
   "id": "af046c62-...-53a16251705f",
   "command": "open",
@@ -3327,20 +3327,20 @@ JSON. Получается сценарий, который можно запу�
   "command": "setWindowSize",
   "target": "1680x960"
 }]
-  \end{json}
-\end{english}
+\end{json}
+
 
 \index{мультиметоды}
 
 На первый взгляд всё просто: обойдём команды в цикле и вызовем для каждой
 мультиметод \code{do-cmd}.
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (doseq [command commands]
   (do-cmd command))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Мультиметод находит реализацию по полю \code{:command}. Останется наполнить его
 командами, и задача готова. Ниже~--- реализация команды \code{open}, которая
@@ -3348,8 +3348,8 @@ JSON. Получается сценарий, который можно запу�
 
 \iflarge\vspace{15mm}\pagebreak[4]\fi
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defmulti do-cmd
   (fn [command]
     (-> command :command keyword)))
@@ -3357,8 +3357,8 @@ JSON. Получается сценарий, который можно запу�
 (defmethod do-cmd :open
   [{:keys [target]}]
   (webdriber/open-url *driver* target))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Ситуация меняется из-за так называемых
 \footurl{flow-команд}{https://www.selenium.dev/selenium-ide/docs/en/introduction/control-flow}[Control\\*flow],
@@ -3375,35 +3375,35 @@ JSON. Получается сценарий, который можно запу�
 читаемости. Чтобы код не вышел громоздким, оставим в каждом словаре минимальный
 набор полей.
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (def data-if
   [{:command "if" :condition ...}
      {:command "print" :text "True"}
    {:command "else"}
      {:command "print" :text "False"}
    {:command "end"}])
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Как и в настоящем языке программирования, команды Selenium IDE могут быть
 неограниченно вложены друг в друга. Например, если верно условие, открыть цикл:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 [{:command "if" :condition ...}
    {:command "for"}
      ...
    {:command "end"}
  {:command "end"}]
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \noindent
 или условие в цикле внутри цикла:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 [{:command "for"}
    {:command "for"}
      {:command "if" :condition ...}
@@ -3413,8 +3413,8 @@ JSON. Получается сценарий, который можно запу�
      {:command "end"}
    {:command "end"}
  {:command "end"}]
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Ожидается, что наш код принимает JSON-файл, некоторые параметры и выполняет
 команды с учетом условий и повторов. На страницах книги мы не будем решать
@@ -3429,25 +3429,25 @@ regex-функциональность.
 будет список пар, где первый элемент~--- тег, а второй~--- команда или её
 сгруппированный вариант. Например, для обычного \texttt{print} получим пару:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 [:cmd {:command "print" :text "hello"}]
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \noindent
 , а для \texttt{if}~--- нечто следующее (элемент \code{{...}} означает словарь
 команды):
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 [:if {:tag {...}
       :condition {...}
       :branch-true [{...} {...}]
       :branch-else [{...} {...}]
       :end {...}}]
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 В первом случае мы просто выполним \code{print}. У варианта с \code{if} второй
 элемент структурирован. Теперь это не плоский список, а словарь с входным тегом,
@@ -3458,25 +3458,25 @@ regex-функциональность.
 Начнём код с простой функции \texttt{parse-flow}, которая принимает вектор
 команд и возвращает вектор пар:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn parse-flow [commands]
   (s/conform ::flow commands))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Чтобы перейти к новой структуре, определим спеку \texttt{::flow}. Это один и
 более элементов, каждый из которых либо \texttt{:if}, либо обычная команда
 \texttt{:cmd} (для краткости пока что опустим \texttt{for}). Спека не допустит
 пустого списка команд, потому что обычно в этом нет смысла.
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::flow
   (s/+ (s/alt :if ::flow-if
               :cmd ::command)))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Подумаем, какой смысл мы вкладываем в термин <<обычная команда>> с ключом
 \code{:cmd}. Если коротко, это действие, которое не зависит от других команд, то
@@ -3486,69 +3486,69 @@ regex-функциональность.
 
 \label{flow-tags}
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (def flow-tags #{"if" "else" "end" "for"})
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Объявим спеку \texttt{::command}. Она проверяет, что поле \texttt{:command}
 словаря заполнено, но не входит в особые теги:
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::command
   (fn [obj]
     (when-let [command (get obj :command)]
       (not (contains?
               flow-tags command)))))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::command
   (fn [obj]
     (when-let [command (get obj :command)]
       (not (contains? flow-tags command)))))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
 Введём вспомогательную функцию \texttt{tag=}. Она принимает тег и возвращает
 функцию, которая принимает команду и проверяет, что у неё такой же тег.
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn tag= [tag]
   (fn [obj]
     (= (get obj :command) tag)))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \noindent
 Функция пригодится, чтобы быстро задать предикат:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (def tag-print? (tag= "print"))
 
 (tag-print? {:command "print"})
 ;; true
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Самое интересное кроется в спеке \texttt{::flow-if}. Приведём её описание:
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure/lines}
+
+\begin{clojure/lines}
 (s/def ::flow-if
   (s/cat
     :this (tag= "if")
@@ -3557,21 +3557,21 @@ regex-функциональность.
                  :this (tag= "else")
                  :flow ::flow))
     :end (tag= "end")))
-  \end{clojure/lines}
-\end{english}
+\end{clojure/lines}
+
 
 \else
 
-\begin{english}
-  \begin{clojure/lines}
+
+\begin{clojure/lines}
 (s/def ::flow-if
   (s/cat :this (tag= "if")
          :flow ::flow
          :else (s/? (s/cat :this (tag= "else")
                            :flow ::flow))
          :end (tag= "end")))
-  \end{clojure/lines}
-\end{english}
+\end{clojure/lines}
+
 
 \fi
 
@@ -3590,35 +3590,35 @@ regex-функциональность.
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 [{:command "if" :condition ...}
    {:command "print" :text "True"}
  {:command "else"}
    {:command "print" :text "False"}
  {:command "end"}]
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 [{:command "if" :condition ...}
    {:command "print" :text "True"}
  {:command "else"}
    {:command "print" :text "False"}
  {:command "end"}]
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
 Если передать эти данные в \texttt{parse-flow}, получим результат:
 
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 [[:if
   {:this {:command "if" :condition "..."}
    :flow [[:cmd {:command "print"
@@ -3628,27 +3628,27 @@ regex-функциональность.
     :flow [[:cmd {:command "print"
                   :text "False"}]]}
    :end {:command "end"}}]]
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Более сложный вариант со вложенным \texttt{if}:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 [{:command "if" :condition "..."}
    {:command "if" :condition "..."}
      {:command "print" :text "hello"}
    {:command "end"}
  {:command "end"}]
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Видим, что структура кода сохраняется:
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 [[:if
   {:this {:command "if"
           :condition "..."}
@@ -3660,13 +3660,13 @@ regex-функциональность.
                     :text "hello"}]]
       :end {:command "end"}}]]
    :end {:command "end"}}]]
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 [[:if
   {:this {:command "if" :condition "..."}
    :flow
@@ -3675,8 +3675,8 @@ regex-функциональность.
       :flow [[:cmd {:command "print" :text "hello"}]]
       :end {:command "end"}}]]
    :end {:command "end"}}]]
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -3685,8 +3685,8 @@ regex-функциональность.
 конце. Двойной \texttt{end} или \texttt{else} тоже нарушат спеку, ровно как и
 пустая ветка без команд. Все варианты ниже вернут \texttt{::s/invalid}.
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (def data-broken1 ;; missing end
   [{:command "if" :condition "..."}
    {:command "print" :text "hello"}])
@@ -3700,8 +3700,8 @@ regex-функциональность.
 (def data-broken3 ;; empty block
   [{:command "if" :condition "..."}
    {:command "end"}])
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \pagebreakafive
 
@@ -3719,40 +3719,40 @@ regex-функциональность.
 Во-вторых, расширим главную спеку \texttt{::flow}. Теперь её элемент либо
 \texttt{if}, либо \texttt{for}, либо обычная команда:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::flow
   (s/+
    (s/alt :if ::flow-if
           :for ::flow-for
           :cmd ::command)))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 В-третьих, напишем спеку \texttt{::flow-for} для разбора одноимённой
 команды. Она проще \texttt{if}, потому что включает в себя только один блок
 команд.
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::flow-for
   (s/cat :this (tag= "for")
          :flow ::flow
          :end (tag= "end")))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Данные с циклом, в теле которого условие:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 [{:command "for"}
    {:command "if" :condition "..."}
      {:command "print" :text "hello"}
    {:command "end"}
  {:command "end"}]
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Результат разбора:
 
@@ -3760,8 +3760,8 @@ regex-функциональность.
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 [[:for
   {:this {:command "for"}
    :flow
@@ -3770,13 +3770,13 @@ regex-функциональность.
       :flow [[:cmd {:command "print" ...}]]
       :end {:command "end"}}]]
    :end {:command "end"}}]]
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 [[:for
   {:this {:command "for"}
    :flow
@@ -3785,8 +3785,8 @@ regex-функциональность.
       :flow [[:cmd {:command "print" :text "hello"}]]
       :end {:command "end"}}]]
    :end {:command "end"}}]]
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -3797,8 +3797,8 @@ regex-функциональность.
 и более блоков \code{case}; внутри каждого блока~--- произвольные команды,
 которые выполняются, если управление переходит на эту ветку.
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 [{:command "switch" :value "..."}
    {:command "case" :value 1}
      {:command "print" :text "one"}
@@ -3807,8 +3807,8 @@ regex-функциональность.
    {:command "print" :text "two"}
      {:command "end"}
  {:command "end"}]
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Пока что не отвлекайтесь на значения полей \code{:value}. Сначала добейтесь,
 чтобы список выше обрёл форму, удобную для будущей обработки.
@@ -3856,34 +3856,34 @@ Selenium IDE. Если код нарушает правила, мы должны
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (defn my-inc
   [x]
   (+ x 1))
-  \end{clojure}
+\end{clojure}
 
 \splitter
 
-  \begin{clojure}
+\begin{clojure}
 (defn my-inc
   "Increase a number."
   [x]
   {:pre [(int? x)]
    :post [(int? %)]}
   (+ x 1))
-  \end{clojure}
+\end{clojure}
 
 \splitter
 
-  \begin{clojure}
+\begin{clojure}
 (defn my-inc
   ([x]
    (my-inc x 1))
   ([x delta]
    (+ x delta)))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
@@ -3891,7 +3891,7 @@ Selenium IDE. Если код нарушает правила, мы должны
 \begin{listing}[ht!]
 \fi
 
-\begin{english}
+
 
 \noindent
 \iflarge
@@ -3900,36 +3900,36 @@ Selenium IDE. Если код нарушает правила, мы должны
 \begin{tabular}{ @{}p{2.7cm} @{}p{4.5cm} @{}p{3cm} }
 \fi
 
-  \begin{clojure}
+\begin{clojure}
 (defn my-inc
   [x]
   (+ x 1))
-  \end{clojure}
+\end{clojure}
 
 &
 
-  \begin{clojure}
+\begin{clojure}
 (defn my-inc
   "Increase a number."
   [x]
   {:pre [(int? x)]
    :post [(int? %)]}
   (+ x 1))
-  \end{clojure}
+\end{clojure}
 
 &
 
-  \begin{clojure}
+\begin{clojure}
 (defn my-inc
   ([x]
    (my-inc x 1))
   ([x delta]
    (+ x delta)))
-  \end{clojure}
+\end{clojure}
 
 \end{tabular}
 
-\end{english}
+
 
 \ifafive
 \caption{Варианты синтаксиса \code{defn}}
@@ -3952,15 +3952,15 @@ Selenium IDE. Если код нарушает правила, мы должны
 документации (её может и не быть). Далее~--- тело или список тел. Набросаем
 черновик:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::defn
   (s/cat :tag #{'defn}
          :name symbol?
          :doc (s/? string?)
          :body ...))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Что скрывается за ключом \code{:body}, пока неизвестно. Проблема в том, что
 \code{defn} принимает либо одно тело, либо их список. Сравните первый и третий
@@ -3970,14 +3970,14 @@ Selenium IDE. Если код нарушает правила, мы должны
 параметров. После него идёт опциональный словарь пре- и постпроверок. Затем
 произвольные формы, из которых состоит тело функции.
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def :defn/body
   (s/cat :args vector?
          :prepost (s/? map?)
          :code (s/* any?)))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 На базе \code{:defn/body} построим такую спеку, которая учитывает оба случая:
 одно тело и несколько. Обозначим её звёздочкой: \code{:defn/body*}. Вот её
@@ -3985,24 +3985,24 @@ Selenium IDE. Если код нарушает правила, мы должны
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def :defn/body*
   (s/alt :single :defn/body
          :multi (s/+
                   (s/spec :defn/body))))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def :defn/body*
   (s/alt :single :defn/body
          :multi (s/+ (s/spec :defn/body))))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -4015,15 +4015,15 @@ Selenium IDE. Если код нарушает правила, мы должны
 а~только возвращает его. Эту запись называют квотированием \eng{quote} или
 заморозкой. На жаргоне программистов говорят <<заквотить символ>>.
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (def defn-expr
   (list 'defn 'my-inc
         "Increase a number"
         ['x]
         {:pre [(list 'int? 'x)]} ...))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Если выполнить \code{defn-expr} в REPL, увидим код в том виде, в каком он
 выглядел бы в редакторе. Однако из-за частых \code{list} и апострофов код
@@ -4031,8 +4031,8 @@ Selenium IDE. Если код нарушает правила, мы должны
 отдельные символы, а выражение \code{defn} целиком. Так мы сохраним оригинальный
 синтаксис:
 
-\begin{english}
-  \begin{clojure/lines}
+
+\begin{clojure/lines}
 (def defn-expr
   '(defn my-inc
      "Increase a number"
@@ -4040,8 +4040,8 @@ Selenium IDE. Если код нарушает правила, мы должны
      {:pre [(int? x)]
       :post [(int? %)]}
      (+ x 1)))
-  \end{clojure/lines}
-\end{english}
+\end{clojure/lines}
+
 
 Обратите внимание на апостроф во второй строке: именно он удерживает \code{defn}
 от выполнения. В результате мы не объявим функцию, а только получим её код.
@@ -4051,11 +4051,11 @@ Selenium IDE. Если код нарушает правила, мы должны
 семантики. Для этого мы и пишем спеку~--- убедиться, что у~списка правильная
 структура. Распарсим его:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/conform ::defn defn-expr)
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \noindent
 Результат:
@@ -4064,8 +4064,8 @@ Selenium IDE. Если код нарушает правила, мы должны
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 {:tag defn
  :name my-inc
  :doc "Increase a number"
@@ -4075,13 +4075,13 @@ Selenium IDE. Если код нарушает правила, мы должны
    :prepost {:pre [(int? x)]
              :post [(int? %)]}
    :code [(+ x 1)]}]}
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 {:tag defn
  :name my-inc
  :doc "Increase a number"
@@ -4090,8 +4090,8 @@ Selenium IDE. Если код нарушает правила, мы должны
   {:args [x]
    :prepost {:pre [(int? x)] :post [(int? %)]}
    :code [(+ x 1)]}]}
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -4101,23 +4101,23 @@ Selenium IDE. Если код нарушает правила, мы должны
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 [:multi [{:args [x]
           :code [(println 1)]}
          {:args [x y]
           :code [(println 2)]}]]
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 [:multi [{:args [x] :code [(println 1)]}
          {:args [x y] :code [(println 2)]}]]
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -4126,8 +4126,8 @@ Selenium IDE. Если код нарушает правила, мы должны
 \code{process-body} обрабатывает словарь тела в зависимости от единичного и
 множественного случаев:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (let [{:keys [body]} result
       [tag body] body]
   (case tag
@@ -4136,8 +4136,8 @@ Selenium IDE. Если код нарушает правила, мы должны
     :multi
     (doseq [body body]
       (process-body body))))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \subsection{Самостоятельная работа}
 
@@ -4147,11 +4147,11 @@ Selenium IDE. Если код нарушает правила, мы должны
 их на обязательные и остаточные. Например, чтобы параметры \code{[x y \& other]}
 предстали в виде словаря:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 {:req [x y] :opt other}
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \noindent
 По аналогии разберите словари пре- и постпроверок.
@@ -4190,8 +4190,8 @@ Clojure~--- программу, которая читает список и вы
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::date-range-args
   (s/and
     ;; parse args
@@ -4199,20 +4199,20 @@ Clojure~--- программу, которая читает список и вы
     ;; compare args
     (fn [{:keys [start end]}]
       (<= (compare start end) 0))))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::date-range-args
   (s/and
    (s/cat :start inst? :end inst?) ;; parse args
    (fn [{:keys [start end]}]       ;; compare args
      (<= (compare start end) 0))))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -4224,8 +4224,8 @@ Clojure~--- программу, которая читает список и вы
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/valid? ::date-range-args
           [#inst "2019" #inst "2020"])
 ;; true
@@ -4233,20 +4233,20 @@ Clojure~--- программу, которая читает список и вы
 (s/valid? ::date-range-args
           [#inst "2020" #inst "2019"])
 ;; false
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/valid? ::date-range-args
           [#inst "2019" #inst "2020"]) ;; true
 
 (s/valid? ::date-range-args
           [#inst "2020" #inst "2019"]) ;; false
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -4285,8 +4285,8 @@ Clojure~--- программу, которая читает список и вы
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (import 'java.util.Date)
 
 (defn date-range-sec
@@ -4296,13 +4296,13 @@ Clojure~--- программу, которая читает список и вы
   (quot (- (.getTime date2)
            (.getTime date1))
         1000))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (import 'java.util.Date)
 
 (defn date-range-sec
@@ -4311,8 +4311,8 @@ Clojure~--- программу, которая читает список и вы
   (quot (- (.getTime date2)
            (.getTime date1))
         1000))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -4322,22 +4322,22 @@ Clojure~--- программу, которая читает список и вы
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (date-range-sec #inst "2019-01-01"
                 #inst "2019-01-02")
 86400
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (date-range-sec #inst "2019-01-01" #inst "2019-01-02")
 86400
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -4355,13 +4355,13 @@ Clojure~--- программу, которая читает список и вы
 
 \index{spec!fdef}
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/fdef date-range-sec
   :args (s/cat :start inst? :end inst?)
   :ret int?)
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 В ключи \code{:args} и \code{:ret} можно передать готовые спеки, что полезно
 для повторного использования. У вас может быть несколько спек для диапазона дат.
@@ -4372,22 +4372,22 @@ Clojure~--- программу, которая читает список и вы
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (require '[clojure.spec.test.alpha
            :refer [instrument]])
 (instrument `date-range-sec)
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (require '[clojure.spec.test.alpha :refer [instrument]])
 (instrument `date-range-sec)
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -4403,24 +4403,24 @@ Clojure~--- программу, которая читает список и вы
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (date-range-sec nil #inst "2019")
 ;; Execution error - invalid arguments
 ;; to date-range-sec
 ;; nil - failed: inst? at: [:start]
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (date-range-sec nil #inst "2019")
 ;; Execution error - invalid arguments to date-range-sec
 ;; nil - failed: inst? at: [:start]
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -4445,8 +4445,8 @@ Clojure~--- программу, которая читает список и вы
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (clojure.repl/doc date-range-sec)
 -------------------------
 ([date1 date2])
@@ -4455,13 +4455,13 @@ Clojure~--- программу, которая читает список и вы
 Spec
   args: (cat :start inst? :end inst?)
   ret: int?
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (clojure.repl/doc date-range-sec)
 -------------------------
 ([date1 date2])
@@ -4469,8 +4469,8 @@ Spec
 Spec
   args: (cat :start inst? :end inst?)
   ret: int?
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -4496,26 +4496,26 @@ Spec
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (time
  (dotimes [n 10000]
    (date-range-sec #inst "2019"
                    #inst "2020")))
 ;; Elapsed time: 1.783962 msecs
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (time
  (dotimes [n 10000]
    (date-range-sec #inst "2019" #inst "2020")))
 ;; Elapsed time: 1.783962 msecs
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -4526,26 +4526,26 @@ Spec
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (time
  (dotimes [n 10000]
    (date-range-sec #inst "2019"
                    #inst "2020")))
 ;; Elapsed time: 116.984496 msecs
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (time
  (dotimes [n 10000]
    (date-range-sec #inst "2019" #inst "2020")))
 ;; Elapsed time: 116.984496 msecs
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -4579,41 +4579,41 @@ Spec
 
 \index{форматы!EDN}
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 {:db {:dbtype "mysql"
       :host "127.0.0.1"
       :port 3306
       :dbname "project"
       :user "user"}}
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Ключи \code{:dbtype}, \code{:host} и другие уже описаны в библиотеке. Один из её
 модулей несёт спеки подключения и основных функций. Используем их повторно:
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (require
   '[clojure.java.jdbc.spec :as jdbc])
 
 (s/def ::db ::jdbc/db-spec)
 (s/def ::config (s/keys :req-un [::db]))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (require '[clojure.java.jdbc.spec :as jdbc])
 
 (s/def ::db ::jdbc/db-spec)
 (s/def ::config (s/keys :req-un [::db]))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -4622,22 +4622,22 @@ Spec
 
 \ifnarrow
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (def config
   (read-string (slurp "config.edn")))
 (s/valid? ::config config)
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \else
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (def config (read-string (slurp "config.edn")))
 (s/valid? ::config config)
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \fi
 
@@ -4649,8 +4649,8 @@ Spec
 \code{s/or}, которые порождают развилки. Если передать её в
 \code{s/conform}, получим поля с тегами (строки 3, 4, 6):
 
-\begin{english}
-  \begin{clojure/lines}
+
+\begin{clojure/lines}
 (s/conform ::config config)
 {:db
  [:friendly
@@ -4660,8 +4660,8 @@ Spec
    :dbname   "project"
    :user     "user"
    :password "********"}]}
-  \end{clojure/lines}
-\end{english}
+\end{clojure/lines}
+
 
 Такой результат не работает с \code{query} и другими функциями JDBC, которые
 ожидают первым параметром словарь подключения. Мы ограничились \code{s/valid?},
@@ -4691,8 +4691,8 @@ Spec входит в поставку Clojure и поэтому меняется
 \index{spec!ошибки}
 \index{сообщения}
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (expound/expound string? 1)
 -- Spec failed --------------------
   1
@@ -4700,8 +4700,8 @@ should satisfy
   string?
 -------------------------
 Detected 1 error
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \index{spec!explain}
 
@@ -4728,43 +4728,43 @@ Clojure. Expound подойдёт для проверки конфигураци
 
 Spec-tools закрывает эту проблему. Добавьте библиотеку в проект:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 [metosin/spec-tools "0.10.4"]
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Объявим простую спеку пользователя:
 
 \iflarge\vspace{15mm}\pagebreak[4]\fi
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def :user/name ::ne-string)
 (s/def :user/age pos-int?)
 
 (s/def :user/user
   (s/keys :req-un [:user/name :user/age]))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Чтобы получить из спеки JSON-схему, передайте её в функцию \code{transform}:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (require '[spec-tools.json-schema
            :as json-schema])
 
 (json-schema/transform :user/user)
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 В результате получим словарь:
 
 \ifafive\vspace{15mm}\pagebreak[4]\fi
 
-\begin{english}
-  \begin{clojure/lines}
+
+\begin{clojure/lines}
 {:type "object"
  :properties
  {"name" {:type "string"}
@@ -4773,8 +4773,8 @@ Spec-tools закрывает эту проблему. Добавьте библ
          :minimum 1}}
  :required ["name" "age"]
  :title "user/user"}
-  \end{clojure/lines}
-\end{english}
+\end{clojure/lines}
+
 
 Обратите внимание, что предикату \code{pos-int?} соответствует минимальное
 значение~--- единица \coderef{6}. Spec-tools учитывает все встроенные предикаты
@@ -4795,13 +4795,13 @@ Spec-tools закрывает эту проблему. Добавьте библ
 макрос \code{s/keys}~--- он принимает только ключи спек, но не предикаты. Это
 значит, не получится описать спеку как в примере ниже:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::user
   {:name string?
    :age pos-int?})
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Библиотека \footurl{Spec-dict}{https://github.com/igrishaev/spec-dict}[Spec-dict]
 разрешает такую запись. Функция \code{dict} принимает словарь, где значения~--- предикаты
@@ -4809,8 +4809,8 @@ Spec-tools закрывает эту проблему. Добавьте библ
 по заданным предикатам. Спеки-словари могут быть вложенными. Вот как задать
 спеку записи в блог, где автор~--- вложенное поле:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 [spec-dict "0.2.1"] ;; project.clj
 
 (require '[spec-dict :refer [dict dict*]])
@@ -4819,8 +4819,8 @@ Spec-tools закрывает эту проблему. Добавьте библ
  (dict {:title string?
         :author (dict {:name string?
                        :email string?})}))
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 Новый синтаксис значительно сокращает описание словарей. Перечислим другие
 особенности библиотеки.
@@ -4830,24 +4830,24 @@ Spec-tools закрывает эту проблему. Добавьте библ
 \item
   Ключи словаря могут быть любого типа, например строкой, числом или датой:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::data (dict {"name" string?}))
 
 (s/valid? ::data {"name" "Test"})
 ;; true
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \item
   В \code{dict} можно передать несколько словарей, и они сольются в один. Если
   предварить словарь синтаксисом \code{\^:opt}, его ключи станут необязательными:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (dict {:name string?} ^:opt {:age int?})
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \item
   Спека, полученная из функции \code{dict}, поддерживает \code{conform} и \code{unform},
@@ -4859,16 +4859,16 @@ Spec-tools закрывает эту проблему. Добавьте библ
   порой это критически важно. В примере ниже данные не пройдут валидацию из-за
   ключа \code{:extra}, который не предусмотрен спекой:
 
-\begin{english}
-  \begin{clojure}
+
+\begin{clojure}
 (s/def ::user-strict
   (dict* {:name string? :age pos-int?}))
 
 (s/valid? ::user-strict
   {:name "test" :age 30 :extra 1})
 ;; false
-  \end{clojure}
-\end{english}
+\end{clojure}
+
 
 \end{itemize}
 
