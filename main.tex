@@ -40,7 +40,7 @@
 \setlength{\marginparoffset}{0mm}
 
 
-\usepackage[T2A]{fontenc}
+\usepackage[T1,T2A]{fontenc}
 \usepackage{tikz}
 \usepackage{tocloft}
 \usepackage{geometry}
@@ -95,7 +95,9 @@
 \usepackage{qrcode}
 
 % to have bold tt fonts in code listings
-\usepackage{bold-extra}
+% \usepackage{bold-extra}
+
+\renewcommand{\ttdefault}{lmtt}
 
 % better macro args
 \usepackage{xparse}
@@ -210,6 +212,8 @@
 \fi
 
 \begin{document}
+
+\selectlanguage{russian}
 
 \input{hyphenation}
 
